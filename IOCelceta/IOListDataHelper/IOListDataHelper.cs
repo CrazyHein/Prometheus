@@ -11,31 +11,49 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
 {
     public enum IO_LIST_FILE_ERROR_T : int
     {
-        NO_ERROR = 0x00000000,
-        FILE_LOAD_ERROR = 0x00000001,
-        UNSUPPORTED_FILE_FORMAT_VERSION = 0x00000002,
-        ELEMENT_MISSING = 0x00000003,
-        FILE_DATA_EXCEPTION = 0x00000004,
+        NO_ERROR                                                = 0x00000000,
+        FILE_LOAD_ERROR                                         = 0x00000001,
+        UNSUPPORTED_FILE_FORMAT_VERSION                         = 0x00000002,
+        ELEMENT_MISSING                                         = 0x00000003,
+        FILE_DATA_EXCEPTION                                     = 0x00000004,
 
-        INVALID_CONTROLLER_EXTENSION_MODEL = 0x00000010,
-        INVALID_CONTROLLER_ETHERNET_MODEL = 0x00000011,
-        DUPLICATE_MODULE_REFERENCE_NAME = 0x00000012,
-        INVALID_CONTROLLER_MODEL = 0x00000013,
-        INVALID_CONTROLLER_MODEL_ID = 0x00000014,
+        INVALID_CONTROLLER_EXTENSION_MODEL                      = 0x00000010,
+        INVALID_CONTROLLER_ETHERNET_MODEL                       = 0x00000011,
+        DUPLICATE_MODULE_REFERENCE_NAME                         = 0x00000012,
+        INVALID_CONTROLLER_MODEL                                = 0x00000013,
+        INVALID_CONTROLLER_MODEL_ID                             = 0x00000014,
 
-        INVALID_OBJECT_DATA_TYPE = 0x00000020,
-        DUPLICATE_OBJECT_INDEX = 0x00000021,
-        INVALID_OBJECT_BINDING_MODULE = 0x00000022,
-        INVALID_OBJECT_BINDING_MODULE_REFERENCE_NAME = 0x00000023,
-        INVALID_OBJECT_BINDING_MODULE_CHANNEL = 0x00000024,
-        INVALID_OBJECT_BINDING_MODULE_CHANNEL_INDEX = 0x00000025,
-        INVALID_OBJECT_CONVERTER_DATA_TYPE = 0x00000026, 
-        INVALID_BIT_OBJECT_INDEX = 0x00000030,
-        INVALID_BLOCK_OBJECT_INDEX = 0x00000031,
+        INVALID_OBJECT_DATA_TYPE                                = 0x00000020,
+        DUPLICATE_OBJECT_INDEX                                  = 0x00000021,
+        INVALID_OBJECT_BINDING_MODULE                           = 0x00000022,
+        INVALID_OBJECT_BINDING_MODULE_REFERENCE_NAME            = 0x00000023,
+        INVALID_OBJECT_BINDING_MODULE_CHANNEL                   = 0x00000024,
+        INVALID_OBJECT_BINDING_MODULE_CHANNEL_INDEX             = 0x00000025,
+        INVALID_OBJECT_CONVERTER_DATA_TYPE                      = 0x00000026, 
+        INVALID_BIT_OBJECT_INDEX                                = 0x00000030,
+        INVALID_BLOCK_OBJECT_INDEX                              = 0x00000031,
+
+        INVALID_OBJECT_REFERENCE_IN_PDO                         = 0x00000040,
+        INVALID_OBJECT_REFERENCE_ID_IN_PDO                      = 0x00000041,
+
+        INVALID_OBJECT_REFERENCE_IN_PDO_AREA                    = 0x00000042,
+        PDO_AREA_OUT_OF_RANGE                                   = 0x00000043,
+        PDO_AREA_OVERLAPPED                                     = 0x00000044,
+
+        MODULE_IS_REFERENCED_BY_OBJECT                          = 0x000000F0,
+        OBJECT_IS_REFERENCED_BY_PDO                             = 0x000000F1,
         
-        MODULE_IS_REFERENCED_BY_OBJECT = 0x000000F0,
-        OBJECT_IS_REFERENCED_BY_PDO = 0x0000000F1,
-        
+    }
+
+    public enum IO_LIST_PDO_AREA_T : byte
+    {
+        TX_DIAGNOSTIC           = 0x01,
+        TX_BIT                  = 0x02,
+        TX_BLOCK                = 0x03,
+
+        RX_CONTROL              = 0x11,
+        RX_BIT                  = 0x12,
+        RX_BLOCK                = 0x13,
     }
 
     public class IOListParseExcepetion : Exception
@@ -60,14 +78,18 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
         public IO_LIST_TARGET_INFORMATION_T TargetInformation;
         private IO_LIST_CONTROLLER_INFORMATION_T __controller_information;
         private IO_LIST_OBJECT_COLLECTION_T __object_collection;
-        //public IReadOnlyDictionary<string, int> ControllerModuleReferenceCounter { get { return __mudule_reference_counter; } }
+        private IO_LIST_CONTROLLER_PDO_COLLECTION __controller_pdo_collection;
 
         public IOListDataHelper(ControllerModuleCatalogue controllerCatalogue, DataTypeCatalogue dataTypeCatalogue)
         {
             __supported_file_format_version = 1;
             __module_reference_counter = new Dictionary<string, int>();
             __object_reference_counter = new Dictionary<uint, int>();
-            SetDefault();
+
+            TargetInformation = new IO_LIST_TARGET_INFORMATION_T();
+            __controller_information = new IO_LIST_CONTROLLER_INFORMATION_T("127.0.0.1", 5010);
+            __object_collection = new IO_LIST_OBJECT_COLLECTION_T();
+            __controller_pdo_collection = new IO_LIST_CONTROLLER_PDO_COLLECTION();
 
             ControllerCatalogue = controllerCatalogue;
             DataTypeCatalogue = dataTypeCatalogue;
@@ -77,9 +99,11 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
         {
             __module_reference_counter.Clear();
             __object_reference_counter.Clear();
-            TargetInformation = new IO_LIST_TARGET_INFORMATION_T("AMEC Etch Tool");
-            __controller_information = new IO_LIST_CONTROLLER_INFORMATION_T("127.0.0.1", 5010);
-            __object_collection = new IO_LIST_OBJECT_COLLECTION_T();
+
+            TargetInformation.Clear();
+            __controller_information.Clear();
+            __object_collection.Clear();
+            __controller_pdo_collection.Clear();
         }
 
         public ControllerModuleCatalogue ControllerCatalogue { get; }
@@ -317,7 +341,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                                     mask |= 0x00000008;
                                     break;
                                 case "Converter":
-                                    __load_object_converter_info(node, ref objectDefinition.converter);
+                                    __load_object_converter_info(node, objectDefinition.converter);
                                     mask |= 0x00000010;
                                     break;
                             }
@@ -389,7 +413,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
             }
         }
 
-        private void __load_object_converter_info(XmlNode converterNode, ref IO_LIST_OBJECT_COLLECTION_T.VALUE_CONVERTER_T converterData)
+        private void __load_object_converter_info(XmlNode converterNode, IO_LIST_OBJECT_COLLECTION_T.VALUE_CONVERTER_T converterData)
         {
             uint mask = 0;
             converterData.enabled = false;
@@ -439,6 +463,87 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                 throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.FILE_DATA_EXCEPTION, e);
             }
         }
+
+        private void __load_controller_pdo_collection(XmlNode areaNode, IO_LIST_CONTROLLER_PDO_COLLECTION.PDO_DEFINITION_T pdo, IO_LIST_PDO_AREA_T area)
+        {
+            uint actualPdoSizeInWord = 0;
+            uint actualPdoSizeInBit = 0;
+
+            try
+            {
+                if (areaNode.NodeType == XmlNodeType.Element)
+                {
+                    pdo.offset_in_word = Convert.ToUInt32(areaNode.Attributes.GetNamedItem("WordOffset").Value, 10);
+                    pdo.size_in_word = Convert.ToUInt32(areaNode.Attributes.GetNamedItem("WordSize").Value, 10);
+                    foreach(XmlNode index in areaNode.ChildNodes)
+                    {
+                        if(index.Name == "Index")
+                        {
+                            uint id = Convert.ToUInt32(index.FirstChild.Value, 16);
+                            IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T objectData = __object_collection.objects[id];
+                            PdoObjectReferenceVerification(area, objectData);
+
+                            if (area == IO_LIST_PDO_AREA_T.RX_BIT || area == IO_LIST_PDO_AREA_T.TX_BIT)
+                            {
+                                actualPdoSizeInBit += objectData.data_type.BitSize;
+                                if (actualPdoSizeInBit % 8 == 0)
+                                    actualPdoSizeInWord = actualPdoSizeInBit / 8;
+                                else
+                                    actualPdoSizeInWord = actualPdoSizeInBit / 8 + 1;
+                            }
+                            else
+                            {
+                                if (objectData.data_type.BitSize % 8 == 0)
+                                    actualPdoSizeInWord += objectData.data_type.BitSize / 8;
+                                else
+                                    actualPdoSizeInWord += objectData.data_type.BitSize / 8 + 1;
+                            }
+
+                            if (actualPdoSizeInWord > pdo.size_in_word)
+                                throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.PDO_AREA_OUT_OF_RANGE, null);
+
+                            __object_reference_counter[id]++;
+                            pdo.objects.Add(__object_collection.objects[id]);
+                            pdo.actual_size_in_byte = actualPdoSizeInWord;
+                        }
+                    }
+                }
+            }
+            catch (IOListParseExcepetion e)
+            {
+                throw e;
+            }
+            catch (Exception e)
+            {
+                throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.FILE_DATA_EXCEPTION, e);
+            }
+        }
+
+        private bool __overlap_detector(Tuple<uint, uint>[] ranges)
+        {
+            int counter = ranges.Length;
+
+            for(int i = 0; i < counter - 1; ++i)
+            {
+                for(int j = 0; j < counter - 1 - i; ++j)
+                {
+                    if(ranges[j].Item1 > ranges[j + 1].Item1)
+                    {
+                        Tuple<uint, uint> temp = ranges[j];
+                        ranges[j] = ranges[j + 1];
+                        ranges[j + 1] = temp;
+                    }
+                }
+            }
+            for (int i = 0; i < counter - 1; ++i)
+            {
+                if (ranges[i].Item1 + ranges[i].Item2 > ranges[i + 1].Item1)
+                    return true;
+            }
+
+            return false;
+        }
+
         public void ModuleDataVerification(IO_LIST_CONTROLLER_INFORMATION_T.MODULE_T moduleData, bool ignoreDuplicate = false)
         {
             if (ignoreDuplicate == false && __controller_information.modules.Keys.Contains(moduleData.reference_name) == true)
@@ -503,8 +608,43 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                 if (objectData.converter.data_type == null)
                     throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_OBJECT_CONVERTER_DATA_TYPE, null);
             }
+        }
 
+        public void PdoObjectReferenceVerification(IO_LIST_PDO_AREA_T area, IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T objectData)
+        {
+            if(objectData == null)
+                throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_OBJECT_REFERENCE_IN_PDO, null);
+            if(__object_collection.objects.Keys.Contains(objectData.index) && 
+                __object_collection.objects[objectData.index] == objectData)
+            {
+                uint index = objectData.index & 0x7FFFFFFF;
+                bool isTx = ((objectData.index & 0x80000000) != 0);
+                bool isRx = ((objectData.index & 0x80000000) == 0);
+                switch (area)
+                {
+                    case IO_LIST_PDO_AREA_T.TX_DIAGNOSTIC:
+                    case IO_LIST_PDO_AREA_T.TX_BLOCK:
+                        if (isRx == true || index < 0x00002000)
+                            throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_OBJECT_REFERENCE_IN_PDO_AREA, null);
+                        break;
+                    case IO_LIST_PDO_AREA_T.TX_BIT:
+                        if (isRx == true || index >= 0x00002000)
+                            throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_OBJECT_REFERENCE_IN_PDO_AREA, null);
+                        break;
 
+                    case IO_LIST_PDO_AREA_T.RX_CONTROL:
+                    case IO_LIST_PDO_AREA_T.RX_BLOCK:
+                        if (isTx == true || index < 0x00002000)
+                            throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_OBJECT_REFERENCE_IN_PDO_AREA, null);
+                        break;
+                    case IO_LIST_PDO_AREA_T.RX_BIT:
+                        if (isTx == true || index >= 0x00002000)
+                            throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_OBJECT_REFERENCE_IN_PDO_AREA, null);
+                        break;
+                }
+            }
+            else
+                throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_OBJECT_REFERENCE_ID_IN_PDO, null);
         }
 
         public void Load(string ioList)
@@ -520,16 +660,12 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                 if (__supported_file_format_version < FileFormatVersion)
                     throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.UNSUPPORTED_FILE_FORMAT_VERSION, null);
 
+                SetDefault();
+
                 XmlNode infoNode =  xmlDoc.SelectSingleNode("/AMECIOList/TargetInfo");
                 __load_target_info(infoNode);
                 infoNode = xmlDoc.SelectSingleNode("/AMECIOList/ControllerInfo/MCServer");
                 __load_mc_server_info(infoNode);
-                
-
-                __controller_information.modules.Clear();
-                __module_reference_counter.Clear();
-                __object_collection.objects.Clear();
-                __object_reference_counter.Clear();
 
                 infoNode = xmlDoc.SelectSingleNode("/AMECIOList/ControllerInfo/ExtensionModules");
                 __load_controller_extension_modules(infoNode);
@@ -539,6 +675,32 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                 infoNode = xmlDoc.SelectSingleNode("/AMECIOList/Objects");
                 __load_object_collection(infoNode);
 
+                infoNode = xmlDoc.SelectSingleNode("/AMECIOList/TxPDO/DiagArea");
+                __load_controller_pdo_collection(infoNode, __controller_pdo_collection.tx_pdo_diagnostic_area, IO_LIST_PDO_AREA_T.TX_DIAGNOSTIC);
+                infoNode = xmlDoc.SelectSingleNode("/AMECIOList/TxPDO/BitArea");
+                __load_controller_pdo_collection(infoNode, __controller_pdo_collection.tx_pdo_bit_area, IO_LIST_PDO_AREA_T.TX_BIT);
+                infoNode = xmlDoc.SelectSingleNode("/AMECIOList/TxPDO/BlockArea");
+                __load_controller_pdo_collection(infoNode, __controller_pdo_collection.tx_pdo_block_area, IO_LIST_PDO_AREA_T.TX_BLOCK);
+
+                infoNode = xmlDoc.SelectSingleNode("/AMECIOList/RxPDO/ControlArea");
+                __load_controller_pdo_collection(infoNode, __controller_pdo_collection.rx_pdo_control_area, IO_LIST_PDO_AREA_T.RX_CONTROL);
+                infoNode = xmlDoc.SelectSingleNode("/AMECIOList/RxPDO/BitArea");
+                __load_controller_pdo_collection(infoNode, __controller_pdo_collection.rx_pdo_bit_area, IO_LIST_PDO_AREA_T.RX_BIT);
+                infoNode = xmlDoc.SelectSingleNode("/AMECIOList/RxPDO/BlockArea");
+                __load_controller_pdo_collection(infoNode, __controller_pdo_collection.rx_pdo_block_area, IO_LIST_PDO_AREA_T.RX_BLOCK);
+
+                bool overlap = __overlap_detector(new Tuple<uint, uint>[] {
+                    new Tuple<uint, uint>(__controller_pdo_collection.tx_pdo_diagnostic_area.offset_in_word, __controller_pdo_collection.tx_pdo_diagnostic_area.size_in_word),
+                    new Tuple<uint, uint>(__controller_pdo_collection.tx_pdo_bit_area.offset_in_word, __controller_pdo_collection.tx_pdo_bit_area.size_in_word),
+                    new Tuple<uint, uint>(__controller_pdo_collection.tx_pdo_block_area.offset_in_word, __controller_pdo_collection.tx_pdo_block_area.size_in_word),
+                    new Tuple<uint, uint>(__controller_pdo_collection.rx_pdo_control_area.offset_in_word, __controller_pdo_collection.rx_pdo_control_area.size_in_word),
+                    new Tuple<uint, uint>(__controller_pdo_collection.rx_pdo_bit_area.offset_in_word, __controller_pdo_collection.rx_pdo_bit_area.size_in_word),
+                    new Tuple<uint, uint>(__controller_pdo_collection.rx_pdo_block_area.offset_in_word, __controller_pdo_collection.rx_pdo_block_area.size_in_word)});
+                if(overlap == true)
+                {
+                    __controller_pdo_collection.Clear();
+                    throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.PDO_AREA_OVERLAPPED, null);
+                }
             }
             catch (IOListParseExcepetion e)
             {
@@ -696,15 +858,15 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
         public string name;
         public string description;
 
-        public IO_LIST_TARGET_INFORMATION_T(string targetToolName, string description)
+        public IO_LIST_TARGET_INFORMATION_T()
         {
-            name = targetToolName;
-            this.description = description;
+            name = "AMEC Etch Tool";
+            description = "Input Tool Description Here";
         }
 
-        public IO_LIST_TARGET_INFORMATION_T(string targetToolName)
+        public void Clear()
         {
-            name = targetToolName;
+            name = "AMEC Etch Tool";
             description = "Input Tool Description Here";
         }
     }
@@ -745,6 +907,20 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
             mc_server_ip_address = mcServerIPAddr;
             mc_server_port = mcServerPort;
             modules = new Dictionary<string, MODULE_T>();
+        }
+
+        public IO_LIST_CONTROLLER_INFORMATION_T()
+        {
+            mc_server_ip_address = "127.0.0.1";
+            mc_server_port = 5010;
+            modules = new Dictionary<string, MODULE_T>();
+        }
+
+        public void Clear()
+        {
+            mc_server_ip_address = "127.0.0.1";
+            mc_server_port = 5010;
+            modules.Clear();
         }
     }
 
@@ -821,6 +997,61 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
         public IO_LIST_OBJECT_COLLECTION_T()
         {
             objects = new Dictionary<uint, OBJECT_DEFINITION_T>();
+        }
+
+        public void Clear()
+        {
+            objects.Clear();
+        }
+    }
+
+    public class IO_LIST_CONTROLLER_PDO_COLLECTION
+    {
+        public class PDO_DEFINITION_T
+        {
+            public uint offset_in_word = 0;
+            public uint size_in_word = 0;
+            public uint actual_size_in_byte = 0;
+            public List<IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T> objects = new List<IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T>();
+        }
+
+        public PDO_DEFINITION_T tx_pdo_diagnostic_area = new PDO_DEFINITION_T();
+        public PDO_DEFINITION_T tx_pdo_bit_area = new PDO_DEFINITION_T();
+        public PDO_DEFINITION_T tx_pdo_block_area = new PDO_DEFINITION_T();
+
+        public PDO_DEFINITION_T rx_pdo_control_area = new PDO_DEFINITION_T();
+        public PDO_DEFINITION_T rx_pdo_bit_area = new PDO_DEFINITION_T();
+        public PDO_DEFINITION_T rx_pdo_block_area = new PDO_DEFINITION_T();
+
+        public void Clear()
+        {
+            tx_pdo_diagnostic_area.objects.Clear();
+            tx_pdo_diagnostic_area.offset_in_word = 0;
+            tx_pdo_diagnostic_area.size_in_word = 0;
+
+            tx_pdo_bit_area.objects.Clear();
+            tx_pdo_bit_area.offset_in_word = 0;
+            tx_pdo_bit_area.size_in_word = 0;
+
+            tx_pdo_block_area.objects.Clear();
+            tx_pdo_block_area.offset_in_word = 0;
+            tx_pdo_block_area.size_in_word = 0;
+
+            tx_pdo_diagnostic_area.objects.Clear();
+            tx_pdo_diagnostic_area.offset_in_word = 0;
+            tx_pdo_diagnostic_area.size_in_word = 0;
+
+            rx_pdo_control_area.objects.Clear();
+            rx_pdo_control_area.offset_in_word = 0;
+            rx_pdo_control_area.size_in_word = 0;
+
+            rx_pdo_bit_area.objects.Clear();
+            rx_pdo_bit_area.offset_in_word = 0;
+            rx_pdo_bit_area.size_in_word = 0;
+
+            rx_pdo_block_area.objects.Clear();
+            rx_pdo_block_area.offset_in_word = 0;
+            rx_pdo_block_area.size_in_word = 0;
         }
     }
 }
