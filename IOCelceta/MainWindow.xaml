@@ -1,0 +1,75 @@
+﻿<Window x:Class="AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta"
+        mc:Ignorable="d"
+        Title="IO Celceta" Height="450" Width="800" WindowState="Maximized" Closing="__on_main_window_closing">
+    <Window.CommandBindings>
+        <CommandBinding Command="local:ConsoleControl.OpenIOListFile" Executed="__open_io_list_file_executed"/>
+        <CommandBinding Command="local:ConsoleControl.NewIOListFile" Executed="__new_io_list_file_executed"/>
+        <CommandBinding Command="local:ConsoleControl.OpenAboutDialog"/>
+        <CommandBinding Command="local:ConsoleControl.OpenCatalogueDialog" Executed="__open_catalogue_dialog_executed"/>
+    </Window.CommandBindings>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition />
+        </Grid.RowDefinitions>
+
+        <Menu Grid.Row="0">
+            <MenuItem Header="_File" Margin="3">
+                <MenuItem Command="local:ConsoleControl.OpenIOListFile">
+                    <MenuItem.Icon>
+                        <Image Source="img/edit_file.png"/>
+                    </MenuItem.Icon>
+                    
+                </MenuItem>
+                <MenuItem Command="local:ConsoleControl.NewIOListFile">
+                    <MenuItem.Icon>
+                        <Image Source="img/new_file.png"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+            </MenuItem>
+            <MenuItem Header="_Tool" Margin="3">
+                <MenuItem Command="local:ConsoleControl.OpenCatalogueDialog">
+                    <MenuItem.Icon>
+                        <Image Source="img/catalogue.png"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Command="local:ConsoleControl.OpenAboutDialog">
+                    <MenuItem.Icon>
+                        <Image Source="img/about.png"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+            </MenuItem>
+        </Menu>
+        <TabControl Grid.Row="1" Margin="4">
+            <TabItem Width="200" Name="__tab_target_inforamtion">
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="img/info.png" Height="32" Margin="2,2,8,2"/>
+                        <TextBlock Text="Target Info" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </TabItem.Header>
+            </TabItem>
+            <TabItem Width="200" Name="__tab_controller_inforamtion" >
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="img/controller_configuration.png" Height="32" Margin="2,2,8,2"/>
+                        <TextBlock Text="Controller Info" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </TabItem.Header>
+            </TabItem>
+            <TabItem Width="200" Name="__tab_object_collection">
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="img/objects.png" Height="32" Margin="2,2,8,2"/>
+                        <TextBlock Text="Object Collection" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </TabItem.Header>
+            </TabItem>
+        </TabControl>
+    </Grid>
+</Window>

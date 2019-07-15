@@ -1,0 +1,111 @@
+﻿<Window x:Class="AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDataControl.ObjectDataControl"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDataControl"
+        mc:Ignorable="d"
+        Title="Object Data Detail" Height="250" Width="650">
+    <DockPanel Width="auto">
+        <StackPanel Orientation="Horizontal" DockPanel.Dock="Bottom" HorizontalAlignment="Right">
+            <Button Content="_OK" Margin="8" Width="120" Click="__on_ok"/>
+            <Button Content="_Cancel" Margin="8" Width="120" Click="__on_cancel"/>
+        </StackPanel>
+        <Grid Validation.Error="__on_data_binding_error">
+            <Grid.Resources>
+                <Style TargetType="ComboBox">
+                    <Setter Property="Margin" Value="4"/>
+                    <Setter Property="VerticalAlignment" Value="Center"/>
+                </Style>
+                <Style TargetType="TextBlock">
+                    <Setter Property="Margin" Value="4"/>
+                    <Setter Property="VerticalAlignment" Value="Center"/>
+                </Style>
+                <Style TargetType="TextBox">
+                    <Setter Property="Margin" Value="4"/>
+                    <Setter Property="VerticalAlignment" Value="Center"/>
+                </Style>
+            </Grid.Resources>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition Width="2"/>
+                <ColumnDefinition/>
+                <ColumnDefinition Width="2"/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <GridSplitter Grid.Column="1" Background="LightBlue" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="0,12,0,4"/>
+            <GridSplitter Grid.Column="3" Background="LightBlue" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="0,12,0,4"/>
+            <GroupBox Header="Basic Info" Margin="4">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="66"/>
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="auto"/>
+                    </Grid.RowDefinitions>
+                    <Grid.Resources>
+                        <local:ObjectItemIndexToText x:Key="IndexToText"/>
+                    </Grid.Resources>
+                    <TextBlock Text="Index : " />
+                    <TextBox Grid.Column="1" Text="{Binding Path=Index, Converter={StaticResource IndexToText}, NotifyOnValidationError=True}"/>
+
+                    <TextBlock Text="Fr. Name : " Grid.Row="1"/>
+                    <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Path=FriendlyName}"/>
+
+                    <TextBlock Text="Data Type : " Grid.Row="2"/>
+                    <ComboBox Grid.Row="2" Grid.Column="2" Name="__cmb_basic_data_type_selection" SelectedItem="{Binding Path=BasicDataTypeSelection}" Height="24"/>
+                </Grid>
+            </GroupBox>
+            <GroupBox Header="Binding" Margin="4" Grid.Column="2">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="66"/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="auto"/>
+                    </Grid.RowDefinitions>
+                    <CheckBox Content="Enable" Margin="4" IsChecked="{Binding BindingEnable}" Name="__chk_binding_enable"/>
+                    <TextBlock Text="Module : " Grid.Row="1"/>
+                    <TextBlock Text="Channel :" Grid.Row="2"/>
+                    <TextBlock Text="Index : " Grid.Row="3"/>
+
+                    <ComboBox Grid.Column="1" Grid.Row="1" Name="__cmb_binding_module_selection" SelectedItem="{Binding Path=BindingModuleSelection}" Height="24" IsEnabled="{Binding ElementName=__chk_binding_enable, Path=IsChecked}"/>
+                    <TextBox Grid.Column="1" Grid.Row="2"  IsEnabled="{Binding ElementName=__chk_binding_enable,Path=IsChecked}" Text="{Binding BindingChannelName}"/>
+                    <TextBox Grid.Column="1" Grid.Row="3"  IsEnabled="{Binding ElementName=__chk_binding_enable,Path=IsChecked}" Text="{Binding BindingChannelIndex, NotifyOnValidationError=True}"/>
+                </Grid>
+            </GroupBox>
+            <GroupBox Header="Converter" Margin="4" Grid.Column="4">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="66"/>
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="auto"/>
+                    </Grid.RowDefinitions>
+                    <CheckBox Content="Enable" Margin="4" Name="__chk_enable_converter" IsChecked="{Binding ConverterEnable}"/>
+                    <TextBlock Text="Data Type : " Grid.Row="1"/>
+                    <TextBlock Text="Up Scale :" Grid.Row="2"/>
+                    <TextBlock Text="Dw Scale : " Grid.Row="3"/>
+                    <TextBlock Text="Unit : " Grid.Row="4"/>
+
+                    <ComboBox Grid.Column="1" Grid.Row="1" Name="__cmb_coverter_data_type_selection" SelectedItem="{Binding Path=ConverterDataTypeSelection}" Height="24" IsEnabled="{Binding ElementName=__chk_enable_converter,Path=IsChecked}"/>
+                    <TextBox Grid.Column="1" Grid.Row="2" IsEnabled="{Binding ElementName=__chk_enable_converter,Path=IsChecked}" Text="{Binding ConverterUpScale, NotifyOnValidationError=True}"/>
+                    <TextBox Grid.Column="1" Grid.Row="3" IsEnabled="{Binding ElementName=__chk_enable_converter,Path=IsChecked}" Text="{Binding ConverterDownScale, NotifyOnValidationError=True}"/>
+                    <TextBox Grid.Column="1" Grid.Row="4" IsEnabled="{Binding ElementName=__chk_enable_converter,Path=IsChecked}" Text="{Binding ConverterUnitName}"/>
+                </Grid>
+            </GroupBox>
+        </Grid>
+    </DockPanel>
+</Window>

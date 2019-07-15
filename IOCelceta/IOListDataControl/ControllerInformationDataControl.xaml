@@ -1,0 +1,172 @@
+﻿<UserControl x:Class="AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDataControl.ControllerInformationDataControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDataControl"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <GroupBox Header="MC Server Info" Margin="4" Padding="8,4,8,4" Validation.Error="__on_data_binding_error">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="IP Address : " Margin="4"/>
+                <TextBlock Text="Port : " Grid.Row="1" Margin="4"/>
+
+                <TextBox Text="{Binding MCServerIPAddress, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Grid.Column="1" Margin="4"/>
+                <TextBox Text="{Binding MCServerPort, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Grid.Column="1" Grid.Row="1" Margin="4"/>
+            </Grid>
+        </GroupBox>
+        <GroupBox Header="Extension Modules" Grid.Row="1" Margin="4" Padding="8,4,8,4">
+            <DockPanel>
+                <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Right">
+                    <Button Width="120" Margin="4" Height="32" Click="__on_add_controller_extension_module_click">
+                        <Button.Content>
+                            <StackPanel Orientation="Horizontal">
+                                <Image Source="../img/add.png" Margin="2,2,8,2"/>
+                                <TextBlock Text="Add" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button.Content>
+                    </Button>
+                    <Button Width="120" Margin="4" Height="32" Click="__on_remove_controller_extension_module_click">
+                        <Button.Content>
+                            <StackPanel Orientation="Horizontal">
+                                <Image Source="../img/remove.png" Margin="2,2,8,2"/>
+                                <TextBlock Text="Remove" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button.Content>
+                    </Button>
+                </StackPanel>
+                <ListView Name="__lsv_extension_modules" MouseDoubleClick="__on_extension_modules_mouse_double_click" DockPanel.Dock="Top">
+                    <ListView.Resources>
+                        <Style TargetType="ListViewItem">
+                            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                        </Style>
+
+                        <DataTemplate x:Key="IDHeadTemplate">
+                            <TextBlock FontWeight="Bold" Text="ID"/>
+                        </DataTemplate>
+                        <DataTemplate x:Key="IDContentTemplate">
+                            <TextBlock Text="{Binding Path=ID, StringFormat=0x{0:X4}}" Margin="4" HorizontalAlignment="Left"/>
+                        </DataTemplate>
+
+                        <DataTemplate x:Key="NameHeadTemplate">
+                            <TextBlock FontWeight="Bold" Text="Name"/>
+                        </DataTemplate>
+                        <DataTemplate x:Key="NameContentTemplate">
+                            <TextBlock Text="{Binding Path=Name}" Margin="4" HorizontalAlignment="Left"/>
+                        </DataTemplate>
+
+                        <DataTemplate x:Key="ReferenceNameHeadTemplate">
+                            <TextBlock FontWeight="Bold" Text="Reference Name"/>
+                        </DataTemplate>
+                        <DataTemplate x:Key="ReferenceNameContentTemplate">
+                            <TextBlock Text="{Binding Path=ReferenceName}" Margin="4" HorizontalAlignment="Left"/>
+                        </DataTemplate>
+
+                        <DataTemplate x:Key="AddressHeadTemplate">
+                            <TextBlock FontWeight="Bold" Text="Address"/>
+                        </DataTemplate>
+                        <DataTemplate x:Key="AddressContentTemplate">
+                            <TextBlock Text="{Binding Path=Address, StringFormat=0x{0:X4}}" Margin="4" HorizontalAlignment="Left"/>
+                        </DataTemplate>
+                    </ListView.Resources>
+                    <ListView.View>
+                        <GridView>
+                            <GridViewColumn Width="80" HeaderTemplate="{StaticResource IDHeadTemplate}" CellTemplate="{StaticResource IDContentTemplate}"/>
+                            <GridViewColumn Width="120" HeaderTemplate="{StaticResource NameHeadTemplate}" CellTemplate="{StaticResource NameContentTemplate}"/>
+                            <GridViewColumn Width="200" HeaderTemplate="{StaticResource ReferenceNameHeadTemplate}" CellTemplate="{StaticResource ReferenceNameContentTemplate}"/>
+                            <GridViewColumn Width="80" HeaderTemplate="{StaticResource AddressHeadTemplate}" CellTemplate="{StaticResource AddressContentTemplate}"/>
+                        </GridView>
+                    </ListView.View>
+                </ListView>
+            </DockPanel>
+        </GroupBox>
+
+        <GroupBox Header="Ethernet Modules" Grid.Row="2" Margin="4" Padding="8,4,8,4">
+            <DockPanel>
+                <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Right">
+                    <Button Width="120" Margin="4" Height="32" Click="__on_add_controller_ethernet_module_click">
+                        <Button.Content>
+                            <StackPanel Orientation="Horizontal">
+                                <Image Source="../img/add.png" Margin="2,2,8,2"/>
+                                <TextBlock Text="Add" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button.Content>
+                    </Button>
+                    <Button Width="120" Margin="4" Height="32" Click="__on_remove_controller_ethernet_module_click">
+                        <Button.Content>
+                            <StackPanel Orientation="Horizontal">
+                                <Image Source="../img/remove.png" Margin="2,2,8,2"/>
+                                <TextBlock Text="Remove" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button.Content>
+                    </Button>
+                </StackPanel>
+                <ListView Name="__lsv_ethernet_modules" MouseDoubleClick="__on_ethernet_modules_mouse_double_click">
+                    <ListView.Resources>
+                        <Style TargetType="ListViewItem">
+                            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                        </Style>
+
+                        <DataTemplate x:Key="IDHeadTemplate">
+                            <TextBlock FontWeight="Bold" Text="ID"/>
+                        </DataTemplate>
+                        <DataTemplate x:Key="IDContentTemplate">
+                            <TextBlock Text="{Binding Path=ID, StringFormat=0x{0:X4}}" Margin="4" HorizontalAlignment="Left"/>
+                        </DataTemplate>
+
+                        <DataTemplate x:Key="NameHeadTemplate">
+                            <TextBlock FontWeight="Bold" Text="Name"/>
+                        </DataTemplate>
+                        <DataTemplate x:Key="NameContentTemplate">
+                            <TextBlock Text="{Binding Path=Name}" Margin="4" HorizontalAlignment="Left"/>
+                        </DataTemplate>
+
+                        <DataTemplate x:Key="ReferenceNameHeadTemplate">
+                            <TextBlock FontWeight="Bold" Text="Reference Name"/>
+                        </DataTemplate>
+                        <DataTemplate x:Key="ReferenceNameContentTemplate">
+                            <TextBlock Text="{Binding Path=ReferenceName}" Margin="4" HorizontalAlignment="Left"/>
+                        </DataTemplate>
+
+                        <DataTemplate x:Key="IPAddressHeadTemplate">
+                            <TextBlock FontWeight="Bold" Text="IP Address"/>
+                        </DataTemplate>
+                        <DataTemplate x:Key="IPAddressContentTemplate">
+                            <TextBlock Text="{Binding Path=IPAddress}" Margin="4" HorizontalAlignment="Left"/>
+                        </DataTemplate>
+
+                        <DataTemplate x:Key="PortHeadTemplate">
+                            <TextBlock FontWeight="Bold" Text="Port"/>
+                        </DataTemplate>
+                        <DataTemplate x:Key="PortContentTemplate">
+                            <TextBlock Text="{Binding Path=Port}" Margin="4" HorizontalAlignment="Left"/>
+                        </DataTemplate>
+                    </ListView.Resources>
+                    <ListView.View>
+                        <GridView>
+                            <GridViewColumn Width="80" HeaderTemplate="{StaticResource IDHeadTemplate}" CellTemplate="{StaticResource IDContentTemplate}"/>
+                            <GridViewColumn Width="120" HeaderTemplate="{StaticResource NameHeadTemplate}" CellTemplate="{StaticResource NameContentTemplate}"/>
+                            <GridViewColumn Width="200" HeaderTemplate="{StaticResource ReferenceNameHeadTemplate}" CellTemplate="{StaticResource ReferenceNameContentTemplate}"/>
+                            <GridViewColumn Width="120" HeaderTemplate="{StaticResource IPAddressHeadTemplate}" CellTemplate="{StaticResource IPAddressContentTemplate}"/>
+                            <GridViewColumn Width="80" HeaderTemplate="{StaticResource PortHeadTemplate}" CellTemplate="{StaticResource PortContentTemplate}"/>
+                        </GridView>
+                    </ListView.View>
+                </ListView>
+            </DockPanel>
+        </GroupBox>
+    </Grid>
+</UserControl>
