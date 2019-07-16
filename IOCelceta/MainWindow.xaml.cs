@@ -24,13 +24,14 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
     {
         private CatalogueWindowDataModel __catalogue_window_data_model;
         private DataTypeCatalogue __data_type_catalogue;
-        private ControllerModuleCatalogue __controller_module_catalogue;
+        private ControllerModelCatalogue __controller_model_catalogue;
         private IOListDataHelper __io_list_data_helper;
+        private string __data_type_catalogue_exception = null;
+        private string __controller_model_catalogue_exception = null;
 
         public MainWindow()
         {
             InitializeComponent();
-            string message;
             try
             {
                 __data_type_catalogue = new DataTypeCatalogue();
@@ -39,29 +40,25 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
             catch(DataTypeCatalogueParseExcepetion e)
             {
                 if (e.ErrorCode == DATA_TYPE_CATALOGUE_FILE_ERROR_CODE_T.FILE_DATA_EXCEPTION)
-                    message = string.Format("at least one unexpected error occurred while reading [Data Type Catalogue] file . \n{0}", e.DataException.ToString());
+                    __data_type_catalogue_exception = string.Format("At least one unexpected error occurred while reading [Data Type Catalogue] file . \n{0}", e.DataException.ToString());
                 else
-                    message = string.Format("at least one unexpected error occurred while reading [Data Type Catalogue] file . \n{0}", e.ErrorCode.ToString());
-
-                MessageBox.Show(message, "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    __data_type_catalogue_exception = string.Format("At least one unexpected error occurred while reading [Data Type Catalogue] file . \n{0}", e.ErrorCode.ToString());
             }
             try
             {
-                __controller_module_catalogue = new ControllerModuleCatalogue();
-                __controller_module_catalogue.Load("controller_module_catalogue.xml");
+                __controller_model_catalogue = new ControllerModelCatalogue();
+                __controller_model_catalogue.Load("controller_model_catalogue.xml");
             }
-            catch(ModuleCatalogueParseExcepetion e)
+            catch(ModelCatalogueParseExcepetion e)
             {
-                if (e.ErrorCode == MODULE_CATALOGUE_FILE_ERROR_CODE_T.FILE_DATA_EXCEPTION)
-                    message = string.Format("at least one unexpected error occurred while reading [Controller Mudule Catalogue] file . \n{0}", e.DataException.ToString());
+                if (e.ErrorCode == MODEL_CATALOGUE_FILE_ERROR_CODE_T.FILE_DATA_EXCEPTION)
+                    __controller_model_catalogue_exception = string.Format("At least one unexpected error occurred while reading [Controller Model Catalogue] file . \n{0}", e.DataException.ToString());
                 else
-                    message = string.Format("at least one unexpected error occurred while reading [Controller Mudule Catalogue] file . \n{0}", e.ErrorCode.ToString());
-
-                MessageBox.Show(message, "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    __controller_model_catalogue_exception = string.Format("At least one unexpected error occurred while reading [Controller Model Catalogue] file . \n{0}", e.ErrorCode.ToString());
             }
 
-            __catalogue_window_data_model = new CatalogueWindowDataModel(__controller_module_catalogue, __data_type_catalogue);
-            __io_list_data_helper = new IOListDataHelper(__controller_module_catalogue, __data_type_catalogue);
+            __catalogue_window_data_model = new CatalogueWindowDataModel(__controller_model_catalogue, __data_type_catalogue);
+            __io_list_data_helper = new IOListDataHelper(__controller_model_catalogue, __data_type_catalogue);
         }
 
         private void __open_catalogue_dialog_executed(object sender, ExecutedRoutedEventArgs e)
@@ -90,9 +87,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                 catch (IOListParseExcepetion exp)
                 {
                     if (exp.ErrorCode == IO_LIST_FILE_ERROR_T.FILE_DATA_EXCEPTION)
-                        message = string.Format("at least one unexpected error occurred while reading [IO List] file . \n{0}", exp.DataException.ToString());
+                        message = string.Format("At least one unexpected error occurred while reading [IO List] file . \n{0}", exp.DataException.ToString());
                     else
-                        message = string.Format("at least one unexpected error occurred while reading [IO List] file . \n{0}", exp.ErrorCode.ToString());
+                        message = string.Format("At least one unexpected error occurred while reading [IO List] file . \n{0}", exp.ErrorCode.ToString());
 
                     MessageBox.Show(message, "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
                 }
@@ -103,10 +100,13 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                 __tab_controller_inforamtion.Content = new ControllerInformationDataControl(controllerInfoDataModel);
                 ObjectCollectionDataModel objectCollectionDataModel = new ObjectCollectionDataModel(__io_list_data_helper);
                 __tab_object_collection.Content = new ObjectCollectionDataControl(objectCollectionDataModel);
+                PDOCollectionDataModel pdoCollectionDataModel = new PDOCollectionDataModel(__io_list_data_helper);
+                __tab_pdo_collection.Content = new PDOCollectionDataControl(pdoCollectionDataModel);
 
                 ((__tab_target_inforamtion.Content as TargetInformationDataControl).DataContext as TargetInformationDataModel).UpdateDataModel();
                 ((__tab_controller_inforamtion.Content as ControllerInformationDataControl).DataContext as ControllerInformationDataModel).UpdateDataModel();
                 ((__tab_object_collection.Content as ObjectCollectionDataControl).DataContext as ObjectCollectionDataModel).UpdateDataModel();
+                ((__tab_pdo_collection.Content as PDOCollectionDataControl).DataContext as PDOCollectionDataModel).UpdateDataModel();
             }
         }
 
@@ -125,10 +125,13 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
             __tab_controller_inforamtion.Content = new ControllerInformationDataControl(controllerInfoDataModel);
             ObjectCollectionDataModel objectCollectionDataModel = new ObjectCollectionDataModel(__io_list_data_helper);
             __tab_object_collection.Content = new ObjectCollectionDataControl(objectCollectionDataModel);
+            PDOCollectionDataModel pdoCollectionDataModel = new PDOCollectionDataModel(__io_list_data_helper);
+            __tab_pdo_collection.Content = new PDOCollectionDataControl(pdoCollectionDataModel);
 
             ((__tab_target_inforamtion.Content as TargetInformationDataControl).DataContext as TargetInformationDataModel).UpdateDataModel();
             ((__tab_controller_inforamtion.Content as ControllerInformationDataControl).DataContext as ControllerInformationDataModel).UpdateDataModel();
             ((__tab_object_collection.Content as ObjectCollectionDataControl).DataContext as ObjectCollectionDataModel).UpdateDataModel();
+            ((__tab_pdo_collection.Content as PDOCollectionDataControl).DataContext as PDOCollectionDataModel).UpdateDataModel();
         }
 
         private void __on_main_window_closing(object sender, System.ComponentModel.CancelEventArgs e)
@@ -138,6 +141,14 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                 if (MessageBox.Show("Discard the changes you have made ?", "Question", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.No)
                     e.Cancel = true;
             }
+        }
+
+        private void __on_main_window_loaded(object sender, RoutedEventArgs e)
+        {
+            if(__data_type_catalogue_exception != null)
+                MessageBox.Show(__data_type_catalogue_exception, "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
+            if(__controller_model_catalogue_exception != null)
+                MessageBox.Show(__controller_model_catalogue_exception, "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
         }
     }
 

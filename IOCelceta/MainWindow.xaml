@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta"
         mc:Ignorable="d"
-        Title="IO Celceta" Height="450" Width="800" WindowState="Maximized" Closing="__on_main_window_closing">
+        Title="IO Celceta" Height="450" Width="1000" WindowState="Maximized" Closing="__on_main_window_closing" Loaded="__on_main_window_loaded">
     <Window.CommandBindings>
         <CommandBinding Command="local:ConsoleControl.OpenIOListFile" Executed="__open_io_list_file_executed"/>
         <CommandBinding Command="local:ConsoleControl.NewIOListFile" Executed="__new_io_list_file_executed"/>
@@ -67,6 +67,14 @@
                     <StackPanel Orientation="Horizontal">
                         <Image Source="img/objects.png" Height="32" Margin="2,2,8,2"/>
                         <TextBlock Text="Object Collection" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </TabItem.Header>
+            </TabItem>
+            <TabItem Width="200" Name="__tab_pdo_collection">
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="img/pdo.png" Height="32" Margin="2,2,8,2"/>
+                        <TextBlock Text="PDO Collection" VerticalAlignment="Center"/>
                     </StackPanel>
                 </TabItem.Header>
             </TabItem>

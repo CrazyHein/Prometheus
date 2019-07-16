@@ -36,16 +36,16 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
 
             if (__extension_module_data_model != null)
             {
-                __available_extension_modules = __host_data_model.DataHelper.ControllerCatalogue.ExtensionModules.Values;
-                ModuleModelInfo = __host_data_model.DataHelper.ControllerCatalogue.ExtensionModules[__extension_module_data_model.ID];
+                __available_extension_modules = __host_data_model.DataHelper.ControllerCatalogue.ExtensionModels.Values;
+                ModuleModelInfo = __host_data_model.DataHelper.ControllerCatalogue.ExtensionModels[__extension_module_data_model.ID];
                 LocalAddress = __extension_module_data_model.Address;
                 ReferenceName = __extension_module_data_model.ReferenceName;
                 IPAddress = "127.0.0.1";
             }
             else if(ethernetDataModel != null)
             {
-                __available_ethernet_modules = __host_data_model.DataHelper.ControllerCatalogue.EthernetModules.Values;
-                ModuleModelInfo = __host_data_model.DataHelper.ControllerCatalogue.EthernetModules[__ethernet_module_data_model.ID];
+                __available_ethernet_modules = __host_data_model.DataHelper.ControllerCatalogue.EthernetModels.Values;
+                ModuleModelInfo = __host_data_model.DataHelper.ControllerCatalogue.EthernetModels[__ethernet_module_data_model.ID];
                 ReferenceName = __ethernet_module_data_model.ReferenceName;
                 IPAddress = __ethernet_module_data_model.IPAddress;
                 Port = __ethernet_module_data_model.Port;

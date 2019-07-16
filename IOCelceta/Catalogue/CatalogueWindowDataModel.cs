@@ -28,11 +28,11 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.Catalogue
             UsedForDataTypesOnly = true;
         }
 
-        public CatalogueWindowDataModel(ControllerModuleCatalogue modules, DataTypeCatalogue dataTypes)
+        public CatalogueWindowDataModel(ControllerModelCatalogue modules, DataTypeCatalogue dataTypes)
         {
             __data_types = dataTypes.DataTypes.Values;
-            __extension_modules = modules.ExtensionModules.Values;
-            __ethernet_modules = modules.EthernetModules.Values;
+            __extension_modules = modules.ExtensionModels.Values;
+            __ethernet_modules = modules.EthernetModels.Values;
             UsedForDataTypesOnly = false;
         }
 

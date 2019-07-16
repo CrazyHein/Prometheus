@@ -77,6 +77,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="IOListDataControl\PDOCollectionDataControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="IOListDataControl\TargetInformationDataControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -93,8 +97,9 @@
       <DependentUpon>CatalogueWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Catalogue\CatalogueWindowDataModel.cs" />
-    <Compile Include="Catalogue\ControllerModuleCatalogue.cs" />
+    <Compile Include="Catalogue\ControllerModelCatalogue.cs" />
     <Compile Include="Catalogue\DataTypeCatalogue.cs" />
+    <Compile Include="Catalogue\VariableCatalogue.cs" />
     <Compile Include="IOListDataControl\ControllerInformationDataControl.xaml.cs">
       <DependentUpon>ControllerInformationDataControl.xaml</DependentUpon>
     </Compile>
@@ -112,6 +117,10 @@
       <DependentUpon>ObjectDataControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="IOListDataControl\ObjectDataModel.cs" />
+    <Compile Include="IOListDataControl\PDOCollectionDataControl.xaml.cs">
+      <DependentUpon>PDOCollectionDataControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="IOListDataControl\PDOCollectionDataModel.cs" />
     <Compile Include="IOListDataControl\TargetInformationDataControl.xaml.cs">
       <DependentUpon>TargetInformationDataControl.xaml</DependentUpon>
     </Compile>
@@ -174,7 +183,21 @@
     <Resource Include="img\objects.png" />
   </ItemGroup>
   <ItemGroup>
-    <SplashScreen Include="img\splash.png" />
+    <Resource Include="img\pdo.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <SplashScreen Include="img\splash.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="img\Rx.png" />
+    <Resource Include="img\Tx.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="img\down.png" />
+    <Resource Include="img\up.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="img\down_left.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

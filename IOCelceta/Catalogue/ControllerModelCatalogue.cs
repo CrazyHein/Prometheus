@@ -7,7 +7,7 @@ using System.Xml;
 
 namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.Catalogue
 {
-    public enum MODULE_CATALOGUE_FILE_ERROR_CODE_T : int
+    public enum MODEL_CATALOGUE_FILE_ERROR_CODE_T : int
     {
         NO_ERROR                                = 0x00000000,
         FILE_LOAD_ERROR                         = 0x00000001,
@@ -16,37 +16,37 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.Catalogue
         FILE_DATA_EXCEPTION                     = 0x00000004
     }
 
-    public class ModuleCatalogueParseExcepetion : Exception
+    public class ModelCatalogueParseExcepetion : Exception
     {
         public Exception DataException { get; private set; }
-        public MODULE_CATALOGUE_FILE_ERROR_CODE_T ErrorCode { get; private set; }
+        public MODEL_CATALOGUE_FILE_ERROR_CODE_T ErrorCode { get; private set; }
 
-        public ModuleCatalogueParseExcepetion(MODULE_CATALOGUE_FILE_ERROR_CODE_T errorCode, Exception dataException)
+        public ModelCatalogueParseExcepetion(MODEL_CATALOGUE_FILE_ERROR_CODE_T errorCode, Exception dataException)
         {
             ErrorCode = errorCode;
             DataException = dataException;
         }
     }
 
-    public class ControllerModuleCatalogue
+    public class ControllerModelCatalogue
     {
-        public IReadOnlyDictionary<ushort, ControllerExtensionModel> ExtensionModules { get; private set; }
-        public IReadOnlyDictionary<ushort, ControllerEthernetModel> EthernetModules { get; private set; }
+        public IReadOnlyDictionary<ushort, ControllerExtensionModel> ExtensionModels { get; private set; }
+        public IReadOnlyDictionary<ushort, ControllerEthernetModel> EthernetModels { get; private set; }
         public uint FileFormatVersion { get; private set; }
         private readonly uint __supported_file_format_version;
 
-        private Dictionary<ushort, ControllerExtensionModel> __extension_modules = null;
-        private Dictionary<ushort, ControllerEthernetModel> __ethernet_modules = null;
+        private Dictionary<ushort, ControllerExtensionModel> __extension_models = null;
+        private Dictionary<ushort, ControllerEthernetModel> __ethernet_models = null;
 
-        public ControllerModuleCatalogue()
+        public ControllerModelCatalogue()
         {
             __supported_file_format_version = 1;
 
-            __extension_modules = new Dictionary<ushort, ControllerExtensionModel>();
-            __ethernet_modules = new Dictionary<ushort, ControllerEthernetModel>();
+            __extension_models = new Dictionary<ushort, ControllerExtensionModel>();
+            __ethernet_models = new Dictionary<ushort, ControllerEthernetModel>();
 
-            ExtensionModules = __extension_modules;
-            EthernetModules = __ethernet_modules;
+            ExtensionModels = __extension_models;
+            EthernetModels = __ethernet_models;
         }
 
         public void Load(string catalogueConfiguration)
@@ -61,33 +61,33 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.Catalogue
             try
             {
                 xmlDoc.Load(catalogueConfiguration);
-                XmlNode rootNode = xmlDoc.SelectSingleNode("/AMECControllerModules");
+                XmlNode rootNode = xmlDoc.SelectSingleNode("/AMECControllerModels");
                 FileFormatVersion = uint.Parse(rootNode.Attributes.GetNamedItem("FormatVersion").Value);
                 if (__supported_file_format_version < FileFormatVersion)
-                    throw new ModuleCatalogueParseExcepetion(MODULE_CATALOGUE_FILE_ERROR_CODE_T.UNSUPPORTED_FILE_FORMAT_VERSION, null);
+                    throw new ModelCatalogueParseExcepetion(MODEL_CATALOGUE_FILE_ERROR_CODE_T.UNSUPPORTED_FILE_FORMAT_VERSION, null);
             }
-            catch (ModuleCatalogueParseExcepetion e)
+            catch (ModelCatalogueParseExcepetion e)
             {
                 throw e;
             }
             catch (Exception e)
             {
-                throw new ModuleCatalogueParseExcepetion(MODULE_CATALOGUE_FILE_ERROR_CODE_T.FILE_DATA_EXCEPTION, e);
+                throw new ModelCatalogueParseExcepetion(MODEL_CATALOGUE_FILE_ERROR_CODE_T.FILE_DATA_EXCEPTION, e);
             }
 
             try
             { 
-                XmlNode extensionModulesNode = xmlDoc.SelectSingleNode("/AMECControllerModules/ExtensionModules");
-                if (extensionModulesNode.NodeType == XmlNodeType.Element)
+                XmlNode extensionModelsNode = xmlDoc.SelectSingleNode("/AMECControllerModels/ExtensionModels");
+                if (extensionModelsNode.NodeType == XmlNodeType.Element)
                 {
-                    foreach (XmlNode extensionModuleNode in extensionModulesNode.ChildNodes)
+                    foreach (XmlNode extensionModelNode in extensionModelsNode.ChildNodes)
                     {
-                        if (extensionModuleNode.NodeType != XmlNodeType.Element || extensionModuleNode.Name != "ExtensionModule")
+                        if (extensionModelNode.NodeType != XmlNodeType.Element || extensionModelNode.Name != "ExtensionModel")
                             continue;
                         mask = 0;
                         txVariables = new Dictionary<string, int>();
                         rxVariables = new Dictionary<string, int>();
-                        foreach (XmlNode node in extensionModuleNode.ChildNodes)
+                        foreach (XmlNode node in extensionModelNode.ChildNodes)
                         {
                             if (node.NodeType != XmlNodeType.Element)
                                 continue;
@@ -124,38 +124,38 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.Catalogue
 
                         }
                         if ((mask & 0x00000003) == 0x00000003)
-                            __extension_modules.Add(id, new ControllerExtensionModel(id, name, txVariables, rxVariables));
+                            __extension_models.Add(id, new ControllerExtensionModel(id, name, txVariables, rxVariables));
                         else
-                            throw new ModuleCatalogueParseExcepetion(MODULE_CATALOGUE_FILE_ERROR_CODE_T.ELEMENT_MISSING, null);
+                            throw new ModelCatalogueParseExcepetion(MODEL_CATALOGUE_FILE_ERROR_CODE_T.ELEMENT_MISSING, null);
                     }
                 }
             }
-            catch (ModuleCatalogueParseExcepetion e)
+            catch (ModelCatalogueParseExcepetion e)
             {
                 throw e;
             }
             catch (Exception e)
             {
-                throw new ModuleCatalogueParseExcepetion(MODULE_CATALOGUE_FILE_ERROR_CODE_T.FILE_DATA_EXCEPTION, e);
+                throw new ModelCatalogueParseExcepetion(MODEL_CATALOGUE_FILE_ERROR_CODE_T.FILE_DATA_EXCEPTION, e);
             }
             finally
             {
-                ExtensionModules = __extension_modules;
+                ExtensionModels = __extension_models;
             }
 
             try
             {
-                XmlNode extensionModulesNode = xmlDoc.SelectSingleNode("/AMECControllerModules/EthernetModules");
-                if (extensionModulesNode.NodeType == XmlNodeType.Element)
+                XmlNode extensionModelsNode = xmlDoc.SelectSingleNode("/AMECControllerModels/EthernetModels");
+                if (extensionModelsNode.NodeType == XmlNodeType.Element)
                 {
-                    foreach (XmlNode extensionModuleNode in extensionModulesNode.ChildNodes)
+                    foreach (XmlNode extensionModelNode in extensionModelsNode.ChildNodes)
                     {
-                        if (extensionModuleNode.NodeType != XmlNodeType.Element || extensionModuleNode.Name != "EthernetModule")
+                        if (extensionModelNode.NodeType != XmlNodeType.Element || extensionModelNode.Name != "EthernetModel")
                             continue;
                         mask = 0;
                         txVariables = new Dictionary<string, int>();
                         rxVariables = new Dictionary<string, int>();
-                        foreach (XmlNode node in extensionModuleNode.ChildNodes)
+                        foreach (XmlNode node in extensionModelNode.ChildNodes)
                         {
                             if (node.NodeType != XmlNodeType.Element)
                                 continue;
@@ -192,23 +192,23 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.Catalogue
 
                         }
                         if ((mask & 0x00000003) == 0x00000003)
-                            __ethernet_modules.Add(id, new ControllerEthernetModel(id, name, txVariables, rxVariables));
+                            __ethernet_models.Add(id, new ControllerEthernetModel(id, name, txVariables, rxVariables));
                         else
-                            throw new ModuleCatalogueParseExcepetion(MODULE_CATALOGUE_FILE_ERROR_CODE_T.ELEMENT_MISSING, null);
+                            throw new ModelCatalogueParseExcepetion(MODEL_CATALOGUE_FILE_ERROR_CODE_T.ELEMENT_MISSING, null);
                     }
                 }
             }
-            catch (ModuleCatalogueParseExcepetion e)
+            catch (ModelCatalogueParseExcepetion e)
             {
                 throw e;
             }
             catch (Exception e)
             {
-                throw new ModuleCatalogueParseExcepetion(MODULE_CATALOGUE_FILE_ERROR_CODE_T.FILE_DATA_EXCEPTION, e);
+                throw new ModelCatalogueParseExcepetion(MODEL_CATALOGUE_FILE_ERROR_CODE_T.FILE_DATA_EXCEPTION, e);
             }
             finally
             {
-                ExtensionModules = __extension_modules;
+                ExtensionModels = __extension_models;
             }
         }
     }

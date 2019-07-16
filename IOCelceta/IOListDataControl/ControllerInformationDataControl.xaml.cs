@@ -75,8 +75,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             ControllerInformationDataModel host = DataContext as ControllerInformationDataModel;
 
             ControllerExtensionModuleDataModel data = new ControllerExtensionModuleDataModel(
-                host.DataHelper.ControllerCatalogue.ExtensionModules.Keys.First(),
-                host.DataHelper.ControllerCatalogue.ExtensionModules[host.DataHelper.ControllerCatalogue.ExtensionModules.Keys.First()].Name);
+                host.DataHelper.ControllerCatalogue.ExtensionModels.Keys.First(),
+                host.DataHelper.ControllerCatalogue.ExtensionModels[host.DataHelper.ControllerCatalogue.ExtensionModels.Keys.First()].Name);
             ControllerModuleDataModel moduleDataModel = new ControllerModuleDataModel(host, data, null, false);
             ControllerModuleDataControl moduleDataControl = new ControllerModuleDataControl(moduleDataModel);
             if (moduleDataControl.ShowDialog() == true)
@@ -117,8 +117,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             ControllerInformationDataModel host = DataContext as ControllerInformationDataModel;
   
             ControllerEthernetModuleDataModel data = new ControllerEthernetModuleDataModel(
-                host.DataHelper.ControllerCatalogue.EthernetModules.Keys.First(),
-                host.DataHelper.ControllerCatalogue.EthernetModules[host.DataHelper.ControllerCatalogue.EthernetModules.Keys.First()].Name);
+                host.DataHelper.ControllerCatalogue.EthernetModels.Keys.First(),
+                host.DataHelper.ControllerCatalogue.EthernetModels[host.DataHelper.ControllerCatalogue.EthernetModels.Keys.First()].Name);
             ControllerModuleDataModel moduleDataModel = new ControllerModuleDataModel(host, null, data, false);
             ControllerModuleDataControl moduleDataControl = new ControllerModuleDataControl(moduleDataModel);
             if (moduleDataControl.ShowDialog() == true)

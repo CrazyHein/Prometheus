@@ -80,7 +80,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
         private IO_LIST_OBJECT_COLLECTION_T __object_collection;
         private IO_LIST_CONTROLLER_PDO_COLLECTION __controller_pdo_collection;
 
-        public IOListDataHelper(ControllerModuleCatalogue controllerCatalogue, DataTypeCatalogue dataTypeCatalogue)
+        public IOListDataHelper(ControllerModelCatalogue controllerCatalogue, DataTypeCatalogue dataTypeCatalogue)
         {
             __supported_file_format_version = 1;
             __module_reference_counter = new Dictionary<string, int>();
@@ -106,7 +106,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
             __controller_pdo_collection.Clear();
         }
 
-        public ControllerModuleCatalogue ControllerCatalogue { get; }
+        public ControllerModelCatalogue ControllerCatalogue { get; }
         public DataTypeCatalogue DataTypeCatalogue { get; }
 
         private void __load_target_info(XmlNode basicNode)
@@ -204,9 +204,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                             {
                                 case "ID":
                                     ushort id = Convert.ToUInt16(node.FirstChild.Value, 16);
-                                    if (ControllerCatalogue.ExtensionModules.Keys.Contains(id) == false)
+                                    if (ControllerCatalogue.ExtensionModels.Keys.Contains(id) == false)
                                         throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_CONTROLLER_EXTENSION_MODEL, null);
-                                    module.model = ControllerCatalogue.ExtensionModules[id];
+                                    module.model = ControllerCatalogue.ExtensionModels[id];
                                     mask |= 0x00000001;
                                     break;
                                 case "Name":
@@ -258,9 +258,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                             {
                                 case "ID":
                                     ushort id = Convert.ToUInt16(node.FirstChild.Value, 16);
-                                    if (ControllerCatalogue.EthernetModules.Keys.Contains(id) == false)
+                                    if (ControllerCatalogue.EthernetModels.Keys.Contains(id) == false)
                                         throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_CONTROLLER_EXTENSION_MODEL, null);
-                                    module.model = ControllerCatalogue.EthernetModules[id];
+                                    module.model = ControllerCatalogue.EthernetModels[id];
                                     mask |= 0x00000001;
                                     break;
                                 case "Name":
@@ -551,10 +551,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
             if (moduleData.model == null)
                 throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_CONTROLLER_MODEL, null);
 
-            bool con0 = (ControllerCatalogue.ExtensionModules.Keys.Contains(moduleData.model.ID) &&
-                ControllerCatalogue.ExtensionModules[moduleData.model.ID] == moduleData.model);
-            bool con1 = (ControllerCatalogue.EthernetModules.Keys.Contains(moduleData.model.ID) &&
-                ControllerCatalogue.EthernetModules[moduleData.model.ID] == moduleData.model);
+            bool con0 = (ControllerCatalogue.ExtensionModels.Keys.Contains(moduleData.model.ID) &&
+                ControllerCatalogue.ExtensionModels[moduleData.model.ID] == moduleData.model);
+            bool con1 = (ControllerCatalogue.EthernetModels.Keys.Contains(moduleData.model.ID) &&
+                ControllerCatalogue.EthernetModels[moduleData.model.ID] == moduleData.model);
 
             if (con0 == false && con1 == false)
                 throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_CONTROLLER_MODEL_ID, null);
@@ -587,9 +587,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                 {
                     moduleID = __controller_information.modules[objectData.binding.module.reference_name].model.ID;
                     if ((objectData.index & 0x80000000) != 0)
-                        variables = ControllerCatalogue.ExtensionModules[moduleID].TxVariables;
+                        variables = ControllerCatalogue.ExtensionModels[moduleID].TxVariables;
                     else
-                        variables = ControllerCatalogue.ExtensionModules[moduleID].RxVariables;
+                        variables = ControllerCatalogue.ExtensionModels[moduleID].RxVariables;
                 }
                 else
                     throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_OBJECT_BINDING_MODULE_REFERENCE_NAME, null);
@@ -851,6 +851,138 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                 __object_collection.objects[index] = dataObject;
             }
         }
+
+        public uint TxDiagnosticAreaOffset
+        {
+            get { return __controller_pdo_collection.tx_pdo_diagnostic_area.offset_in_word; }
+            set { __controller_pdo_collection.tx_pdo_diagnostic_area.offset_in_word = value; }
+        }
+        public uint TxDiagnosticAreaSize
+        {
+            get { return __controller_pdo_collection.tx_pdo_diagnostic_area.size_in_word; }
+            set { __controller_pdo_collection.tx_pdo_diagnostic_area.size_in_word = value; }
+        }
+        public uint TxDiagnosticAreaActualSize
+        {
+            get { return __controller_pdo_collection.tx_pdo_diagnostic_area.actual_size_in_byte; }
+        }
+        public IReadOnlyList<IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T> TxDiagnosticArea
+        {
+            get
+            {
+                return __controller_pdo_collection.tx_pdo_diagnostic_area.objects;
+            }
+        }
+
+        public uint TxBitAreaOffset
+        {
+            get { return __controller_pdo_collection.tx_pdo_bit_area.offset_in_word; }
+            set { __controller_pdo_collection.tx_pdo_bit_area.offset_in_word = value; }
+        }
+        public uint TxBitAreaAreaSize
+        {
+            get { return __controller_pdo_collection.tx_pdo_bit_area.size_in_word; }
+            set { __controller_pdo_collection.tx_pdo_bit_area.size_in_word = value; }
+        }
+        public uint TxBitAreaAreaActualSize
+        {
+            get { return __controller_pdo_collection.tx_pdo_bit_area.actual_size_in_byte; }
+        }
+        public IReadOnlyList<IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T> TxBitArea
+        {
+            get
+            {
+                return __controller_pdo_collection.tx_pdo_bit_area.objects;
+            }
+        }
+
+        public uint TxBlockAreaOffset
+        {
+            get { return __controller_pdo_collection.tx_pdo_block_area.offset_in_word; }
+            set { __controller_pdo_collection.tx_pdo_block_area.offset_in_word = value; }
+        }
+        public uint TxBlockAreaAreaSize
+        {
+            get { return __controller_pdo_collection.tx_pdo_block_area.size_in_word; }
+            set { __controller_pdo_collection.tx_pdo_block_area.size_in_word = value; }
+        }
+        public uint TxBlockAreaAreaActualSize
+        {
+            get { return __controller_pdo_collection.tx_pdo_block_area.actual_size_in_byte; }
+        }
+        public IReadOnlyList<IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T> TxBlockArea
+        {
+            get
+            {
+                return __controller_pdo_collection.tx_pdo_block_area.objects;
+            }
+        }
+
+        public uint RxControlAreaOffset
+        {
+            get { return __controller_pdo_collection.rx_pdo_control_area.offset_in_word; }
+            set { __controller_pdo_collection.rx_pdo_control_area.offset_in_word = value; }
+        }
+        public uint RxControlAreaSize
+        {
+            get { return __controller_pdo_collection.rx_pdo_control_area.size_in_word; }
+            set { __controller_pdo_collection.rx_pdo_control_area.size_in_word = value; }
+        }
+        public uint RxControlActualSize
+        {
+            get { return __controller_pdo_collection.rx_pdo_control_area.actual_size_in_byte; }
+        }
+        public IReadOnlyList<IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T> RxControlArea
+        {
+            get
+            {
+                return __controller_pdo_collection.rx_pdo_control_area.objects;
+            }
+        }
+
+        public uint RxBitAreaOffset
+        {
+            get { return __controller_pdo_collection.rx_pdo_bit_area.offset_in_word; }
+            set { __controller_pdo_collection.rx_pdo_bit_area.offset_in_word = value; }
+        }
+        public uint RxBitAreaAreaSize
+        {
+            get { return __controller_pdo_collection.rx_pdo_bit_area.size_in_word; }
+            set { __controller_pdo_collection.rx_pdo_bit_area.size_in_word = value; }
+        }
+        public uint RxBitAreaAreaActualSize
+        {
+            get { return __controller_pdo_collection.rx_pdo_bit_area.actual_size_in_byte; }
+        }
+        public IReadOnlyList<IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T> RxBitArea
+        {
+            get
+            {
+                return __controller_pdo_collection.rx_pdo_bit_area.objects;
+            }
+        }
+
+        public uint RxBlockAreaOffset
+        {
+            get { return __controller_pdo_collection.rx_pdo_block_area.offset_in_word; }
+            set { __controller_pdo_collection.rx_pdo_block_area.offset_in_word = value; }
+        }
+        public uint RxBlockAreaAreaSize
+        {
+            get { return __controller_pdo_collection.rx_pdo_block_area.size_in_word; }
+            set { __controller_pdo_collection.rx_pdo_block_area.size_in_word = value; }
+        }
+        public uint RxBlockAreaAreaActualSize
+        {
+            get { return __controller_pdo_collection.rx_pdo_block_area.actual_size_in_byte; }
+        }
+        public IReadOnlyList<IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T> RxBlockArea
+        {
+            get
+            {
+                return __controller_pdo_collection.rx_pdo_block_area.objects;
+            }
+        }
     }
 
     public class IO_LIST_TARGET_INFORMATION_T
@@ -1015,13 +1147,13 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
             public List<IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T> objects = new List<IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T>();
         }
 
-        public PDO_DEFINITION_T tx_pdo_diagnostic_area = new PDO_DEFINITION_T();
-        public PDO_DEFINITION_T tx_pdo_bit_area = new PDO_DEFINITION_T();
-        public PDO_DEFINITION_T tx_pdo_block_area = new PDO_DEFINITION_T();
+        public PDO_DEFINITION_T tx_pdo_diagnostic_area = new PDO_DEFINITION_T() {offset_in_word = 0, size_in_word = 128};
+        public PDO_DEFINITION_T tx_pdo_bit_area = new PDO_DEFINITION_T() { offset_in_word = 128, size_in_word = 32 };
+        public PDO_DEFINITION_T tx_pdo_block_area = new PDO_DEFINITION_T() { offset_in_word = 160, size_in_word = 512 };
 
-        public PDO_DEFINITION_T rx_pdo_control_area = new PDO_DEFINITION_T();
-        public PDO_DEFINITION_T rx_pdo_bit_area = new PDO_DEFINITION_T();
-        public PDO_DEFINITION_T rx_pdo_block_area = new PDO_DEFINITION_T();
+        public PDO_DEFINITION_T rx_pdo_control_area = new PDO_DEFINITION_T() { offset_in_word = 672, size_in_word = 128 };
+        public PDO_DEFINITION_T rx_pdo_bit_area = new PDO_DEFINITION_T() { offset_in_word = 800, size_in_word = 32 };
+        public PDO_DEFINITION_T rx_pdo_block_area = new PDO_DEFINITION_T() { offset_in_word = 832, size_in_word = 512 };
 
         public void Clear()
         {
