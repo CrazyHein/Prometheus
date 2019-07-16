@@ -466,7 +466,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
 
         private void __load_controller_pdo_collection(XmlNode areaNode, IO_LIST_CONTROLLER_PDO_COLLECTION.PDO_DEFINITION_T pdo, IO_LIST_PDO_AREA_T area)
         {
-            uint actualPdoSizeInWord = 0;
+            uint actualPdoSizeInByte = 0;
             uint actualPdoSizeInBit = 0;
 
             try
@@ -487,24 +487,24 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                             {
                                 actualPdoSizeInBit += objectData.data_type.BitSize;
                                 if (actualPdoSizeInBit % 8 == 0)
-                                    actualPdoSizeInWord = actualPdoSizeInBit / 8;
+                                    actualPdoSizeInByte = actualPdoSizeInBit / 8;
                                 else
-                                    actualPdoSizeInWord = actualPdoSizeInBit / 8 + 1;
+                                    actualPdoSizeInByte = actualPdoSizeInBit / 8 + 1;
                             }
                             else
                             {
                                 if (objectData.data_type.BitSize % 8 == 0)
-                                    actualPdoSizeInWord += objectData.data_type.BitSize / 8;
+                                    actualPdoSizeInByte += objectData.data_type.BitSize / 8;
                                 else
-                                    actualPdoSizeInWord += objectData.data_type.BitSize / 8 + 1;
+                                    actualPdoSizeInByte += objectData.data_type.BitSize / 8 + 1;
                             }
 
-                            if (actualPdoSizeInWord > pdo.size_in_word)
+                            if (actualPdoSizeInByte > (pdo.size_in_word *2))
                                 throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.PDO_AREA_OUT_OF_RANGE, null);
 
                             __object_reference_counter[id]++;
                             pdo.objects.Add(__object_collection.objects[id]);
-                            pdo.actual_size_in_byte = actualPdoSizeInWord;
+                            pdo.actual_size_in_byte = actualPdoSizeInByte;
                         }
                     }
                 }
@@ -809,6 +809,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
             {
                 __object_collection.objects.Add(dataObject.index, dataObject);
                 __object_collection.objects_updated = true;
+                __module_reference_counter[dataObject.binding.module.reference_name]++;
                 __object_reference_counter.Add(dataObject.index, 0);
             }
             catch (Exception e)
@@ -823,8 +824,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
             {
                 if (__object_reference_counter[index] != 0)
                     throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.OBJECT_IS_REFERENCED_BY_PDO, null);
+                __module_reference_counter[__object_collection.objects[index].binding.module.reference_name]--;
                 __object_collection.objects.Remove(index);
-                __object_collection.objects_updated = true;
+                __object_collection.objects_updated = true;    
                 __object_reference_counter.Remove(index);
             }
             catch (IOListParseExcepetion e)
@@ -879,12 +881,12 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
             get { return __controller_pdo_collection.tx_pdo_bit_area.offset_in_word; }
             set { __controller_pdo_collection.tx_pdo_bit_area.offset_in_word = value; }
         }
-        public uint TxBitAreaAreaSize
+        public uint TxBitAreaSize
         {
             get { return __controller_pdo_collection.tx_pdo_bit_area.size_in_word; }
             set { __controller_pdo_collection.tx_pdo_bit_area.size_in_word = value; }
         }
-        public uint TxBitAreaAreaActualSize
+        public uint TxBitAreaActualSize
         {
             get { return __controller_pdo_collection.tx_pdo_bit_area.actual_size_in_byte; }
         }
@@ -901,12 +903,12 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
             get { return __controller_pdo_collection.tx_pdo_block_area.offset_in_word; }
             set { __controller_pdo_collection.tx_pdo_block_area.offset_in_word = value; }
         }
-        public uint TxBlockAreaAreaSize
+        public uint TxBlockAreaSize
         {
             get { return __controller_pdo_collection.tx_pdo_block_area.size_in_word; }
             set { __controller_pdo_collection.tx_pdo_block_area.size_in_word = value; }
         }
-        public uint TxBlockAreaAreaActualSize
+        public uint TxBlockAreaActualSize
         {
             get { return __controller_pdo_collection.tx_pdo_block_area.actual_size_in_byte; }
         }
@@ -928,7 +930,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
             get { return __controller_pdo_collection.rx_pdo_control_area.size_in_word; }
             set { __controller_pdo_collection.rx_pdo_control_area.size_in_word = value; }
         }
-        public uint RxControlActualSize
+        public uint RxControlAreaActualSize
         {
             get { return __controller_pdo_collection.rx_pdo_control_area.actual_size_in_byte; }
         }
@@ -945,12 +947,12 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
             get { return __controller_pdo_collection.rx_pdo_bit_area.offset_in_word; }
             set { __controller_pdo_collection.rx_pdo_bit_area.offset_in_word = value; }
         }
-        public uint RxBitAreaAreaSize
+        public uint RxBitAreaSize
         {
             get { return __controller_pdo_collection.rx_pdo_bit_area.size_in_word; }
             set { __controller_pdo_collection.rx_pdo_bit_area.size_in_word = value; }
         }
-        public uint RxBitAreaAreaActualSize
+        public uint RxBitAreaActualSize
         {
             get { return __controller_pdo_collection.rx_pdo_bit_area.actual_size_in_byte; }
         }
@@ -967,12 +969,12 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
             get { return __controller_pdo_collection.rx_pdo_block_area.offset_in_word; }
             set { __controller_pdo_collection.rx_pdo_block_area.offset_in_word = value; }
         }
-        public uint RxBlockAreaAreaSize
+        public uint RxBlockAreaSize
         {
             get { return __controller_pdo_collection.rx_pdo_block_area.size_in_word; }
             set { __controller_pdo_collection.rx_pdo_block_area.size_in_word = value; }
         }
-        public uint RxBlockAreaAreaActualSize
+        public uint RxBlockAreaActualSize
         {
             get { return __controller_pdo_collection.rx_pdo_block_area.actual_size_in_byte; }
         }

@@ -6,225 +6,290 @@
              xmlns:local="clr-namespace:AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDataControl"
              mc:Ignorable="d" 
              d:DesignHeight="850" d:DesignWidth="800">
-    <DockPanel Margin="4">
-        <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Right">
-            <StackPanel.Resources>
-                <Style TargetType="Button">
-                    <Setter Property="Width" Value="120"/>
-                    <Setter Property="Height" Value="32"/>
-                    <Setter Property="Margin" Value="4"/>
-                </Style>
-                <Style TargetType="Image">
-                    <Setter Property="Margin" Value="2,2,8,2"/>
-                </Style>
-            </StackPanel.Resources>
-            <Button>
-                <Button.Content>
-                    <StackPanel Orientation="Horizontal">
-                        <Image Source="../img/add.png"/>
-                        <TextBlock Text="Add" VerticalAlignment="Center"/>
-                    </StackPanel>
-                </Button.Content>
-            </Button>
-            <Button>
-                <Button.Content>
-                    <StackPanel Orientation="Horizontal">
-                        <Image Source="../img/down_left.png"/>
-                        <TextBlock Text="Insert Before" VerticalAlignment="Center"/>
-                    </StackPanel>
-                </Button.Content>
-            </Button>
-            <Button>
-                <Button.Content>
-                    <StackPanel Orientation="Horizontal">
-                        <Image Source="../img/remove.png"/>
-                        <TextBlock Text="Remove" VerticalAlignment="Center"/>
-                    </StackPanel>
-                </Button.Content>
-            </Button>
-            <Button>
-                <Button.Content>
-                    <StackPanel Orientation="Horizontal">
-                        <Image Source="../img/up.png"/>
-                        <TextBlock Text="Move Up" VerticalAlignment="Center"/>
-                    </StackPanel>
-                </Button.Content>
-            </Button>
-            <Button>
-                <Button.Content>
-                    <StackPanel Orientation="Horizontal">
-                        <Image Source="../img/down.png"/>
-                        <TextBlock Text="Move Down" VerticalAlignment="Center"/>
-                    </StackPanel>
-                </Button.Content>
-            </Button>
-        </StackPanel>
-        <TabControl TabStripPlacement="Left">
-            <TabControl.Resources>
-                <Style TargetType="{x:Type TabItem}">
-                    <Setter Property="Padding" Value="4" />
-                    <Setter Property="HeaderTemplate">
-                        <Setter.Value>
-                            <DataTemplate>
-                                <ContentPresenter Content="{TemplateBinding Property=ContentControl.Content}">
-                                    <ContentPresenter.LayoutTransform>
-                                        <RotateTransform Angle="90" />
-                                    </ContentPresenter.LayoutTransform>
-                                </ContentPresenter>
-                            </DataTemplate>
-                        </Setter.Value>
-                    </Setter>
-                </Style>
-                
-                <Style TargetType="ListViewItem">
-                    <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
-                </Style>
+    <ScrollViewer HorizontalScrollBarVisibility="Auto">
+        <DockPanel Margin="4" LastChildFill="True">
+            <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Right">
+                <StackPanel.Resources>
+                    <Style TargetType="Button">
+                        <Setter Property="Width" Value="120"/>
+                        <Setter Property="Height" Value="32"/>
+                        <Setter Property="Margin" Value="4"/>
+                    </Style>
+                    <Style TargetType="Image">
+                        <Setter Property="Margin" Value="2,2,8,2"/>
+                    </Style>
+                </StackPanel.Resources>
+                <Button>
+                    <Button.Content>
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="../img/add.png"/>
+                            <TextBlock Text="Add" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button.Content>
+                </Button>
+                <Button>
+                    <Button.Content>
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="../img/down_left.png"/>
+                            <TextBlock Text="Insert Before" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button.Content>
+                </Button>
+                <Button>
+                    <Button.Content>
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="../img/remove.png"/>
+                            <TextBlock Text="Remove" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button.Content>
+                </Button>
+                <Button>
+                    <Button.Content>
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="../img/up.png"/>
+                            <TextBlock Text="Move Up" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button.Content>
+                </Button>
+                <Button>
+                    <Button.Content>
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="../img/down.png"/>
+                            <TextBlock Text="Move Down" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button.Content>
+                </Button>
+            </StackPanel>
+            <TabControl TabStripPlacement="Left">
+                <TabControl.Resources>
+                    <Style TargetType="{x:Type TabItem}">
+                        <Setter Property="Padding" Value="4" />
+                        <Setter Property="HeaderTemplate">
+                            <Setter.Value>
+                                <DataTemplate>
+                                    <ContentPresenter Content="{TemplateBinding Property=ContentControl.Content}">
+                                        <ContentPresenter.LayoutTransform>
+                                            <RotateTransform Angle="90" />
+                                        </ContentPresenter.LayoutTransform>
+                                    </ContentPresenter>
+                                </DataTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
 
-                <DataTemplate x:Key="IndexHeadTemplate">
-                    <TextBlock FontWeight="Bold" Text="Index"/>
-                </DataTemplate>
-                <DataTemplate x:Key="IndexContentTemplate">
-                    <TextBlock Text="{Binding Path=Index, StringFormat=0x{0:X8}}" Margin="4" HorizontalAlignment="Left"/>
-                </DataTemplate>
+                    <Style TargetType="ListViewItem">
+                        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                    </Style>
 
-                <DataTemplate x:Key="FriendlyNameHeadTemplate">
-                    <TextBlock FontWeight="Bold" Text="Friendly Name"/>
-                </DataTemplate>
-                <DataTemplate x:Key="FriendlyNameContentTemplate">
-                    <TextBlock Text="{Binding Path=FriendlyName}" Margin="4" HorizontalAlignment="Left"/>
-                </DataTemplate>
+                    <DataTemplate x:Key="IndexHeadTemplate">
+                        <TextBlock FontWeight="Bold" Text="Index"/>
+                    </DataTemplate>
+                    <DataTemplate x:Key="IndexContentTemplate">
+                        <TextBlock Text="{Binding Path=Index, StringFormat=0x{0:X8}}" Margin="4" HorizontalAlignment="Left"/>
+                    </DataTemplate>
 
-                <DataTemplate x:Key="DataTypeHeadTemplate">
-                    <TextBlock FontWeight="Bold" Text="Data Type"/>
-                </DataTemplate>
-                <DataTemplate x:Key="DataTypeContentTemplate">
-                    <TextBlock Text="{Binding Path=DataType}" Margin="4" HorizontalAlignment="Left"/>
-                </DataTemplate>
+                    <DataTemplate x:Key="FriendlyNameHeadTemplate">
+                        <TextBlock FontWeight="Bold" Text="Friendly Name"/>
+                    </DataTemplate>
+                    <DataTemplate x:Key="FriendlyNameContentTemplate">
+                        <TextBlock Text="{Binding Path=FriendlyName}" Margin="4" HorizontalAlignment="Left"/>
+                    </DataTemplate>
 
-                <DataTemplate x:Key="BindingHeadTemplate">
-                    <TextBlock FontWeight="Bold" Text="Binding"/>
-                </DataTemplate>
-                <DataTemplate x:Key="BindingContentTemplate">
-                    <TextBlock Text="{Binding Path=Binding}" Margin="4" HorizontalAlignment="Left"/>
-                </DataTemplate>
-                <DataTemplate x:Key="ConverterHeadTemplate">
-                    <TextBlock FontWeight="Bold" Text="Converter"/>
-                </DataTemplate>
-                <DataTemplate x:Key="ConverterContentTemplate">
-                    <TextBlock Text="{Binding Path=Converter}" Margin="4" HorizontalAlignment="Left"/>
-                </DataTemplate>
-            </TabControl.Resources>
-            <TabItem Height="120">
-                <TabItem.Header>
-                    <StackPanel Orientation="Horizontal">
-                        <Image Source="../img/Tx.png" Height="24" Margin="2,2,8,2"/>
-                        <TextBlock Text="Diagnostic" VerticalAlignment="Center"/>
-                    </StackPanel>
-                </TabItem.Header>
-                <DockPanel Margin="4">
-                    <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
-                        <TextBlock Text="Offset In Word : " Margin="6" FontWeight="Bold"/>
-                        <TextBox Width="100" Margin="6" Text="{Binding TxDiagnosticAreaOffsetInWord}"/>
-                        <TextBlock Text="Size In Word : " Margin="6" FontWeight="Bold"/>
-                        <TextBox Width="100" Margin="6" Text="{Binding TxDiagnosticAreaSizeInWord}"/>
-                        <TextBlock Text="Actual Size In Word : " Margin="6" FontWeight="Bold"/>
-                        <TextBox Width="100" Margin="6" Text="{Binding TxDiagnosticAreaActualSizeInWord, Mode=OneWay}" IsReadOnly="True"/>
-                    </StackPanel>
-                    <ListView Name="__lsv_tx_diagnostic_area" >
-                        <ListView.View>
-                            <GridView>
-                                <GridViewColumn Width="100" HeaderTemplate="{StaticResource IndexHeadTemplate}" CellTemplate="{StaticResource IndexContentTemplate}"/>
-                                <GridViewColumn Width="200" HeaderTemplate="{StaticResource FriendlyNameHeadTemplate}" CellTemplate="{StaticResource FriendlyNameContentTemplate}"/>
-                                <GridViewColumn Width="100" HeaderTemplate="{StaticResource DataTypeHeadTemplate}" CellTemplate="{StaticResource DataTypeContentTemplate}"/>
-                                <GridViewColumn Width="200" HeaderTemplate="{StaticResource BindingHeadTemplate}" CellTemplate="{StaticResource BindingContentTemplate}"/>
-                                <GridViewColumn Width="200" HeaderTemplate="{StaticResource ConverterHeadTemplate}" CellTemplate="{StaticResource ConverterContentTemplate}"/>
-                            </GridView>
-                        </ListView.View>
-                    </ListView>
-                </DockPanel>
-            </TabItem>
-            <TabItem Height="120">
-                <TabItem.Header>
-                    <StackPanel Orientation="Horizontal">
-                        <Image Source="../img/Tx.png" Height="24" Margin="2,2,8,2"/>
-                        <TextBlock Text="Bit Area" VerticalAlignment="Center"/>
-                    </StackPanel>
-                </TabItem.Header>
-                <DockPanel Margin="4">
-                    <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
-                        <TextBlock Text="Offset In Word : " Margin="6" FontWeight="Bold"/>
-                        <TextBox Width="100" Margin="6" Text="{Binding TxBitAreaOffsetInWord}"/>
-                        <TextBlock Text="Size In Word : " Margin="6" FontWeight="Bold"/>
-                        <TextBox Width="100" Margin="6" Text="{Binding TxBitAreaSizeInWord}"/>
-                        <TextBlock Text="Actual Size In Word : " Margin="6" FontWeight="Bold"/>
-                        <TextBox Width="100" Margin="6" Text="{Binding TxBitAreaActualSizeInWord, Mode=OneWay}" IsReadOnly="True"/>
-                    </StackPanel>
-                    <ListView Name="__lsv_tx_bit_area" >
-                        <ListView.View>
-                            <GridView>
-                                <GridViewColumn Width="100" HeaderTemplate="{StaticResource IndexHeadTemplate}" CellTemplate="{StaticResource IndexContentTemplate}"/>
-                                <GridViewColumn Width="200" HeaderTemplate="{StaticResource FriendlyNameHeadTemplate}" CellTemplate="{StaticResource FriendlyNameContentTemplate}"/>
-                                <GridViewColumn Width="100" HeaderTemplate="{StaticResource DataTypeHeadTemplate}" CellTemplate="{StaticResource DataTypeContentTemplate}"/>
-                                <GridViewColumn Width="200" HeaderTemplate="{StaticResource BindingHeadTemplate}" CellTemplate="{StaticResource BindingContentTemplate}"/>
-                                <GridViewColumn Width="200" HeaderTemplate="{StaticResource ConverterHeadTemplate}" CellTemplate="{StaticResource ConverterContentTemplate}"/>
-                            </GridView>
-                        </ListView.View>
-                    </ListView>
-                </DockPanel>
-            </TabItem>
-            <TabItem Height="120">
-                <TabItem.Header>
-                    <StackPanel Orientation="Horizontal">
-                        <Image Source="../img/Tx.png" Height="24" Margin="2,2,8,2"/>
-                        <TextBlock Text="Block Area" VerticalAlignment="Center"/>
-                    </StackPanel>
-                </TabItem.Header>
-                <DockPanel Margin="4">
-                    <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
-                        <TextBlock Text="Offset In Word : " Margin="6" FontWeight="Bold"/>
-                        <TextBox Width="100" Margin="6" Text="{Binding TxBlockAreaOffsetInWord}"/>
-                        <TextBlock Text="Size In Word : " Margin="6" FontWeight="Bold"/>
-                        <TextBox Width="100" Margin="6" Text="{Binding TxBlockAreaSizeInWord}"/>
-                        <TextBlock Text="Actual Size In Word : " Margin="6" FontWeight="Bold"/>
-                        <TextBox Width="100" Margin="6" Text="{Binding TxBlockAreaActualSizeInWord, Mode=OneWay}" IsReadOnly="True"/>
-                    </StackPanel>
-                    <ListView Name="__lsv_tx_block_area" >
-                        <ListView.View>
-                            <GridView>
-                                <GridViewColumn Width="100" HeaderTemplate="{StaticResource IndexHeadTemplate}" CellTemplate="{StaticResource IndexContentTemplate}"/>
-                                <GridViewColumn Width="200" HeaderTemplate="{StaticResource FriendlyNameHeadTemplate}" CellTemplate="{StaticResource FriendlyNameContentTemplate}"/>
-                                <GridViewColumn Width="100" HeaderTemplate="{StaticResource DataTypeHeadTemplate}" CellTemplate="{StaticResource DataTypeContentTemplate}"/>
-                                <GridViewColumn Width="200" HeaderTemplate="{StaticResource BindingHeadTemplate}" CellTemplate="{StaticResource BindingContentTemplate}"/>
-                                <GridViewColumn Width="200" HeaderTemplate="{StaticResource ConverterHeadTemplate}" CellTemplate="{StaticResource ConverterContentTemplate}"/>
-                            </GridView>
-                        </ListView.View>
-                    </ListView>
-                </DockPanel>
-            </TabItem>
-            <TabItem Height="120">
-                <TabItem.Header>
-                    <StackPanel Orientation="Horizontal">
-                        <Image Source="../img/Rx.png" Height="24" Margin="2,2,8,2"/>
-                        <TextBlock Text="Control" VerticalAlignment="Center"/>
-                    </StackPanel>
-                </TabItem.Header>
-            </TabItem>
-            <TabItem Height="120">
-                <TabItem.Header>
-                    <StackPanel Orientation="Horizontal">
-                        <Image Source="../img/Rx.png" Height="24" Margin="2,2,8,2"/>
-                        <TextBlock Text="Bit Area" VerticalAlignment="Center"/>
-                    </StackPanel>
-                </TabItem.Header>
-            </TabItem>
-            <TabItem Height="120">
-                <TabItem.Header>
-                    <StackPanel Orientation="Horizontal">
-                        <Image Source="../img/Rx.png" Height="24" Margin="2,2,8,2"/>
-                        <TextBlock Text="Block Area" VerticalAlignment="Center"/>
-                    </StackPanel>
-                </TabItem.Header>
-            </TabItem>
-        </TabControl>
-    </DockPanel>
+                    <DataTemplate x:Key="DataTypeHeadTemplate">
+                        <TextBlock FontWeight="Bold" Text="Data Type"/>
+                    </DataTemplate>
+                    <DataTemplate x:Key="DataTypeContentTemplate">
+                        <TextBlock Text="{Binding Path=DataType}" Margin="4" HorizontalAlignment="Left"/>
+                    </DataTemplate>
+
+                    <DataTemplate x:Key="BindingHeadTemplate">
+                        <TextBlock FontWeight="Bold" Text="Binding"/>
+                    </DataTemplate>
+                    <DataTemplate x:Key="BindingContentTemplate">
+                        <TextBlock Text="{Binding Path=Binding}" Margin="4" HorizontalAlignment="Left"/>
+                    </DataTemplate>
+                    <DataTemplate x:Key="ConverterHeadTemplate">
+                        <TextBlock FontWeight="Bold" Text="Converter"/>
+                    </DataTemplate>
+                    <DataTemplate x:Key="ConverterContentTemplate">
+                        <TextBlock Text="{Binding Path=Converter}" Margin="4" HorizontalAlignment="Left"/>
+                    </DataTemplate>
+                </TabControl.Resources>
+                <TabItem Height="120">
+                    <TabItem.Header>
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="../img/Tx.png" Height="24" Margin="2,2,8,2"/>
+                            <TextBlock Text="Diagnostic" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </TabItem.Header>
+                    <DockPanel Margin="4">
+                        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
+                            <TextBlock Text="Offset In Word : " Margin="6" FontWeight="Bold"/>
+                            <TextBox Width="100" Margin="6" Text="{Binding TxDiagnosticAreaOffsetInWord}"/>
+                            <TextBlock Text="Size In Word : " Margin="6" FontWeight="Bold"/>
+                            <TextBox Width="100" Margin="6" Text="{Binding TxDiagnosticAreaSizeInWord}"/>
+                            <TextBlock Text="Actual Size In Byte : " Margin="6" FontWeight="Bold"/>
+                            <TextBox Width="100" Margin="6" Text="{Binding TxDiagnosticAreaActualSizeInByte, Mode=OneWay}" IsReadOnly="True"/>
+                        </StackPanel>
+                        <ListView Name="__lsv_tx_diagnostic_area" ItemsSource="{Binding TxDiagnosticArea}">
+                            <ListView.View>
+                                <GridView>
+                                    <GridViewColumn Width="100" HeaderTemplate="{StaticResource IndexHeadTemplate}" CellTemplate="{StaticResource IndexContentTemplate}"/>
+                                    <GridViewColumn Width="200" HeaderTemplate="{StaticResource FriendlyNameHeadTemplate}" CellTemplate="{StaticResource FriendlyNameContentTemplate}"/>
+                                    <GridViewColumn Width="100" HeaderTemplate="{StaticResource DataTypeHeadTemplate}" CellTemplate="{StaticResource DataTypeContentTemplate}"/>
+                                    <GridViewColumn Width="200" HeaderTemplate="{StaticResource BindingHeadTemplate}" CellTemplate="{StaticResource BindingContentTemplate}"/>
+                                    <GridViewColumn Width="200" HeaderTemplate="{StaticResource ConverterHeadTemplate}" CellTemplate="{StaticResource ConverterContentTemplate}"/>
+                                </GridView>
+                            </ListView.View>
+                        </ListView>
+                    </DockPanel>
+                </TabItem>
+                <TabItem Height="120">
+                    <TabItem.Header>
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="../img/Tx.png" Height="24" Margin="2,2,8,2"/>
+                            <TextBlock Text="Bit Area" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </TabItem.Header>
+                    <DockPanel Margin="4">
+                        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
+                            <TextBlock Text="Offset In Word : " Margin="6" FontWeight="Bold"/>
+                            <TextBox Width="100" Margin="6" Text="{Binding TxBitAreaOffsetInWord}"/>
+                            <TextBlock Text="Size In Word : " Margin="6" FontWeight="Bold"/>
+                            <TextBox Width="100" Margin="6" Text="{Binding TxBitAreaSizeInWord}"/>
+                            <TextBlock Text="Actual Size In Byte : " Margin="6" FontWeight="Bold"/>
+                            <TextBox Width="100" Margin="6" Text="{Binding TxBitAreaActualSizeInByte, Mode=OneWay}" IsReadOnly="True"/>
+                        </StackPanel>
+                        <ListView Name="__lsv_tx_bit_area" ItemsSource="{Binding TxBitArea}">
+                            <ListView.View>
+                                <GridView>
+                                    <GridViewColumn Width="100" HeaderTemplate="{StaticResource IndexHeadTemplate}" CellTemplate="{StaticResource IndexContentTemplate}"/>
+                                    <GridViewColumn Width="200" HeaderTemplate="{StaticResource FriendlyNameHeadTemplate}" CellTemplate="{StaticResource FriendlyNameContentTemplate}"/>
+                                    <GridViewColumn Width="100" HeaderTemplate="{StaticResource DataTypeHeadTemplate}" CellTemplate="{StaticResource DataTypeContentTemplate}"/>
+                                    <GridViewColumn Width="200" HeaderTemplate="{StaticResource BindingHeadTemplate}" CellTemplate="{StaticResource BindingContentTemplate}"/>
+                                    <GridViewColumn Width="200" HeaderTemplate="{StaticResource ConverterHeadTemplate}" CellTemplate="{StaticResource ConverterContentTemplate}"/>
+                                </GridView>
+                            </ListView.View>
+                        </ListView>
+                    </DockPanel>
+                </TabItem>
+                <TabItem Height="120">
+                    <TabItem.Header>
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="../img/Tx.png" Height="24" Margin="2,2,8,2"/>
+                            <TextBlock Text="Block Area" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </TabItem.Header>
+                    <DockPanel Margin="4">
+                        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
+                            <TextBlock Text="Offset In Word : " Margin="6" FontWeight="Bold"/>
+                            <TextBox Width="100" Margin="6" Text="{Binding TxBlockAreaOffsetInWord}"/>
+                            <TextBlock Text="Size In Word : " Margin="6" FontWeight="Bold"/>
+                            <TextBox Width="100" Margin="6" Text="{Binding TxBlockAreaSizeInWord}"/>
+                            <TextBlock Text="Actual Size In Byte : " Margin="6" FontWeight="Bold"/>
+                            <TextBox Width="100" Margin="6" Text="{Binding TxBlockAreaActualSizeInByte, Mode=OneWay}" IsReadOnly="True"/>
+                        </StackPanel>
+                        <ListView Name="__lsv_tx_block_area" ItemsSource="{Binding TxBlockArea}">
+                            <ListView.View>
+                                <GridView>
+                                    <GridViewColumn Width="100" HeaderTemplate="{StaticResource IndexHeadTemplate}" CellTemplate="{StaticResource IndexContentTemplate}"/>
+                                    <GridViewColumn Width="200" HeaderTemplate="{StaticResource FriendlyNameHeadTemplate}" CellTemplate="{StaticResource FriendlyNameContentTemplate}"/>
+                                    <GridViewColumn Width="100" HeaderTemplate="{StaticResource DataTypeHeadTemplate}" CellTemplate="{StaticResource DataTypeContentTemplate}"/>
+                                    <GridViewColumn Width="200" HeaderTemplate="{StaticResource BindingHeadTemplate}" CellTemplate="{StaticResource BindingContentTemplate}"/>
+                                    <GridViewColumn Width="200" HeaderTemplate="{StaticResource ConverterHeadTemplate}" CellTemplate="{StaticResource ConverterContentTemplate}"/>
+                                </GridView>
+                            </ListView.View>
+                        </ListView>
+                    </DockPanel>
+                </TabItem>
+                <TabItem Height="120">
+                    <TabItem.Header>
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="../img/Rx.png" Height="24" Margin="2,2,8,2"/>
+                            <TextBlock Text="Control" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </TabItem.Header>
+                    <DockPanel Margin="4">
+                        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
+                            <TextBlock Text="Offset In Word : " Margin="6" FontWeight="Bold"/>
+                            <TextBox Width="100" Margin="6" Text="{Binding RxControlAreaOffsetInWord}"/>
+                            <TextBlock Text="Size In Word : " Margin="6" FontWeight="Bold"/>
+                            <TextBox Width="100" Margin="6" Text="{Binding RxControlAreaSizeInWord}"/>
+                            <TextBlock Text="Actual Size In Byte : " Margin="6" FontWeight="Bold"/>
+                            <TextBox Width="100" Margin="6" Text="{Binding RxControlAreaActualSizeInByte, Mode=OneWay}" IsReadOnly="True"/>
+                        </StackPanel>
+                        <ListView Name="__lsv_rx_control_area" ItemsSource="{Binding RxControlArea}">
+                            <ListView.View>
+                                <GridView>
+                                    <GridViewColumn Width="100" HeaderTemplate="{StaticResource IndexHeadTemplate}" CellTemplate="{StaticResource IndexContentTemplate}"/>
+                                    <GridViewColumn Width="200" HeaderTemplate="{StaticResource FriendlyNameHeadTemplate}" CellTemplate="{StaticResource FriendlyNameContentTemplate}"/>
+                                    <GridViewColumn Width="100" HeaderTemplate="{StaticResource DataTypeHeadTemplate}" CellTemplate="{StaticResource DataTypeContentTemplate}"/>
+                                    <GridViewColumn Width="200" HeaderTemplate="{StaticResource BindingHeadTemplate}" CellTemplate="{StaticResource BindingContentTemplate}"/>
+                                    <GridViewColumn Width="200" HeaderTemplate="{StaticResource ConverterHeadTemplate}" CellTemplate="{StaticResource ConverterContentTemplate}"/>
+                                </GridView>
+                            </ListView.View>
+                        </ListView>
+                    </DockPanel>
+                </TabItem>
+                <TabItem Height="120">
+                    <TabItem.Header>
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="../img/Rx.png" Height="24" Margin="2,2,8,2"/>
+                            <TextBlock Text="Bit Area" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </TabItem.Header>
+                    <DockPanel Margin="4">
+                        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
+                            <TextBlock Text="Offset In Word : " Margin="6" FontWeight="Bold"/>
+                            <TextBox Width="100" Margin="6" Text="{Binding RxBitAreaOffsetInWord}"/>
+                            <TextBlock Text="Size In Word : " Margin="6" FontWeight="Bold"/>
+                            <TextBox Width="100" Margin="6" Text="{Binding RxBitAreaSizeInWord}"/>
+                            <TextBlock Text="Actual Size In Byte : " Margin="6" FontWeight="Bold"/>
+                            <TextBox Width="100" Margin="6" Text="{Binding RxBitAreaActualSizeInByte, Mode=OneWay}" IsReadOnly="True"/>
+                        </StackPanel>
+                        <ListView Name="__lsv_rx_bit_area" ItemsSource="{Binding RxBitArea}">
+                            <ListView.View>
+                                <GridView>
+                                    <GridViewColumn Width="100" HeaderTemplate="{StaticResource IndexHeadTemplate}" CellTemplate="{StaticResource IndexContentTemplate}"/>
+                                    <GridViewColumn Width="200" HeaderTemplate="{StaticResource FriendlyNameHeadTemplate}" CellTemplate="{StaticResource FriendlyNameContentTemplate}"/>
+                                    <GridViewColumn Width="100" HeaderTemplate="{StaticResource DataTypeHeadTemplate}" CellTemplate="{StaticResource DataTypeContentTemplate}"/>
+                                    <GridViewColumn Width="200" HeaderTemplate="{StaticResource BindingHeadTemplate}" CellTemplate="{StaticResource BindingContentTemplate}"/>
+                                    <GridViewColumn Width="200" HeaderTemplate="{StaticResource ConverterHeadTemplate}" CellTemplate="{StaticResource ConverterContentTemplate}"/>
+                                </GridView>
+                            </ListView.View>
+                        </ListView>
+                    </DockPanel>
+                </TabItem>
+                <TabItem Height="120">
+                    <TabItem.Header>
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="../img/Rx.png" Height="24" Margin="2,2,8,2"/>
+                            <TextBlock Text="Block Area" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </TabItem.Header>
+                    <DockPanel Margin="4">
+                        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
+                            <TextBlock Text="Offset In Word : " Margin="6" FontWeight="Bold"/>
+                            <TextBox Width="100" Margin="6" Text="{Binding RxBlockAreaOffsetInWord}"/>
+                            <TextBlock Text="Size In Word : " Margin="6" FontWeight="Bold"/>
+                            <TextBox Width="100" Margin="6" Text="{Binding RxBlockAreaSizeInWord}"/>
+                            <TextBlock Text="Actual Size In Byte : " Margin="6" FontWeight="Bold"/>
+                            <TextBox Width="100" Margin="6" Text="{Binding RxBlockAreaActualSizeInByte, Mode=OneWay}" IsReadOnly="True"/>
+                        </StackPanel>
+                        <ListView Name="__lsv_rx_block_area" ItemsSource="{Binding RxBlockArea}">
+                            <ListView.View>
+                                <GridView>
+                                    <GridViewColumn Width="100" HeaderTemplate="{StaticResource IndexHeadTemplate}" CellTemplate="{StaticResource IndexContentTemplate}"/>
+                                    <GridViewColumn Width="200" HeaderTemplate="{StaticResource FriendlyNameHeadTemplate}" CellTemplate="{StaticResource FriendlyNameContentTemplate}"/>
+                                    <GridViewColumn Width="100" HeaderTemplate="{StaticResource DataTypeHeadTemplate}" CellTemplate="{StaticResource DataTypeContentTemplate}"/>
+                                    <GridViewColumn Width="200" HeaderTemplate="{StaticResource BindingHeadTemplate}" CellTemplate="{StaticResource BindingContentTemplate}"/>
+                                    <GridViewColumn Width="200" HeaderTemplate="{StaticResource ConverterHeadTemplate}" CellTemplate="{StaticResource ConverterContentTemplate}"/>
+                                </GridView>
+                            </ListView.View>
+                        </ListView>
+                    </DockPanel>
+                </TabItem>
+            </TabControl>
+        </DockPanel>
+    </ScrollViewer>
 </UserControl>

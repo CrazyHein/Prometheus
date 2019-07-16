@@ -19,12 +19,12 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
         public ObservableCollection<ObjectItemDataModel> RxBitArea { get; private set; }
         public ObservableCollection<ObjectItemDataModel> RxBlockArea { get; private set; }
 
-        private uint __tx_diag_offset_in_word, __tx_diag_size_in_word, __tx_diag_actual_size_in_word;
-        private uint __tx_bit_offset_in_word, __tx_bit_size_in_word, __tx_bit_actual_size_in_word;
-        private uint __tx_block_offset_in_word, __tx_block_size_in_word, __tx_block_actual_size_in_word;
-        private uint __rx_control_offset_in_word, __rx_control_size_in_word;
-        private uint __rx_bit_offset_in_word, __rx_bit_size_in_word;
-        private uint __rx_block_offset_in_word, __rx_block_size_in_word;
+        private uint __tx_diag_offset_in_word, __tx_diag_size_in_word, __tx_diag_actual_size_in_byte;
+        private uint __tx_bit_offset_in_word, __tx_bit_size_in_word, __tx_bit_actual_size_in_byte;
+        private uint __tx_block_offset_in_word, __tx_block_size_in_word, __tx_block_actual_size_in_byte;
+        private uint __rx_control_offset_in_word, __rx_control_size_in_word, __rx_control_actual_size_in_byte;
+        private uint __rx_bit_offset_in_word, __rx_bit_size_in_word, __rx_bit_actual_size_in_byte;
+        private uint __rx_block_offset_in_word, __rx_block_size_in_word, __rx_block_actual_size_in_byte;
 
         public PDOCollectionDataModel(IOListDataHelper helper) : base(helper)
         {
@@ -46,10 +46,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             get { return __tx_diag_size_in_word; }
             set { SetProperty(ref __tx_diag_size_in_word, value); }
         }
-        public uint TxDiagnosticAreaActualSizeInWord
+        public uint TxDiagnosticAreaActualSizeInByte
         {
-            get { return __tx_diag_actual_size_in_word; }
-            private set { SetProperty(ref __tx_diag_actual_size_in_word, value); }
+            get { return __tx_diag_actual_size_in_byte; }
+            private set { SetProperty(ref __tx_diag_actual_size_in_byte, value); }
         }
 
         public uint TxBitAreaOffsetInWord
@@ -62,10 +62,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             get { return __tx_bit_size_in_word; }
             set { SetProperty(ref __tx_bit_size_in_word, value); }
         }
-        public uint TxBitAreaActualSizeInWord
+        public uint TxBitAreaActualSizeInByte
         {
-            get { return __tx_bit_actual_size_in_word; }
-            private set { SetProperty(ref __tx_bit_actual_size_in_word, value); }
+            get { return __tx_bit_actual_size_in_byte; }
+            private set { SetProperty(ref __tx_bit_actual_size_in_byte, value); }
         }
 
         public uint TxBlockAreaOffsetInWord
@@ -78,10 +78,58 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             get { return __tx_block_size_in_word; }
             set { SetProperty(ref __tx_block_size_in_word, value); }
         }
-        public uint TxBlockAreaActualSizeInWord
+        public uint TxBlockAreaActualSizeInByte
         {
-            get { return __tx_block_actual_size_in_word; }
-            private set { SetProperty(ref __tx_block_actual_size_in_word, value); }
+            get { return __tx_block_actual_size_in_byte; }
+            private set { SetProperty(ref __tx_block_actual_size_in_byte, value); }
+        }
+
+        public uint RxControlAreaOffsetInWord
+        {
+            get { return __rx_control_offset_in_word; }
+            set { SetProperty(ref __rx_control_offset_in_word, value); }
+        }
+        public uint RxControlAreaSizeInWord
+        {
+            get { return __rx_control_size_in_word; }
+            set { SetProperty(ref __rx_control_size_in_word, value); }
+        }
+        public uint RxControlAreaActualSizeInByte
+        {
+            get { return __rx_control_actual_size_in_byte; }
+            private set { SetProperty(ref __rx_control_actual_size_in_byte, value); }
+        }
+
+        public uint RxBitAreaOffsetInWord
+        {
+            get { return __rx_bit_offset_in_word; }
+            set { SetProperty(ref __rx_bit_offset_in_word, value); }
+        }
+        public uint RxBitAreaSizeInWord
+        {
+            get { return __rx_bit_size_in_word; }
+            set { SetProperty(ref __rx_bit_size_in_word, value); }
+        }
+        public uint RxBitAreaActualSizeInByte
+        {
+            get { return __rx_bit_actual_size_in_byte; }
+            private set { SetProperty(ref __rx_bit_actual_size_in_byte, value); }
+        }
+
+        public uint RxBlockAreaOffsetInWord
+        {
+            get { return __rx_block_offset_in_word; }
+            set { SetProperty(ref __rx_block_offset_in_word, value); }
+        }
+        public uint RxBlockAreaSizeInWord
+        {
+            get { return __rx_block_size_in_word; }
+            set { SetProperty(ref __rx_block_size_in_word, value); }
+        }
+        public uint RxBlockAreaActualSizeInByte
+        {
+            get { return __rx_block_actual_size_in_byte; }
+            private set { SetProperty(ref __rx_block_actual_size_in_byte, value); }
         }
 
         public override void UpdateDataHelper()
@@ -93,7 +141,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
         {
             TxDiagnosticAreaOffsetInWord = _data_helper.TxDiagnosticAreaOffset;
             TxDiagnosticAreaSizeInWord = _data_helper.TxDiagnosticAreaSize;
-            TxDiagnosticAreaActualSizeInWord = _data_helper.TxDiagnosticAreaActualSize;
+            TxDiagnosticAreaActualSizeInByte = _data_helper.TxDiagnosticAreaActualSize;
             TxDiagnosticArea.Clear();
             foreach (var o in _data_helper.TxDiagnosticArea)
             {
@@ -102,8 +150,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             }
 
             TxBitAreaOffsetInWord = _data_helper.TxBitAreaOffset;
-            TxBitAreaSizeInWord = _data_helper.TxBitAreaAreaSize;
-            TxBitAreaActualSizeInWord = _data_helper.TxBitAreaAreaActualSize;
+            TxBitAreaSizeInWord = _data_helper.TxBitAreaSize;
+            TxBitAreaActualSizeInByte = _data_helper.TxBitAreaActualSize;
             TxBitArea.Clear();
             foreach (var o in _data_helper.TxBitArea)
             {
@@ -112,8 +160,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             }
 
             TxBlockAreaOffsetInWord = _data_helper.TxBlockAreaOffset;
-            TxBlockAreaSizeInWord = _data_helper.TxBlockAreaAreaSize;
-            TxBlockAreaActualSizeInWord = _data_helper.TxBlockAreaAreaActualSize;
+            TxBlockAreaSizeInWord = _data_helper.TxBlockAreaSize;
+            TxBlockAreaActualSizeInByte = _data_helper.TxBlockAreaActualSize;
             TxBlockArea.Clear();
             foreach (var o in _data_helper.TxBlockArea)
             {
@@ -121,6 +169,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
                 TxBlockArea.Add(model);
             }
 
+            RxControlAreaOffsetInWord = _data_helper.RxControlAreaOffset;
+            RxControlAreaSizeInWord = _data_helper.RxControlAreaSize;
+            RxControlAreaActualSizeInByte = _data_helper.RxControlAreaActualSize;
             RxControlArea.Clear();
             foreach (var o in _data_helper.RxControlArea)
             {
@@ -128,6 +179,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
                 RxControlArea.Add(model);
             }
 
+            RxBitAreaOffsetInWord = _data_helper.RxBitAreaOffset;
+            RxBitAreaSizeInWord = _data_helper.RxBitAreaSize;
+            RxBitAreaActualSizeInByte = _data_helper.RxBitAreaActualSize;
             RxBitArea.Clear();
             foreach (var o in _data_helper.RxBitArea)
             {
@@ -135,11 +189,14 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
                 RxBitArea.Add(model);
             }
 
+            RxBlockAreaOffsetInWord = _data_helper.RxBlockAreaOffset;
+            RxBlockAreaSizeInWord = _data_helper.RxBlockAreaSize;
+            RxBlockAreaActualSizeInByte = _data_helper.RxBlockAreaActualSize;
             RxBlockArea.Clear();
             foreach (var o in _data_helper.RxBlockArea)
             {
                 ObjectItemDataModel model = new ObjectItemDataModel(o);
-                TxBlockArea.Add(model);
+                RxBlockArea.Add(model);
             }
         }
     

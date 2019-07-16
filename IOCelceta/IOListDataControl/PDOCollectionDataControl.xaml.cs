@@ -24,9 +24,6 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
         {
             InitializeComponent();
             DataContext = dataModel;
-            __lsv_tx_diagnostic_area.ItemsSource = dataModel.TxDiagnosticArea;
-            __lsv_tx_bit_area.ItemsSource = dataModel.TxBitArea;
-            __lsv_tx_block_area.ItemsSource = dataModel.TxBlockArea;
         }
     }
 }
