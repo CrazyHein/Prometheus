@@ -985,6 +985,49 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                 return __controller_pdo_collection.rx_pdo_block_area.objects;
             }
         }
+
+        public void SwapPDOItem(IO_LIST_PDO_AREA_T area, int first, int second)
+        {
+            IO_LIST_CONTROLLER_PDO_COLLECTION.PDO_DEFINITION_T pdo = null;
+            switch(area)
+            {
+                case IO_LIST_PDO_AREA_T.TX_DIAGNOSTIC:
+                    pdo = __controller_pdo_collection.tx_pdo_diagnostic_area;
+                    break;
+                case IO_LIST_PDO_AREA_T.TX_BIT:
+                    pdo = __controller_pdo_collection.tx_pdo_bit_area;
+                    break;
+                case IO_LIST_PDO_AREA_T.TX_BLOCK:
+                    pdo = __controller_pdo_collection.tx_pdo_block_area;
+                    break;
+
+                case IO_LIST_PDO_AREA_T.RX_CONTROL:
+                    pdo = __controller_pdo_collection.rx_pdo_control_area;
+                    break;
+                case IO_LIST_PDO_AREA_T.RX_BIT:
+                    pdo = __controller_pdo_collection.rx_pdo_bit_area;
+                    break;
+                case IO_LIST_PDO_AREA_T.RX_BLOCK:
+                    pdo = __controller_pdo_collection.rx_pdo_block_area;
+                    break;
+            }
+
+
+            try
+            {
+                IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T temp = pdo.objects[first];
+                pdo.objects[first] = pdo.objects[second];
+                pdo.objects[second] = temp;
+            }
+            catch (IOListParseExcepetion e)
+            {
+                throw e;
+            }
+            catch (Exception e)
+            {
+                throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.FILE_DATA_EXCEPTION, e);
+            }
+        }
     }
 
     public class IO_LIST_TARGET_INFORMATION_T
