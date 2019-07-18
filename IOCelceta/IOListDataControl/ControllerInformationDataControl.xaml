@@ -7,6 +7,20 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
+        <Grid.Resources>
+            <ContextMenu x:Key="ContextMenu">
+                <MenuItem Command="local:IOListDataControlCommand.RemoveElement">
+                    <MenuItem.Icon>
+                        <Image Source="../img/remove.png"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Command="local:IOListDataControlCommand.ModifyElement">
+                    <MenuItem.Icon>
+                        <Image Source="../img/detail.png"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+            </ContextMenu>
+        </Grid.Resources>
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"/>
             <RowDefinition/>
@@ -30,9 +44,14 @@
             </Grid>
         </GroupBox>
         <GroupBox Header="Extension Modules" Grid.Row="1" Margin="4" Padding="8,4,8,4">
+            <GroupBox.CommandBindings>
+                <CommandBinding Command="local:IOListDataControlCommand.AddElement" Executed="__on_extension_add_element_command_executed"/>
+                <CommandBinding Command="local:IOListDataControlCommand.RemoveElement" Executed="__on_extension_remove_element_command_executed" CanExecute="__on_extension_remove_modify_element_can_executed"/>
+                <CommandBinding Command="local:IOListDataControlCommand.ModifyElement" Executed="__on_extension_modify_element_command_executed" CanExecute="__on_extension_remove_modify_element_can_executed"/>
+            </GroupBox.CommandBindings>
             <DockPanel>
                 <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Right">
-                    <Button Width="120" Margin="4" Height="32" Click="__on_add_controller_extension_module_click">
+                    <Button Width="120" Margin="4" Height="32" Command="local:IOListDataControlCommand.AddElement">
                         <Button.Content>
                             <StackPanel Orientation="Horizontal">
                                 <Image Source="../img/add.png" Margin="2,2,8,2"/>
@@ -40,7 +59,7 @@
                             </StackPanel>
                         </Button.Content>
                     </Button>
-                    <Button Width="120" Margin="4" Height="32" Click="__on_remove_controller_extension_module_click">
+                    <Button Width="120" Margin="4" Height="32" Command="local:IOListDataControlCommand.RemoveElement">
                         <Button.Content>
                             <StackPanel Orientation="Horizontal">
                                 <Image Source="../img/remove.png" Margin="2,2,8,2"/>
@@ -49,7 +68,7 @@
                         </Button.Content>
                     </Button>
                 </StackPanel>
-                <ListView Name="__lsv_extension_modules" MouseDoubleClick="__on_extension_modules_mouse_double_click" DockPanel.Dock="Top">
+                <ListView Name="__lsv_extension_modules" DockPanel.Dock="Top" SelectionMode="Single" ContextMenu="{StaticResource ResourceKey=ContextMenu}">
                     <ListView.Resources>
                         <Style TargetType="ListViewItem">
                             <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
@@ -96,9 +115,14 @@
         </GroupBox>
 
         <GroupBox Header="Ethernet Modules" Grid.Row="2" Margin="4" Padding="8,4,8,4">
+            <GroupBox.CommandBindings>
+                <CommandBinding Command="local:IOListDataControlCommand.AddElement" Executed="__on_ethernet_add_element_command_executed"/>
+                <CommandBinding Command="local:IOListDataControlCommand.RemoveElement" Executed="__on_ethernet_remove_element_command_executed" CanExecute="__on_ethernet_remove_modify_element_can_executed"/>
+                <CommandBinding Command="local:IOListDataControlCommand.ModifyElement" Executed="__on_ethernet_modify_element_command_executed" CanExecute="__on_ethernet_remove_modify_element_can_executed"/>
+            </GroupBox.CommandBindings>
             <DockPanel>
                 <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Right">
-                    <Button Width="120" Margin="4" Height="32" Click="__on_add_controller_ethernet_module_click">
+                    <Button Width="120" Margin="4" Height="32" Command="local:IOListDataControlCommand.AddElement">
                         <Button.Content>
                             <StackPanel Orientation="Horizontal">
                                 <Image Source="../img/add.png" Margin="2,2,8,2"/>
@@ -106,7 +130,7 @@
                             </StackPanel>
                         </Button.Content>
                     </Button>
-                    <Button Width="120" Margin="4" Height="32" Click="__on_remove_controller_ethernet_module_click">
+                    <Button Width="120" Margin="4" Height="32" Command="local:IOListDataControlCommand.RemoveElement">
                         <Button.Content>
                             <StackPanel Orientation="Horizontal">
                                 <Image Source="../img/remove.png" Margin="2,2,8,2"/>
@@ -115,7 +139,7 @@
                         </Button.Content>
                     </Button>
                 </StackPanel>
-                <ListView Name="__lsv_ethernet_modules" MouseDoubleClick="__on_ethernet_modules_mouse_double_click">
+                <ListView Name="__lsv_ethernet_modules" SelectionMode="Single" ContextMenu="{StaticResource ResourceKey=ContextMenu}">
                     <ListView.Resources>
                         <Style TargetType="ListViewItem">
                             <Setter Property="HorizontalContentAlignment" Value="Stretch"/>

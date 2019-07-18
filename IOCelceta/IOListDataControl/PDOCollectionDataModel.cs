@@ -132,6 +132,31 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             private set { SetProperty(ref __rx_block_actual_size_in_byte, value); }
         }
 
+        public void UpdateAreaActualSize(IO_LIST_PDO_AREA_T area)
+        {
+            switch (area)
+            {
+                case IO_LIST_PDO_AREA_T.TX_DIAGNOSTIC:
+                    TxDiagnosticAreaActualSizeInByte = _data_helper.TxDiagnosticAreaActualSize;
+                    break;
+                case IO_LIST_PDO_AREA_T.TX_BIT:
+                    TxBitAreaActualSizeInByte = _data_helper.TxBitAreaActualSize;
+                    break;
+                case IO_LIST_PDO_AREA_T.TX_BLOCK:
+                    TxBlockAreaActualSizeInByte = _data_helper.TxBlockAreaActualSize;
+                    break;
+                case IO_LIST_PDO_AREA_T.RX_CONTROL:
+                    RxControlAreaActualSizeInByte = _data_helper.RxControlAreaActualSize;
+                    break;
+                case IO_LIST_PDO_AREA_T.RX_BIT:
+                    RxBitAreaActualSizeInByte = _data_helper.RxBitAreaActualSize;
+                    break;
+                case IO_LIST_PDO_AREA_T.RX_BLOCK:
+                    RxBlockAreaActualSizeInByte = _data_helper.RxBlockAreaActualSize;
+                    break;
+            }
+        }
+
         public override void UpdateDataHelper()
         {
             throw new NotImplementedException();

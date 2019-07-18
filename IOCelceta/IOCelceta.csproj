@@ -77,6 +77,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="IOListDataControl\ObjectSearchDataControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="IOListDataControl\PDOCollectionDataControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -108,6 +112,7 @@
       <DependentUpon>ControllerModuleDataControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="IOListDataControl\ControllerModuleDataModel.cs" />
+    <Compile Include="IOListDataControl\IOListDataControlCommand.cs" />
     <Compile Include="IOListDataControl\IOListDataModel.cs" />
     <Compile Include="IOListDataControl\ObjectCollectionDataControl.xaml.cs">
       <DependentUpon>ObjectCollectionDataControl.xaml</DependentUpon>
@@ -117,6 +122,10 @@
       <DependentUpon>ObjectDataControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="IOListDataControl\ObjectDataModel.cs" />
+    <Compile Include="IOListDataControl\ObjectSearchDataControl.xaml.cs">
+      <DependentUpon>ObjectSearchDataControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="IOListDataControl\ObjectSearchDataModel.cs" />
     <Compile Include="IOListDataControl\PDOCollectionDataControl.xaml.cs">
       <DependentUpon>PDOCollectionDataControl.xaml</DependentUpon>
     </Compile>
@@ -189,8 +198,8 @@
     <SplashScreen Include="img\splash.jpg" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="img\Rx.png" />
-    <Resource Include="img\Tx.png" />
+    <Resource Include="img\rx.png" />
+    <Resource Include="img\tx.png" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="img\down.png" />
@@ -198,6 +207,9 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="img\down_left.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="img\detail.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

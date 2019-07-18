@@ -7,8 +7,27 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <DockPanel>
+        <DockPanel.CommandBindings>
+            <CommandBinding Command="local:IOListDataControlCommand.AddElement" Executed="__on_add_element_command_executed"/>
+            <CommandBinding Command="local:IOListDataControlCommand.RemoveElement" Executed="__on_remove_element_command_executed" CanExecute="__on_remove_modify_element_can_executed"/>
+            <CommandBinding Command="local:IOListDataControlCommand.ModifyElement" Executed="__on_modify_element_command_executed" CanExecute="__on_remove_modify_element_can_executed"/>
+        </DockPanel.CommandBindings>
+        <DockPanel.Resources>
+            <ContextMenu x:Key="ContextMenu">
+                <MenuItem Command="local:IOListDataControlCommand.RemoveElement">
+                    <MenuItem.Icon>
+                        <Image Source="../img/remove.png"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Command="local:IOListDataControlCommand.ModifyElement">
+                    <MenuItem.Icon>
+                        <Image Source="../img/detail.png"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+            </ContextMenu>
+        </DockPanel.Resources>
         <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Right">
-            <Button Width="120" Margin="4" Height="32" Click="__on_add_object_click">
+            <Button Width="120" Margin="4" Height="32" Command="local:IOListDataControlCommand.AddElement">
                 <Button.Content>
                     <StackPanel Orientation="Horizontal">
                         <Image Source="../img/add.png" Margin="2,2,8,2"/>
@@ -16,7 +35,7 @@
                     </StackPanel>
                 </Button.Content>
             </Button>
-            <Button Width="120" Margin="4" Height="32" Click="__on_remove_object_click">
+            <Button Width="120" Margin="4" Height="32" Command="local:IOListDataControlCommand.RemoveElement">
                 <Button.Content>
                     <StackPanel Orientation="Horizontal">
                         <Image Source="../img/remove.png" Margin="2,2,8,2"/>
@@ -65,7 +84,7 @@
                 <ComboBox Grid.Row="1" Grid.Column="4" Margin="4" IsEnabled="{Binding ElementName=__chk_filtered_by_binding_module, Path=IsChecked}" Name="__cmb_filter_binding_module" SelectionChanged="__cmb_filter_binding_module_selection_changed" DropDownOpened="__cmb_filter_binding_module_drop_down_opened"/>
             </Grid>
         </GroupBox>
-        <ListView Name="__lsv_io_objects" MouseDoubleClick="__lsv_io_objects_mouse_double_click" Margin="4">
+        <ListView Name="__lsv_io_objects" Margin="4" SelectionMode="Single" ContextMenu="{StaticResource ContextMenu}">
             <ListView.Resources>
                 <Style TargetType="ListViewItem">
                     <Setter Property="HorizontalContentAlignment" Value="Stretch"/>

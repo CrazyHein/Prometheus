@@ -29,38 +29,6 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             __lsv_ethernet_modules.ItemsSource = dataModel.EthernetModules;
         }
 
-        private void __on_extension_modules_mouse_double_click(object sender, MouseButtonEventArgs e)
-        {
-            ListView view = sender as ListView;
-            ControllerExtensionModuleDataModel selectedData = view.SelectedItem as ControllerExtensionModuleDataModel;
-            if (selectedData != null)
-            {
-                ControllerInformationDataModel host = DataContext as ControllerInformationDataModel;
-                ControllerModuleDataModel moduleDataModel = new ControllerModuleDataModel(host, selectedData, null);
-                ControllerModuleDataControl moduleDataControl = new ControllerModuleDataControl(moduleDataModel);
-                if(moduleDataControl.ShowDialog() == true)
-                {
-
-                }
-            }
-        }
-
-        private void __on_ethernet_modules_mouse_double_click(object sender, MouseButtonEventArgs e)
-        {
-            ListView view = sender as ListView;
-            ControllerEthernetModuleDataModel selectedData = view.SelectedItem as ControllerEthernetModuleDataModel;
-            if (selectedData != null)
-            {
-                ControllerInformationDataModel host = DataContext as ControllerInformationDataModel;
-                ControllerModuleDataModel moduleDataModel = new ControllerModuleDataModel(host, null, selectedData);
-                ControllerModuleDataControl moduleDataControl = new ControllerModuleDataControl(moduleDataModel);
-                if (moduleDataControl.ShowDialog() == true)
-                {
-
-                }
-            }
-        }
-
         private int __data_binding_error_counter = 0;
         private void __on_data_binding_error(object sender, ValidationErrorEventArgs e)
         {
@@ -70,7 +38,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
                 __data_binding_error_counter--;
         }
 
-        private void __on_add_controller_extension_module_click(object sender, RoutedEventArgs e)
+        private void __on_extension_add_element_command_executed(object sender, ExecutedRoutedEventArgs e)
         {
             ControllerInformationDataModel host = DataContext as ControllerInformationDataModel;
 
@@ -83,14 +51,15 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             {
 
             }
+            e.Handled = true;
         }
 
-        private void __on_remove_controller_extension_module_click(object sender, RoutedEventArgs e)
+        private void __on_extension_remove_element_command_executed(object sender, ExecutedRoutedEventArgs e)
         {
             ControllerExtensionModuleDataModel selectedData = __lsv_extension_modules.SelectedItem as ControllerExtensionModuleDataModel;
             if (selectedData != null)
             {
-                if(MessageBox.Show("Are you sure ?","Question", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+                if (MessageBox.Show("Are you sure ?", "Question", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
                 {
                     try
                     {
@@ -98,7 +67,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
                         dataModel.DataHelper.RemoveControllerModule(selectedData.ReferenceName);
                         dataModel.ExtensionModules.Remove(selectedData);
                     }
-                    catch(IOListParseExcepetion exp)
+                    catch (IOListParseExcepetion exp)
                     {
                         string message;
                         if (exp.ErrorCode == IO_LIST_FILE_ERROR_T.FILE_DATA_EXCEPTION)
@@ -110,12 +79,29 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
                     }
                 }
             }
+            e.Handled = true;
         }
 
-        private void __on_add_controller_ethernet_module_click(object sender, RoutedEventArgs e)
+        private void __on_extension_modify_element_command_executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            ControllerExtensionModuleDataModel selectedData = __lsv_extension_modules.SelectedItem as ControllerExtensionModuleDataModel;
+            if (selectedData != null)
+            {
+                ControllerInformationDataModel host = DataContext as ControllerInformationDataModel;
+                ControllerModuleDataModel moduleDataModel = new ControllerModuleDataModel(host, selectedData, null);
+                ControllerModuleDataControl moduleDataControl = new ControllerModuleDataControl(moduleDataModel);
+                if (moduleDataControl.ShowDialog() == true)
+                {
+
+                }
+            }
+            e.Handled = true;
+        }
+
+        private void __on_ethernet_add_element_command_executed(object sender, ExecutedRoutedEventArgs e)
         {
             ControllerInformationDataModel host = DataContext as ControllerInformationDataModel;
-  
+
             ControllerEthernetModuleDataModel data = new ControllerEthernetModuleDataModel(
                 host.DataHelper.ControllerCatalogue.EthernetModels.Keys.First(),
                 host.DataHelper.ControllerCatalogue.EthernetModels[host.DataHelper.ControllerCatalogue.EthernetModels.Keys.First()].Name);
@@ -125,10 +111,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             {
 
             }
-            
+            e.Handled = true;
         }
 
-        private void __on_remove_controller_ethernet_module_click(object sender, RoutedEventArgs e)
+        private void __on_ethernet_remove_element_command_executed(object sender, ExecutedRoutedEventArgs e)
         {
             ControllerEthernetModuleDataModel selectedData = __lsv_ethernet_modules.SelectedItem as ControllerEthernetModuleDataModel;
             if (selectedData != null)
@@ -153,6 +139,39 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
                     }
                 }
             }
+            e.Handled = true;
+        }
+
+        private void __on_ethernet_modify_element_command_executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            ControllerEthernetModuleDataModel selectedData = __lsv_ethernet_modules.SelectedItem as ControllerEthernetModuleDataModel;
+            if (selectedData != null)
+            {
+                ControllerInformationDataModel host = DataContext as ControllerInformationDataModel;
+                ControllerModuleDataModel moduleDataModel = new ControllerModuleDataModel(host, null, selectedData);
+                ControllerModuleDataControl moduleDataControl = new ControllerModuleDataControl(moduleDataModel);
+                if (moduleDataControl.ShowDialog() == true)
+                {
+
+                }
+            }
+            e.Handled = true;
+        }
+
+        private void __on_extension_remove_modify_element_can_executed(object sender, CanExecuteRoutedEventArgs e)
+        {
+            if (__lsv_extension_modules == null)
+                e.CanExecute = false;
+            else
+                e.CanExecute = __lsv_extension_modules.SelectedItem != null;
+        }
+
+        private void __on_ethernet_remove_modify_element_can_executed(object sender, CanExecuteRoutedEventArgs e)
+        {
+            if (__lsv_ethernet_modules == null)
+                e.CanExecute = false;
+            else
+                e.CanExecute = __lsv_ethernet_modules.SelectedItem != null;
         }
     }
 }

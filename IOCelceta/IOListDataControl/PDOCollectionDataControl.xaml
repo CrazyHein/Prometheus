@@ -9,6 +9,43 @@
              d:DesignHeight="850" d:DesignWidth="800">
     <ScrollViewer HorizontalScrollBarVisibility="Auto">
         <DockPanel Margin="4" LastChildFill="True">
+            <DockPanel.CommandBindings>
+                <CommandBinding Command="local:IOListDataControlCommand.AddElement" Executed="__on_add_element_command_executed"/>
+                <CommandBinding Command="local:IOListDataControlCommand.RemoveElement" Executed="__on_remove_element_command_executed" CanExecute="__on_remove_modify_element_can_executed"/>
+                <CommandBinding Command="local:IOListDataControlCommand.ModifyElement" Executed="__on_modify_element_command_executed" CanExecute="__on_remove_modify_element_can_executed"/>
+                <CommandBinding Command="local:IOListDataControlCommand.MoveElementUp" Executed="__on_move_element_up_command_executed" CanExecute="__on_move_element_up_can_executed"/>
+                <CommandBinding Command="local:IOListDataControlCommand.MoveElementDown" Executed="__on_move_element_down_command_executed" CanExecute="__on_move_element_down_can_executed"/>
+                <CommandBinding Command="local:IOListDataControlCommand.InsertElementBefore" Executed="__on_insert_element_before_command_executed" CanExecute="__on_remove_modify_element_can_executed"/>
+            </DockPanel.CommandBindings>
+            <DockPanel.Resources>
+                <ContextMenu x:Key="ContextMenu">
+                    <MenuItem Command="local:IOListDataControlCommand.RemoveElement">
+                        <MenuItem.Icon>
+                            <Image Source="../img/remove.png"/>
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem Command="local:IOListDataControlCommand.ModifyElement">
+                        <MenuItem.Icon>
+                            <Image Source="../img/detail.png"/>
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem Command="local:IOListDataControlCommand.MoveElementUp">
+                        <MenuItem.Icon>
+                            <Image Source="../img/up.png"/>
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem Command="local:IOListDataControlCommand.MoveElementDown">
+                        <MenuItem.Icon>
+                            <Image Source="../img/down.png"/>
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem Command="local:IOListDataControlCommand.InsertElementBefore">
+                        <MenuItem.Icon>
+                            <Image Source="../img/down_left.png"/>
+                        </MenuItem.Icon>
+                    </MenuItem>
+                </ContextMenu>
+            </DockPanel.Resources>
             <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Right">
                 <StackPanel.Resources>
                     <Style TargetType="Button">
@@ -20,7 +57,7 @@
                         <Setter Property="Margin" Value="2,2,8,2"/>
                     </Style>
                 </StackPanel.Resources>
-                <Button>
+                <Button Command="local:IOListDataControlCommand.AddElement">
                     <Button.Content>
                         <StackPanel Orientation="Horizontal">
                             <Image Source="../img/add.png"/>
@@ -28,7 +65,7 @@
                         </StackPanel>
                     </Button.Content>
                 </Button>
-                <Button>
+                <Button Command="local:IOListDataControlCommand.InsertElementBefore">
                     <Button.Content>
                         <StackPanel Orientation="Horizontal">
                             <Image Source="../img/down_left.png"/>
@@ -36,7 +73,7 @@
                         </StackPanel>
                     </Button.Content>
                 </Button>
-                <Button>
+                <Button Command="local:IOListDataControlCommand.RemoveElement">
                     <Button.Content>
                         <StackPanel Orientation="Horizontal">
                             <Image Source="../img/remove.png"/>
@@ -44,7 +81,7 @@
                         </StackPanel>
                     </Button.Content>
                 </Button>
-                <Button Click="__on_pdo_item_move_up_click">
+                <Button Command="local:IOListDataControlCommand.MoveElementUp">
                     <Button.Content>
                         <StackPanel Orientation="Horizontal">
                             <Image Source="../img/up.png"/>
@@ -52,7 +89,7 @@
                         </StackPanel>
                     </Button.Content>
                 </Button>
-                <Button>
+                <Button Command="local:IOListDataControlCommand.MoveElementDown">
                     <Button.Content>
                         <StackPanel Orientation="Horizontal">
                             <Image Source="../img/down.png"/>
@@ -119,7 +156,7 @@
                 <TabItem Height="120" Tag="{x:Static root:IO_LIST_PDO_AREA_T.TX_DIAGNOSTIC}">
                     <TabItem.Header>
                         <StackPanel Orientation="Horizontal">
-                            <Image Source="../img/Tx.png" Height="24" Margin="2,2,8,2"/>
+                            <Image Source="../img/tx.png" Height="24" Margin="2,2,8,2"/>
                             <TextBlock Text="Diagnostic" VerticalAlignment="Center"/>
                         </StackPanel>
                     </TabItem.Header>
@@ -132,7 +169,7 @@
                             <TextBlock Text="Actual Size In Byte : " Margin="6" FontWeight="Bold"/>
                             <TextBox Width="100" Margin="6" Text="{Binding TxDiagnosticAreaActualSizeInByte, Mode=OneWay}" IsReadOnly="True"/>
                         </StackPanel>
-                        <ListView Name="__lsv_tx_diagnostic_area" ItemsSource="{Binding TxDiagnosticArea}">
+                        <ListView Name="__lsv_tx_diagnostic_area" ItemsSource="{Binding TxDiagnosticArea}" SelectionMode="Single" ContextMenu="{StaticResource ContextMenu}">
                             <ListView.View>
                                 <GridView>
                                     <GridViewColumn Width="100" HeaderTemplate="{StaticResource IndexHeadTemplate}" CellTemplate="{StaticResource IndexContentTemplate}"/>
@@ -148,7 +185,7 @@
                 <TabItem Height="120" Tag="{x:Static root:IO_LIST_PDO_AREA_T.TX_BIT}">
                     <TabItem.Header>
                         <StackPanel Orientation="Horizontal">
-                            <Image Source="../img/Tx.png" Height="24" Margin="2,2,8,2"/>
+                            <Image Source="../img/tx.png" Height="24" Margin="2,2,8,2"/>
                             <TextBlock Text="Bit Area" VerticalAlignment="Center"/>
                         </StackPanel>
                     </TabItem.Header>
@@ -161,7 +198,7 @@
                             <TextBlock Text="Actual Size In Byte : " Margin="6" FontWeight="Bold"/>
                             <TextBox Width="100" Margin="6" Text="{Binding TxBitAreaActualSizeInByte, Mode=OneWay}" IsReadOnly="True"/>
                         </StackPanel>
-                        <ListView Name="__lsv_tx_bit_area" ItemsSource="{Binding TxBitArea}">
+                        <ListView Name="__lsv_tx_bit_area" ItemsSource="{Binding TxBitArea}" SelectionMode="Single"  ContextMenu="{StaticResource ContextMenu}">
                             <ListView.View>
                                 <GridView>
                                     <GridViewColumn Width="100" HeaderTemplate="{StaticResource IndexHeadTemplate}" CellTemplate="{StaticResource IndexContentTemplate}"/>
@@ -177,7 +214,7 @@
                 <TabItem Height="120" Tag="{x:Static root:IO_LIST_PDO_AREA_T.TX_BLOCK}">
                     <TabItem.Header>
                         <StackPanel Orientation="Horizontal">
-                            <Image Source="../img/Tx.png" Height="24" Margin="2,2,8,2"/>
+                            <Image Source="../img/tx.png" Height="24" Margin="2,2,8,2"/>
                             <TextBlock Text="Block Area" VerticalAlignment="Center"/>
                         </StackPanel>
                     </TabItem.Header>
@@ -190,7 +227,7 @@
                             <TextBlock Text="Actual Size In Byte : " Margin="6" FontWeight="Bold"/>
                             <TextBox Width="100" Margin="6" Text="{Binding TxBlockAreaActualSizeInByte, Mode=OneWay}" IsReadOnly="True"/>
                         </StackPanel>
-                        <ListView Name="__lsv_tx_block_area" ItemsSource="{Binding TxBlockArea}">
+                        <ListView Name="__lsv_tx_block_area" ItemsSource="{Binding TxBlockArea}" SelectionMode="Single"  ContextMenu="{StaticResource ContextMenu}">
                             <ListView.View>
                                 <GridView>
                                     <GridViewColumn Width="100" HeaderTemplate="{StaticResource IndexHeadTemplate}" CellTemplate="{StaticResource IndexContentTemplate}"/>
@@ -206,7 +243,7 @@
                 <TabItem Height="120" Tag="{x:Static root:IO_LIST_PDO_AREA_T.RX_CONTROL}">
                     <TabItem.Header>
                         <StackPanel Orientation="Horizontal">
-                            <Image Source="../img/Rx.png" Height="24" Margin="2,2,8,2"/>
+                            <Image Source="../img/rx.png" Height="24" Margin="2,2,8,2"/>
                             <TextBlock Text="Control" VerticalAlignment="Center"/>
                         </StackPanel>
                     </TabItem.Header>
@@ -219,7 +256,7 @@
                             <TextBlock Text="Actual Size In Byte : " Margin="6" FontWeight="Bold"/>
                             <TextBox Width="100" Margin="6" Text="{Binding RxControlAreaActualSizeInByte, Mode=OneWay}" IsReadOnly="True"/>
                         </StackPanel>
-                        <ListView Name="__lsv_rx_control_area" ItemsSource="{Binding RxControlArea}">
+                        <ListView Name="__lsv_rx_control_area" ItemsSource="{Binding RxControlArea}" SelectionMode="Single"  ContextMenu="{StaticResource ContextMenu}">
                             <ListView.View>
                                 <GridView>
                                     <GridViewColumn Width="100" HeaderTemplate="{StaticResource IndexHeadTemplate}" CellTemplate="{StaticResource IndexContentTemplate}"/>
@@ -235,7 +272,7 @@
                 <TabItem Height="120" Tag="{x:Static root:IO_LIST_PDO_AREA_T.RX_BIT}">
                     <TabItem.Header>
                         <StackPanel Orientation="Horizontal">
-                            <Image Source="../img/Rx.png" Height="24" Margin="2,2,8,2"/>
+                            <Image Source="../img/rx.png" Height="24" Margin="2,2,8,2"/>
                             <TextBlock Text="Bit Area" VerticalAlignment="Center"/>
                         </StackPanel>
                     </TabItem.Header>
@@ -248,7 +285,7 @@
                             <TextBlock Text="Actual Size In Byte : " Margin="6" FontWeight="Bold"/>
                             <TextBox Width="100" Margin="6" Text="{Binding RxBitAreaActualSizeInByte, Mode=OneWay}" IsReadOnly="True"/>
                         </StackPanel>
-                        <ListView Name="__lsv_rx_bit_area" ItemsSource="{Binding RxBitArea}">
+                        <ListView Name="__lsv_rx_bit_area" ItemsSource="{Binding RxBitArea}" SelectionMode="Single"  ContextMenu="{StaticResource ContextMenu}">
                             <ListView.View>
                                 <GridView>
                                     <GridViewColumn Width="100" HeaderTemplate="{StaticResource IndexHeadTemplate}" CellTemplate="{StaticResource IndexContentTemplate}"/>
@@ -264,7 +301,7 @@
                 <TabItem Height="120" Tag="{x:Static root:IO_LIST_PDO_AREA_T.RX_BLOCK}">
                     <TabItem.Header>
                         <StackPanel Orientation="Horizontal">
-                            <Image Source="../img/Rx.png" Height="24" Margin="2,2,8,2"/>
+                            <Image Source="../img/rx.png" Height="24" Margin="2,2,8,2"/>
                             <TextBlock Text="Block Area" VerticalAlignment="Center"/>
                         </StackPanel>
                     </TabItem.Header>
@@ -277,7 +314,7 @@
                             <TextBlock Text="Actual Size In Byte : " Margin="6" FontWeight="Bold"/>
                             <TextBox Width="100" Margin="6" Text="{Binding RxBlockAreaActualSizeInByte, Mode=OneWay}" IsReadOnly="True"/>
                         </StackPanel>
-                        <ListView Name="__lsv_rx_block_area" ItemsSource="{Binding RxBlockArea}">
+                        <ListView Name="__lsv_rx_block_area" ItemsSource="{Binding RxBlockArea}" SelectionMode="Single"  ContextMenu="{StaticResource ContextMenu}">
                             <ListView.View>
                                 <GridView>
                                     <GridViewColumn Width="100" HeaderTemplate="{StaticResource IndexHeadTemplate}" CellTemplate="{StaticResource IndexContentTemplate}"/>

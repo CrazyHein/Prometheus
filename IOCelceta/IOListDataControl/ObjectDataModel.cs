@@ -65,12 +65,12 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             };
             if (__edit_mode == true)
             {
-                HostDataModel.DataHelper.ModifyDataObject(__object_item_data_model.Index, objectItem);
+                HostDataModel.DataHelper.ModifyObjectData(__object_item_data_model.Index, objectItem);
                 __object_item_data_model.UpdataDataModel(objectItem);
             }
             else
             {
-                HostDataModel.DataHelper.AddDataObject(objectItem);
+                HostDataModel.DataHelper.AddObjectData(objectItem);
                 HostDataModel.Objects.Add(new ObjectItemDataModel(objectItem));
             }
         }

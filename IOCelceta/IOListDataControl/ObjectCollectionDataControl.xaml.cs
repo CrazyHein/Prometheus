@@ -50,53 +50,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             }
         }
 
-        private void __on_remove_object_click(object sender, RoutedEventArgs e)
-        {
-            ObjectItemDataModel selectedData = __lsv_io_objects.SelectedItem as ObjectItemDataModel;
-            if (selectedData != null)
-            {
-                if (MessageBox.Show("Are you sure ?", "Question", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
-                {
-                    try
-                    {
-                        ObjectCollectionDataModel dataModel = DataContext as ObjectCollectionDataModel;
-                        dataModel.DataHelper.RemoveDataObject(selectedData.Index);
-                        dataModel.Objects.Remove(selectedData);
-                    }
-                    catch (IOListParseExcepetion exp)
-                    {
-                        string message;
-                        if (exp.ErrorCode == IO_LIST_FILE_ERROR_T.FILE_DATA_EXCEPTION)
-                            message = string.Format("At least one unexpected error occurred while removing controller object . \n{0}", exp.DataException.ToString());
-                        else
-                            message = string.Format("At least one unexpected error occurred while removing controller object . \n{0}", exp.ErrorCode.ToString());
-
-                        MessageBox.Show(message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                    }
-                }
-            }
-        }
-
-        private void __on_add_object_click(object sender, RoutedEventArgs e)
-        {
-            ObjectCollectionDataModel host = DataContext as ObjectCollectionDataModel;
-            ObjectItemDataModel newObjectItem = new ObjectItemDataModel(host.DataHelper.DataTypeCatalogue.DataTypes.Values.First());
-            ObjectDataModel objectDataModel = new ObjectDataModel(host, newObjectItem, false);
-            ObjectDataControl objectDataControl = new ObjectDataControl(objectDataModel);
-            objectDataControl.ShowDialog();
-        }
-
         private void __lsv_io_objects_mouse_double_click(object sender, MouseButtonEventArgs e)
         {
-            ListView view = sender as ListView;
-            ObjectItemDataModel selectedData = view.SelectedItem as ObjectItemDataModel;
-            ObjectCollectionDataModel hostData = DataContext as ObjectCollectionDataModel;
-            if (selectedData != null)
-            {
-                ObjectDataModel dataModel = new ObjectDataModel(hostData, selectedData);
-                ObjectDataControl dataControl = new ObjectDataControl(dataModel);
-                dataControl.ShowDialog();
-            }
+
         }
 
         private void __on_enable_data_type_filter(object sender, RoutedEventArgs e)
@@ -170,6 +126,65 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
                 (DataContext as ObjectCollectionDataModel).ItemFilter.BindingModule = __cmb_filter_binding_module.SelectedItem.ToString();
                 view.Refresh();
             }
+        }
+
+        private void __on_add_element_command_executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            ObjectCollectionDataModel host = DataContext as ObjectCollectionDataModel;
+            ObjectItemDataModel newObjectItem = new ObjectItemDataModel(host.DataHelper.DataTypeCatalogue.DataTypes.Values.First());
+            ObjectDataModel objectDataModel = new ObjectDataModel(host, newObjectItem, false);
+            ObjectDataControl objectDataControl = new ObjectDataControl(objectDataModel);
+            objectDataControl.ShowDialog();
+            e.Handled = true;
+        }
+
+        private void __on_remove_element_command_executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            ObjectItemDataModel selectedData = __lsv_io_objects.SelectedItem as ObjectItemDataModel;
+            if (selectedData != null)
+            {
+                if (MessageBox.Show("Are you sure ?", "Question", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+                {
+                    try
+                    {
+                        ObjectCollectionDataModel dataModel = DataContext as ObjectCollectionDataModel;
+                        dataModel.DataHelper.RemoveObjectData(selectedData.Index);
+                        dataModel.Objects.Remove(selectedData);
+                    }
+                    catch (IOListParseExcepetion exp)
+                    {
+                        string message;
+                        if (exp.ErrorCode == IO_LIST_FILE_ERROR_T.FILE_DATA_EXCEPTION)
+                            message = string.Format("At least one unexpected error occurred while removing controller object . \n{0}", exp.DataException.ToString());
+                        else
+                            message = string.Format("At least one unexpected error occurred while removing controller object . \n{0}", exp.ErrorCode.ToString());
+
+                        MessageBox.Show(message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                }
+            }
+            e.Handled = true;
+        }
+
+        private void __on_modify_element_command_executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            ObjectItemDataModel selectedData = __lsv_io_objects.SelectedItem as ObjectItemDataModel;
+            ObjectCollectionDataModel hostData = DataContext as ObjectCollectionDataModel;
+            if (selectedData != null)
+            {
+                ObjectDataModel dataModel = new ObjectDataModel(hostData, selectedData);
+                ObjectDataControl dataControl = new ObjectDataControl(dataModel);
+                dataControl.ShowDialog();
+            }
+            e.Handled = true;
+        }
+
+        private void __on_remove_modify_element_can_executed(object sender, CanExecuteRoutedEventArgs e)
+        {
+            if (__lsv_io_objects == null)
+                e.CanExecute = false;
+            else
+                e.CanExecute = __lsv_io_objects.SelectedItem != null;
         }
     }
 }
