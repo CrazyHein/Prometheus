@@ -84,7 +84,7 @@
                 <ComboBox Grid.Row="1" Grid.Column="4" Margin="4" IsEnabled="{Binding ElementName=__chk_filtered_by_binding_module, Path=IsChecked}" Name="__cmb_filter_binding_module" SelectionChanged="__cmb_filter_binding_module_selection_changed" DropDownOpened="__cmb_filter_binding_module_drop_down_opened"/>
             </Grid>
         </GroupBox>
-        <ListView Name="__lsv_io_objects" Margin="4" SelectionMode="Single" ContextMenu="{StaticResource ContextMenu}">
+        <ListView Name="__lsv_io_objects" Margin="4" SelectionMode="Single" ContextMenu="{StaticResource ContextMenu}" VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.IsVirtualizingWhenGrouping="True" VirtualizingPanel.VirtualizationMode="Recycling">
             <ListView.Resources>
                 <Style TargetType="ListViewItem">
                     <Setter Property="HorizontalContentAlignment" Value="Stretch"/>

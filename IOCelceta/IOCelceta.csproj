@@ -77,10 +77,6 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="IOListDataControl\ObjectSearchDataControl.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="IOListDataControl\PDOCollectionDataControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -122,10 +118,6 @@
       <DependentUpon>ObjectDataControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="IOListDataControl\ObjectDataModel.cs" />
-    <Compile Include="IOListDataControl\ObjectSearchDataControl.xaml.cs">
-      <DependentUpon>ObjectSearchDataControl.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="IOListDataControl\ObjectSearchDataModel.cs" />
     <Compile Include="IOListDataControl\PDOCollectionDataControl.xaml.cs">
       <DependentUpon>PDOCollectionDataControl.xaml</DependentUpon>
     </Compile>

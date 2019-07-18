@@ -40,7 +40,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             };
             InputGestureCollection gesturInsertElementBefore = new InputGestureCollection
             {
-                new KeyGesture(Key.M, ModifierKeys.Control, "Ctrl+M")
+                new KeyGesture(Key.I, ModifierKeys.Control, "Ctrl+I")
             };
 
             AddElement = new RoutedUICommand("Add", "Add", typeof(IOListDataControlCommand), gestureAddElement);

@@ -72,12 +72,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
 
         private void __on_modify_element_command_executed(object sender, ExecutedRoutedEventArgs e)
         {
-            IO_LIST_PDO_AREA_T area = (IO_LIST_PDO_AREA_T)((__tab_pdo_container.SelectedItem as TabItem).Tag);
 
-            ObjectSearchDataModel dataModel = new ObjectSearchDataModel(DataContext as PDOCollectionDataModel, __area_views[area].SelectedItem as ObjectItemDataModel);
-            ObjectSearchDataControl dataControl = new ObjectSearchDataControl(dataModel);
-
-            dataControl.ShowDialog();
         }
 
         private void __on_move_element_up_command_executed(object sender, ExecutedRoutedEventArgs e)

@@ -57,6 +57,14 @@
                         <Setter Property="Margin" Value="2,2,8,2"/>
                     </Style>
                 </StackPanel.Resources>
+                <Button>
+                    <Button.Content>
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="../img/add.png"/>
+                            <TextBlock Text="Objects" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button.Content>
+                </Button>
                 <Button Command="local:IOListDataControlCommand.AddElement">
                     <Button.Content>
                         <StackPanel Orientation="Horizontal">
@@ -113,6 +121,8 @@
                                 </DataTemplate>
                             </Setter.Value>
                         </Setter>
+                        <Setter Property="Height" Value="120"/>
+                        <Setter Property="Width" Value="40"/>
                     </Style>
 
                     <Style TargetType="ListViewItem">
@@ -153,7 +163,7 @@
                         <TextBlock Text="{Binding Path=Converter}" Margin="4" HorizontalAlignment="Left"/>
                     </DataTemplate>
                 </TabControl.Resources>
-                <TabItem Height="120" Tag="{x:Static root:IO_LIST_PDO_AREA_T.TX_DIAGNOSTIC}">
+                <TabItem Tag="{x:Static root:IO_LIST_PDO_AREA_T.TX_DIAGNOSTIC}">
                     <TabItem.Header>
                         <StackPanel Orientation="Horizontal">
                             <Image Source="../img/tx.png" Height="24" Margin="2,2,8,2"/>
@@ -182,7 +192,7 @@
                         </ListView>
                     </DockPanel>
                 </TabItem>
-                <TabItem Height="120" Tag="{x:Static root:IO_LIST_PDO_AREA_T.TX_BIT}">
+                <TabItem Tag="{x:Static root:IO_LIST_PDO_AREA_T.TX_BIT}">
                     <TabItem.Header>
                         <StackPanel Orientation="Horizontal">
                             <Image Source="../img/tx.png" Height="24" Margin="2,2,8,2"/>
@@ -198,7 +208,7 @@
                             <TextBlock Text="Actual Size In Byte : " Margin="6" FontWeight="Bold"/>
                             <TextBox Width="100" Margin="6" Text="{Binding TxBitAreaActualSizeInByte, Mode=OneWay}" IsReadOnly="True"/>
                         </StackPanel>
-                        <ListView Name="__lsv_tx_bit_area" ItemsSource="{Binding TxBitArea}" SelectionMode="Single"  ContextMenu="{StaticResource ContextMenu}">
+                        <ListView Name="__lsv_tx_bit_area" ItemsSource="{Binding TxBitArea}" SelectionMode="Single"  ContextMenu="{StaticResource ContextMenu}" VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.VirtualizationMode="Recycling">
                             <ListView.View>
                                 <GridView>
                                     <GridViewColumn Width="100" HeaderTemplate="{StaticResource IndexHeadTemplate}" CellTemplate="{StaticResource IndexContentTemplate}"/>
@@ -211,7 +221,7 @@
                         </ListView>
                     </DockPanel>
                 </TabItem>
-                <TabItem Height="120" Tag="{x:Static root:IO_LIST_PDO_AREA_T.TX_BLOCK}">
+                <TabItem Tag="{x:Static root:IO_LIST_PDO_AREA_T.TX_BLOCK}">
                     <TabItem.Header>
                         <StackPanel Orientation="Horizontal">
                             <Image Source="../img/tx.png" Height="24" Margin="2,2,8,2"/>
@@ -227,7 +237,7 @@
                             <TextBlock Text="Actual Size In Byte : " Margin="6" FontWeight="Bold"/>
                             <TextBox Width="100" Margin="6" Text="{Binding TxBlockAreaActualSizeInByte, Mode=OneWay}" IsReadOnly="True"/>
                         </StackPanel>
-                        <ListView Name="__lsv_tx_block_area" ItemsSource="{Binding TxBlockArea}" SelectionMode="Single"  ContextMenu="{StaticResource ContextMenu}">
+                        <ListView Name="__lsv_tx_block_area" ItemsSource="{Binding TxBlockArea}" SelectionMode="Single"  ContextMenu="{StaticResource ContextMenu}" VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.VirtualizationMode="Recycling">
                             <ListView.View>
                                 <GridView>
                                     <GridViewColumn Width="100" HeaderTemplate="{StaticResource IndexHeadTemplate}" CellTemplate="{StaticResource IndexContentTemplate}"/>
@@ -240,7 +250,7 @@
                         </ListView>
                     </DockPanel>
                 </TabItem>
-                <TabItem Height="120" Tag="{x:Static root:IO_LIST_PDO_AREA_T.RX_CONTROL}">
+                <TabItem Tag="{x:Static root:IO_LIST_PDO_AREA_T.RX_CONTROL}">
                     <TabItem.Header>
                         <StackPanel Orientation="Horizontal">
                             <Image Source="../img/rx.png" Height="24" Margin="2,2,8,2"/>
@@ -269,7 +279,7 @@
                         </ListView>
                     </DockPanel>
                 </TabItem>
-                <TabItem Height="120" Tag="{x:Static root:IO_LIST_PDO_AREA_T.RX_BIT}">
+                <TabItem Tag="{x:Static root:IO_LIST_PDO_AREA_T.RX_BIT}">
                     <TabItem.Header>
                         <StackPanel Orientation="Horizontal">
                             <Image Source="../img/rx.png" Height="24" Margin="2,2,8,2"/>
@@ -285,7 +295,7 @@
                             <TextBlock Text="Actual Size In Byte : " Margin="6" FontWeight="Bold"/>
                             <TextBox Width="100" Margin="6" Text="{Binding RxBitAreaActualSizeInByte, Mode=OneWay}" IsReadOnly="True"/>
                         </StackPanel>
-                        <ListView Name="__lsv_rx_bit_area" ItemsSource="{Binding RxBitArea}" SelectionMode="Single"  ContextMenu="{StaticResource ContextMenu}">
+                        <ListView Name="__lsv_rx_bit_area" ItemsSource="{Binding RxBitArea}" SelectionMode="Single"  ContextMenu="{StaticResource ContextMenu}" VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.VirtualizationMode="Recycling">
                             <ListView.View>
                                 <GridView>
                                     <GridViewColumn Width="100" HeaderTemplate="{StaticResource IndexHeadTemplate}" CellTemplate="{StaticResource IndexContentTemplate}"/>
@@ -298,7 +308,7 @@
                         </ListView>
                     </DockPanel>
                 </TabItem>
-                <TabItem Height="120" Tag="{x:Static root:IO_LIST_PDO_AREA_T.RX_BLOCK}">
+                <TabItem Tag="{x:Static root:IO_LIST_PDO_AREA_T.RX_BLOCK}">
                     <TabItem.Header>
                         <StackPanel Orientation="Horizontal">
                             <Image Source="../img/rx.png" Height="24" Margin="2,2,8,2"/>
@@ -314,7 +324,7 @@
                             <TextBlock Text="Actual Size In Byte : " Margin="6" FontWeight="Bold"/>
                             <TextBox Width="100" Margin="6" Text="{Binding RxBlockAreaActualSizeInByte, Mode=OneWay}" IsReadOnly="True"/>
                         </StackPanel>
-                        <ListView Name="__lsv_rx_block_area" ItemsSource="{Binding RxBlockArea}" SelectionMode="Single"  ContextMenu="{StaticResource ContextMenu}">
+                        <ListView Name="__lsv_rx_block_area" ItemsSource="{Binding RxBlockArea}" SelectionMode="Single"  ContextMenu="{StaticResource ContextMenu}" VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.VirtualizationMode="Recycling">
                             <ListView.View>
                                 <GridView>
                                     <GridViewColumn Width="100" HeaderTemplate="{StaticResource IndexHeadTemplate}" CellTemplate="{StaticResource IndexContentTemplate}"/>
