@@ -82,7 +82,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             e.Handled = true;
         }
 
-        private void __on_extension_modify_element_command_executed(object sender, ExecutedRoutedEventArgs e)
+        private void __on_extension_edit_element_command_executed(object sender, ExecutedRoutedEventArgs e)
         {
             ControllerExtensionModuleDataModel selectedData = __lsv_extension_modules.SelectedItem as ControllerExtensionModuleDataModel;
             if (selectedData != null)
@@ -142,7 +142,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             e.Handled = true;
         }
 
-        private void __on_ethernet_modify_element_command_executed(object sender, ExecutedRoutedEventArgs e)
+        private void __on_ethernet_edit_element_command_executed(object sender, ExecutedRoutedEventArgs e)
         {
             ControllerEthernetModuleDataModel selectedData = __lsv_ethernet_modules.SelectedItem as ControllerEthernetModuleDataModel;
             if (selectedData != null)
@@ -158,7 +158,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             e.Handled = true;
         }
 
-        private void __on_extension_remove_modify_element_can_executed(object sender, CanExecuteRoutedEventArgs e)
+        private void __on_extension_remove_edit_element_can_executed(object sender, CanExecuteRoutedEventArgs e)
         {
             if (__lsv_extension_modules == null)
                 e.CanExecute = false;
@@ -166,7 +166,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
                 e.CanExecute = __lsv_extension_modules.SelectedItem != null;
         }
 
-        private void __on_ethernet_remove_modify_element_can_executed(object sender, CanExecuteRoutedEventArgs e)
+        private void __on_ethernet_remove_edit_element_can_executed(object sender, CanExecuteRoutedEventArgs e)
         {
             if (__lsv_ethernet_modules == null)
                 e.CanExecute = false;

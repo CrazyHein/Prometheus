@@ -796,6 +796,14 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
             }
         }
 
+        public IReadOnlyDictionary<uint, IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T> IOObjectDictionary
+        {
+            get
+            {
+                return __object_collection.objects;
+            }
+        }
+
         public bool ControllerObjectsUpdated
         {
             get { return __object_collection.objects_updated; }
@@ -1007,6 +1015,48 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
             }
         }
 
+        public void AppendPDOItem(IO_LIST_PDO_AREA_T area, IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T objectData)
+        {
+            uint bitSize = 0, byteSize = 0;
+            try
+            {
+                PdoObjectReferenceVerification(area, objectData);
+                IO_LIST_CONTROLLER_PDO_COLLECTION.PDO_DEFINITION_T pdo = __controller_pdo_collection.PDOs[area];
+
+                if (area == IO_LIST_PDO_AREA_T.RX_BIT || area == IO_LIST_PDO_AREA_T.TX_BIT)
+                {
+                    bitSize = (uint)pdo.objects.Count();
+                    bitSize += objectData.data_type.BitSize;
+                    if (bitSize % 8 == 0)
+                        byteSize = bitSize / 8;
+                    else
+                        byteSize = bitSize / 8 + 1;
+                }
+                else
+                {
+                    byteSize = pdo.actual_size_in_byte;
+                    if (objectData.data_type.BitSize % 8 == 0)
+                        byteSize += objectData.data_type.BitSize / 8;
+                    else
+                        byteSize += objectData.data_type.BitSize / 8 + 1;
+                }
+                if (byteSize > (pdo.size_in_word * 2))
+                    throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.PDO_AREA_OUT_OF_RANGE, null);
+
+                pdo.objects.Add(objectData);
+                pdo.actual_size_in_byte = byteSize;
+                __object_reference_counter[objectData.index]++;
+            }
+            catch (IOListParseExcepetion e)
+            {
+                throw e;
+            }
+            catch (Exception e)
+            {
+                throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.FILE_DATA_EXCEPTION, e);
+            }
+        }
+
         public void InsertPDOItem(int pos, IO_LIST_PDO_AREA_T area, IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T objectData)
         {
             uint bitSize = 0, byteSize = 0;
@@ -1020,9 +1070,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                     bitSize = (uint)pdo.objects.Count();
                     bitSize += objectData.data_type.BitSize;
                     if (bitSize % 8 == 0)
-                        byteSize = byteSize / 8;
+                        byteSize = bitSize / 8;
                     else
-                        byteSize = byteSize / 8 + 1;
+                        byteSize = bitSize / 8 + 1;
                 }
                 else
                 {
@@ -1094,7 +1144,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
             }
         }
 
-            public void RemovePDOItem(int pos, IO_LIST_PDO_AREA_T area)
+        public void RemovePDOItem(int pos, IO_LIST_PDO_AREA_T area)
         {
             uint bitSize = 0, byteSize = 0;
             IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T objectData;
@@ -1108,9 +1158,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                     bitSize = (uint)pdo.objects.Count();
                     bitSize -= objectData.data_type.BitSize;
                     if (bitSize % 8 == 0)
-                        byteSize = byteSize / 8;
+                        byteSize = bitSize / 8;
                     else
-                        byteSize = byteSize / 8 + 1;
+                        byteSize = bitSize / 8 + 1;
                 }
                 else
                 {

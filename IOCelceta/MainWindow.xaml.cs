@@ -100,7 +100,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                 __tab_controller_inforamtion.Content = new ControllerInformationDataControl(controllerInfoDataModel);
                 ObjectCollectionDataModel objectCollectionDataModel = new ObjectCollectionDataModel(__io_list_data_helper);
                 __tab_object_collection.Content = new ObjectCollectionDataControl(objectCollectionDataModel);
-                PDOCollectionDataModel pdoCollectionDataModel = new PDOCollectionDataModel(__io_list_data_helper);
+                PDOCollectionDataModel pdoCollectionDataModel = new PDOCollectionDataModel(__io_list_data_helper, objectCollectionDataModel);
                 __tab_pdo_collection.Content = new PDOCollectionDataControl(pdoCollectionDataModel);
 
                 ((__tab_target_inforamtion.Content as TargetInformationDataControl).DataContext as TargetInformationDataModel).UpdateDataModel();
@@ -125,7 +125,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
             __tab_controller_inforamtion.Content = new ControllerInformationDataControl(controllerInfoDataModel);
             ObjectCollectionDataModel objectCollectionDataModel = new ObjectCollectionDataModel(__io_list_data_helper);
             __tab_object_collection.Content = new ObjectCollectionDataControl(objectCollectionDataModel);
-            PDOCollectionDataModel pdoCollectionDataModel = new PDOCollectionDataModel(__io_list_data_helper);
+            PDOCollectionDataModel pdoCollectionDataModel = new PDOCollectionDataModel(__io_list_data_helper, objectCollectionDataModel);
             __tab_pdo_collection.Content = new PDOCollectionDataControl(pdoCollectionDataModel);
 
             ((__tab_target_inforamtion.Content as TargetInformationDataControl).DataContext as TargetInformationDataModel).UpdateDataModel();

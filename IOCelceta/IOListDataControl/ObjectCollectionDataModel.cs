@@ -15,17 +15,21 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
     public class ObjectCollectionDataModel : IOListDataModel
     {
         public ObservableCollection<ObjectItemDataModel> Objects { get; private set; }
+        public IReadOnlyDictionary<uint, ObjectItemDataModel> ObjectDictionary { get { return __object_dictionary; } }
 
         public PropertyGroupDescription DataTypeGroupDescription { get; private set; }
         public PropertyGroupDescription BindingModuleGroupDescription { get; private set; }
         public ObjectItemFilter ItemFilter { get; private set; }
+
+        private Dictionary<uint, ObjectItemDataModel> __object_dictionary;
 
         public ObjectCollectionDataModel(IOListDataHelper helper):base(helper)
         {
             Objects = new ObservableCollection<ObjectItemDataModel>();
             DataTypeGroupDescription = new PropertyGroupDescription("DataType");
             BindingModuleGroupDescription = new PropertyGroupDescription("Binding", new ObjectItemBindingModule());
-            ItemFilter = new ObjectItemFilter(null, null);
+            ItemFilter = new ObjectItemFilter(null, null, null);
+            __object_dictionary = new Dictionary<uint, ObjectItemDataModel>();
         }
 
         public override void UpdateDataHelper()
@@ -36,7 +40,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
         public override void UpdateDataModel()
         {
             Objects.Clear();
-            foreach(var o in _data_helper.IOObjectCollection)
+            __object_dictionary.Clear();
+            foreach (var o in _data_helper.IOObjectCollection)
             {
                 IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T definition = new IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T()
                 {
@@ -49,6 +54,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
                 ObjectItemDataModel temp = new ObjectItemDataModel(definition);
 
                 Objects.Add(temp);
+                __object_dictionary.Add(o.index, temp);
             }
         }
     }
@@ -144,14 +150,16 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
 
     public class ObjectItemFilter
     {
-        public string DataTypeName { get; set; }
+        public DataTypeDefinition DataType { get; set; }
         public string BindingModule { get; set; }
+        public string FriendlyName { get; set; }
         private byte __filter_mask { get; set; }
 
-        public ObjectItemFilter(string dataTypeName, string bindingModule)
+        public ObjectItemFilter(DataTypeDefinition dataType, string bindingModule, string friendlyName)
         {
-            DataTypeName = dataTypeName;
+            DataType = dataType;
             BindingModule = bindingModule;
+            FriendlyName = friendlyName;
             __filter_mask = 0;
         }
 
@@ -159,17 +167,31 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
         public void DisableDataTypeFilter() { __filter_mask &= 0xFE; }
         public void EnableBindingModuleFilter() { __filter_mask |= 0x02; }
         public void DisableBindingModuleFilter() { __filter_mask &= 0xFD; }
+        public void EnableFriendlyNameFilter() { __filter_mask |= 0x04; }
+        public void DisableFriendlyNameFilter() { __filter_mask &= 0xFB; }
+
+        public void DisableFilter() { __filter_mask = 0x00; }
+        public void EnableFilter() { __filter_mask = 0x07; }
 
         public bool FilterItem(object item)
         {
+            byte res = 0;
             if (__filter_mask == 0)
                 return true;
-            else if (__filter_mask == 0x01)
-                return (item as ObjectItemDataModel).DataType.Name == DataTypeName;
-            else if (__filter_mask == 0x02)
-                return (item as ObjectItemDataModel).Binding.ToString().StartsWith(BindingModule);
-            else
-                return (item as ObjectItemDataModel).DataType.Name == DataTypeName && (item as ObjectItemDataModel).Binding.ToString().StartsWith(BindingModule);
+
+            if ((__filter_mask & 0x01) != 0)
+                if ((item as ObjectItemDataModel).DataType == DataType)
+                    res |= 0x01;
+
+            if ((__filter_mask & 0x02) != 0)
+                if ((item as ObjectItemDataModel).Binding.ToString().StartsWith(BindingModule))
+                    res |= 0x02;
+
+            if ((__filter_mask & 0x04) != 0)
+                if ((item as ObjectItemDataModel).FriendlyName.ToLower().Contains(FriendlyName.ToLower()))
+                    res |= 0x04;
+
+            return res == __filter_mask;
         }
     }
 }

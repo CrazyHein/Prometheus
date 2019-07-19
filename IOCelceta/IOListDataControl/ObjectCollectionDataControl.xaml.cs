@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.Catalogue;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -50,18 +51,13 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             }
         }
 
-        private void __lsv_io_objects_mouse_double_click(object sender, MouseButtonEventArgs e)
-        {
-
-        }
-
         private void __on_enable_data_type_filter(object sender, RoutedEventArgs e)
         {
             ListCollectionView view = CollectionViewSource.GetDefaultView(__lsv_io_objects.ItemsSource) as ListCollectionView;
             ObjectItemFilter filter = (DataContext as ObjectCollectionDataModel).ItemFilter;
             if (__chk_filtered_by_data_type.IsChecked == true && __cmb_filter_data_type.SelectedItem != null)
             {
-                filter.DataTypeName = __cmb_filter_data_type.SelectedItem.ToString();
+                filter.DataType = __cmb_filter_data_type.SelectedItem as DataTypeDefinition;
                 filter.EnableDataTypeFilter();
             }
             else if(__chk_filtered_by_data_type.IsChecked == false)
@@ -113,7 +109,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             if (__chk_filtered_by_data_type.IsChecked == true && __cmb_filter_data_type.SelectedItem != null)
             {
                 ListCollectionView view = CollectionViewSource.GetDefaultView(__lsv_io_objects.ItemsSource) as ListCollectionView;
-                (DataContext as ObjectCollectionDataModel).ItemFilter.DataTypeName = __cmb_filter_data_type.SelectedItem.ToString();
+                (DataContext as ObjectCollectionDataModel).ItemFilter.DataType = __cmb_filter_data_type.SelectedItem as DataTypeDefinition;
                 view.Refresh();
             }
         }
@@ -166,7 +162,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             e.Handled = true;
         }
 
-        private void __on_modify_element_command_executed(object sender, ExecutedRoutedEventArgs e)
+        private void __on_edit_element_command_executed(object sender, ExecutedRoutedEventArgs e)
         {
             ObjectItemDataModel selectedData = __lsv_io_objects.SelectedItem as ObjectItemDataModel;
             ObjectCollectionDataModel hostData = DataContext as ObjectCollectionDataModel;
@@ -179,7 +175,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             e.Handled = true;
         }
 
-        private void __on_remove_modify_element_can_executed(object sender, CanExecuteRoutedEventArgs e)
+        private void __on_remove_edit_element_can_executed(object sender, CanExecuteRoutedEventArgs e)
         {
             if (__lsv_io_objects == null)
                 e.CanExecute = false;

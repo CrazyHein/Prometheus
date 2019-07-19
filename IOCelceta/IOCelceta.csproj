@@ -203,5 +203,11 @@
   <ItemGroup>
     <Resource Include="img\detail.png" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="img\left.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="img\recycle.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

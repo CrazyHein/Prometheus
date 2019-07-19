@@ -6,107 +6,165 @@
              xmlns:local="clr-namespace:AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDataControl"
              xmlns:root="clr-namespace:AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta"
              mc:Ignorable="d" 
-             d:DesignHeight="850" d:DesignWidth="800">
-    <ScrollViewer HorizontalScrollBarVisibility="Auto">
-        <DockPanel Margin="4" LastChildFill="True">
-            <DockPanel.CommandBindings>
-                <CommandBinding Command="local:IOListDataControlCommand.AddElement" Executed="__on_add_element_command_executed"/>
-                <CommandBinding Command="local:IOListDataControlCommand.RemoveElement" Executed="__on_remove_element_command_executed" CanExecute="__on_remove_modify_element_can_executed"/>
-                <CommandBinding Command="local:IOListDataControlCommand.ModifyElement" Executed="__on_modify_element_command_executed" CanExecute="__on_remove_modify_element_can_executed"/>
-                <CommandBinding Command="local:IOListDataControlCommand.MoveElementUp" Executed="__on_move_element_up_command_executed" CanExecute="__on_move_element_up_can_executed"/>
-                <CommandBinding Command="local:IOListDataControlCommand.MoveElementDown" Executed="__on_move_element_down_command_executed" CanExecute="__on_move_element_down_can_executed"/>
-                <CommandBinding Command="local:IOListDataControlCommand.InsertElementBefore" Executed="__on_insert_element_before_command_executed" CanExecute="__on_remove_modify_element_can_executed"/>
-            </DockPanel.CommandBindings>
-            <DockPanel.Resources>
-                <ContextMenu x:Key="ContextMenu">
-                    <MenuItem Command="local:IOListDataControlCommand.RemoveElement">
-                        <MenuItem.Icon>
-                            <Image Source="../img/remove.png"/>
-                        </MenuItem.Icon>
-                    </MenuItem>
-                    <MenuItem Command="local:IOListDataControlCommand.ModifyElement">
-                        <MenuItem.Icon>
-                            <Image Source="../img/detail.png"/>
-                        </MenuItem.Icon>
-                    </MenuItem>
-                    <MenuItem Command="local:IOListDataControlCommand.MoveElementUp">
-                        <MenuItem.Icon>
-                            <Image Source="../img/up.png"/>
-                        </MenuItem.Icon>
-                    </MenuItem>
-                    <MenuItem Command="local:IOListDataControlCommand.MoveElementDown">
-                        <MenuItem.Icon>
-                            <Image Source="../img/down.png"/>
-                        </MenuItem.Icon>
-                    </MenuItem>
-                    <MenuItem Command="local:IOListDataControlCommand.InsertElementBefore">
-                        <MenuItem.Icon>
-                            <Image Source="../img/down_left.png"/>
-                        </MenuItem.Icon>
-                    </MenuItem>
-                </ContextMenu>
-            </DockPanel.Resources>
-            <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Right">
-                <StackPanel.Resources>
-                    <Style TargetType="Button">
-                        <Setter Property="Width" Value="120"/>
-                        <Setter Property="Height" Value="32"/>
-                        <Setter Property="Margin" Value="4"/>
-                    </Style>
-                    <Style TargetType="Image">
-                        <Setter Property="Margin" Value="2,2,8,2"/>
-                    </Style>
-                </StackPanel.Resources>
-                <Button>
-                    <Button.Content>
-                        <StackPanel Orientation="Horizontal">
-                            <Image Source="../img/add.png"/>
-                            <TextBlock Text="Objects" VerticalAlignment="Center"/>
-                        </StackPanel>
-                    </Button.Content>
-                </Button>
-                <Button Command="local:IOListDataControlCommand.AddElement">
-                    <Button.Content>
-                        <StackPanel Orientation="Horizontal">
-                            <Image Source="../img/add.png"/>
-                            <TextBlock Text="Add" VerticalAlignment="Center"/>
-                        </StackPanel>
-                    </Button.Content>
-                </Button>
-                <Button Command="local:IOListDataControlCommand.InsertElementBefore">
-                    <Button.Content>
-                        <StackPanel Orientation="Horizontal">
-                            <Image Source="../img/down_left.png"/>
-                            <TextBlock Text="Insert Before" VerticalAlignment="Center"/>
-                        </StackPanel>
-                    </Button.Content>
-                </Button>
-                <Button Command="local:IOListDataControlCommand.RemoveElement">
-                    <Button.Content>
-                        <StackPanel Orientation="Horizontal">
-                            <Image Source="../img/remove.png"/>
-                            <TextBlock Text="Remove" VerticalAlignment="Center"/>
-                        </StackPanel>
-                    </Button.Content>
-                </Button>
-                <Button Command="local:IOListDataControlCommand.MoveElementUp">
-                    <Button.Content>
-                        <StackPanel Orientation="Horizontal">
-                            <Image Source="../img/up.png"/>
-                            <TextBlock Text="Move Up" VerticalAlignment="Center"/>
-                        </StackPanel>
-                    </Button.Content>
-                </Button>
-                <Button Command="local:IOListDataControlCommand.MoveElementDown">
-                    <Button.Content>
-                        <StackPanel Orientation="Horizontal">
-                            <Image Source="../img/down.png"/>
-                            <TextBlock Text="Move Down" VerticalAlignment="Center"/>
-                        </StackPanel>
-                    </Button.Content>
-                </Button>
-            </StackPanel>
-            <TabControl TabStripPlacement="Left" Name="__tab_pdo_container">
+             d:DesignHeight="768" d:DesignWidth="2000">
+    <DockPanel LastChildFill="True">
+        <DockPanel.CommandBindings>
+            <CommandBinding Command="local:IOListDataControlCommand.AddElement" Executed="__on_add_element_command_executed" CanExecute="__on_add_element_can_executed"/>
+            <CommandBinding Command="local:IOListDataControlCommand.RemoveElement" Executed="__on_remove_element_command_executed" CanExecute="__on_remove_element_can_executed"/>
+            <CommandBinding Command="local:IOListDataControlCommand.MoveElementUp" Executed="__on_move_up_element_command_executed" CanExecute="__on_move_up_element_can_executed"/>
+            <CommandBinding Command="local:IOListDataControlCommand.MoveElementDown" Executed="__on_move_down_element_command_executed" CanExecute="__on_move_down_element_can_executed"/>
+            <CommandBinding Command="local:IOListDataControlCommand.InsertElementBefore" Executed="__on_insert_element_before_command_executed" CanExecute="__on_replace_element_can_executed"/>
+            <CommandBinding Command="local:IOListDataControlCommand.ReplaceElement" Executed="__on_replace_element_command_executed" CanExecute="__on_replace_element_can_executed"/>
+        </DockPanel.CommandBindings>
+        <DockPanel.Resources>
+            <ContextMenu x:Key="PDOContextMenu">
+                <MenuItem Command="local:IOListDataControlCommand.RemoveElement">
+                    <MenuItem.Icon>
+                        <Image Source="../img/remove.png"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Command="local:IOListDataControlCommand.MoveElementUp">
+                    <MenuItem.Icon>
+                        <Image Source="../img/up.png"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Command="local:IOListDataControlCommand.MoveElementDown">
+                    <MenuItem.Icon>
+                        <Image Source="../img/down.png"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+            </ContextMenu>
+            <ContextMenu x:Key="ObjectContextMenu">
+                <MenuItem Command="local:IOListDataControlCommand.AddElement">
+                    <MenuItem.Icon>
+                        <Image Source="../img/add.png"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Command="local:IOListDataControlCommand.InsertElementBefore">
+                    <MenuItem.Icon>
+                        <Image Source="../img/left.png"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Command="local:IOListDataControlCommand.ReplaceElement">
+                    <MenuItem.Icon>
+                        <Image Source="../img/recycle.png"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+            </ContextMenu>
+        </DockPanel.Resources>
+        <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Right">
+            <StackPanel.Resources>
+                <Style TargetType="Button">
+                    <Setter Property="Width" Value="120"/>
+                    <Setter Property="Height" Value="32"/>
+                    <Setter Property="Margin" Value="4"/>
+                </Style>
+                <Style TargetType="Image">
+                    <Setter Property="Margin" Value="2,2,8,2"/>
+                </Style>
+            </StackPanel.Resources>
+            <Button Command="local:IOListDataControlCommand.AddElement">
+                <Button.Content>
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="../img/add.png"/>
+                        <TextBlock Text="Add" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Button.Content>
+            </Button>
+            <Button Command="local:IOListDataControlCommand.InsertElementBefore">
+                <Button.Content>
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="../img/left.png"/>
+                        <TextBlock Text="Insert Before" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Button.Content>
+            </Button>
+            <Button Command="local:IOListDataControlCommand.ReplaceElement">
+                <Button.Content>
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="../img/recycle.png"/>
+                        <TextBlock Text="Replace" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Button.Content>
+            </Button>
+            <Button Command="local:IOListDataControlCommand.RemoveElement">
+                <Button.Content>
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="../img/remove.png"/>
+                        <TextBlock Text="Remove" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Button.Content>
+            </Button>
+            <Button Command="local:IOListDataControlCommand.MoveElementUp">
+                <Button.Content>
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="../img/up.png"/>
+                        <TextBlock Text="Move Up" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Button.Content>
+            </Button>
+            <Button Command="local:IOListDataControlCommand.MoveElementDown">
+                <Button.Content>
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="../img/down.png"/>
+                        <TextBlock Text="Move Down" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Button.Content>
+            </Button>
+        </StackPanel>
+        <Grid Margin="4" >
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition Width="12"/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto"/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <Grid.Resources>
+                <Style TargetType="ListViewItem">
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                </Style>
+
+                <DataTemplate x:Key="IndexHeadTemplate">
+                    <TextBlock FontWeight="Bold" Text="Index"/>
+                </DataTemplate>
+                <DataTemplate x:Key="IndexContentTemplate">
+                    <TextBlock Text="{Binding Path=Index, StringFormat=0x{0:X8}}" Margin="4" HorizontalAlignment="Left"/>
+                </DataTemplate>
+
+                <DataTemplate x:Key="FriendlyNameHeadTemplate">
+                    <TextBlock FontWeight="Bold" Text="Friendly Name"/>
+                </DataTemplate>
+                <DataTemplate x:Key="FriendlyNameContentTemplate">
+                    <TextBlock Text="{Binding Path=FriendlyName}" Margin="4" HorizontalAlignment="Left"/>
+                </DataTemplate>
+
+                <DataTemplate x:Key="DataTypeHeadTemplate">
+                    <TextBlock FontWeight="Bold" Text="Data Type"/>
+                </DataTemplate>
+                <DataTemplate x:Key="DataTypeContentTemplate">
+                    <TextBlock Text="{Binding Path=DataType}" Margin="4" HorizontalAlignment="Left"/>
+                </DataTemplate>
+
+                <DataTemplate x:Key="BindingHeadTemplate">
+                    <TextBlock FontWeight="Bold" Text="Binding"/>
+                </DataTemplate>
+                <DataTemplate x:Key="BindingContentTemplate">
+                    <TextBlock Text="{Binding Path=Binding}" Margin="4" HorizontalAlignment="Left"/>
+                </DataTemplate>
+                <DataTemplate x:Key="ConverterHeadTemplate">
+                    <TextBlock FontWeight="Bold" Text="Converter"/>
+                </DataTemplate>
+                <DataTemplate x:Key="ConverterContentTemplate">
+                    <TextBlock Text="{Binding Path=Converter}" Margin="4" HorizontalAlignment="Left"/>
+                </DataTemplate>
+            </Grid.Resources>
+            <TextBlock Text="PDO Mappings : " FontWeight="Bold" FontSize="20" FontStyle="Italic" Margin="8,4,4,8"/>
+            <TextBlock Text="Object Viewer :" Grid.Column="2" FontWeight="Bold" FontSize="20" FontStyle="Italic" Margin="8,4,4,8"/>
+            <GridSplitter Grid.Column="1" Grid.RowSpan="2" Background="Gray" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="4,0,4,0"/>
+            <TabControl TabStripPlacement="Left" Name="__tab_pdo_container" Grid.Row ="1">
                 <TabControl.Resources>
                     <Style TargetType="{x:Type TabItem}">
                         <Setter Property="Padding" Value="4" />
@@ -121,47 +179,9 @@
                                 </DataTemplate>
                             </Setter.Value>
                         </Setter>
-                        <Setter Property="Height" Value="120"/>
+                        <Setter Property="Height" Value="110"/>
                         <Setter Property="Width" Value="40"/>
                     </Style>
-
-                    <Style TargetType="ListViewItem">
-                        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
-                    </Style>
-
-                    <DataTemplate x:Key="IndexHeadTemplate">
-                        <TextBlock FontWeight="Bold" Text="Index"/>
-                    </DataTemplate>
-                    <DataTemplate x:Key="IndexContentTemplate">
-                        <TextBlock Text="{Binding Path=Index, StringFormat=0x{0:X8}}" Margin="4" HorizontalAlignment="Left"/>
-                    </DataTemplate>
-
-                    <DataTemplate x:Key="FriendlyNameHeadTemplate">
-                        <TextBlock FontWeight="Bold" Text="Friendly Name"/>
-                    </DataTemplate>
-                    <DataTemplate x:Key="FriendlyNameContentTemplate">
-                        <TextBlock Text="{Binding Path=FriendlyName}" Margin="4" HorizontalAlignment="Left"/>
-                    </DataTemplate>
-
-                    <DataTemplate x:Key="DataTypeHeadTemplate">
-                        <TextBlock FontWeight="Bold" Text="Data Type"/>
-                    </DataTemplate>
-                    <DataTemplate x:Key="DataTypeContentTemplate">
-                        <TextBlock Text="{Binding Path=DataType}" Margin="4" HorizontalAlignment="Left"/>
-                    </DataTemplate>
-
-                    <DataTemplate x:Key="BindingHeadTemplate">
-                        <TextBlock FontWeight="Bold" Text="Binding"/>
-                    </DataTemplate>
-                    <DataTemplate x:Key="BindingContentTemplate">
-                        <TextBlock Text="{Binding Path=Binding}" Margin="4" HorizontalAlignment="Left"/>
-                    </DataTemplate>
-                    <DataTemplate x:Key="ConverterHeadTemplate">
-                        <TextBlock FontWeight="Bold" Text="Converter"/>
-                    </DataTemplate>
-                    <DataTemplate x:Key="ConverterContentTemplate">
-                        <TextBlock Text="{Binding Path=Converter}" Margin="4" HorizontalAlignment="Left"/>
-                    </DataTemplate>
                 </TabControl.Resources>
                 <TabItem Tag="{x:Static root:IO_LIST_PDO_AREA_T.TX_DIAGNOSTIC}">
                     <TabItem.Header>
@@ -171,25 +191,29 @@
                         </StackPanel>
                     </TabItem.Header>
                     <DockPanel Margin="4">
-                        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
-                            <TextBlock Text="Offset In Word : " Margin="6" FontWeight="Bold"/>
-                            <TextBox Width="100" Margin="6" Text="{Binding TxDiagnosticAreaOffsetInWord}"/>
-                            <TextBlock Text="Size In Word : " Margin="6" FontWeight="Bold"/>
-                            <TextBox Width="100" Margin="6" Text="{Binding TxDiagnosticAreaSizeInWord}"/>
-                            <TextBlock Text="Actual Size In Byte : " Margin="6" FontWeight="Bold"/>
-                            <TextBox Width="100" Margin="6" Text="{Binding TxDiagnosticAreaActualSizeInByte, Mode=OneWay}" IsReadOnly="True"/>
-                        </StackPanel>
-                        <ListView Name="__lsv_tx_diagnostic_area" ItemsSource="{Binding TxDiagnosticArea}" SelectionMode="Single" ContextMenu="{StaticResource ContextMenu}">
-                            <ListView.View>
-                                <GridView>
-                                    <GridViewColumn Width="100" HeaderTemplate="{StaticResource IndexHeadTemplate}" CellTemplate="{StaticResource IndexContentTemplate}"/>
-                                    <GridViewColumn Width="200" HeaderTemplate="{StaticResource FriendlyNameHeadTemplate}" CellTemplate="{StaticResource FriendlyNameContentTemplate}"/>
-                                    <GridViewColumn Width="100" HeaderTemplate="{StaticResource DataTypeHeadTemplate}" CellTemplate="{StaticResource DataTypeContentTemplate}"/>
-                                    <GridViewColumn Width="200" HeaderTemplate="{StaticResource BindingHeadTemplate}" CellTemplate="{StaticResource BindingContentTemplate}"/>
-                                    <GridViewColumn Width="200" HeaderTemplate="{StaticResource ConverterHeadTemplate}" CellTemplate="{StaticResource ConverterContentTemplate}"/>
-                                </GridView>
-                            </ListView.View>
-                        </ListView>
+                        <GroupBox DockPanel.Dock="Top" Header="Rx Diagnostic Area" Margin="0,0,0,8" Padding="6">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="Offset In Word : " Margin="0,0,6,0" FontWeight="Bold"/>
+                                <TextBox Width="100" Margin="0,0,6,0" Text="{Binding TxDiagnosticAreaOffsetInWord}"/>
+                                <TextBlock Text="Size In Word : " Margin="0,0,6,0" FontWeight="Bold"/>
+                                <TextBox Width="100" Margin="0,0,6,0" Text="{Binding TxDiagnosticAreaSizeInWord}"/>
+                                <TextBlock Text="Actual Size In Byte : " Margin="0,0,6,0" FontWeight="Bold"/>
+                                <TextBox Width="100" Margin="0,0,6,0" Text="{Binding TxDiagnosticAreaActualSizeInByte, Mode=OneWay}" IsReadOnly="True"/>
+                            </StackPanel>
+                        </GroupBox>
+                        <GroupBox Header="PDO Mapping" Padding="6">
+                            <ListView Name="__lsv_tx_diagnostic_area" ItemsSource="{Binding TxDiagnosticArea}" SelectionMode="Single" ContextMenu="{StaticResource PDOContextMenu}">
+                                <ListView.View>
+                                    <GridView>
+                                        <GridViewColumn Width="100" HeaderTemplate="{StaticResource IndexHeadTemplate}" CellTemplate="{StaticResource IndexContentTemplate}"/>
+                                        <GridViewColumn Width="200" HeaderTemplate="{StaticResource FriendlyNameHeadTemplate}" CellTemplate="{StaticResource FriendlyNameContentTemplate}"/>
+                                        <GridViewColumn Width="100" HeaderTemplate="{StaticResource DataTypeHeadTemplate}" CellTemplate="{StaticResource DataTypeContentTemplate}"/>
+                                        <GridViewColumn Width="200" HeaderTemplate="{StaticResource BindingHeadTemplate}" CellTemplate="{StaticResource BindingContentTemplate}"/>
+                                        <GridViewColumn Width="200" HeaderTemplate="{StaticResource ConverterHeadTemplate}" CellTemplate="{StaticResource ConverterContentTemplate}"/>
+                                    </GridView>
+                                </ListView.View>
+                            </ListView>
+                        </GroupBox>
                     </DockPanel>
                 </TabItem>
                 <TabItem Tag="{x:Static root:IO_LIST_PDO_AREA_T.TX_BIT}">
@@ -200,25 +224,29 @@
                         </StackPanel>
                     </TabItem.Header>
                     <DockPanel Margin="4">
-                        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
-                            <TextBlock Text="Offset In Word : " Margin="6" FontWeight="Bold"/>
-                            <TextBox Width="100" Margin="6" Text="{Binding TxBitAreaOffsetInWord}"/>
-                            <TextBlock Text="Size In Word : " Margin="6" FontWeight="Bold"/>
-                            <TextBox Width="100" Margin="6" Text="{Binding TxBitAreaSizeInWord}"/>
-                            <TextBlock Text="Actual Size In Byte : " Margin="6" FontWeight="Bold"/>
-                            <TextBox Width="100" Margin="6" Text="{Binding TxBitAreaActualSizeInByte, Mode=OneWay}" IsReadOnly="True"/>
-                        </StackPanel>
-                        <ListView Name="__lsv_tx_bit_area" ItemsSource="{Binding TxBitArea}" SelectionMode="Single"  ContextMenu="{StaticResource ContextMenu}" VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.VirtualizationMode="Recycling">
-                            <ListView.View>
-                                <GridView>
-                                    <GridViewColumn Width="100" HeaderTemplate="{StaticResource IndexHeadTemplate}" CellTemplate="{StaticResource IndexContentTemplate}"/>
-                                    <GridViewColumn Width="200" HeaderTemplate="{StaticResource FriendlyNameHeadTemplate}" CellTemplate="{StaticResource FriendlyNameContentTemplate}"/>
-                                    <GridViewColumn Width="100" HeaderTemplate="{StaticResource DataTypeHeadTemplate}" CellTemplate="{StaticResource DataTypeContentTemplate}"/>
-                                    <GridViewColumn Width="200" HeaderTemplate="{StaticResource BindingHeadTemplate}" CellTemplate="{StaticResource BindingContentTemplate}"/>
-                                    <GridViewColumn Width="200" HeaderTemplate="{StaticResource ConverterHeadTemplate}" CellTemplate="{StaticResource ConverterContentTemplate}"/>
-                                </GridView>
-                            </ListView.View>
-                        </ListView>
+                        <GroupBox DockPanel.Dock="Top" Header="Tx Bit Area" Margin="0,0,0,8" Padding="6">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="Offset In Word : " Margin="0,0,6,0" FontWeight="Bold"/>
+                                <TextBox Width="100" Margin="0,0,6,0" Text="{Binding TxBitAreaOffsetInWord}"/>
+                                <TextBlock Text="Size In Word : " Margin="0,0,6,0" FontWeight="Bold"/>
+                                <TextBox Width="100" Margin="0,0,6,0" Text="{Binding TxBitAreaSizeInWord}"/>
+                                <TextBlock Text="Actual Size In Byte : " Margin="0,0,6,0"  FontWeight="Bold"/>
+                                <TextBox Width="100" Margin="0,0,6,0" Text="{Binding TxBitAreaActualSizeInByte, Mode=OneWay}" IsReadOnly="True"/>
+                            </StackPanel>
+                        </GroupBox>
+                        <GroupBox Header="PDO Mapping" Padding="6">
+                            <ListView Name="__lsv_tx_bit_area" ItemsSource="{Binding TxBitArea}" SelectionMode="Single"  ContextMenu="{StaticResource PDOContextMenu}" VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.VirtualizationMode="Recycling">
+                                <ListView.View>
+                                    <GridView>
+                                        <GridViewColumn Width="100" HeaderTemplate="{StaticResource IndexHeadTemplate}" CellTemplate="{StaticResource IndexContentTemplate}"/>
+                                        <GridViewColumn Width="200" HeaderTemplate="{StaticResource FriendlyNameHeadTemplate}" CellTemplate="{StaticResource FriendlyNameContentTemplate}"/>
+                                        <GridViewColumn Width="100" HeaderTemplate="{StaticResource DataTypeHeadTemplate}" CellTemplate="{StaticResource DataTypeContentTemplate}"/>
+                                        <GridViewColumn Width="200" HeaderTemplate="{StaticResource BindingHeadTemplate}" CellTemplate="{StaticResource BindingContentTemplate}"/>
+                                        <GridViewColumn Width="200" HeaderTemplate="{StaticResource ConverterHeadTemplate}" CellTemplate="{StaticResource ConverterContentTemplate}"/>
+                                    </GridView>
+                                </ListView.View>
+                            </ListView>
+                        </GroupBox>
                     </DockPanel>
                 </TabItem>
                 <TabItem Tag="{x:Static root:IO_LIST_PDO_AREA_T.TX_BLOCK}">
@@ -229,25 +257,29 @@
                         </StackPanel>
                     </TabItem.Header>
                     <DockPanel Margin="4">
-                        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
-                            <TextBlock Text="Offset In Word : " Margin="6" FontWeight="Bold"/>
-                            <TextBox Width="100" Margin="6" Text="{Binding TxBlockAreaOffsetInWord}"/>
-                            <TextBlock Text="Size In Word : " Margin="6" FontWeight="Bold"/>
-                            <TextBox Width="100" Margin="6" Text="{Binding TxBlockAreaSizeInWord}"/>
-                            <TextBlock Text="Actual Size In Byte : " Margin="6" FontWeight="Bold"/>
-                            <TextBox Width="100" Margin="6" Text="{Binding TxBlockAreaActualSizeInByte, Mode=OneWay}" IsReadOnly="True"/>
-                        </StackPanel>
-                        <ListView Name="__lsv_tx_block_area" ItemsSource="{Binding TxBlockArea}" SelectionMode="Single"  ContextMenu="{StaticResource ContextMenu}" VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.VirtualizationMode="Recycling">
-                            <ListView.View>
-                                <GridView>
-                                    <GridViewColumn Width="100" HeaderTemplate="{StaticResource IndexHeadTemplate}" CellTemplate="{StaticResource IndexContentTemplate}"/>
-                                    <GridViewColumn Width="200" HeaderTemplate="{StaticResource FriendlyNameHeadTemplate}" CellTemplate="{StaticResource FriendlyNameContentTemplate}"/>
-                                    <GridViewColumn Width="100" HeaderTemplate="{StaticResource DataTypeHeadTemplate}" CellTemplate="{StaticResource DataTypeContentTemplate}"/>
-                                    <GridViewColumn Width="200" HeaderTemplate="{StaticResource BindingHeadTemplate}" CellTemplate="{StaticResource BindingContentTemplate}"/>
-                                    <GridViewColumn Width="200" HeaderTemplate="{StaticResource ConverterHeadTemplate}" CellTemplate="{StaticResource ConverterContentTemplate}"/>
-                                </GridView>
-                            </ListView.View>
-                        </ListView>
+                        <GroupBox DockPanel.Dock="Top" Header="Tx Block Area" Margin="0,0,0,8" Padding="6">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="Offset In Word : " Margin="0,0,6,0" FontWeight="Bold"/>
+                                <TextBox Width="100" Margin="0,0,6,0" Text="{Binding TxBlockAreaOffsetInWord}"/>
+                                <TextBlock Text="Size In Word : " Margin="0,0,6,0" FontWeight="Bold"/>
+                                <TextBox Width="100" Margin="0,0,6,0" Text="{Binding TxBlockAreaSizeInWord}"/>
+                                <TextBlock Text="Actual Size In Byte : " Margin="0,0,6,0" FontWeight="Bold"/>
+                                <TextBox Width="100" Margin="0,0,6,0" Text="{Binding TxBlockAreaActualSizeInByte, Mode=OneWay}" IsReadOnly="True"/>
+                            </StackPanel>
+                        </GroupBox>
+                        <GroupBox Header="PDO Mapping" Padding="6">
+                            <ListView Name="__lsv_tx_block_area" ItemsSource="{Binding TxBlockArea}" SelectionMode="Single"  ContextMenu="{StaticResource PDOContextMenu}" VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.VirtualizationMode="Recycling">
+                                <ListView.View>
+                                    <GridView>
+                                        <GridViewColumn Width="100" HeaderTemplate="{StaticResource IndexHeadTemplate}" CellTemplate="{StaticResource IndexContentTemplate}"/>
+                                        <GridViewColumn Width="200" HeaderTemplate="{StaticResource FriendlyNameHeadTemplate}" CellTemplate="{StaticResource FriendlyNameContentTemplate}"/>
+                                        <GridViewColumn Width="100" HeaderTemplate="{StaticResource DataTypeHeadTemplate}" CellTemplate="{StaticResource DataTypeContentTemplate}"/>
+                                        <GridViewColumn Width="200" HeaderTemplate="{StaticResource BindingHeadTemplate}" CellTemplate="{StaticResource BindingContentTemplate}"/>
+                                        <GridViewColumn Width="200" HeaderTemplate="{StaticResource ConverterHeadTemplate}" CellTemplate="{StaticResource ConverterContentTemplate}"/>
+                                    </GridView>
+                                </ListView.View>
+                            </ListView>
+                        </GroupBox>
                     </DockPanel>
                 </TabItem>
                 <TabItem Tag="{x:Static root:IO_LIST_PDO_AREA_T.RX_CONTROL}">
@@ -258,25 +290,29 @@
                         </StackPanel>
                     </TabItem.Header>
                     <DockPanel Margin="4">
-                        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
-                            <TextBlock Text="Offset In Word : " Margin="6" FontWeight="Bold"/>
-                            <TextBox Width="100" Margin="6" Text="{Binding RxControlAreaOffsetInWord}"/>
-                            <TextBlock Text="Size In Word : " Margin="6" FontWeight="Bold"/>
-                            <TextBox Width="100" Margin="6" Text="{Binding RxControlAreaSizeInWord}"/>
-                            <TextBlock Text="Actual Size In Byte : " Margin="6" FontWeight="Bold"/>
-                            <TextBox Width="100" Margin="6" Text="{Binding RxControlAreaActualSizeInByte, Mode=OneWay}" IsReadOnly="True"/>
-                        </StackPanel>
-                        <ListView Name="__lsv_rx_control_area" ItemsSource="{Binding RxControlArea}" SelectionMode="Single"  ContextMenu="{StaticResource ContextMenu}">
-                            <ListView.View>
-                                <GridView>
-                                    <GridViewColumn Width="100" HeaderTemplate="{StaticResource IndexHeadTemplate}" CellTemplate="{StaticResource IndexContentTemplate}"/>
-                                    <GridViewColumn Width="200" HeaderTemplate="{StaticResource FriendlyNameHeadTemplate}" CellTemplate="{StaticResource FriendlyNameContentTemplate}"/>
-                                    <GridViewColumn Width="100" HeaderTemplate="{StaticResource DataTypeHeadTemplate}" CellTemplate="{StaticResource DataTypeContentTemplate}"/>
-                                    <GridViewColumn Width="200" HeaderTemplate="{StaticResource BindingHeadTemplate}" CellTemplate="{StaticResource BindingContentTemplate}"/>
-                                    <GridViewColumn Width="200" HeaderTemplate="{StaticResource ConverterHeadTemplate}" CellTemplate="{StaticResource ConverterContentTemplate}"/>
-                                </GridView>
-                            </ListView.View>
-                        </ListView>
+                        <GroupBox DockPanel.Dock="Top" Header="Rx Control Area" Margin="0,0,0,8" Padding="6">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="Offset In Word : " Margin="0,0,6,0" FontWeight="Bold"/>
+                                <TextBox Width="100" Margin="0,0,6,0" Text="{Binding RxControlAreaOffsetInWord}"/>
+                                <TextBlock Text="Size In Word : " Margin="0,0,6,0" FontWeight="Bold"/>
+                                <TextBox Width="100" Margin="0,0,6,0" Text="{Binding RxControlAreaSizeInWord}"/>
+                                <TextBlock Text="Actual Size In Byte : " Margin="0,0,6,0" FontWeight="Bold"/>
+                                <TextBox Width="100" Margin="0,0,6,0" Text="{Binding RxControlAreaActualSizeInByte, Mode=OneWay}" IsReadOnly="True"/>
+                            </StackPanel>
+                        </GroupBox>
+                        <GroupBox Header="PDO Mapping" Padding="6">
+                            <ListView Name="__lsv_rx_control_area" ItemsSource="{Binding RxControlArea}" SelectionMode="Single"  ContextMenu="{StaticResource PDOContextMenu}">
+                                <ListView.View>
+                                    <GridView>
+                                        <GridViewColumn Width="100" HeaderTemplate="{StaticResource IndexHeadTemplate}" CellTemplate="{StaticResource IndexContentTemplate}"/>
+                                        <GridViewColumn Width="200" HeaderTemplate="{StaticResource FriendlyNameHeadTemplate}" CellTemplate="{StaticResource FriendlyNameContentTemplate}"/>
+                                        <GridViewColumn Width="100" HeaderTemplate="{StaticResource DataTypeHeadTemplate}" CellTemplate="{StaticResource DataTypeContentTemplate}"/>
+                                        <GridViewColumn Width="200" HeaderTemplate="{StaticResource BindingHeadTemplate}" CellTemplate="{StaticResource BindingContentTemplate}"/>
+                                        <GridViewColumn Width="200" HeaderTemplate="{StaticResource ConverterHeadTemplate}" CellTemplate="{StaticResource ConverterContentTemplate}"/>
+                                    </GridView>
+                                </ListView.View>
+                            </ListView>
+                        </GroupBox>
                     </DockPanel>
                 </TabItem>
                 <TabItem Tag="{x:Static root:IO_LIST_PDO_AREA_T.RX_BIT}">
@@ -287,25 +323,29 @@
                         </StackPanel>
                     </TabItem.Header>
                     <DockPanel Margin="4">
-                        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
-                            <TextBlock Text="Offset In Word : " Margin="6" FontWeight="Bold"/>
-                            <TextBox Width="100" Margin="6" Text="{Binding RxBitAreaOffsetInWord}"/>
-                            <TextBlock Text="Size In Word : " Margin="6" FontWeight="Bold"/>
-                            <TextBox Width="100" Margin="6" Text="{Binding RxBitAreaSizeInWord}"/>
-                            <TextBlock Text="Actual Size In Byte : " Margin="6" FontWeight="Bold"/>
-                            <TextBox Width="100" Margin="6" Text="{Binding RxBitAreaActualSizeInByte, Mode=OneWay}" IsReadOnly="True"/>
-                        </StackPanel>
-                        <ListView Name="__lsv_rx_bit_area" ItemsSource="{Binding RxBitArea}" SelectionMode="Single"  ContextMenu="{StaticResource ContextMenu}" VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.VirtualizationMode="Recycling">
-                            <ListView.View>
-                                <GridView>
-                                    <GridViewColumn Width="100" HeaderTemplate="{StaticResource IndexHeadTemplate}" CellTemplate="{StaticResource IndexContentTemplate}"/>
-                                    <GridViewColumn Width="200" HeaderTemplate="{StaticResource FriendlyNameHeadTemplate}" CellTemplate="{StaticResource FriendlyNameContentTemplate}"/>
-                                    <GridViewColumn Width="100" HeaderTemplate="{StaticResource DataTypeHeadTemplate}" CellTemplate="{StaticResource DataTypeContentTemplate}"/>
-                                    <GridViewColumn Width="200" HeaderTemplate="{StaticResource BindingHeadTemplate}" CellTemplate="{StaticResource BindingContentTemplate}"/>
-                                    <GridViewColumn Width="200" HeaderTemplate="{StaticResource ConverterHeadTemplate}" CellTemplate="{StaticResource ConverterContentTemplate}"/>
-                                </GridView>
-                            </ListView.View>
-                        </ListView>
+                        <GroupBox DockPanel.Dock="Top" Header="Rx Bit Area" Margin="0,0,0,8" Padding="6">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="Offset In Word : " Margin="0,0,6,0" FontWeight="Bold"/>
+                                <TextBox Width="100" Margin="0,0,6,0" Text="{Binding RxBitAreaOffsetInWord}"/>
+                                <TextBlock Text="Size In Word : " Margin="0,0,6,0" FontWeight="Bold"/>
+                                <TextBox Width="100" Margin="0,0,6,0" Text="{Binding RxBitAreaSizeInWord}"/>
+                                <TextBlock Text="Actual Size In Byte : " Margin="0,0,6,0" FontWeight="Bold"/>
+                                <TextBox Width="100" Margin="0,0,6,0" Text="{Binding RxBitAreaActualSizeInByte, Mode=OneWay}" IsReadOnly="True"/>
+                            </StackPanel>
+                        </GroupBox>
+                        <GroupBox Header="PDO Mapping" Padding="6">
+                            <ListView Name="__lsv_rx_bit_area" ItemsSource="{Binding RxBitArea}" SelectionMode="Single"  ContextMenu="{StaticResource PDOContextMenu}" VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.VirtualizationMode="Recycling">
+                                <ListView.View>
+                                    <GridView>
+                                        <GridViewColumn Width="100" HeaderTemplate="{StaticResource IndexHeadTemplate}" CellTemplate="{StaticResource IndexContentTemplate}"/>
+                                        <GridViewColumn Width="200" HeaderTemplate="{StaticResource FriendlyNameHeadTemplate}" CellTemplate="{StaticResource FriendlyNameContentTemplate}"/>
+                                        <GridViewColumn Width="100" HeaderTemplate="{StaticResource DataTypeHeadTemplate}" CellTemplate="{StaticResource DataTypeContentTemplate}"/>
+                                        <GridViewColumn Width="200" HeaderTemplate="{StaticResource BindingHeadTemplate}" CellTemplate="{StaticResource BindingContentTemplate}"/>
+                                        <GridViewColumn Width="200" HeaderTemplate="{StaticResource ConverterHeadTemplate}" CellTemplate="{StaticResource ConverterContentTemplate}"/>
+                                    </GridView>
+                                </ListView.View>
+                            </ListView>
+                        </GroupBox>
                     </DockPanel>
                 </TabItem>
                 <TabItem Tag="{x:Static root:IO_LIST_PDO_AREA_T.RX_BLOCK}">
@@ -316,28 +356,67 @@
                         </StackPanel>
                     </TabItem.Header>
                     <DockPanel Margin="4">
-                        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
-                            <TextBlock Text="Offset In Word : " Margin="6" FontWeight="Bold"/>
-                            <TextBox Width="100" Margin="6" Text="{Binding RxBlockAreaOffsetInWord}"/>
-                            <TextBlock Text="Size In Word : " Margin="6" FontWeight="Bold"/>
-                            <TextBox Width="100" Margin="6" Text="{Binding RxBlockAreaSizeInWord}"/>
-                            <TextBlock Text="Actual Size In Byte : " Margin="6" FontWeight="Bold"/>
-                            <TextBox Width="100" Margin="6" Text="{Binding RxBlockAreaActualSizeInByte, Mode=OneWay}" IsReadOnly="True"/>
-                        </StackPanel>
-                        <ListView Name="__lsv_rx_block_area" ItemsSource="{Binding RxBlockArea}" SelectionMode="Single"  ContextMenu="{StaticResource ContextMenu}" VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.VirtualizationMode="Recycling">
-                            <ListView.View>
-                                <GridView>
-                                    <GridViewColumn Width="100" HeaderTemplate="{StaticResource IndexHeadTemplate}" CellTemplate="{StaticResource IndexContentTemplate}"/>
-                                    <GridViewColumn Width="200" HeaderTemplate="{StaticResource FriendlyNameHeadTemplate}" CellTemplate="{StaticResource FriendlyNameContentTemplate}"/>
-                                    <GridViewColumn Width="100" HeaderTemplate="{StaticResource DataTypeHeadTemplate}" CellTemplate="{StaticResource DataTypeContentTemplate}"/>
-                                    <GridViewColumn Width="200" HeaderTemplate="{StaticResource BindingHeadTemplate}" CellTemplate="{StaticResource BindingContentTemplate}"/>
-                                    <GridViewColumn Width="200" HeaderTemplate="{StaticResource ConverterHeadTemplate}" CellTemplate="{StaticResource ConverterContentTemplate}"/>
-                                </GridView>
-                            </ListView.View>
-                        </ListView>
+                        <GroupBox DockPanel.Dock="Top" Header="Rx Block Area" Margin="0,0,0,8" Padding="6">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="Offset In Word : " Margin="0,0,6,0" FontWeight="Bold"/>
+                                <TextBox Width="100" Margin="0,0,6,0" Text="{Binding RxBlockAreaOffsetInWord}"/>
+                                <TextBlock Text="Size In Word : " Margin="0,0,6,0" FontWeight="Bold"/>
+                                <TextBox Width="100" Margin="0,0,6,0" Text="{Binding RxBlockAreaSizeInWord}"/>
+                                <TextBlock Text="Actual Size In Byte : " Margin="0,0,6,0" FontWeight="Bold"/>
+                                <TextBox Width="100" Margin="0,0,6,0" Text="{Binding RxBlockAreaActualSizeInByte, Mode=OneWay}" IsReadOnly="True"/>
+                            </StackPanel>
+                        </GroupBox>
+                        <GroupBox Header="PDO Mapping" Padding="6">
+                            <ListView Name="__lsv_rx_block_area" ItemsSource="{Binding RxBlockArea}" SelectionMode="Single"  ContextMenu="{StaticResource PDOContextMenu}" VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.VirtualizationMode="Recycling">
+                                <ListView.View>
+                                    <GridView>
+                                        <GridViewColumn Width="100" HeaderTemplate="{StaticResource IndexHeadTemplate}" CellTemplate="{StaticResource IndexContentTemplate}"/>
+                                        <GridViewColumn Width="200" HeaderTemplate="{StaticResource FriendlyNameHeadTemplate}" CellTemplate="{StaticResource FriendlyNameContentTemplate}"/>
+                                        <GridViewColumn Width="100" HeaderTemplate="{StaticResource DataTypeHeadTemplate}" CellTemplate="{StaticResource DataTypeContentTemplate}"/>
+                                        <GridViewColumn Width="200" HeaderTemplate="{StaticResource BindingHeadTemplate}" CellTemplate="{StaticResource BindingContentTemplate}"/>
+                                        <GridViewColumn Width="200" HeaderTemplate="{StaticResource ConverterHeadTemplate}" CellTemplate="{StaticResource ConverterContentTemplate}"/>
+                                    </GridView>
+                                </ListView.View>
+                            </ListView>
+                        </GroupBox>
                     </DockPanel>
                 </TabItem>
             </TabControl>
-        </DockPanel>
-    </ScrollViewer>
+            <DockPanel Grid.Column="2" Grid.Row="1">
+                <GroupBox Header="Filter &amp; Control" DockPanel.Dock="Top" Margin="0,0,0,6" Padding="6">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="auto"/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <CheckBox Content="Data Type : " Margin="2" Name="__chk_enable_data_type_filter"/>
+                        <CheckBox Content="Friendly Name : " Margin="2" Grid.Row="1" Name="__chk_enable_friendly_name_filter" Click="__on_enable_friendly_name_filter_click"/>
+                        <CheckBox Content="Binding Module : " Margin="2" Grid.Row="2" Name="__chk_enable_binding_module_filter"/>
+
+                        <TextBox Grid.Column="1" Margin="2" IsEnabled="{Binding ElementName=__chk_enable_data_type_filter, Path=IsChecked}"/>
+                        <TextBox Grid.Column="1" Margin="2"  Grid.Row="1" Text="{Binding FilterFriendlyName, UpdateSourceTrigger=Explicit}" IsEnabled="{Binding ElementName=__chk_enable_friendly_name_filter, Path=IsChecked}" KeyDown="__on_new_filter_friendly_name_enter" Name="__txt_filter_friendly_name"/>
+                        <TextBox Grid.Column="1" Margin="2"  Grid.Row="2" IsEnabled="{Binding ElementName=__chk_enable_binding_module_filter, Path=IsChecked}"/>
+                    </Grid>
+                </GroupBox>
+                <GroupBox Header="Available Objects" Padding="6">
+                    <ListView Name="__lsv_object_collection"  SelectionMode="Single" ContextMenu="{StaticResource ObjectContextMenu}" VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.VirtualizationMode="Recycling">
+                        <ListView.View>
+                            <GridView>
+                                <GridViewColumn Width="100" HeaderTemplate="{StaticResource IndexHeadTemplate}" CellTemplate="{StaticResource IndexContentTemplate}"/>
+                                <GridViewColumn Width="200" HeaderTemplate="{StaticResource FriendlyNameHeadTemplate}" CellTemplate="{StaticResource FriendlyNameContentTemplate}"/>
+                                <GridViewColumn Width="100" HeaderTemplate="{StaticResource DataTypeHeadTemplate}" CellTemplate="{StaticResource DataTypeContentTemplate}"/>
+                                <GridViewColumn Width="200" HeaderTemplate="{StaticResource BindingHeadTemplate}" CellTemplate="{StaticResource BindingContentTemplate}"/>
+                                <GridViewColumn Width="200" HeaderTemplate="{StaticResource ConverterHeadTemplate}" CellTemplate="{StaticResource ConverterContentTemplate}"/>
+                            </GridView>
+                        </ListView.View>
+                    </ListView>
+                </GroupBox>
+            </DockPanel>
+        </Grid>
+    </DockPanel>
 </UserControl>

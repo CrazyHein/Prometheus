@@ -14,7 +14,7 @@
                         <Image Source="../img/remove.png"/>
                     </MenuItem.Icon>
                 </MenuItem>
-                <MenuItem Command="local:IOListDataControlCommand.ModifyElement">
+                <MenuItem Command="local:IOListDataControlCommand.EditElement">
                     <MenuItem.Icon>
                         <Image Source="../img/detail.png"/>
                     </MenuItem.Icon>
@@ -46,8 +46,8 @@
         <GroupBox Header="Extension Modules" Grid.Row="1" Margin="4" Padding="8,4,8,4">
             <GroupBox.CommandBindings>
                 <CommandBinding Command="local:IOListDataControlCommand.AddElement" Executed="__on_extension_add_element_command_executed"/>
-                <CommandBinding Command="local:IOListDataControlCommand.RemoveElement" Executed="__on_extension_remove_element_command_executed" CanExecute="__on_extension_remove_modify_element_can_executed"/>
-                <CommandBinding Command="local:IOListDataControlCommand.ModifyElement" Executed="__on_extension_modify_element_command_executed" CanExecute="__on_extension_remove_modify_element_can_executed"/>
+                <CommandBinding Command="local:IOListDataControlCommand.RemoveElement" Executed="__on_extension_remove_element_command_executed" CanExecute="__on_extension_remove_edit_element_can_executed"/>
+                <CommandBinding Command="local:IOListDataControlCommand.EditElement" Executed="__on_extension_edit_element_command_executed" CanExecute="__on_extension_remove_edit_element_can_executed"/>
             </GroupBox.CommandBindings>
             <DockPanel>
                 <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Right">
@@ -117,8 +117,8 @@
         <GroupBox Header="Ethernet Modules" Grid.Row="2" Margin="4" Padding="8,4,8,4">
             <GroupBox.CommandBindings>
                 <CommandBinding Command="local:IOListDataControlCommand.AddElement" Executed="__on_ethernet_add_element_command_executed"/>
-                <CommandBinding Command="local:IOListDataControlCommand.RemoveElement" Executed="__on_ethernet_remove_element_command_executed" CanExecute="__on_ethernet_remove_modify_element_can_executed"/>
-                <CommandBinding Command="local:IOListDataControlCommand.ModifyElement" Executed="__on_ethernet_modify_element_command_executed" CanExecute="__on_ethernet_remove_modify_element_can_executed"/>
+                <CommandBinding Command="local:IOListDataControlCommand.RemoveElement" Executed="__on_ethernet_remove_element_command_executed" CanExecute="__on_ethernet_remove_edit_element_can_executed"/>
+                <CommandBinding Command="local:IOListDataControlCommand.EditElement" Executed="__on_ethernet_edit_element_command_executed" CanExecute="__on_ethernet_remove_edit_element_can_executed"/>
             </GroupBox.CommandBindings>
             <DockPanel>
                 <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Right">

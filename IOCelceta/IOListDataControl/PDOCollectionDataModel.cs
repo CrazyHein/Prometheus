@@ -18,6 +18,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
         public ObservableCollection<ObjectItemDataModel> RxControlArea { get; private set; }
         public ObservableCollection<ObjectItemDataModel> RxBitArea { get; private set; }
         public ObservableCollection<ObjectItemDataModel> RxBlockArea { get; private set; }
+        public ObservableCollection<ObjectItemDataModel> AvailableObjects { get { return __object_collection_data_model.Objects; }}
+        public ObjectItemFilter AvailableObjectItemFilter { get; private set; }
+        public string FilterFriendlyName { get; set; }
+
 
         private uint __tx_diag_offset_in_word, __tx_diag_size_in_word, __tx_diag_actual_size_in_byte;
         private uint __tx_bit_offset_in_word, __tx_bit_size_in_word, __tx_bit_actual_size_in_byte;
@@ -26,7 +30,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
         private uint __rx_bit_offset_in_word, __rx_bit_size_in_word, __rx_bit_actual_size_in_byte;
         private uint __rx_block_offset_in_word, __rx_block_size_in_word, __rx_block_actual_size_in_byte;
 
-        public PDOCollectionDataModel(IOListDataHelper helper) : base(helper)
+        private ObjectCollectionDataModel __object_collection_data_model;
+
+        public PDOCollectionDataModel(IOListDataHelper helper, ObjectCollectionDataModel objectCollectionDataModel) : base(helper)
         {
             TxDiagnosticArea = new ObservableCollection<ObjectItemDataModel>();
             TxBitArea = new ObservableCollection<ObjectItemDataModel>();
@@ -34,6 +40,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             RxControlArea = new ObservableCollection<ObjectItemDataModel>();
             RxBitArea = new ObservableCollection<ObjectItemDataModel>();
             RxBlockArea = new ObservableCollection<ObjectItemDataModel>();
+            __object_collection_data_model = objectCollectionDataModel;
+
+            FilterFriendlyName = "";
+            AvailableObjectItemFilter = new ObjectItemFilter(null, null, FilterFriendlyName);
         }
 
         public uint TxDiagnosticAreaOffsetInWord
@@ -170,8 +180,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             TxDiagnosticArea.Clear();
             foreach (var o in _data_helper.TxDiagnosticArea)
             {
-                ObjectItemDataModel model = new ObjectItemDataModel(o);
-                TxDiagnosticArea.Add(model);
+                TxDiagnosticArea.Add(__object_collection_data_model.ObjectDictionary[o.index]);
             }
 
             TxBitAreaOffsetInWord = _data_helper.TxBitAreaOffset;
@@ -180,8 +189,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             TxBitArea.Clear();
             foreach (var o in _data_helper.TxBitArea)
             {
-                ObjectItemDataModel model = new ObjectItemDataModel(o);
-                TxBitArea.Add(model);
+                //ObjectItemDataModel model = new ObjectItemDataModel(o);
+                TxBitArea.Add(__object_collection_data_model.ObjectDictionary[o.index]);
             }
 
             TxBlockAreaOffsetInWord = _data_helper.TxBlockAreaOffset;
@@ -190,8 +199,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             TxBlockArea.Clear();
             foreach (var o in _data_helper.TxBlockArea)
             {
-                ObjectItemDataModel model = new ObjectItemDataModel(o);
-                TxBlockArea.Add(model);
+                //ObjectItemDataModel model = new ObjectItemDataModel(o);
+                TxBlockArea.Add(__object_collection_data_model.ObjectDictionary[o.index]);
             }
 
             RxControlAreaOffsetInWord = _data_helper.RxControlAreaOffset;
@@ -200,8 +209,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             RxControlArea.Clear();
             foreach (var o in _data_helper.RxControlArea)
             {
-                ObjectItemDataModel model = new ObjectItemDataModel(o);
-                RxControlArea.Add(model);
+                //ObjectItemDataModel model = new ObjectItemDataModel(o);
+                RxControlArea.Add(__object_collection_data_model.ObjectDictionary[o.index]);
             }
 
             RxBitAreaOffsetInWord = _data_helper.RxBitAreaOffset;
@@ -210,8 +219,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             RxBitArea.Clear();
             foreach (var o in _data_helper.RxBitArea)
             {
-                ObjectItemDataModel model = new ObjectItemDataModel(o);
-                RxBitArea.Add(model);
+                //ObjectItemDataModel model = new ObjectItemDataModel(o);
+                RxBitArea.Add(__object_collection_data_model.ObjectDictionary[o.index]);
             }
 
             RxBlockAreaOffsetInWord = _data_helper.RxBlockAreaOffset;
@@ -220,8 +229,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             RxBlockArea.Clear();
             foreach (var o in _data_helper.RxBlockArea)
             {
-                ObjectItemDataModel model = new ObjectItemDataModel(o);
-                RxBlockArea.Add(model);
+                //ObjectItemDataModel model = new ObjectItemDataModel(o);
+                RxBlockArea.Add(__object_collection_data_model.ObjectDictionary[o.index]);
             }
         }
     

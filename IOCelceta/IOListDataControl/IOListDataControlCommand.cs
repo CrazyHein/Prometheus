@@ -11,10 +11,11 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
     {
         public static RoutedUICommand AddElement { get; private set; }
         public static RoutedUICommand RemoveElement { get; private set; }
-        public static RoutedUICommand ModifyElement { get; private set; }
+        public static RoutedUICommand EditElement { get; private set; }
         public static RoutedUICommand MoveElementUp { get; private set; }
         public static RoutedUICommand MoveElementDown { get; private set; }
         public static RoutedUICommand InsertElementBefore { get; private set; }
+        public static RoutedUICommand ReplaceElement { get; private set; }
 
         static IOListDataControlCommand()
         {
@@ -26,9 +27,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             {
                 new KeyGesture(Key.R, ModifierKeys.Control, "Ctrl+R")
             };
-            InputGestureCollection gestureModifyElement = new InputGestureCollection
+            InputGestureCollection gestureEditElement = new InputGestureCollection
             {
-                new KeyGesture(Key.M, ModifierKeys.Control, "Ctrl+M")
+                new KeyGesture(Key.M, ModifierKeys.Control, "Ctrl+E")
             };
             InputGestureCollection gesturMoveElementUp = new InputGestureCollection
             {
@@ -42,14 +43,19 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             {
                 new KeyGesture(Key.I, ModifierKeys.Control, "Ctrl+I")
             };
+            InputGestureCollection gesturReplaceElementElement = new InputGestureCollection
+            {
+                new KeyGesture(Key.M, ModifierKeys.Control, "Ctrl+M")
+            };
 
-            AddElement = new RoutedUICommand("Add", "Add", typeof(IOListDataControlCommand), gestureAddElement);
-            RemoveElement = new RoutedUICommand("Remove", "Remove", typeof(IOListDataControlCommand), gestureRemoveElement);
-            ModifyElement = new RoutedUICommand("Modify", "Modify", typeof(IOListDataControlCommand), gestureModifyElement);
+            AddElement = new RoutedUICommand("Add", "Add an element to the last position", typeof(IOListDataControlCommand), gestureAddElement);
+            RemoveElement = new RoutedUICommand("Remove", "Remove the selected element", typeof(IOListDataControlCommand), gestureRemoveElement);
+            EditElement = new RoutedUICommand("Edit", "Edit the selected element", typeof(IOListDataControlCommand), gestureEditElement);
 
-            MoveElementUp = new RoutedUICommand("Move Up", "MoveUp", typeof(IOListDataControlCommand), gesturMoveElementUp);
-            MoveElementDown = new RoutedUICommand("Move Down", "MoveDown", typeof(IOListDataControlCommand), gestureMoveElementDown);
-            InsertElementBefore = new RoutedUICommand("Insert Before", "InsertBefore", typeof(IOListDataControlCommand), gesturInsertElementBefore);
+            MoveElementUp = new RoutedUICommand("Move Up", "Move up the selected element", typeof(IOListDataControlCommand), gesturMoveElementUp);
+            MoveElementDown = new RoutedUICommand("Move Down", "Move down the selected element", typeof(IOListDataControlCommand), gestureMoveElementDown);
+            InsertElementBefore = new RoutedUICommand("InsertBefore", "Insert an element Before the selected one", typeof(IOListDataControlCommand), gesturInsertElementBefore);
+            ReplaceElement = new RoutedUICommand("Replace", "Replace the element with the selected one", typeof(IOListDataControlCommand), gesturReplaceElementElement);
         }
     }
 }

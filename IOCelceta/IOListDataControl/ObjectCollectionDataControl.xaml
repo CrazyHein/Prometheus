@@ -9,8 +9,8 @@
     <DockPanel>
         <DockPanel.CommandBindings>
             <CommandBinding Command="local:IOListDataControlCommand.AddElement" Executed="__on_add_element_command_executed"/>
-            <CommandBinding Command="local:IOListDataControlCommand.RemoveElement" Executed="__on_remove_element_command_executed" CanExecute="__on_remove_modify_element_can_executed"/>
-            <CommandBinding Command="local:IOListDataControlCommand.ModifyElement" Executed="__on_modify_element_command_executed" CanExecute="__on_remove_modify_element_can_executed"/>
+            <CommandBinding Command="local:IOListDataControlCommand.RemoveElement" Executed="__on_remove_element_command_executed" CanExecute="__on_remove_edit_element_can_executed"/>
+            <CommandBinding Command="local:IOListDataControlCommand.EditElement" Executed="__on_edit_element_command_executed" CanExecute="__on_remove_edit_element_can_executed"/>
         </DockPanel.CommandBindings>
         <DockPanel.Resources>
             <ContextMenu x:Key="ContextMenu">
@@ -19,7 +19,7 @@
                         <Image Source="../img/remove.png"/>
                     </MenuItem.Icon>
                 </MenuItem>
-                <MenuItem Command="local:IOListDataControlCommand.ModifyElement">
+                <MenuItem Command="local:IOListDataControlCommand.EditElement">
                     <MenuItem.Icon>
                         <Image Source="../img/detail.png"/>
                     </MenuItem.Icon>
