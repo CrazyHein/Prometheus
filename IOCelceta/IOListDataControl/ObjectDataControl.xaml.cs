@@ -19,15 +19,21 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
     /// </summary>
     public partial class ObjectDataControl : Window
     {
-        public ObjectDataControl(ObjectDataModel dataModel)
+        private bool __new_object_data_item;
+        private int __insert_pos;
+        private uint __original_object_index;
+        public ObjectDataControl(ObjectItemDataModel dataModel, bool newObjectDataItem, int insertPos = -1)
         {
             InitializeComponent();
             DataContext = dataModel;
+            __new_object_data_item = newObjectDataItem;
+            __insert_pos = insertPos;
+            __original_object_index = dataModel.Index;
 
-            __cmb_basic_data_type_selection.ItemsSource = dataModel.HostDataModel.DataHelper.DataTypeCatalogue.DataTypes.Values;
-            __cmb_coverter_data_type_selection.ItemsSource = dataModel.HostDataModel.DataHelper.DataTypeCatalogue.DataTypes.Values;
+            __cmb_basic_data_type_selection.ItemsSource = dataModel.Host.DataHelper.DataTypeCatalogue.DataTypes.Values;
+            __cmb_coverter_data_type_selection.ItemsSource = dataModel.Host.DataHelper.DataTypeCatalogue.DataTypes.Values;
 
-            __cmb_binding_module_selection.ItemsSource = dataModel.HostDataModel.DataHelper.ControllerModuleCollection;
+            __cmb_binding_module_selection.ItemsSource = dataModel.Host.DataHelper.ControllerModuleCollection;
         }
 
         private void __on_cancel(object sender, RoutedEventArgs e)
@@ -44,7 +50,11 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
 
                 try
                 {
-                    (DataContext as ObjectDataModel).UpdateHostDataModel();
+                    var data = DataContext as ObjectItemDataModel;
+                    if (__new_object_data_item)
+                        data.Host.AddDataModel(data, __insert_pos);
+                    else
+                        data.Host.ModifyDataModel(__original_object_index, data);
                     DialogResult = true;
                 }
                 catch (IOListParseExcepetion exception)

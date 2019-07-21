@@ -11,17 +11,35 @@
             <CommandBinding Command="local:IOListDataControlCommand.AddElement" Executed="__on_add_element_command_executed"/>
             <CommandBinding Command="local:IOListDataControlCommand.RemoveElement" Executed="__on_remove_element_command_executed" CanExecute="__on_remove_edit_element_can_executed"/>
             <CommandBinding Command="local:IOListDataControlCommand.EditElement" Executed="__on_edit_element_command_executed" CanExecute="__on_remove_edit_element_can_executed"/>
+            <CommandBinding Command="local:IOListDataControlCommand.MoveElementUp" Executed="__on_move_up_element_command_executed" CanExecute="__on_move_up_element_can_executed"/>
+            <CommandBinding Command="local:IOListDataControlCommand.MoveElementDown" Executed="__on_move_down_element_command_executed" CanExecute="__on_move_down_element_can_executed"/>
+            <CommandBinding Command="local:IOListDataControlCommand.InsertElementBefore" Executed="__on_insert_element_before_command_executed" CanExecute="__on_remove_edit_element_can_executed"/>
         </DockPanel.CommandBindings>
         <DockPanel.Resources>
             <ContextMenu x:Key="ContextMenu">
-                <MenuItem Command="local:IOListDataControlCommand.RemoveElement">
+                <MenuItem Command="local:IOListDataControlCommand.InsertElementBefore">
                     <MenuItem.Icon>
-                        <Image Source="../img/remove.png"/>
+                        <Image Source="../img/left.png"/>
                     </MenuItem.Icon>
                 </MenuItem>
                 <MenuItem Command="local:IOListDataControlCommand.EditElement">
                     <MenuItem.Icon>
                         <Image Source="../img/detail.png"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Command="local:IOListDataControlCommand.RemoveElement">
+                    <MenuItem.Icon>
+                        <Image Source="../img/remove.png"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Command="local:IOListDataControlCommand.MoveElementUp">
+                    <MenuItem.Icon>
+                        <Image Source="../img/up.png"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Command="local:IOListDataControlCommand.MoveElementDown">
+                    <MenuItem.Icon>
+                        <Image Source="../img/down.png"/>
                     </MenuItem.Icon>
                 </MenuItem>
             </ContextMenu>
@@ -35,11 +53,43 @@
                     </StackPanel>
                 </Button.Content>
             </Button>
+            <Button Width="120" Margin="4" Height="32" Command="local:IOListDataControlCommand.InsertElementBefore">
+                <Button.Content>
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="../img/left.png" Margin="2,2,8,2"/>
+                        <TextBlock Text="Insert" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Button.Content>
+            </Button>
+            <Button Width="120" Margin="4" Height="32" Command="local:IOListDataControlCommand.EditElement">
+                <Button.Content>
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="../img/detail.png" Margin="2,2,8,2"/>
+                        <TextBlock Text="Edit" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Button.Content>
+            </Button>
             <Button Width="120" Margin="4" Height="32" Command="local:IOListDataControlCommand.RemoveElement">
                 <Button.Content>
                     <StackPanel Orientation="Horizontal">
                         <Image Source="../img/remove.png" Margin="2,2,8,2"/>
                         <TextBlock Text="Remove" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Button.Content>
+            </Button>
+            <Button Width="120" Margin="4" Height="32" Command="local:IOListDataControlCommand.MoveElementUp">
+                <Button.Content>
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="../img/up.png" Margin="2,2,8,2"/>
+                        <TextBlock Text="Move Up" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Button.Content>
+            </Button>
+            <Button Width="120" Margin="4" Height="32" Command="local:IOListDataControlCommand.MoveElementDown">
+                <Button.Content>
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="../img/down.png" Margin="2,2,8,2"/>
+                        <TextBlock Text="Move Down" VerticalAlignment="Center"/>
                     </StackPanel>
                 </Button.Content>
             </Button>
@@ -81,11 +131,13 @@
                 <CheckBox Content="Data Type" Grid.Row="1" Grid.Column="1"  Name="__chk_filtered_by_data_type" Click="__on_enable_data_type_filter"/>
                 <ComboBox Grid.Row="1" Grid.Column="2" Margin="4" IsEnabled="{Binding ElementName=__chk_filtered_by_data_type, Path=IsChecked}" Name="__cmb_filter_data_type" SelectionChanged="__cmb_filter_data_type_selection_changed"/>
                 <CheckBox Content="Binding Module" Grid.Row="1" Grid.Column="3" Name="__chk_filtered_by_binding_module" Click="__on_enable_binding_module_filter"/>
-                <ComboBox Grid.Row="1" Grid.Column="4" Margin="4" IsEnabled="{Binding ElementName=__chk_filtered_by_binding_module, Path=IsChecked}" Name="__cmb_filter_binding_module" SelectionChanged="__cmb_filter_binding_module_selection_changed" DropDownOpened="__cmb_filter_binding_module_drop_down_opened"/>
+                <TextBox Grid.Row="1" Grid.Column="4" Margin="4" IsEnabled="{Binding ElementName=__chk_filtered_by_binding_module, Path=IsChecked}" Name="__txt_filter_binding_module" KeyDown="__txt_filter_binding_module_key_down" VerticalContentAlignment="Center"/>
             </Grid>
         </GroupBox>
         <ListView Name="__lsv_io_objects" Margin="4" SelectionMode="Single" ContextMenu="{StaticResource ContextMenu}" VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.IsVirtualizingWhenGrouping="True" VirtualizingPanel.VirtualizationMode="Recycling">
             <ListView.Resources>
+                <local:ObjectItemBindingString x:Key="BindingString"/>
+                <local:ObjectItemConverterString x:Key="ConverterString"/>
                 <Style TargetType="ListViewItem">
                     <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
                 </Style>
@@ -108,20 +160,39 @@
                     <TextBlock FontWeight="Bold" Text="Data Type"/>
                 </DataTemplate>
                 <DataTemplate x:Key="DataTypeContentTemplate">
-                    <TextBlock Text="{Binding Path=DataType}" Margin="4" HorizontalAlignment="Left"/>
+                    <TextBlock Text="{Binding Path=BasicDataTypeSelection}" Margin="4" HorizontalAlignment="Left"/>
                 </DataTemplate>
 
                 <DataTemplate x:Key="BindingHeadTemplate">
                     <TextBlock FontWeight="Bold" Text="Binding"/>
                 </DataTemplate>
                 <DataTemplate x:Key="BindingContentTemplate">
-                    <TextBlock Text="{Binding Path=Binding}" Margin="4" HorizontalAlignment="Left"/>
+                    <TextBlock Margin="4" HorizontalAlignment="Left">
+                        <TextBlock.Text>
+                            <MultiBinding Converter="{StaticResource BindingString}">
+                                <Binding Path="BindingEnable"/>
+                                <Binding Path="BindingModuleSelection"/>
+                                <Binding Path="BindingChannelName"/>
+                                <Binding Path="BindingChannelIndex"/>
+                            </MultiBinding>
+                        </TextBlock.Text>
+                    </TextBlock>
                 </DataTemplate>
                 <DataTemplate x:Key="ConverterHeadTemplate">
                     <TextBlock FontWeight="Bold" Text="Converter"/>
                 </DataTemplate>
                 <DataTemplate x:Key="ConverterContentTemplate">
-                    <TextBlock Text="{Binding Path=Converter}" Margin="4" HorizontalAlignment="Left"/>
+                    <TextBlock Margin="4" HorizontalAlignment="Left">
+                        <TextBlock.Text>
+                            <MultiBinding Converter="{StaticResource ConverterString}">
+                                <Binding Path="ConverterEnable"/>
+                                <Binding Path="ConverterDataTypeSelection"/>
+                                <Binding Path="ConverterDownScale"/>
+                                <Binding Path="ConverterUpScale"/>
+                                <Binding Path="ConverterUnitName"/>
+                            </MultiBinding>
+                        </TextBlock.Text>
+                    </TextBlock>
                 </DataTemplate>
             </ListView.Resources>
             <ListView.GroupStyle>

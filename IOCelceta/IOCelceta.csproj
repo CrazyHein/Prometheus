@@ -107,7 +107,6 @@
     <Compile Include="IOListDataControl\ControllerModuleDataControl.xaml.cs">
       <DependentUpon>ControllerModuleDataControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="IOListDataControl\ControllerModuleDataModel.cs" />
     <Compile Include="IOListDataControl\IOListDataControlCommand.cs" />
     <Compile Include="IOListDataControl\IOListDataModel.cs" />
     <Compile Include="IOListDataControl\ObjectCollectionDataControl.xaml.cs">
@@ -117,7 +116,6 @@
     <Compile Include="IOListDataControl\ObjectDataControl.xaml.cs">
       <DependentUpon>ObjectDataControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="IOListDataControl\ObjectDataModel.cs" />
     <Compile Include="IOListDataControl\PDOCollectionDataControl.xaml.cs">
       <DependentUpon>PDOCollectionDataControl.xaml</DependentUpon>
     </Compile>

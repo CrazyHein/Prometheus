@@ -41,22 +41,25 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
         private void __on_extension_add_element_command_executed(object sender, ExecutedRoutedEventArgs e)
         {
             ControllerInformationDataModel host = DataContext as ControllerInformationDataModel;
-
-            ControllerExtensionModuleDataModel data = new ControllerExtensionModuleDataModel(
-                host.DataHelper.ControllerCatalogue.ExtensionModels.Keys.First(),
-                host.DataHelper.ControllerCatalogue.ExtensionModels[host.DataHelper.ControllerCatalogue.ExtensionModels.Keys.First()].Name);
-            ControllerModuleDataModel moduleDataModel = new ControllerModuleDataModel(host, data, null, false);
-            ControllerModuleDataControl moduleDataControl = new ControllerModuleDataControl(moduleDataModel);
-            if (moduleDataControl.ShowDialog() == true)
+            if (host.DataHelper.ControllerCatalogue.ExtensionModels.Count == 0)
+                MessageBox.Show("There is no available [Extension Model] in [Controller Catalogue] .", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            else
             {
+                ControllerExtensionModuleItemDataModel data = new ControllerExtensionModuleItemDataModel(host,
+                    host.DataHelper.ControllerCatalogue.ExtensionModels.First().Value);
+                ControllerModuleDataControl moduleDataControl = new ControllerModuleDataControl(data, null, -1);
+                if (moduleDataControl.ShowDialog() == true)
+                {
 
+                }
             }
             e.Handled = true;
         }
 
         private void __on_extension_remove_element_command_executed(object sender, ExecutedRoutedEventArgs e)
         {
-            ControllerExtensionModuleDataModel selectedData = __lsv_extension_modules.SelectedItem as ControllerExtensionModuleDataModel;
+            ControllerExtensionModuleItemDataModel selectedData = __lsv_extension_modules.SelectedItem as ControllerExtensionModuleItemDataModel;
+            int selectedPos = __lsv_extension_modules.SelectedIndex;
             if (selectedData != null)
             {
                 if (MessageBox.Show("Are you sure ?", "Question", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
@@ -64,8 +67,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
                     try
                     {
                         ControllerInformationDataModel dataModel = DataContext as ControllerInformationDataModel;
-                        dataModel.DataHelper.RemoveControllerModule(selectedData.ReferenceName);
-                        dataModel.ExtensionModules.Remove(selectedData);
+                        dataModel.RemoveDataModel(selectedData.ReferenceName, selectedPos);
                     }
                     catch (IOListParseExcepetion exp)
                     {
@@ -84,12 +86,51 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
 
         private void __on_extension_edit_element_command_executed(object sender, ExecutedRoutedEventArgs e)
         {
-            ControllerExtensionModuleDataModel selectedData = __lsv_extension_modules.SelectedItem as ControllerExtensionModuleDataModel;
+            ControllerExtensionModuleItemDataModel selectedData = __lsv_extension_modules.SelectedItem as ControllerExtensionModuleItemDataModel;
             if (selectedData != null)
             {
                 ControllerInformationDataModel host = DataContext as ControllerInformationDataModel;
-                ControllerModuleDataModel moduleDataModel = new ControllerModuleDataModel(host, selectedData, null);
-                ControllerModuleDataControl moduleDataControl = new ControllerModuleDataControl(moduleDataModel);
+                ControllerExtensionModuleItemDataModel data = new ControllerExtensionModuleItemDataModel(host,
+                    selectedData.Model, selectedData.ReferenceName, selectedData.LocalAddress);
+                ControllerModuleDataControl moduleDataControl = new ControllerModuleDataControl(data, selectedData.ReferenceName);
+                if (moduleDataControl.ShowDialog() == true)
+                {
+
+                }
+            }
+            e.Handled = true;
+        }
+
+        private void __on_extension_move_up_element_command_executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            ControllerInformationDataModel dataModel = DataContext as ControllerInformationDataModel;
+            int selectedIndex = __lsv_extension_modules.SelectedIndex;
+            dataModel.SwapExtensionDataModel(selectedIndex, selectedIndex - 1);
+            __lsv_extension_modules.SelectedIndex = selectedIndex - 1;
+            __lsv_extension_modules.ScrollIntoView(__lsv_extension_modules.SelectedItem);
+            e.Handled = true;
+        }
+
+        private void __on_extension_move_down_element_command_executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            ControllerInformationDataModel dataModel = DataContext as ControllerInformationDataModel;
+            int selectedIndex = __lsv_extension_modules.SelectedIndex;
+            dataModel.SwapExtensionDataModel(selectedIndex, selectedIndex + 1);
+            __lsv_extension_modules.SelectedIndex = selectedIndex + 1;
+            __lsv_extension_modules.ScrollIntoView(__lsv_extension_modules.SelectedItem);
+            e.Handled = true;
+        }
+
+        private void __on_extension_insert_element_before_command_executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            ControllerInformationDataModel host = DataContext as ControllerInformationDataModel;
+            if (host.DataHelper.ControllerCatalogue.ExtensionModels.Count == 0)
+                MessageBox.Show("There is no available [Extension Model] in [Controller Catalogue] .", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            else
+            {
+                ControllerExtensionModuleItemDataModel data = new ControllerExtensionModuleItemDataModel(host,
+                    host.DataHelper.ControllerCatalogue.ExtensionModels.First().Value);
+                ControllerModuleDataControl moduleDataControl = new ControllerModuleDataControl(data, null, __lsv_extension_modules.SelectedIndex);
                 if (moduleDataControl.ShowDialog() == true)
                 {
 
@@ -101,22 +142,26 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
         private void __on_ethernet_add_element_command_executed(object sender, ExecutedRoutedEventArgs e)
         {
             ControllerInformationDataModel host = DataContext as ControllerInformationDataModel;
-
-            ControllerEthernetModuleDataModel data = new ControllerEthernetModuleDataModel(
-                host.DataHelper.ControllerCatalogue.EthernetModels.Keys.First(),
-                host.DataHelper.ControllerCatalogue.EthernetModels[host.DataHelper.ControllerCatalogue.EthernetModels.Keys.First()].Name);
-            ControllerModuleDataModel moduleDataModel = new ControllerModuleDataModel(host, null, data, false);
-            ControllerModuleDataControl moduleDataControl = new ControllerModuleDataControl(moduleDataModel);
-            if (moduleDataControl.ShowDialog() == true)
+            if (host.DataHelper.ControllerCatalogue.EthernetModels.Count == 0)
+                MessageBox.Show("There is no available [Ethernet Model] in [Controller Catalogue] .", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            else
             {
+                ControllerEthernetModuleItemDataModel data = new ControllerEthernetModuleItemDataModel(host,
+                    host.DataHelper.ControllerCatalogue.EthernetModels.First().Value);
 
+                ControllerModuleDataControl moduleDataControl = new ControllerModuleDataControl(data, null);
+                if (moduleDataControl.ShowDialog() == true)
+                {
+
+                }
             }
             e.Handled = true;
         }
 
         private void __on_ethernet_remove_element_command_executed(object sender, ExecutedRoutedEventArgs e)
         {
-            ControllerEthernetModuleDataModel selectedData = __lsv_ethernet_modules.SelectedItem as ControllerEthernetModuleDataModel;
+            ControllerEthernetModuleItemDataModel selectedData = __lsv_ethernet_modules.SelectedItem as ControllerEthernetModuleItemDataModel;
+            int selectedPos = __lsv_ethernet_modules.SelectedIndex;
             if (selectedData != null)
             {
                 if (MessageBox.Show("Are you sure ?", "Question", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
@@ -124,8 +169,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
                     try
                     {
                         ControllerInformationDataModel dataModel = DataContext as ControllerInformationDataModel;
-                        dataModel.DataHelper.RemoveControllerModule(selectedData.ReferenceName);
-                        dataModel.EthernetModules.Remove(selectedData);
+                        dataModel.RemoveDataModel(selectedData.ReferenceName, selectedPos);
                     }
                     catch (IOListParseExcepetion exp)
                     {
@@ -144,12 +188,49 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
 
         private void __on_ethernet_edit_element_command_executed(object sender, ExecutedRoutedEventArgs e)
         {
-            ControllerEthernetModuleDataModel selectedData = __lsv_ethernet_modules.SelectedItem as ControllerEthernetModuleDataModel;
+            ControllerEthernetModuleItemDataModel selectedData = __lsv_ethernet_modules.SelectedItem as ControllerEthernetModuleItemDataModel;
             if (selectedData != null)
             {
                 ControllerInformationDataModel host = DataContext as ControllerInformationDataModel;
-                ControllerModuleDataModel moduleDataModel = new ControllerModuleDataModel(host, null, selectedData);
-                ControllerModuleDataControl moduleDataControl = new ControllerModuleDataControl(moduleDataModel);
+                ControllerEthernetModuleItemDataModel data = new ControllerEthernetModuleItemDataModel(host,
+                    selectedData.Model, selectedData.ReferenceName, selectedData.IPAddress, selectedData.Port);
+                ControllerModuleDataControl moduleDataControl = new ControllerModuleDataControl(data, selectedData.ReferenceName);
+                if (moduleDataControl.ShowDialog() == true)
+                {
+
+                }
+            }
+            e.Handled = true;
+        }
+
+        private void __on_ethernet_move_up_element_command_executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            ControllerInformationDataModel dataModel = DataContext as ControllerInformationDataModel;
+            int selectedIndex = __lsv_ethernet_modules.SelectedIndex;
+            dataModel.SwapEthernetDataModel(selectedIndex, selectedIndex - 1);
+            __lsv_ethernet_modules.SelectedIndex = selectedIndex - 1;
+            __lsv_ethernet_modules.ScrollIntoView(__lsv_ethernet_modules.SelectedItem);
+        }
+
+        private void __on_ethernet_move_down_element_command_executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            ControllerInformationDataModel dataModel = DataContext as ControllerInformationDataModel;
+            int selectedIndex = __lsv_ethernet_modules.SelectedIndex;
+            dataModel.SwapEthernetDataModel(selectedIndex, selectedIndex + 1);
+            __lsv_ethernet_modules.SelectedIndex = selectedIndex + 1;
+            __lsv_ethernet_modules.ScrollIntoView(__lsv_ethernet_modules.SelectedItem);
+        }
+
+        private void __on_ethernet_insert_element_before_command_executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            ControllerInformationDataModel host = DataContext as ControllerInformationDataModel;
+            if (host.DataHelper.ControllerCatalogue.EthernetModels.Count == 0)
+                MessageBox.Show("There is no available [Ethernt Model] in [Controller Catalogue] .", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            else
+            {
+                ControllerEthernetModuleItemDataModel data = new ControllerEthernetModuleItemDataModel(host,
+                    host.DataHelper.ControllerCatalogue.EthernetModels.First().Value);
+                ControllerModuleDataControl moduleDataControl = new ControllerModuleDataControl(data, null, __lsv_ethernet_modules.SelectedIndex);
                 if (moduleDataControl.ShowDialog() == true)
                 {
 
@@ -172,6 +253,54 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
                 e.CanExecute = false;
             else
                 e.CanExecute = __lsv_ethernet_modules.SelectedItem != null;
+        }
+
+        private void __on_extension_move_up_element_can_executed(object sender, CanExecuteRoutedEventArgs e)
+        {
+            try
+            {
+                e.CanExecute = __lsv_extension_modules.SelectedItem != null && __lsv_extension_modules.SelectedIndex - 1 >= 0;
+            }
+            catch
+            {
+                e.CanExecute = false;
+            }
+        }
+
+        private void __on_extension_move_down_element_can_executed(object sender, CanExecuteRoutedEventArgs e)
+        {
+            try
+            {
+                e.CanExecute = __lsv_extension_modules.SelectedItem != null && __lsv_extension_modules.SelectedIndex + 1 < __lsv_extension_modules.Items.Count;
+            }
+            catch
+            {
+                e.CanExecute = false;
+            }
+        }
+
+        private void __on_ethernet_move_up_element_can_executed(object sender, CanExecuteRoutedEventArgs e)
+        {
+            try
+            {
+                e.CanExecute = __lsv_ethernet_modules.SelectedItem != null && __lsv_ethernet_modules.SelectedIndex - 1 >= 0;
+            }
+            catch
+            {
+                e.CanExecute = false;
+            }
+        }
+
+        private void __on_ethernet_move_down_element_can_executed(object sender, CanExecuteRoutedEventArgs e)
+        {
+            try
+            {
+                e.CanExecute = __lsv_ethernet_modules.SelectedItem != null && __lsv_ethernet_modules.SelectedIndex + 1 < __lsv_ethernet_modules.Items.Count;
+            }
+            catch
+            {
+                e.CanExecute = false;
+            }
         }
     }
 }

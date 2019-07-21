@@ -74,7 +74,7 @@
                 <TabItem.Header>
                     <StackPanel Orientation="Horizontal">
                         <Image Source="img/pdo.png" Height="32" Margin="2,2,8,2"/>
-                        <TextBlock Text="PDO Collection" VerticalAlignment="Center"/>
+                        <TextBlock Text="PDO Mapping Collection" VerticalAlignment="Center"/>
                     </StackPanel>
                 </TabItem.Header>
             </TabItem>

@@ -29,28 +29,15 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             __lsv_io_objects.ItemsSource = dataModel.Objects;
             __cmb_filter_data_type.ItemsSource = dataModel.DataHelper.DataTypeCatalogue.DataTypes.Values;
             __cmb_filter_data_type.SelectedIndex = 0;
-            __cmb_filter_binding_module.ItemsSource = dataModel.DataHelper.ControllerModuleCollection;
-            __cmb_filter_binding_module.SelectedIndex = 0;
             ListCollectionView view = CollectionViewSource.GetDefaultView(__lsv_io_objects.ItemsSource) as ListCollectionView;
             view.Filter = new Predicate<object>(dataModel.ItemFilter.FilterItem);
             view.IsLiveGrouping = true;
             view.IsLiveFiltering = true;
-            view.LiveGroupingProperties.Add("DataType");
-            view.LiveGroupingProperties.Add("Binding");
-            view.LiveFilteringProperties.Add("DataType");
-            view.LiveFilteringProperties.Add("Binding");
+            view.LiveGroupingProperties.Add(ObjectCollectionDataModel.DataTypePropertyName);
+            view.LiveGroupingProperties.Add(ObjectCollectionDataModel.BindingModulePropertyName);
+            view.LiveFilteringProperties.Add(ObjectCollectionDataModel.DataTypePropertyName);
+            view.LiveFilteringProperties.Add(ObjectCollectionDataModel.BindingModulePropertyName);
         }
-
-        private void __cmb_filter_binding_module_drop_down_opened(object sender, EventArgs e)
-        {
-            ObjectCollectionDataModel dataModel = DataContext as ObjectCollectionDataModel;
-            if(dataModel.DataHelper.ControllerModulesUpdated == true)
-            {
-                CollectionViewSource.GetDefaultView(__cmb_filter_binding_module.ItemsSource).Refresh();
-                dataModel.DataHelper.ControllerModulesUpdated = false;
-            }
-        }
-
         private void __on_enable_data_type_filter(object sender, RoutedEventArgs e)
         {
             ListCollectionView view = CollectionViewSource.GetDefaultView(__lsv_io_objects.ItemsSource) as ListCollectionView;
@@ -71,9 +58,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
         {
             ListCollectionView view = CollectionViewSource.GetDefaultView(__lsv_io_objects.ItemsSource) as ListCollectionView;
             ObjectItemFilter filter = (DataContext as ObjectCollectionDataModel).ItemFilter;
-            if (__chk_filtered_by_binding_module.IsChecked == true && __cmb_filter_binding_module.SelectedItem != null)
+            if (__chk_filtered_by_binding_module.IsChecked == true)
             {
-                filter.BindingModule = __cmb_filter_binding_module.SelectedItem.ToString();
+                filter.BindingModule = __txt_filter_binding_module.Text;
                 filter.EnableBindingModuleFilter();
 
             }
@@ -94,14 +81,14 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
         {
             ICollectionView view = CollectionViewSource.GetDefaultView(__lsv_io_objects.ItemsSource);
             view.GroupDescriptions.Clear();
-            view.GroupDescriptions.Add((DataContext as ObjectCollectionDataModel).DataTypeGroupDescription);
+            view.GroupDescriptions.Add(ObjectCollectionDataModel.DataTypeGroupDescription);
         }
 
         private void __on_group_by_binding_click(object sender, RoutedEventArgs e)
         {
             ICollectionView view = CollectionViewSource.GetDefaultView(__lsv_io_objects.ItemsSource);
             view.GroupDescriptions.Clear();
-            view.GroupDescriptions.Add((DataContext as ObjectCollectionDataModel).BindingModuleGroupDescription);
+            view.GroupDescriptions.Add(ObjectCollectionDataModel.BindingModuleGroupDescription);
         }
 
         private void __cmb_filter_data_type_selection_changed(object sender, SelectionChangedEventArgs e)
@@ -114,22 +101,26 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             }
         }
 
-        private void __cmb_filter_binding_module_selection_changed(object sender, SelectionChangedEventArgs e)
-        {
-            if (__chk_filtered_by_binding_module.IsChecked == true && __cmb_filter_binding_module.SelectedItem != null)
-            {
-                ListCollectionView view = CollectionViewSource.GetDefaultView(__lsv_io_objects.ItemsSource) as ListCollectionView;
-                (DataContext as ObjectCollectionDataModel).ItemFilter.BindingModule = __cmb_filter_binding_module.SelectedItem.ToString();
-                view.Refresh();
-            }
-        }
-
         private void __on_add_element_command_executed(object sender, ExecutedRoutedEventArgs e)
         {
             ObjectCollectionDataModel host = DataContext as ObjectCollectionDataModel;
-            ObjectItemDataModel newObjectItem = new ObjectItemDataModel(host.DataHelper.DataTypeCatalogue.DataTypes.Values.First());
-            ObjectDataModel objectDataModel = new ObjectDataModel(host, newObjectItem, false);
-            ObjectDataControl objectDataControl = new ObjectDataControl(objectDataModel);
+
+            if (host.DataHelper.DataTypeCatalogue.DataTypes.Count == 0)
+                MessageBox.Show("There is no available [Data Type] in [DataType Catalogue] .", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            ObjectItemDataModel newObjectItem = new ObjectItemDataModel(host, host.DataHelper.DataTypeCatalogue.DataTypes.Values.First());
+            ObjectDataControl objectDataControl = new ObjectDataControl(newObjectItem, true);
+            objectDataControl.ShowDialog();
+            e.Handled = true;
+        }
+
+        private void __on_insert_element_before_command_executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            ObjectCollectionDataModel host = DataContext as ObjectCollectionDataModel;
+
+            if (host.DataHelper.DataTypeCatalogue.DataTypes.Count == 0)
+                MessageBox.Show("There is no available [Data Type] in [DataType Catalogue] .", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            ObjectItemDataModel newObjectItem = new ObjectItemDataModel(host, host.DataHelper.DataTypeCatalogue.DataTypes.Values.First());
+            ObjectDataControl objectDataControl = new ObjectDataControl(newObjectItem, true, __lsv_io_objects.SelectedIndex);
             objectDataControl.ShowDialog();
             e.Handled = true;
         }
@@ -137,6 +128,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
         private void __on_remove_element_command_executed(object sender, ExecutedRoutedEventArgs e)
         {
             ObjectItemDataModel selectedData = __lsv_io_objects.SelectedItem as ObjectItemDataModel;
+            int selectedPos = __lsv_io_objects.SelectedIndex;
             if (selectedData != null)
             {
                 if (MessageBox.Show("Are you sure ?", "Question", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
@@ -144,8 +136,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
                     try
                     {
                         ObjectCollectionDataModel dataModel = DataContext as ObjectCollectionDataModel;
-                        dataModel.DataHelper.RemoveObjectData(selectedData.Index);
-                        dataModel.Objects.Remove(selectedData);
+                        dataModel.RemoveDataModel(selectedData.Index, selectedPos);
                     }
                     catch (IOListParseExcepetion exp)
                     {
@@ -168,10 +159,31 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             ObjectCollectionDataModel hostData = DataContext as ObjectCollectionDataModel;
             if (selectedData != null)
             {
-                ObjectDataModel dataModel = new ObjectDataModel(hostData, selectedData);
-                ObjectDataControl dataControl = new ObjectDataControl(dataModel);
-                dataControl.ShowDialog();
+                ObjectItemDataModel newObjectItem = selectedData.Clone();
+                ObjectDataControl objectDataControl = new ObjectDataControl(newObjectItem, false);
+                objectDataControl.ShowDialog();
             }
+            e.Handled = true;
+        }
+
+        private void __on_move_up_element_command_executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            ObjectCollectionDataModel dataModel = DataContext as ObjectCollectionDataModel;
+            int selectedIndex = __lsv_io_objects.SelectedIndex;
+            dataModel.SwapDataModel(selectedIndex, selectedIndex - 1);
+            __lsv_io_objects.SelectedIndex = selectedIndex - 1;
+            __lsv_io_objects.ScrollIntoView(__lsv_io_objects.SelectedItem);
+            e.Handled = true;
+        }
+
+        private void __on_move_down_element_command_executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            ObjectCollectionDataModel dataModel = DataContext as ObjectCollectionDataModel;
+            int selectedIndex = __lsv_io_objects.SelectedIndex;
+            //dataModel.SwapDataModel(selectedIndex + 1, selectedIndex);
+            dataModel.SwapDataModel(selectedIndex, selectedIndex + 1);
+            __lsv_io_objects.SelectedIndex = selectedIndex + 1;
+            __lsv_io_objects.ScrollIntoView(__lsv_io_objects.SelectedItem);
             e.Handled = true;
         }
 
@@ -181,6 +193,42 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
                 e.CanExecute = false;
             else
                 e.CanExecute = __lsv_io_objects.SelectedItem != null;
+        }
+
+        private void __on_move_up_element_can_executed(object sender, CanExecuteRoutedEventArgs e)
+        {
+            try
+            {
+                e.CanExecute = __lsv_io_objects.SelectedItem != null && __lsv_io_objects.SelectedIndex - 1 >= 0;
+            }
+            catch
+            {
+                e.CanExecute = false;
+            }
+        }
+
+        private void __on_move_down_element_can_executed(object sender, CanExecuteRoutedEventArgs e)
+        {
+            try
+            {
+                e.CanExecute = __lsv_io_objects.SelectedItem != null && __lsv_io_objects.SelectedIndex + 1 < __lsv_io_objects.Items.Count;
+            }
+            catch
+            {
+                e.CanExecute = false;
+            }
+        }
+
+        private void __txt_filter_binding_module_key_down(object sender, KeyEventArgs e)
+        {
+            if(e.Key == Key.Enter)
+            {
+                ListCollectionView view = CollectionViewSource.GetDefaultView(__lsv_io_objects.ItemsSource) as ListCollectionView;
+                (DataContext as ObjectCollectionDataModel).ItemFilter.BindingModule = __txt_filter_binding_module.Text;
+                view.Refresh();
+
+                e.Handled = true;
+            }
         }
     }
 }

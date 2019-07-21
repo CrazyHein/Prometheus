@@ -12,7 +12,7 @@
             <Button Content="_Cancel" Margin="8" Width="120" Click="__on_cancel"/>
         </StackPanel>
         <StackPanel DockPanel.Dock="Top">
-            <ComboBox Margin="4" HorizontalAlignment="Stretch"  Grid.ColumnSpan="4" Name="__cmb_available_controller_modules" SelectedItem="{Binding Path=ModuleModelInfo}" SelectionChanged="__on_controller_module_selection_changed"/>
+            <ComboBox Margin="4" HorizontalAlignment="Stretch"  Grid.ColumnSpan="4" Name="__cmb_available_controller_modules" SelectedItem="{Binding Path=Model}" SelectionChanged="__on_controller_module_selection_changed"/>
             <UniformGrid Height="100" Rows="1" Columns="2">
                 <DockPanel LastChildFill="True">
                     <TextBlock Text="RX :" DockPanel.Dock="Top" Margin="4,4,4,2" />
@@ -26,8 +26,7 @@
         </StackPanel>
         <Grid Validation.Error="__on_data_binding_error">
             <Grid.Resources>
-                <local:IsEthernetModuleDataField x:Key="IsEthernet"/>
-                <local:IsExtensionModuleDataField x:Key="IsExtension"/>
+                <local:ModuleDataFieldVisibility x:Key="FieldVisibility"/>
                 <local:ModuleHexAddressToText x:Key="HexToText"/>
             </Grid.Resources>
             <Grid.RowDefinitions>
@@ -41,13 +40,13 @@
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
 
-            <TextBlock Text="Local Address : " Grid.Row="0" Grid.Column="0" Margin="4" Visibility="{Binding IsExtensionModule, Converter={StaticResource IsExtension}}"/>
-            <TextBox  Grid.Row="0" Grid.Column="1" Margin="4" Text="{Binding LocalAddress, ValidatesOnExceptions=True,NotifyOnValidationError=True, Converter={StaticResource HexToText}}" Visibility="{Binding IsExtensionModule, Converter={StaticResource IsExtension}}"/>
+            <TextBlock Text="Local Address : " Grid.Row="0" Grid.Column="0" Margin="4" Visibility="{Binding IsExtensionModule, Converter={StaticResource FieldVisibility}}"/>
+            <TextBox  Grid.Row="0" Grid.Column="1" Margin="4" Text="{Binding LocalAddress, ValidatesOnExceptions=True,NotifyOnValidationError=True, Converter={StaticResource HexToText}}" Visibility="{Binding IsExtensionModule, Converter={StaticResource FieldVisibility}}"/>
 
-            <TextBlock Text="IP Address : " Grid.Row="1" Grid.Column="0" Margin="4" Visibility="{Binding IsExtensionModule, Converter={StaticResource IsEthernet}}"/>
-            <TextBox  Grid.Row="1" Grid.Column="1" Margin="4" Text="{Binding IPAddress, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Visibility="{Binding IsExtensionModule, Converter={StaticResource IsEthernet}}"/>
-            <TextBlock Text="Port : " Grid.Row="2" Margin="4" Visibility="{Binding IsExtensionModule, Converter={StaticResource IsEthernet}}"/>
-            <TextBox  Grid.Row="2" Grid.Column="1" Margin="4" Text="{Binding Port, NotifyOnValidationError=True}" Visibility="{Binding IsExtensionModule, Converter={StaticResource IsEthernet}}"/>
+            <TextBlock Text="IP Address : " Grid.Row="1" Grid.Column="0" Margin="4" Visibility="{Binding IsEthernetModule, Converter={StaticResource FieldVisibility}}"/>
+            <TextBox  Grid.Row="1" Grid.Column="1" Margin="4" Text="{Binding IPAddress, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Visibility="{Binding IsEthernetModule, Converter={StaticResource FieldVisibility}}"/>
+            <TextBlock Text="Port : " Grid.Row="2" Margin="4" Visibility="{Binding IsEthernetModule, Converter={StaticResource FieldVisibility}}"/>
+            <TextBox  Grid.Row="2" Grid.Column="1" Margin="4" Text="{Binding Port, NotifyOnValidationError=True}" Visibility="{Binding IsEthernetModule, Converter={StaticResource FieldVisibility}}"/>
 
             <TextBlock Text="Reference Name : " Grid.Row="3" Grid.Column="0" Margin="4"/>
             <TextBox  Grid.Row="3" Grid.Column="1" Margin="4" Text="{Binding ReferenceName}"/>

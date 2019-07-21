@@ -20,24 +20,28 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
     /// </summary>
     public partial class ControllerModuleDataControl : Window
     {
-        public ControllerModuleDataControl(ControllerModuleDataModel dataModel)
+        private string __original_reference_name;
+        private int __insert_pos;
+        public ControllerModuleDataControl(ControllerModuleItemDataModel dataModel, string originalReferenceName, int insertPos = -1)
         {
             InitializeComponent();
             DataContext = dataModel;
-            if (dataModel.IsExtensionModule == true)
-                __cmb_available_controller_modules.ItemsSource = dataModel.AvailableExtensionModules;
-            else
-                __cmb_available_controller_modules.ItemsSource = dataModel.AvailableEthernetModules;
+            __original_reference_name = originalReferenceName;
+            __insert_pos = insertPos;
+            if (dataModel is ControllerExtensionModuleItemDataModel)
+                __cmb_available_controller_modules.ItemsSource = dataModel.Host.DataHelper.ControllerCatalogue.ExtensionModels.Values;
+            else if (dataModel is ControllerEthernetModuleItemDataModel)
+                __cmb_available_controller_modules.ItemsSource = dataModel.Host.DataHelper.ControllerCatalogue.EthernetModels.Values;
         }
 
         private void __on_controller_module_selection_changed(object sender, SelectionChangedEventArgs e)
         {
-            if ((DataContext as ControllerModuleDataModel).IsExtensionModule == true)
+            if (DataContext is ControllerExtensionModuleItemDataModel)
             {
                 __lst_rx_content.ItemsSource = (__cmb_available_controller_modules.SelectedItem as ControllerExtensionModel).RxVariables;
                 __lst_tx_content.ItemsSource = (__cmb_available_controller_modules.SelectedItem as ControllerExtensionModel).TxVariables;
             }
-            else
+            else if(DataContext is ControllerEthernetModuleItemDataModel)
             {
                 __lst_rx_content.ItemsSource = (__cmb_available_controller_modules.SelectedItem as ControllerEthernetModel).RxVariables;
                 __lst_tx_content.ItemsSource = (__cmb_available_controller_modules.SelectedItem as ControllerEthernetModel).TxVariables;
@@ -65,10 +69,13 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
                 MessageBox.Show("Invalid User Input ...","Error",MessageBoxButton.OK, MessageBoxImage.Error);
             else
             {
-
                 try
                 {
-                    (DataContext as ControllerModuleDataModel).UpdateHostDataModel();
+                    ControllerModuleItemDataModel data = DataContext as ControllerModuleItemDataModel;
+                    if (__original_reference_name == null)
+                        data.Host.AddDataModel(data, __insert_pos);
+                    else
+                        data.Host.ModifyDataModel(__original_reference_name, data);
                     DialogResult = true;
                 }
                 catch(IOListParseExcepetion exception)

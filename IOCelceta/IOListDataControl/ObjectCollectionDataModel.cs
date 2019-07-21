@@ -14,22 +14,35 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
 {
     public class ObjectCollectionDataModel : IOListDataModel
     {
-        public ObservableCollection<ObjectItemDataModel> Objects { get; private set; }
-        public IReadOnlyDictionary<uint, ObjectItemDataModel> ObjectDictionary { get { return __object_dictionary; } }
-
-        public PropertyGroupDescription DataTypeGroupDescription { get; private set; }
-        public PropertyGroupDescription BindingModuleGroupDescription { get; private set; }
+        public static PropertyGroupDescription DataTypeGroupDescription { get; private set; }
+        public static PropertyGroupDescription BindingModuleGroupDescription { get; private set; }
         public ObjectItemFilter ItemFilter { get; private set; }
+        public static string DataTypePropertyName { get; private set; }
+        public static string BindingModulePropertyName { get; private set; }
+        public static string FriendlyNamePropertyName { get; private set; }
+
+        public IReadOnlyDictionary<uint, ObjectItemDataModel> ObjectDictionary { get; private set; }
+        public IReadOnlyList<ObjectItemDataModel> Objects { get; private set; }
 
         private Dictionary<uint, ObjectItemDataModel> __object_dictionary;
+        private ObservableCollection<ObjectItemDataModel> __objects;
+
+        static ObjectCollectionDataModel()
+        {
+            DataTypePropertyName = "BasicDataTypeSelection";
+            BindingModulePropertyName = "BindingModuleSelection";
+            FriendlyNamePropertyName = "FriendlyName";
+            DataTypeGroupDescription = new PropertyGroupDescription(DataTypePropertyName);
+            BindingModuleGroupDescription = new PropertyGroupDescription(BindingModulePropertyName, new ObjectItemBindingModule());
+        }
 
         public ObjectCollectionDataModel(IOListDataHelper helper):base(helper)
         {
-            Objects = new ObservableCollection<ObjectItemDataModel>();
-            DataTypeGroupDescription = new PropertyGroupDescription("DataType");
-            BindingModuleGroupDescription = new PropertyGroupDescription("Binding", new ObjectItemBindingModule());
-            ItemFilter = new ObjectItemFilter(null, null, null);
             __object_dictionary = new Dictionary<uint, ObjectItemDataModel>();
+            __objects = new ObservableCollection<ObjectItemDataModel>();
+            ObjectDictionary = __object_dictionary;
+            Objects = __objects;
+            ItemFilter = new ObjectItemFilter(null, null, null);
         }
 
         public override void UpdateDataHelper()
@@ -39,23 +52,75 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
 
         public override void UpdateDataModel()
         {
-            Objects.Clear();
+            __objects.Clear();
             __object_dictionary.Clear();
             foreach (var o in _data_helper.IOObjectCollection)
             {
-                IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T definition = new IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T()
-                {
-                    index = o.index,
-                    binding = o.binding,
-                    converter = o.converter,
-                    data_type = o.data_type,
-                    friendly_name = o.friendly_name
-                };
-                ObjectItemDataModel temp = new ObjectItemDataModel(definition);
-
-                Objects.Add(temp);
+                ObjectItemDataModel temp = new ObjectItemDataModel(this, o);
+                __objects.Add(temp);
                 __object_dictionary.Add(o.index, temp);
             }
+        }
+
+        public void SwapDataModel(int firstPos, int secondPos)
+        {
+            var temp = __objects[firstPos];
+            __objects.Move(secondPos, firstPos);
+            //__objects[firstPos] = __objects[secondPos];
+            __objects[secondPos] = temp;
+        }
+
+        public void AddDataModel(ObjectItemDataModel dataModel, int pos = -1)
+        {
+            IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T objectItem = new IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T()
+            {
+                index = dataModel.Index,
+                friendly_name = dataModel.FriendlyName,
+                data_type = dataModel.BasicDataTypeSelection,
+                binding = { enabled = dataModel.BindingEnable, module = dataModel.BindingModuleSelection, channel_name = dataModel.BindingChannelName, channel_index = dataModel.BindingChannelIndex },
+                converter = { enabled = dataModel.ConverterEnable, data_type = dataModel.ConverterDataTypeSelection, up_scale = dataModel.ConverterUpScale, down_scale = dataModel.ConverterDownScale, unit_name = dataModel.ConverterUnitName }
+            };
+            _data_helper.AddObjectData(objectItem);
+            if(pos == -1)
+                __objects.Add(dataModel);
+            else
+                __objects.Insert(pos, dataModel);
+            __object_dictionary.Add(dataModel.Index, dataModel);
+        }
+
+        public void ModifyDataModel(uint index, ObjectItemDataModel dataModel)
+        {
+            IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T objectItem = new IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T()
+            {
+                index = dataModel.Index,
+                friendly_name = dataModel.FriendlyName,
+                data_type = dataModel.BasicDataTypeSelection,
+                binding = { enabled = dataModel.BindingEnable, module = dataModel.BindingModuleSelection, channel_name = dataModel.BindingChannelName, channel_index = dataModel.BindingChannelIndex },
+                converter = { enabled = dataModel.ConverterEnable, data_type = dataModel.ConverterDataTypeSelection, up_scale = dataModel.ConverterUpScale, down_scale = dataModel.ConverterDownScale, unit_name = dataModel.ConverterUnitName }
+            };
+            _data_helper.ModifyObjectData(index, objectItem);
+            var data = __object_dictionary[index];
+            data.ImportObjectDefinition(objectItem);
+            if (dataModel.Index != index)
+            {
+                __object_dictionary.Remove(index);
+                __object_dictionary.Add(data.Index, data);
+            }
+        }
+
+        public void RemoveDataModel(uint index)
+        {
+            var dataModel = __object_dictionary[index];
+            _data_helper.RemoveObjectData(index);
+            __objects.Remove(dataModel);
+            __object_dictionary.Remove(index);
+        }
+
+        public void RemoveDataModel(uint index, int listPos)
+        {
+            _data_helper.RemoveObjectData(index);
+            __objects.RemoveAt(listPos);
+            __object_dictionary.Remove(index);
         }
     }
 
@@ -74,75 +139,193 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             OnPropertyChanged(propertyName);
         }
 
-        public ObjectItemDataModel(DataTypeDefinition dataType, uint index = 0, string friendlyName = "New Object")
+        public ObjectItemDataModel(ObjectCollectionDataModel host, DataTypeDefinition dataType, uint index = 0, string friendlyName = "New Object")
         {
-            DataType = dataType;
+            Host = host;
             Index = index;
             FriendlyName = friendlyName;
-            Binding = new IO_LIST_OBJECT_COLLECTION_T.MODULE_BINDING_T();
-            Converter = new IO_LIST_OBJECT_COLLECTION_T.VALUE_CONVERTER_T();
+            BasicDataTypeSelection = dataType;
         }
 
-        public ObjectItemDataModel(IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T objectDefinition)
+        public ObjectItemDataModel(ObjectCollectionDataModel host, IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T objectDefinition)
         {
-            UpdataDataModel(objectDefinition);
+            Host = host;
+            ImportObjectDefinition(objectDefinition);
         }
 
-        public void UpdataDataModel(IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T objectDefinition)
+        public ObjectItemDataModel Clone()
+        {
+            return MemberwiseClone() as ObjectItemDataModel;
+        }
+
+        public void ImportObjectDefinition(IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T objectDefinition)
         {
             Index = objectDefinition.index;
             FriendlyName = objectDefinition.friendly_name;
-            DataType = objectDefinition.data_type;
-            Binding = objectDefinition.binding;
-            Converter = objectDefinition.converter;
+            BasicDataTypeSelection = objectDefinition.data_type;
+
+            BindingEnable = objectDefinition.binding.enabled;
+            if (BindingEnable == true)
+                BindingModuleSelection = objectDefinition.binding.module;
+            else
+                BindingModuleSelection = null;
+            BindingChannelName = objectDefinition.binding.channel_name;
+            BindingChannelIndex = objectDefinition.binding.channel_index;
+
+            ConverterEnable = objectDefinition.converter.enabled;
+            ConverterDataTypeSelection = objectDefinition.converter.data_type;
+            ConverterUpScale = objectDefinition.converter.up_scale;
+            ConverterDownScale = objectDefinition.converter.down_scale;
+            ConverterUnitName = objectDefinition.converter.unit_name;
         }
 
         private uint __index;
         private string __friendly_name;
-        private DataTypeDefinition __data_type;
-        private IO_LIST_OBJECT_COLLECTION_T.MODULE_BINDING_T __binding_definition;
-        private IO_LIST_OBJECT_COLLECTION_T.VALUE_CONVERTER_T __converter_definition;
+        private DataTypeDefinition __basic_data_type;
+
+        private bool __binding_enable;
+        private IO_LIST_CONTROLLER_INFORMATION_T.MODULE_T __binding_module;
+        private string __binding_channel_name;
+        private int __binding_channel_index;
+
+        private bool __converter_enable;
+        private DataTypeDefinition __converter_data_type;
+        private int __converter_up_scale;
+        private int __converter_down_scale;
+        private string __converter_unit_name;
 
         public uint Index
         {
             get { return __index; }
             set { SetProperty(ref __index, value); }
         }
-
         public string FriendlyName
         {
             get { return __friendly_name; }
             set { SetProperty(ref __friendly_name, value); }
         }
-        public DataTypeDefinition DataType
+        public DataTypeDefinition BasicDataTypeSelection
         {
-            get { return __data_type; }
-            set { SetProperty(ref __data_type, value); }
+            get { return __basic_data_type; }
+            set { SetProperty(ref __basic_data_type, value); }
         }
-        public IO_LIST_OBJECT_COLLECTION_T.MODULE_BINDING_T Binding
+
+        public bool BindingEnable
         {
-            get { return __binding_definition; }
-            set { SetProperty(ref __binding_definition, value); }
+            get { return __binding_enable; }
+            set { SetProperty(ref __binding_enable, value); }
         }
-        public IO_LIST_OBJECT_COLLECTION_T.VALUE_CONVERTER_T Converter
+        public IO_LIST_CONTROLLER_INFORMATION_T.MODULE_T BindingModuleSelection
         {
-            get { return __converter_definition; }
-            set { SetProperty(ref __converter_definition, value); }
+            get { return __binding_module; }
+            set { SetProperty(ref __binding_module, value); }
         }
+        public string BindingChannelName
+        {
+            get { return __binding_channel_name; }
+            set { SetProperty(ref __binding_channel_name, value); }
+        }
+        public int BindingChannelIndex
+        {
+            get { return __binding_channel_index; }
+            set { SetProperty(ref __binding_channel_index, value); }
+        }
+        public string Binding
+        {
+            get
+            {
+                if (BindingEnable == false)
+                    return "N/A";
+                else
+                    return string.Format("{0} -- [{1} : {2}]", BindingModuleSelection.reference_name, BindingChannelName, BindingChannelIndex);
+            }
+        }
+
+        public bool ConverterEnable
+        {
+            get { return __converter_enable; }
+            set { SetProperty(ref __converter_enable, value); }
+        }
+        public DataTypeDefinition ConverterDataTypeSelection
+        {
+            get { return __converter_data_type; }
+            set { SetProperty(ref __converter_data_type, value); }
+        }
+        public int ConverterUpScale
+        {
+            get { return __converter_up_scale; }
+            set { SetProperty(ref __converter_up_scale, value); }
+        }
+        public int ConverterDownScale
+        {
+            get { return __converter_down_scale; }
+            set { SetProperty(ref __converter_down_scale, value); }
+        }
+        public string ConverterUnitName
+        {
+            get { return __converter_unit_name; }
+            set { SetProperty(ref __converter_unit_name, value); }
+        }
+        public string Converter
+        {
+            get
+            {
+                if (ConverterEnable == false)
+                    return "N/A";
+                else
+                    return string.Format("{0} -- [{1}, {2}] ({3})", ConverterDataTypeSelection.Name, ConverterDownScale, ConverterUpScale, ConverterUnitName);
+            }
+        }
+
+        public ObjectCollectionDataModel Host { get; private set; }
     }
 
     class ObjectItemBindingModule : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            IO_LIST_OBJECT_COLLECTION_T.MODULE_BINDING_T binding = (IO_LIST_OBJECT_COLLECTION_T.MODULE_BINDING_T)value;
-            if (binding.enabled == true)
-                return binding.module.reference_name;
+            IO_LIST_CONTROLLER_INFORMATION_T.MODULE_T module = (IO_LIST_CONTROLLER_INFORMATION_T.MODULE_T)value;
+            if (module != null)
+                return module.reference_name;
             else
                 return "N/A";
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    class ObjectItemBindingString : IMultiValueConverter
+    {
+        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
+        {
+            if ((bool)values[0] == false || values[1] == null || values[2] == null)
+                return "N/A";
+            else
+                return string.Format("{0} -- [{1} : {2}]", 
+                    ((IO_LIST_CONTROLLER_INFORMATION_T.MODULE_T)values[1]).reference_name, 
+                    (string)values[2], (int)values[3]);
+        }
+
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    class ObjectItemConverterString : IMultiValueConverter
+    {
+        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
+        {
+            if ((bool)values[0] == false || values[1] == null || values[4] == null)
+                return "N/A";
+            else
+                return string.Format("{0} -- [{1}, {2}] ({3})", ((DataTypeDefinition)values[1]).Name, (int)values[2], (int)values[3], (string)values[4]);
+        }
+
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
         {
             throw new NotImplementedException();
         }
@@ -180,11 +363,11 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
                 return true;
 
             if ((__filter_mask & 0x01) != 0)
-                if ((item as ObjectItemDataModel).DataType == DataType)
+                if ((item as ObjectItemDataModel).BasicDataTypeSelection == DataType)
                     res |= 0x01;
 
             if ((__filter_mask & 0x02) != 0)
-                if ((item as ObjectItemDataModel).Binding.ToString().StartsWith(BindingModule))
+                if ((item as ObjectItemDataModel).Binding.StartsWith(BindingModule))
                     res |= 0x02;
 
             if ((__filter_mask & 0x04) != 0)
@@ -192,6 +375,34 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
                     res |= 0x04;
 
             return res == __filter_mask;
+        }
+    }
+
+    class ObjectItemIndexToText : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return string.Format("0x{0:X8}", value);
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            try
+            {
+                return System.Convert.ToUInt32((string)value, 10);
+            }
+            catch
+            {
+
+            }
+            try
+            {
+                return System.Convert.ToUInt32((string)value, 16);
+            }
+            catch
+            {
+                return new ArgumentException();
+            }
         }
     }
 }

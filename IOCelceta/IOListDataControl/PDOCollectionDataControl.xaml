@@ -123,6 +123,8 @@
                 <RowDefinition/>
             </Grid.RowDefinitions>
             <Grid.Resources>
+                <local:ObjectItemBindingString x:Key="BindingString"/>
+                <local:ObjectItemConverterString x:Key="ConverterString"/>
                 <Style TargetType="ListViewItem">
                     <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
                 </Style>
@@ -145,20 +147,39 @@
                     <TextBlock FontWeight="Bold" Text="Data Type"/>
                 </DataTemplate>
                 <DataTemplate x:Key="DataTypeContentTemplate">
-                    <TextBlock Text="{Binding Path=DataType}" Margin="4" HorizontalAlignment="Left"/>
+                    <TextBlock Text="{Binding Path=BasicDataTypeSelection}" Margin="4" HorizontalAlignment="Left"/>
                 </DataTemplate>
 
                 <DataTemplate x:Key="BindingHeadTemplate">
                     <TextBlock FontWeight="Bold" Text="Binding"/>
                 </DataTemplate>
                 <DataTemplate x:Key="BindingContentTemplate">
-                    <TextBlock Text="{Binding Path=Binding}" Margin="4" HorizontalAlignment="Left"/>
+                    <TextBlock Margin="4" HorizontalAlignment="Left">
+                        <TextBlock.Text>
+                            <MultiBinding Converter="{StaticResource BindingString}">
+                                <Binding Path="BindingEnable"/>
+                                <Binding Path="BindingModuleSelection"/>
+                                <Binding Path="BindingChannelName"/>
+                                <Binding Path="BindingChannelIndex"/>
+                            </MultiBinding>
+                        </TextBlock.Text>
+                    </TextBlock>
                 </DataTemplate>
                 <DataTemplate x:Key="ConverterHeadTemplate">
                     <TextBlock FontWeight="Bold" Text="Converter"/>
                 </DataTemplate>
                 <DataTemplate x:Key="ConverterContentTemplate">
-                    <TextBlock Text="{Binding Path=Converter}" Margin="4" HorizontalAlignment="Left"/>
+                    <TextBlock Margin="4" HorizontalAlignment="Left">
+                        <TextBlock.Text>
+                            <MultiBinding Converter="{StaticResource ConverterString}">
+                                <Binding Path="ConverterEnable"/>
+                                <Binding Path="ConverterDataTypeSelection"/>
+                                <Binding Path="ConverterDownScale"/>
+                                <Binding Path="ConverterUpScale"/>
+                                <Binding Path="ConverterUnitName"/>
+                            </MultiBinding>
+                        </TextBlock.Text>
+                    </TextBlock>
                 </DataTemplate>
             </Grid.Resources>
             <TextBlock Text="PDO Mappings : " FontWeight="Bold" FontSize="20" FontStyle="Italic" Margin="8,4,4,8"/>

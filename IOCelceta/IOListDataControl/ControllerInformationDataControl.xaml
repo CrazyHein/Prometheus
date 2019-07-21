@@ -9,14 +9,29 @@
     <Grid>
         <Grid.Resources>
             <ContextMenu x:Key="ContextMenu">
-                <MenuItem Command="local:IOListDataControlCommand.RemoveElement">
+                <MenuItem Command="local:IOListDataControlCommand.InsertElementBefore">
                     <MenuItem.Icon>
-                        <Image Source="../img/remove.png"/>
+                        <Image Source="../img/left.png"/>
                     </MenuItem.Icon>
                 </MenuItem>
                 <MenuItem Command="local:IOListDataControlCommand.EditElement">
                     <MenuItem.Icon>
                         <Image Source="../img/detail.png"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Command="local:IOListDataControlCommand.RemoveElement">
+                    <MenuItem.Icon>
+                        <Image Source="../img/remove.png"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Command="local:IOListDataControlCommand.MoveElementUp">
+                    <MenuItem.Icon>
+                        <Image Source="../img/up.png"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Command="local:IOListDataControlCommand.MoveElementDown">
+                    <MenuItem.Icon>
+                        <Image Source="../img/down.png"/>
                     </MenuItem.Icon>
                 </MenuItem>
             </ContextMenu>
@@ -48,6 +63,9 @@
                 <CommandBinding Command="local:IOListDataControlCommand.AddElement" Executed="__on_extension_add_element_command_executed"/>
                 <CommandBinding Command="local:IOListDataControlCommand.RemoveElement" Executed="__on_extension_remove_element_command_executed" CanExecute="__on_extension_remove_edit_element_can_executed"/>
                 <CommandBinding Command="local:IOListDataControlCommand.EditElement" Executed="__on_extension_edit_element_command_executed" CanExecute="__on_extension_remove_edit_element_can_executed"/>
+                <CommandBinding Command="local:IOListDataControlCommand.MoveElementUp" Executed="__on_extension_move_up_element_command_executed" CanExecute="__on_extension_move_up_element_can_executed"/>
+                <CommandBinding Command="local:IOListDataControlCommand.MoveElementDown" Executed="__on_extension_move_down_element_command_executed" CanExecute="__on_extension_move_down_element_can_executed"/>
+                <CommandBinding Command="local:IOListDataControlCommand.InsertElementBefore" Executed="__on_extension_insert_element_before_command_executed" CanExecute="__on_extension_remove_edit_element_can_executed"/>
             </GroupBox.CommandBindings>
             <DockPanel>
                 <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Right">
@@ -59,11 +77,43 @@
                             </StackPanel>
                         </Button.Content>
                     </Button>
+                    <Button Width="120" Margin="4" Height="32" Command="local:IOListDataControlCommand.InsertElementBefore">
+                        <Button.Content>
+                            <StackPanel Orientation="Horizontal">
+                                <Image Source="../img/left.png" Margin="2,2,8,2"/>
+                                <TextBlock Text="Insert" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button.Content>
+                    </Button>
+                    <Button Width="120" Margin="4" Height="32" Command="local:IOListDataControlCommand.EditElement">
+                        <Button.Content>
+                            <StackPanel Orientation="Horizontal">
+                                <Image Source="../img/detail.png" Margin="2,2,8,2"/>
+                                <TextBlock Text="Edit" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button.Content>
+                    </Button>
                     <Button Width="120" Margin="4" Height="32" Command="local:IOListDataControlCommand.RemoveElement">
                         <Button.Content>
                             <StackPanel Orientation="Horizontal">
                                 <Image Source="../img/remove.png" Margin="2,2,8,2"/>
                                 <TextBlock Text="Remove" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button.Content>
+                    </Button>
+                    <Button Width="120" Margin="4" Height="32" Command="local:IOListDataControlCommand.MoveElementUp">
+                        <Button.Content>
+                            <StackPanel Orientation="Horizontal">
+                                <Image Source="../img/up.png" Margin="2,2,8,2"/>
+                                <TextBlock Text="Move Up" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button.Content>
+                    </Button>
+                    <Button Width="120" Margin="4" Height="32" Command="local:IOListDataControlCommand.MoveElementDown">
+                        <Button.Content>
+                            <StackPanel Orientation="Horizontal">
+                                <Image Source="../img/down.png" Margin="2,2,8,2"/>
+                                <TextBlock Text="Move Down" VerticalAlignment="Center"/>
                             </StackPanel>
                         </Button.Content>
                     </Button>
@@ -99,7 +149,7 @@
                             <TextBlock FontWeight="Bold" Text="Address"/>
                         </DataTemplate>
                         <DataTemplate x:Key="AddressContentTemplate">
-                            <TextBlock Text="{Binding Path=Address, StringFormat=0x{0:X4}}" Margin="4" HorizontalAlignment="Left"/>
+                            <TextBlock Text="{Binding Path=LocalAddress, StringFormat=0x{0:X4}}" Margin="4" HorizontalAlignment="Left"/>
                         </DataTemplate>
                     </ListView.Resources>
                     <ListView.View>
@@ -119,6 +169,9 @@
                 <CommandBinding Command="local:IOListDataControlCommand.AddElement" Executed="__on_ethernet_add_element_command_executed"/>
                 <CommandBinding Command="local:IOListDataControlCommand.RemoveElement" Executed="__on_ethernet_remove_element_command_executed" CanExecute="__on_ethernet_remove_edit_element_can_executed"/>
                 <CommandBinding Command="local:IOListDataControlCommand.EditElement" Executed="__on_ethernet_edit_element_command_executed" CanExecute="__on_ethernet_remove_edit_element_can_executed"/>
+                <CommandBinding Command="local:IOListDataControlCommand.MoveElementUp" Executed="__on_ethernet_move_up_element_command_executed" CanExecute="__on_ethernet_move_up_element_can_executed"/>
+                <CommandBinding Command="local:IOListDataControlCommand.MoveElementDown" Executed="__on_ethernet_move_down_element_command_executed" CanExecute="__on_ethernet_move_down_element_can_executed"/>
+                <CommandBinding Command="local:IOListDataControlCommand.InsertElementBefore" Executed="__on_ethernet_insert_element_before_command_executed" CanExecute="__on_ethernet_remove_edit_element_can_executed"/>
             </GroupBox.CommandBindings>
             <DockPanel>
                 <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Right">
@@ -130,11 +183,43 @@
                             </StackPanel>
                         </Button.Content>
                     </Button>
+                    <Button Width="120" Margin="4" Height="32" Command="local:IOListDataControlCommand.InsertElementBefore">
+                        <Button.Content>
+                            <StackPanel Orientation="Horizontal">
+                                <Image Source="../img/left.png" Margin="2,2,8,2"/>
+                                <TextBlock Text="Insert" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button.Content>
+                    </Button>
+                    <Button Width="120" Margin="4" Height="32" Command="local:IOListDataControlCommand.EditElement">
+                        <Button.Content>
+                            <StackPanel Orientation="Horizontal">
+                                <Image Source="../img/detail.png" Margin="2,2,8,2"/>
+                                <TextBlock Text="Edit" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button.Content>
+                    </Button>
                     <Button Width="120" Margin="4" Height="32" Command="local:IOListDataControlCommand.RemoveElement">
                         <Button.Content>
                             <StackPanel Orientation="Horizontal">
                                 <Image Source="../img/remove.png" Margin="2,2,8,2"/>
                                 <TextBlock Text="Remove" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button.Content>
+                    </Button>
+                    <Button Width="120" Margin="4" Height="32" Command="local:IOListDataControlCommand.MoveElementUp">
+                        <Button.Content>
+                            <StackPanel Orientation="Horizontal">
+                                <Image Source="../img/up.png" Margin="2,2,8,2"/>
+                                <TextBlock Text="Move Up" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button.Content>
+                    </Button>
+                    <Button Width="120" Margin="4" Height="32" Command="local:IOListDataControlCommand.MoveElementDown">
+                        <Button.Content>
+                            <StackPanel Orientation="Horizontal">
+                                <Image Source="../img/down.png" Margin="2,2,8,2"/>
+                                <TextBlock Text="Move Down" VerticalAlignment="Center"/>
                             </StackPanel>
                         </Button.Content>
                     </Button>
