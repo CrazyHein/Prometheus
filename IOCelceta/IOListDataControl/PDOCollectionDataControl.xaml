@@ -415,13 +415,13 @@
                             <ColumnDefinition Width="auto"/>
                             <ColumnDefinition/>
                         </Grid.ColumnDefinitions>
-                        <CheckBox Content="Data Type : " Margin="2" Name="__chk_enable_data_type_filter"/>
+                        <CheckBox Content="Data Type : " Margin="2" Name="__chk_enable_data_type_name_filter" Click="__on_enable_data_type_name_filter_click"/>
                         <CheckBox Content="Friendly Name : " Margin="2" Grid.Row="1" Name="__chk_enable_friendly_name_filter" Click="__on_enable_friendly_name_filter_click"/>
-                        <CheckBox Content="Binding Module : " Margin="2" Grid.Row="2" Name="__chk_enable_binding_module_filter"/>
+                        <CheckBox Content="Binding Module : " Margin="2" Grid.Row="2" Name="__chk_enable_binding_module_name_filter" Click="__on_enable_binding_module_name_filter_click"/>
 
-                        <TextBox Grid.Column="1" Margin="2" IsEnabled="{Binding ElementName=__chk_enable_data_type_filter, Path=IsChecked}"/>
-                        <TextBox Grid.Column="1" Margin="2"  Grid.Row="1" Text="{Binding FilterFriendlyName, UpdateSourceTrigger=Explicit}" IsEnabled="{Binding ElementName=__chk_enable_friendly_name_filter, Path=IsChecked}" KeyDown="__on_new_filter_friendly_name_enter" Name="__txt_filter_friendly_name"/>
-                        <TextBox Grid.Column="1" Margin="2"  Grid.Row="2" IsEnabled="{Binding ElementName=__chk_enable_binding_module_filter, Path=IsChecked}"/>
+                        <TextBox Grid.Column="1" Margin="2" Text="{Binding FilterDataTypeName, UpdateSourceTrigger=Explicit}" IsEnabled="{Binding ElementName=__chk_enable_data_type_name_filter, Path=IsChecked}" KeyDown="__on_new_filter_data_type_name_enter"/>
+                        <TextBox Grid.Column="1" Margin="2"  Grid.Row="1" Text="{Binding FilterFriendlyName, UpdateSourceTrigger=Explicit}" IsEnabled="{Binding ElementName=__chk_enable_friendly_name_filter, Path=IsChecked}" KeyDown="__on_new_filter_friendly_name_enter"/>
+                        <TextBox Grid.Column="1" Margin="2"  Grid.Row="2" Text="{Binding FilterModuleName, UpdateSourceTrigger=Explicit}" IsEnabled="{Binding ElementName=__chk_enable_binding_module_name_filter, Path=IsChecked}" KeyDown="__on_new_filter_binding_module_name_enter"/>
                     </Grid>
                 </GroupBox>
                 <GroupBox Header="Available Objects" Padding="6">

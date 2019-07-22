@@ -20,8 +20,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
         public IReadOnlyList<ObjectItemDataModel> RxBlockArea { get { return __rx_block_area; } }
         public IReadOnlyList<ObjectItemDataModel> AvailableObjects { get { return __object_collection_data_model.Objects; }}
         public ObjectItemFilter AvailableObjectItemFilter { get; private set; }
+        public string FilterDataTypeName { get; set; }
         public string FilterFriendlyName { get; set; }
-
+        public string FilterModuleName { get; set; }
 
         private ObservableCollection<ObjectItemDataModel> __tx_diagnostic_area;
         private ObservableCollection<ObjectItemDataModel> __tx_bit_area;
@@ -61,7 +62,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             __object_collection_data_model = objectCollectionDataModel;
 
             FilterFriendlyName = "";
-            AvailableObjectItemFilter = new ObjectItemFilter(null, null, FilterFriendlyName);
+            FilterDataTypeName = "";
+            FilterModuleName = "";
+            AvailableObjectItemFilter = new ObjectItemFilter(null, FilterModuleName, FilterFriendlyName);
         }
 
         public uint TxDiagnosticAreaOffsetInWord
@@ -160,7 +163,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             private set { SetProperty(ref __rx_block_actual_size_in_byte, value); }
         }
 
-        public void UpdateAreaActualSize(IO_LIST_PDO_AREA_T area)
+        public void __updata_area_actual_size(IO_LIST_PDO_AREA_T area)
         {
             switch (area)
             {
@@ -181,6 +184,31 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
                     break;
                 case IO_LIST_PDO_AREA_T.RX_BLOCK:
                     RxBlockAreaActualSizeInByte = _data_helper.RxBlockAreaActualSize;
+                    break;
+            }
+        }
+
+        private void __updata_area_size(IO_LIST_PDO_AREA_T area)
+        {
+            switch (area)
+            {
+                case IO_LIST_PDO_AREA_T.TX_DIAGNOSTIC:
+                    _data_helper.TxDiagnosticAreaSize = TxDiagnosticAreaSizeInWord;
+                    break;
+                case IO_LIST_PDO_AREA_T.TX_BIT:
+                    _data_helper.TxBitAreaSize = TxBitAreaSizeInWord;
+                    break;
+                case IO_LIST_PDO_AREA_T.TX_BLOCK:
+                    _data_helper.TxBlockAreaSize = TxBlockAreaSizeInWord;
+                    break;
+                case IO_LIST_PDO_AREA_T.RX_CONTROL:
+                    RxControlAreaActualSizeInByte = RxControlAreaSizeInWord;
+                    break;
+                case IO_LIST_PDO_AREA_T.RX_BIT:
+                    _data_helper.RxBitAreaSize = RxBitAreaSizeInWord;
+                    break;
+                case IO_LIST_PDO_AREA_T.RX_BLOCK:
+                    _data_helper.RxBlockAreaSize = RxBlockAreaSizeInWord;
                     break;
             }
         }
@@ -252,69 +280,85 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             }
         }
 
-        public void SwapPDOMapping(IO_LIST_PDO_AREA_T area, int first, int second)
+        public void SwapPDOMapping(IO_LIST_PDO_AREA_T area, int firstPos, int secondPos)
         {
-            _data_helper.SwapPDOMapping(area, first, second);
-            //UpdateAreaActualSize(area);
-            ObjectItemDataModel temp = __collection_areas[area][first];
-            //__collection_areas[area][first] = __collection_areas[area][second];
-            __collection_areas[area].Move(second, first);
-            __collection_areas[area][second] = temp;
+            _data_helper.SwapPDOMapping(area, firstPos, secondPos);
+            if (firstPos < secondPos)
+            {
+                __collection_areas[area].Move(secondPos, firstPos);
+                __collection_areas[area].Move(firstPos + 1, secondPos);
+            }
+            else if (firstPos > secondPos)
+            {
+                __collection_areas[area].Move(firstPos, secondPos);
+                __collection_areas[area].Move(secondPos + 1, firstPos);
+            }
         }
 
         public void InsertPDOMapping(int pos, IO_LIST_PDO_AREA_T area, uint objectIndex)
         {
+            __updata_area_size(area);
             IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T objectData = _data_helper.IOObjectDictionary[objectIndex];
             _data_helper.InsertPDOMapping(pos, area, objectData);
-            UpdateAreaActualSize(area);
+            __updata_area_actual_size(area);
             __collection_areas[area].Insert(pos, __object_collection_data_model.ObjectDictionary[objectIndex]);
         }
 
         public void InsertPDOMapping(int pos, IO_LIST_PDO_AREA_T area, ObjectItemDataModel objectDataModel)
         {
+            __updata_area_size(area);
             IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T objectData = _data_helper.IOObjectDictionary[objectDataModel.Index];
             _data_helper.InsertPDOMapping(pos, area, objectData);
-            UpdateAreaActualSize(area);
+            __updata_area_actual_size(area);
             __collection_areas[area].Insert(pos, objectDataModel);
         }
 
         public void RemovePDOMapping(int pos, IO_LIST_PDO_AREA_T area)
         {
+            __updata_area_size(area);
             _data_helper.RemovePDOMapping(pos, area);
-            UpdateAreaActualSize(area);
+            __updata_area_actual_size(area);
             __collection_areas[area].RemoveAt(pos);
         }
 
         public void AppendPDOMapping(IO_LIST_PDO_AREA_T area, uint objectIndex)
         {
+            __updata_area_size(area);
             IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T objectData = _data_helper.IOObjectDictionary[objectIndex];
             _data_helper.AppendPDOMapping(area, objectData);
-            UpdateAreaActualSize(area);
+            __updata_area_actual_size(area);
             __collection_areas[area].Add(__object_collection_data_model.ObjectDictionary[objectIndex]);
         }
 
         public void AppendPDOMapping(IO_LIST_PDO_AREA_T area, ObjectItemDataModel objectDataModel)
         {
+            __updata_area_size(area);
             IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T objectData = _data_helper.IOObjectDictionary[objectDataModel.Index];
             _data_helper.AppendPDOMapping(area, objectData);
-            UpdateAreaActualSize(area);
+            __updata_area_actual_size(area);
             __collection_areas[area].Add(objectDataModel);
         }
 
         public void ReplacePDOMapping(IO_LIST_PDO_AREA_T area, int pos, uint objectIndex)
         {
+            __updata_area_size(area);
             IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T objectData = _data_helper.IOObjectDictionary[objectIndex];
             _data_helper.ReplacePDOMapping(area, pos, objectData);
-            UpdateAreaActualSize(area);
-            __collection_areas[area][pos] = __object_collection_data_model.ObjectDictionary[objectIndex];
+            __updata_area_actual_size(area);
+            __collection_areas[area].RemoveAt(pos);
+            __collection_areas[area].Insert(pos, __object_collection_data_model.ObjectDictionary[objectIndex]);
+            //__collection_areas[area][pos] = __object_collection_data_model.ObjectDictionary[objectIndex];
         }
 
         public void ReplacePDOMapping(IO_LIST_PDO_AREA_T area, int pos, ObjectItemDataModel objectDataModel)
         {
+            __updata_area_size(area);
             IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T objectData = _data_helper.IOObjectDictionary[objectDataModel.Index];
             _data_helper.ReplacePDOMapping(area, pos, objectData);
-            UpdateAreaActualSize(area);
-            __collection_areas[area][pos] = objectDataModel;
+            __updata_area_actual_size(area);
+            __collection_areas[area].RemoveAt(pos);
+            __collection_areas[area].Insert(pos, objectDataModel);
+            //__collection_areas[area][pos] = objectDataModel;
         }
     }
 }

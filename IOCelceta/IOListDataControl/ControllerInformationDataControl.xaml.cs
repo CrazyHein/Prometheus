@@ -58,29 +58,25 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
 
         private void __on_extension_remove_element_command_executed(object sender, ExecutedRoutedEventArgs e)
         {
-            ControllerExtensionModuleItemDataModel selectedData = __lsv_extension_modules.SelectedItem as ControllerExtensionModuleItemDataModel;
-            int selectedPos = __lsv_extension_modules.SelectedIndex;
-            if (selectedData != null)
+            if (MessageBox.Show("Are you sure ?", "Question", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
             {
-                if (MessageBox.Show("Are you sure ?", "Question", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+                try
                 {
-                    try
-                    {
-                        ControllerInformationDataModel dataModel = DataContext as ControllerInformationDataModel;
-                        dataModel.RemoveDataModel(selectedData.ReferenceName, selectedPos);
-                    }
-                    catch (IOListParseExcepetion exp)
-                    {
-                        string message;
-                        if (exp.ErrorCode == IO_LIST_FILE_ERROR_T.FILE_DATA_EXCEPTION)
-                            message = string.Format("At least one unexpected error occurred while removing controller module . \n{0}", exp.DataException.ToString());
-                        else
-                            message = string.Format("At least one unexpected error occurred while removing controller module . \n{0}", exp.ErrorCode.ToString());
+                    ControllerInformationDataModel dataModel = DataContext as ControllerInformationDataModel;
+                    dataModel.RemoveExtensionDataModel(__lsv_extension_modules.SelectedIndex);
+                }
+                catch (IOListParseExcepetion exp)
+                {
+                    string message;
+                    if (exp.ErrorCode == IO_LIST_FILE_ERROR_T.FILE_DATA_EXCEPTION)
+                        message = string.Format("At least one unexpected error occurred while removing controller module . \n{0}", exp.DataException.ToString());
+                    else
+                        message = string.Format("At least one unexpected error occurred while removing controller module . \n{0}", exp.ErrorCode.ToString());
 
-                        MessageBox.Show(message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                    }
+                    MessageBox.Show(message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
+
             e.Handled = true;
         }
 
@@ -160,29 +156,25 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
 
         private void __on_ethernet_remove_element_command_executed(object sender, ExecutedRoutedEventArgs e)
         {
-            ControllerEthernetModuleItemDataModel selectedData = __lsv_ethernet_modules.SelectedItem as ControllerEthernetModuleItemDataModel;
-            int selectedPos = __lsv_ethernet_modules.SelectedIndex;
-            if (selectedData != null)
+            if (MessageBox.Show("Are you sure ?", "Question", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
             {
-                if (MessageBox.Show("Are you sure ?", "Question", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+                try
                 {
-                    try
-                    {
-                        ControllerInformationDataModel dataModel = DataContext as ControllerInformationDataModel;
-                        dataModel.RemoveDataModel(selectedData.ReferenceName, selectedPos);
-                    }
-                    catch (IOListParseExcepetion exp)
-                    {
-                        string message;
-                        if (exp.ErrorCode == IO_LIST_FILE_ERROR_T.FILE_DATA_EXCEPTION)
-                            message = string.Format("At least one unexpected error occurred while removing controller module . \n{0}", exp.DataException.ToString());
-                        else
-                            message = string.Format("At least one unexpected error occurred while removing controller module . \n{0}", exp.ErrorCode.ToString());
+                    ControllerInformationDataModel dataModel = DataContext as ControllerInformationDataModel;
+                    dataModel.RemoveEthernetDataModel(__lsv_ethernet_modules.SelectedIndex);
+                }
+                catch (IOListParseExcepetion exp)
+                {
+                    string message;
+                    if (exp.ErrorCode == IO_LIST_FILE_ERROR_T.FILE_DATA_EXCEPTION)
+                        message = string.Format("At least one unexpected error occurred while removing controller module . \n{0}", exp.DataException.ToString());
+                    else
+                        message = string.Format("At least one unexpected error occurred while removing controller module . \n{0}", exp.ErrorCode.ToString());
 
-                        MessageBox.Show(message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                    }
+                    MessageBox.Show(message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
+
             e.Handled = true;
         }
 

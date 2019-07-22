@@ -64,10 +64,21 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
 
         public void SwapDataModel(int firstPos, int secondPos)
         {
-            var temp = __objects[firstPos];
-            __objects.Move(secondPos, firstPos);
-            //__objects[firstPos] = __objects[secondPos];
-            __objects[secondPos] = temp;
+            if (firstPos < secondPos)
+            {
+                __objects.Move(secondPos, firstPos);
+                __objects.Move(firstPos + 1, secondPos);
+            }
+            else if(firstPos > secondPos)
+            {
+                __objects.Move(firstPos, secondPos);
+                __objects.Move(secondPos + 1, firstPos);
+            }
+        }
+
+        public void SwapDataModel(ObjectItemDataModel first, ObjectItemDataModel second)
+        {
+            SwapDataModel(__objects.IndexOf(second), __objects.IndexOf(first));
         }
 
         public void AddDataModel(ObjectItemDataModel dataModel, int pos = -1)
@@ -108,19 +119,19 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             }
         }
 
-        public void RemoveDataModel(uint index)
+        public void RemoveDataModel(ObjectItemDataModel dataModel)
         {
-            var dataModel = __object_dictionary[index];
-            _data_helper.RemoveObjectData(index);
+            _data_helper.RemoveObjectData(dataModel.Index);
             __objects.Remove(dataModel);
-            __object_dictionary.Remove(index);
+            __object_dictionary.Remove(dataModel.Index);
         }
 
-        public void RemoveDataModel(uint index, int listPos)
+        public void RemoveDataModel(int listPos)
         {
-            _data_helper.RemoveObjectData(index);
+            var dataModel = __objects[listPos];
+            _data_helper.RemoveObjectData(dataModel.Index);
             __objects.RemoveAt(listPos);
-            __object_dictionary.Remove(index);
+            __object_dictionary.Remove(dataModel.Index);
         }
     }
 

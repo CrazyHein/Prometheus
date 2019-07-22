@@ -88,18 +88,30 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
 
         public void SwapExtensionDataModel(int firstPos, int secondPos)
         {
-            var temp = __extension_modules[firstPos];
-            //__extension_modules[firstPos] = __extension_modules[secondPos];
-            __extension_modules.Move(secondPos, firstPos);
-            __extension_modules[secondPos] = temp;
+            if (firstPos < secondPos)
+            {
+                __extension_modules.Move(secondPos, firstPos);
+                __extension_modules.Move(firstPos + 1, secondPos);
+            }
+            else if (firstPos > secondPos)
+            {
+                __extension_modules.Move(firstPos, secondPos);
+                __extension_modules.Move(secondPos + 1, firstPos);
+            }
         }
 
         public void SwapEthernetDataModel(int firstPos, int secondPos)
         {
-            var temp = __ethernet_modules[firstPos];
-            //__ethernet_modules[firstPos] = __ethernet_modules[secondPos];
-            __ethernet_modules.Move(secondPos, firstPos);
-            __ethernet_modules[secondPos] = temp;
+            if (firstPos < secondPos)
+            {
+                __ethernet_modules.Move(secondPos, firstPos);
+                __ethernet_modules.Move(firstPos + 1, secondPos);
+            }
+            else if (firstPos > secondPos)
+            {
+                __ethernet_modules.Move(firstPos, secondPos);
+                __ethernet_modules.Move(secondPos + 1, firstPos);
+            }
         }
 
         public void AddDataModel(ControllerModuleItemDataModel itemDataModel, int pos = -1)
@@ -191,38 +203,36 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             }
         }
 
-        public void RemoveDataModel(string referenceName)
+        public void RemoveDataModel(ControllerModuleItemDataModel dataModel)
         {  
-            var dataModel = __controller_module_dictionary[referenceName];
             if(dataModel is ControllerExtensionModuleItemDataModel)
             {
-                _data_helper.RemoveControllerModule(referenceName);
+                _data_helper.RemoveControllerModule(dataModel.ReferenceName);
                 __extension_modules.Remove(dataModel as ControllerExtensionModuleItemDataModel);
-                __controller_module_dictionary.Remove(referenceName);
+                __controller_module_dictionary.Remove(dataModel.ReferenceName);
             }
             else if (dataModel is ControllerEthernetModuleItemDataModel)
             {
-                _data_helper.RemoveControllerModule(referenceName);
+                _data_helper.RemoveControllerModule(dataModel.ReferenceName);
                 __ethernet_modules.Remove(dataModel as ControllerEthernetModuleItemDataModel);
-                __controller_module_dictionary.Remove(referenceName);
+                __controller_module_dictionary.Remove(dataModel.ReferenceName);
             }
         }
 
-        public void RemoveDataModel(string referenceName, int listPos)
+        public void RemoveExtensionDataModel(int listPos)
         {
-            var dataModel = __controller_module_dictionary[referenceName];
-            if (dataModel is ControllerExtensionModuleItemDataModel)
-            {
-                _data_helper.RemoveControllerModule(referenceName);
-                __extension_modules.RemoveAt(listPos);
-                __controller_module_dictionary.Remove(referenceName);
-            }
-            else if (dataModel is ControllerEthernetModuleItemDataModel)
-            {
-                _data_helper.RemoveControllerModule(referenceName);
-                __ethernet_modules.RemoveAt(listPos);
-                __controller_module_dictionary.Remove(referenceName);
-            }
+            var dataModel = __extension_modules[listPos];
+            _data_helper.RemoveControllerModule(dataModel.ReferenceName);
+            __extension_modules.RemoveAt(listPos);
+            __controller_module_dictionary.Remove(dataModel.ReferenceName);
+        }
+
+        public void RemoveEthernetDataModel(int listPos)
+        {
+            var dataModel = __ethernet_modules[listPos];
+            _data_helper.RemoveControllerModule(dataModel.ReferenceName);
+            __ethernet_modules.RemoveAt(listPos);
+            __controller_module_dictionary.Remove(dataModel.ReferenceName);
         }
     }
 

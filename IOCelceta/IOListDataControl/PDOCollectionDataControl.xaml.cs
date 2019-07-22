@@ -264,13 +264,70 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             __available_objects_view.Refresh();
         }
 
+        private void __on_enable_data_type_name_filter_click(object sender, RoutedEventArgs e)
+        {
+            if (__chk_enable_data_type_name_filter.IsChecked == true)
+            {
+                var dataTypeCatalogue = (DataContext as PDOCollectionDataModel).DataHelper.DataTypeCatalogue.DataTypes;
+                if (dataTypeCatalogue.Keys.Contains((DataContext as PDOCollectionDataModel).FilterDataTypeName))
+                    __object_item_filter.DataType = dataTypeCatalogue[(DataContext as PDOCollectionDataModel).FilterDataTypeName];
+                else
+                    __object_item_filter.DataType = null;
+                __object_item_filter.EnableDataTypeFilter();
+            }
+            else
+                __object_item_filter.DisableDataTypeFilter();
+
+            __available_objects_view.Refresh();
+        }
+
+        private void __on_enable_binding_module_name_filter_click(object sender, RoutedEventArgs e)
+        {
+            if (__chk_enable_binding_module_name_filter.IsChecked == true)
+            {
+                __object_item_filter.BindingModule = (DataContext as PDOCollectionDataModel).FilterModuleName;
+                __object_item_filter.EnableBindingModuleFilter();
+            }
+            else
+                __object_item_filter.DisableBindingModuleFilter();
+
+            __available_objects_view.Refresh();
+        }
+
         private void __on_new_filter_friendly_name_enter(object sender, KeyEventArgs e)
         {
             if(e.Key == Key.Enter)
             {
-                BindingExpression binging = __txt_filter_friendly_name.GetBindingExpression(TextBox.TextProperty);
+                BindingExpression binging = (sender as TextBox).GetBindingExpression(TextBox.TextProperty);
                 binging.UpdateSource();
                 __object_item_filter.FriendlyName = (DataContext as PDOCollectionDataModel).FilterFriendlyName;
+                __available_objects_view.Refresh();
+            }
+        }
+
+        private void __on_new_filter_data_type_name_enter(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                BindingExpression binging = (sender as TextBox).GetBindingExpression(TextBox.TextProperty);
+                binging.UpdateSource();
+
+                var dataTypeCatalogue = (DataContext as PDOCollectionDataModel).DataHelper.DataTypeCatalogue.DataTypes;
+                if (dataTypeCatalogue.Keys.Contains((DataContext as PDOCollectionDataModel).FilterDataTypeName))
+                    __object_item_filter.DataType = dataTypeCatalogue[(DataContext as PDOCollectionDataModel).FilterDataTypeName];
+                else
+                    __object_item_filter.DataType = null;
+                __available_objects_view.Refresh();
+            }
+        }
+
+        private void __on_new_filter_binding_module_name_enter(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                BindingExpression binging = (sender as TextBox).GetBindingExpression(TextBox.TextProperty);
+                binging.UpdateSource();
+                __object_item_filter.BindingModule = (DataContext as PDOCollectionDataModel).FilterModuleName;
                 __available_objects_view.Refresh();
             }
         }

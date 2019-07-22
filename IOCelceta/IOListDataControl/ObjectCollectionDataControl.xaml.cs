@@ -127,36 +127,34 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
 
         private void __on_remove_element_command_executed(object sender, ExecutedRoutedEventArgs e)
         {
-            ObjectItemDataModel selectedData = __lsv_io_objects.SelectedItem as ObjectItemDataModel;
-            int selectedPos = __lsv_io_objects.SelectedIndex;
-            if (selectedData != null)
+            if (MessageBox.Show("Are you sure ?", "Question", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
             {
-                if (MessageBox.Show("Are you sure ?", "Question", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+                try
                 {
-                    try
-                    {
-                        ObjectCollectionDataModel dataModel = DataContext as ObjectCollectionDataModel;
-                        dataModel.RemoveDataModel(selectedData.Index, selectedPos);
-                    }
-                    catch (IOListParseExcepetion exp)
-                    {
-                        string message;
-                        if (exp.ErrorCode == IO_LIST_FILE_ERROR_T.FILE_DATA_EXCEPTION)
-                            message = string.Format("At least one unexpected error occurred while removing controller object . \n{0}", exp.DataException.ToString());
-                        else
-                            message = string.Format("At least one unexpected error occurred while removing controller object . \n{0}", exp.ErrorCode.ToString());
+                    ObjectCollectionDataModel dataModel = DataContext as ObjectCollectionDataModel;
+                    if(__rad_group_by_none.IsChecked == true && __chk_filtered_by_data_type.IsChecked == false && __chk_filtered_by_binding_module.IsChecked == false)
+                        dataModel.RemoveDataModel(__lsv_io_objects.SelectedIndex);
+                    else
+                        dataModel.RemoveDataModel(__lsv_io_objects.SelectedItem as ObjectItemDataModel);
+                }
+                catch (IOListParseExcepetion exp)
+                {
+                    string message;
+                    if (exp.ErrorCode == IO_LIST_FILE_ERROR_T.FILE_DATA_EXCEPTION)
+                        message = string.Format("At least one unexpected error occurred while removing controller object . \n{0}", exp.DataException.ToString());
+                    else
+                        message = string.Format("At least one unexpected error occurred while removing controller object . \n{0}", exp.ErrorCode.ToString());
 
-                        MessageBox.Show(message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                    }
+                    MessageBox.Show(message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
+
             e.Handled = true;
         }
 
         private void __on_edit_element_command_executed(object sender, ExecutedRoutedEventArgs e)
         {
             ObjectItemDataModel selectedData = __lsv_io_objects.SelectedItem as ObjectItemDataModel;
-            ObjectCollectionDataModel hostData = DataContext as ObjectCollectionDataModel;
             if (selectedData != null)
             {
                 ObjectItemDataModel newObjectItem = selectedData.Clone();
@@ -170,7 +168,12 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
         {
             ObjectCollectionDataModel dataModel = DataContext as ObjectCollectionDataModel;
             int selectedIndex = __lsv_io_objects.SelectedIndex;
-            dataModel.SwapDataModel(selectedIndex, selectedIndex - 1);
+            if (__chk_filtered_by_data_type.IsChecked == false && __chk_filtered_by_binding_module.IsChecked == false)
+                dataModel.SwapDataModel(selectedIndex, selectedIndex - 1);
+            else
+                dataModel.SwapDataModel(__lsv_io_objects.Items[selectedIndex] as ObjectItemDataModel,
+                    __lsv_io_objects.Items[selectedIndex - 1] as ObjectItemDataModel);
+
             __lsv_io_objects.SelectedIndex = selectedIndex - 1;
             __lsv_io_objects.ScrollIntoView(__lsv_io_objects.SelectedItem);
             e.Handled = true;
@@ -180,8 +183,12 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
         {
             ObjectCollectionDataModel dataModel = DataContext as ObjectCollectionDataModel;
             int selectedIndex = __lsv_io_objects.SelectedIndex;
-            //dataModel.SwapDataModel(selectedIndex + 1, selectedIndex);
-            dataModel.SwapDataModel(selectedIndex, selectedIndex + 1);
+            if(__chk_filtered_by_data_type.IsChecked == false && __chk_filtered_by_binding_module.IsChecked == false)
+                dataModel.SwapDataModel(selectedIndex, selectedIndex + 1);
+            else
+                dataModel.SwapDataModel(__lsv_io_objects.Items[selectedIndex] as ObjectItemDataModel,
+                    __lsv_io_objects.Items[selectedIndex + 1] as ObjectItemDataModel);
+
             __lsv_io_objects.SelectedIndex = selectedIndex + 1;
             __lsv_io_objects.ScrollIntoView(__lsv_io_objects.SelectedItem);
             e.Handled = true;
@@ -199,7 +206,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
         {
             try
             {
-                e.CanExecute = __lsv_io_objects.SelectedItem != null && __lsv_io_objects.SelectedIndex - 1 >= 0;
+                e.CanExecute = __lsv_io_objects.SelectedItem != null && __lsv_io_objects.SelectedIndex - 1 >= 0 && 
+                    __rad_group_by_none.IsChecked == true;
             }
             catch
             {
@@ -211,7 +219,21 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
         {
             try
             {
-                e.CanExecute = __lsv_io_objects.SelectedItem != null && __lsv_io_objects.SelectedIndex + 1 < __lsv_io_objects.Items.Count;
+                e.CanExecute = __lsv_io_objects.SelectedItem != null && __lsv_io_objects.SelectedIndex + 1 < __lsv_io_objects.Items.Count && 
+                    __rad_group_by_none.IsChecked == true;
+            }
+            catch
+            {
+                e.CanExecute = false;
+            }
+        }
+
+        private void __on_insert_element_before_can_executed(object sender, CanExecuteRoutedEventArgs e)
+        {
+            try
+            {
+                e.CanExecute = __lsv_io_objects.SelectedItem != null && __rad_group_by_none.IsChecked == true && 
+                    __chk_filtered_by_data_type.IsChecked == false && __chk_filtered_by_binding_module.IsChecked == false;
             }
             catch
             {
