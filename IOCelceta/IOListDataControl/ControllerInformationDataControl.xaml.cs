@@ -29,13 +29,12 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             __lsv_ethernet_modules.ItemsSource = dataModel.EthernetModules;
         }
 
-        private int __data_binding_error_counter = 0;
         private void __on_data_binding_error(object sender, ValidationErrorEventArgs e)
         {
             if (e.Action == ValidationErrorEventAction.Added)
-                __data_binding_error_counter++;
-            else
-                __data_binding_error_counter--;
+                (DataContext as ControllerInformationDataModel).FieldDataBindingErrors++;
+            else if (e.Action == ValidationErrorEventAction.Removed)
+                (DataContext as ControllerInformationDataModel).FieldDataBindingErrors--;
         }
 
         private void __on_extension_add_element_command_executed(object sender, ExecutedRoutedEventArgs e)

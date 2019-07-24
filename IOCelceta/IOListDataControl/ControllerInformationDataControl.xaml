@@ -54,8 +54,8 @@
                 <TextBlock Text="IP Address : " Margin="4"/>
                 <TextBlock Text="Port : " Grid.Row="1" Margin="4"/>
 
-                <TextBox Text="{Binding MCServerIPAddress, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Grid.Column="1" Margin="4"/>
-                <TextBox Text="{Binding MCServerPort, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Grid.Column="1" Grid.Row="1" Margin="4"/>
+                <TextBox Text="{Binding MCServerIPAddress, ValidatesOnExceptions=True, NotifyOnValidationError=True, UpdateSourceTrigger=PropertyChanged}" Grid.Column="1" Margin="4"/>
+                <TextBox Text="{Binding MCServerPort, ValidatesOnExceptions=True, NotifyOnValidationError=True, UpdateSourceTrigger=PropertyChanged}" Grid.Column="1" Grid.Row="1" Margin="4"/>
             </Grid>
         </GroupBox>
         <GroupBox Header="Extension Modules" Grid.Row="1" Margin="4" Padding="8,4,8,4">

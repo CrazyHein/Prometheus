@@ -25,5 +25,13 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             InitializeComponent();
             DataContext = dataModel;
         }
+
+        private void __on_data_binding_error(object sender, ValidationErrorEventArgs e)
+        {
+            if (e.Action == ValidationErrorEventAction.Added)
+                (DataContext as TargetInformationDataModel).FieldDataBindingErrors++;
+            else if (e.Action == ValidationErrorEventAction.Removed)
+                (DataContext as TargetInformationDataModel).FieldDataBindingErrors--;
+        }
     }
 }

@@ -65,7 +65,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
 
         public override void UpdateDataHelper()
         {
-            throw new NotImplementedException();
+            _data_helper.MCServerIPAddress = MCServerIPAddress;
+            _data_helper.MCServerPort = MCServerPort;
         }
 
         public string MCServerIPAddress

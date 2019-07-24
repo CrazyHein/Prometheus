@@ -215,9 +215,9 @@
                         <GroupBox DockPanel.Dock="Top" Header="Rx Diagnostic Area" Margin="0,0,0,8" Padding="6">
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock Text="Offset In Word : " Margin="0,0,6,0" FontWeight="Bold"/>
-                                <TextBox Width="100" Margin="0,0,6,0" Text="{Binding TxDiagnosticAreaOffsetInWord}"/>
+                                <TextBox Width="100" Margin="0,0,6,0" Text="{Binding TxDiagnosticAreaOffsetInWord, ValidatesOnExceptions=True, NotifyOnValidationError=True, UpdateSourceTrigger=PropertyChanged}"/>
                                 <TextBlock Text="Size In Word : " Margin="0,0,6,0" FontWeight="Bold"/>
-                                <TextBox Width="100" Margin="0,0,6,0" Text="{Binding TxDiagnosticAreaSizeInWord}"/>
+                                <TextBox Width="100" Margin="0,0,6,0" Text="{Binding TxDiagnosticAreaSizeInWord, ValidatesOnExceptions=True, NotifyOnValidationError=True, UpdateSourceTrigger=PropertyChanged}"/>
                                 <TextBlock Text="Actual Size In Byte : " Margin="0,0,6,0" FontWeight="Bold"/>
                                 <TextBox Width="100" Margin="0,0,6,0" Text="{Binding TxDiagnosticAreaActualSizeInByte, Mode=OneWay}" IsReadOnly="True"/>
                             </StackPanel>
@@ -248,9 +248,9 @@
                         <GroupBox DockPanel.Dock="Top" Header="Tx Bit Area" Margin="0,0,0,8" Padding="6">
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock Text="Offset In Word : " Margin="0,0,6,0" FontWeight="Bold"/>
-                                <TextBox Width="100" Margin="0,0,6,0" Text="{Binding TxBitAreaOffsetInWord}"/>
+                                <TextBox Width="100" Margin="0,0,6,0" Text="{Binding TxBitAreaOffsetInWord, ValidatesOnExceptions=True, NotifyOnValidationError=True, UpdateSourceTrigger=PropertyChanged}"/>
                                 <TextBlock Text="Size In Word : " Margin="0,0,6,0" FontWeight="Bold"/>
-                                <TextBox Width="100" Margin="0,0,6,0" Text="{Binding TxBitAreaSizeInWord}"/>
+                                <TextBox Width="100" Margin="0,0,6,0" Text="{Binding TxBitAreaSizeInWord, ValidatesOnExceptions=True, NotifyOnValidationError=True, UpdateSourceTrigger=PropertyChanged}"/>
                                 <TextBlock Text="Actual Size In Byte : " Margin="0,0,6,0"  FontWeight="Bold"/>
                                 <TextBox Width="100" Margin="0,0,6,0" Text="{Binding TxBitAreaActualSizeInByte, Mode=OneWay}" IsReadOnly="True"/>
                             </StackPanel>
@@ -281,9 +281,9 @@
                         <GroupBox DockPanel.Dock="Top" Header="Tx Block Area" Margin="0,0,0,8" Padding="6">
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock Text="Offset In Word : " Margin="0,0,6,0" FontWeight="Bold"/>
-                                <TextBox Width="100" Margin="0,0,6,0" Text="{Binding TxBlockAreaOffsetInWord}"/>
+                                <TextBox Width="100" Margin="0,0,6,0" Text="{Binding TxBlockAreaOffsetInWord, ValidatesOnExceptions=True, NotifyOnValidationError=True, UpdateSourceTrigger=PropertyChanged}"/>
                                 <TextBlock Text="Size In Word : " Margin="0,0,6,0" FontWeight="Bold"/>
-                                <TextBox Width="100" Margin="0,0,6,0" Text="{Binding TxBlockAreaSizeInWord}"/>
+                                <TextBox Width="100" Margin="0,0,6,0" Text="{Binding TxBlockAreaSizeInWord, ValidatesOnExceptions=True, NotifyOnValidationError=True, UpdateSourceTrigger=PropertyChanged}"/>
                                 <TextBlock Text="Actual Size In Byte : " Margin="0,0,6,0" FontWeight="Bold"/>
                                 <TextBox Width="100" Margin="0,0,6,0" Text="{Binding TxBlockAreaActualSizeInByte, Mode=OneWay}" IsReadOnly="True"/>
                             </StackPanel>
@@ -314,9 +314,9 @@
                         <GroupBox DockPanel.Dock="Top" Header="Rx Control Area" Margin="0,0,0,8" Padding="6">
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock Text="Offset In Word : " Margin="0,0,6,0" FontWeight="Bold"/>
-                                <TextBox Width="100" Margin="0,0,6,0" Text="{Binding RxControlAreaOffsetInWord}"/>
+                                <TextBox Width="100" Margin="0,0,6,0" Text="{Binding RxControlAreaOffsetInWord, ValidatesOnExceptions=True, NotifyOnValidationError=True, UpdateSourceTrigger=PropertyChanged}"/>
                                 <TextBlock Text="Size In Word : " Margin="0,0,6,0" FontWeight="Bold"/>
-                                <TextBox Width="100" Margin="0,0,6,0" Text="{Binding RxControlAreaSizeInWord}"/>
+                                <TextBox Width="100" Margin="0,0,6,0" Text="{Binding RxControlAreaSizeInWord, ValidatesOnExceptions=True, NotifyOnValidationError=True, UpdateSourceTrigger=PropertyChanged}"/>
                                 <TextBlock Text="Actual Size In Byte : " Margin="0,0,6,0" FontWeight="Bold"/>
                                 <TextBox Width="100" Margin="0,0,6,0" Text="{Binding RxControlAreaActualSizeInByte, Mode=OneWay}" IsReadOnly="True"/>
                             </StackPanel>
@@ -347,9 +347,9 @@
                         <GroupBox DockPanel.Dock="Top" Header="Rx Bit Area" Margin="0,0,0,8" Padding="6">
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock Text="Offset In Word : " Margin="0,0,6,0" FontWeight="Bold"/>
-                                <TextBox Width="100" Margin="0,0,6,0" Text="{Binding RxBitAreaOffsetInWord}"/>
+                                <TextBox Width="100" Margin="0,0,6,0" Text="{Binding RxBitAreaOffsetInWord, ValidatesOnExceptions=True, NotifyOnValidationError=True, UpdateSourceTrigger=PropertyChanged}"/>
                                 <TextBlock Text="Size In Word : " Margin="0,0,6,0" FontWeight="Bold"/>
-                                <TextBox Width="100" Margin="0,0,6,0" Text="{Binding RxBitAreaSizeInWord}"/>
+                                <TextBox Width="100" Margin="0,0,6,0" Text="{Binding RxBitAreaSizeInWord, ValidatesOnExceptions=True, NotifyOnValidationError=True, UpdateSourceTrigger=PropertyChanged}"/>
                                 <TextBlock Text="Actual Size In Byte : " Margin="0,0,6,0" FontWeight="Bold"/>
                                 <TextBox Width="100" Margin="0,0,6,0" Text="{Binding RxBitAreaActualSizeInByte, Mode=OneWay}" IsReadOnly="True"/>
                             </StackPanel>
@@ -380,9 +380,9 @@
                         <GroupBox DockPanel.Dock="Top" Header="Rx Block Area" Margin="0,0,0,8" Padding="6">
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock Text="Offset In Word : " Margin="0,0,6,0" FontWeight="Bold"/>
-                                <TextBox Width="100" Margin="0,0,6,0" Text="{Binding RxBlockAreaOffsetInWord}"/>
+                                <TextBox Width="100" Margin="0,0,6,0" Text="{Binding RxBlockAreaOffsetInWord, ValidatesOnExceptions=True, NotifyOnValidationError=True, UpdateSourceTrigger=PropertyChanged}"/>
                                 <TextBlock Text="Size In Word : " Margin="0,0,6,0" FontWeight="Bold"/>
-                                <TextBox Width="100" Margin="0,0,6,0" Text="{Binding RxBlockAreaSizeInWord}"/>
+                                <TextBox Width="100" Margin="0,0,6,0" Text="{Binding RxBlockAreaSizeInWord, ValidatesOnExceptions=True, NotifyOnValidationError=True, UpdateSourceTrigger=PropertyChanged}"/>
                                 <TextBlock Text="Actual Size In Byte : " Margin="0,0,6,0" FontWeight="Bold"/>
                                 <TextBox Width="100" Margin="0,0,6,0" Text="{Binding RxBlockAreaActualSizeInByte, Mode=OneWay}" IsReadOnly="True"/>
                             </StackPanel>

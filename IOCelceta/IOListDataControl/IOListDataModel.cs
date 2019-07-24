@@ -36,5 +36,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
         protected IOListDataHelper _data_helper;
         public abstract void UpdateDataModel();
         public abstract void UpdateDataHelper();
+
+        public int FieldDataBindingErrors { get; set; }
     }
 }

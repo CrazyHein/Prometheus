@@ -25,7 +25,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
 
         public override void UpdateDataHelper()
         {
-            throw new NotImplementedException();
+            _data_helper.TargetInformation.name = Name;
+            _data_helper.TargetInformation.description = Description;
         }
 
         public string Name

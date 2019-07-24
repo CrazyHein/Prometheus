@@ -1,0 +1,55 @@
+﻿<Window x:Class="AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.About"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta"
+        mc:Ignorable="d"
+        Title="About" Height="300" Width="800" ResizeMode="NoResize">
+    <DockPanel>
+        <Border DockPanel.Dock="Left" BorderBrush="Black" BorderThickness="1" VerticalAlignment="Center" Margin="8" Padding="8">
+            <Image Source="img/logo.png" Grid.RowSpan="2"   Height="128"/>
+        </Border>
+        <ScrollViewer>
+            <Grid Margin="8">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                <Grid.Resources>
+                    <Style TargetType="TextBlock">
+                        <Setter Property="FontSize" Value="18"/>
+                        <Setter Property="VerticalAlignment" Value="Center"/>
+                        <Setter Property ="Margin" Value="8,4,8,4"/>
+                        <Setter Property="TextWrapping" Value="Wrap"/>
+                        <Setter Property="FontWeight" Value="Light"/>
+                    </Style>
+                </Grid.Resources>
+                <TextBlock Grid.Column="0" Text="Title : "/>
+                <TextBlock Grid.Column="0" Grid.Row="1" Text="Description : "/>
+                <TextBlock Grid.Column="0" Grid.Row="2" Text="DataType Catalogue : "/>
+                <TextBlock Grid.Column="0" Grid.Row="3" Text="Model Catalogue : "/>
+                <TextBlock Grid.Column="0" Grid.Row="4" Text="DataHelper Version : "/>
+                <TextBlock Grid.Column="0" Grid.Row="5" Text="Assembly Version : " />
+                <TextBlock Grid.Column="0" Grid.Row="6" Text="File Version : " />
+
+                <TextBlock Grid.Column="1" Grid.Row="0" Text="{Binding Title}"/>
+                <TextBlock Grid.Column="1" Grid.Row="1" Text="{Binding Description}"/>
+                <TextBlock Grid.Column="1" Grid.Row="2" Text="{Binding DataTypeCatalogue}"/>
+                <TextBlock Grid.Column="1" Grid.Row="3" Text="{Binding ControllerModelCatalogue}"/>
+                <TextBlock Grid.Column="1" Grid.Row="4" Text="{Binding DataHelperSupportedFileFormatVersion}"/>
+                <TextBlock Grid.Column="1" Grid.Row="5" Text="{Binding AssemblyVersion}" />
+                <TextBlock Grid.Column="1" Grid.Row="6" Text="{Binding ProductVersion}"/>
+            </Grid>
+        </ScrollViewer>
+    </DockPanel>
+</Window>

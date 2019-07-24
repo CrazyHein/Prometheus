@@ -298,8 +298,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
         public void InsertPDOMapping(int pos, IO_LIST_PDO_AREA_T area, uint objectIndex)
         {
             __updata_area_size(area);
-            IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T objectData = _data_helper.IOObjectDictionary[objectIndex];
-            _data_helper.InsertPDOMapping(pos, area, objectData);
+            _data_helper.InsertPDOMapping(pos, area, objectIndex);
             __updata_area_actual_size(area);
             __collection_areas[area].Insert(pos, __object_collection_data_model.ObjectDictionary[objectIndex]);
         }
@@ -308,7 +307,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
         {
             __updata_area_size(area);
             IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T objectData = _data_helper.IOObjectDictionary[objectDataModel.Index];
-            _data_helper.InsertPDOMapping(pos, area, objectData);
+            _data_helper.InsertPDOMapping(pos, area, objectData, false);
             __updata_area_actual_size(area);
             __collection_areas[area].Insert(pos, objectDataModel);
         }
@@ -324,8 +323,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
         public void AppendPDOMapping(IO_LIST_PDO_AREA_T area, uint objectIndex)
         {
             __updata_area_size(area);
-            IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T objectData = _data_helper.IOObjectDictionary[objectIndex];
-            _data_helper.AppendPDOMapping(area, objectData);
+            _data_helper.AppendPDOMapping(area, objectIndex);
             __updata_area_actual_size(area);
             __collection_areas[area].Add(__object_collection_data_model.ObjectDictionary[objectIndex]);
         }
@@ -334,7 +332,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
         {
             __updata_area_size(area);
             IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T objectData = _data_helper.IOObjectDictionary[objectDataModel.Index];
-            _data_helper.AppendPDOMapping(area, objectData);
+            _data_helper.AppendPDOMapping(area, objectData, false);
             __updata_area_actual_size(area);
             __collection_areas[area].Add(objectDataModel);
         }
@@ -342,8 +340,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
         public void ReplacePDOMapping(IO_LIST_PDO_AREA_T area, int pos, uint objectIndex)
         {
             __updata_area_size(area);
-            IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T objectData = _data_helper.IOObjectDictionary[objectIndex];
-            _data_helper.ReplacePDOMapping(area, pos, objectData);
+            _data_helper.ReplacePDOMapping(area, pos, objectIndex);
             __updata_area_actual_size(area);
             __collection_areas[area].RemoveAt(pos);
             __collection_areas[area].Insert(pos, __object_collection_data_model.ObjectDictionary[objectIndex]);
@@ -354,7 +351,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
         {
             __updata_area_size(area);
             IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T objectData = _data_helper.IOObjectDictionary[objectDataModel.Index];
-            _data_helper.ReplacePDOMapping(area, pos, objectData);
+            _data_helper.ReplacePDOMapping(area, pos, objectData, false);
             __updata_area_actual_size(area);
             __collection_areas[area].RemoveAt(pos);
             __collection_areas[area].Insert(pos, objectDataModel);

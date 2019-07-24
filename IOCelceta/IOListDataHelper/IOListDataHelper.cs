@@ -22,6 +22,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
         DUPLICATE_MODULE_REFERENCE_NAME                         = 0x00000012,
         INVALID_CONTROLLER_MODEL                                = 0x00000013,
         INVALID_CONTROLLER_MODEL_ID                             = 0x00000014,
+        INVALID_MC_SERVER_IPV4_ADDRESS                          = 0x00000015,
 
         INVALID_OBJECT_DATA_TYPE                                = 0x00000020,
         DUPLICATE_OBJECT_INDEX                                  = 0x00000021,
@@ -80,6 +81,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
         private IO_LIST_CONTROLLER_INFORMATION_T __controller_information;
         private IO_LIST_OBJECT_COLLECTION_T __object_collection;
         private IO_LIST_CONTROLLER_PDO_COLLECTION __controller_pdo_collection;
+
+        public uint SupportedFileFormatVersion { get { return __supported_file_format_version; } }
 
         public IOListDataHelper(ControllerModelCatalogue controllerCatalogue, DataTypeCatalogue dataTypeCatalogue)
         {
@@ -162,11 +165,11 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                         switch (node.Name)
                         {
                             case "IP":
-                                __controller_information.mc_server_ip_address = node.FirstChild.Value;
+                                MCServerIPAddress = node.FirstChild.Value;
                                 mask |= 0x00000001;
                                 break;
                             case "Port":
-                                __controller_information.mc_server_port = Convert.ToUInt16(node.FirstChild.Value, 10);
+                                MCServerPort = Convert.ToUInt16(node.FirstChild.Value, 10);
                                 mask |= 0x00000002;
                                 break;
                         }
@@ -482,7 +485,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                         {
                             uint id = Convert.ToUInt32(index.FirstChild.Value, 16);
                             IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T objectData = __object_collection.objects[id];
-                            PdoObjectReferenceVerification(area, objectData);
+                            PdoObjectDataVerification(area, objectData, false);
 
                             if (area == IO_LIST_PDO_AREA_T.RX_BIT || area == IO_LIST_PDO_AREA_T.TX_BIT)
                             {
@@ -616,41 +619,58 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
             }
         }
 
-        public void PdoObjectReferenceVerification(IO_LIST_PDO_AREA_T area, IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T objectData)
+        private void __object_data_area_verification(IO_LIST_PDO_AREA_T area, IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T objectData)
         {
-            if(objectData == null)
-                throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_OBJECT_REFERENCE_IN_PDO, null);
-            if(__object_collection.objects.Keys.Contains(objectData.index) && 
-                __object_collection.objects[objectData.index] == objectData)
+            uint index = objectData.index & 0x7FFFFFFF;
+            bool isTx = ((objectData.index & 0x80000000) != 0);
+            bool isRx = ((objectData.index & 0x80000000) == 0);
+            switch (area)
             {
-                uint index = objectData.index & 0x7FFFFFFF;
-                bool isTx = ((objectData.index & 0x80000000) != 0);
-                bool isRx = ((objectData.index & 0x80000000) == 0);
-                switch (area)
-                {
-                    case IO_LIST_PDO_AREA_T.TX_DIAGNOSTIC:
-                    case IO_LIST_PDO_AREA_T.TX_BLOCK:
-                        if (isRx == true || index < 0x00002000)
-                            throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_OBJECT_REFERENCE_IN_PDO_AREA, null);
-                        break;
-                    case IO_LIST_PDO_AREA_T.TX_BIT:
-                        if (isRx == true || index >= 0x00002000)
-                            throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_OBJECT_REFERENCE_IN_PDO_AREA, null);
-                        break;
+                case IO_LIST_PDO_AREA_T.TX_DIAGNOSTIC:
+                case IO_LIST_PDO_AREA_T.TX_BLOCK:
+                    if (isRx == true || index < 0x00002000)
+                        throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_OBJECT_REFERENCE_IN_PDO_AREA, null);
+                    break;
+                case IO_LIST_PDO_AREA_T.TX_BIT:
+                    if (isRx == true || index >= 0x00002000)
+                        throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_OBJECT_REFERENCE_IN_PDO_AREA, null);
+                    break;
 
-                    case IO_LIST_PDO_AREA_T.RX_CONTROL:
-                    case IO_LIST_PDO_AREA_T.RX_BLOCK:
-                        if (isTx == true || index < 0x00002000)
-                            throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_OBJECT_REFERENCE_IN_PDO_AREA, null);
-                        break;
-                    case IO_LIST_PDO_AREA_T.RX_BIT:
-                        if (isTx == true || index >= 0x00002000)
-                            throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_OBJECT_REFERENCE_IN_PDO_AREA, null);
-                        break;
-                }
+                case IO_LIST_PDO_AREA_T.RX_CONTROL:
+                case IO_LIST_PDO_AREA_T.RX_BLOCK:
+                    if (isTx == true || index < 0x00002000)
+                        throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_OBJECT_REFERENCE_IN_PDO_AREA, null);
+                    break;
+                case IO_LIST_PDO_AREA_T.RX_BIT:
+                    if (isTx == true || index >= 0x00002000)
+                        throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_OBJECT_REFERENCE_IN_PDO_AREA, null);
+                    break;
+            }
+        }
+
+        public IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T PdoObjectReferenceVerification(IO_LIST_PDO_AREA_T area, uint objectIndex)
+        {
+            if (__object_collection.objects.Keys.Contains(objectIndex))
+            {
+                IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T objectData = __object_collection.objects[objectIndex];
+                __object_data_area_verification(area, objectData);
+                return objectData;
             }
             else
                 throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_OBJECT_REFERENCE_ID_IN_PDO, null);
+        }
+
+        public void PdoObjectDataVerification(IO_LIST_PDO_AREA_T area, IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T objectData, bool objectReferenceVerify = true)
+        {
+            if(objectData == null)
+                throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_OBJECT_REFERENCE_IN_PDO, null);
+            if (objectReferenceVerify)
+            {
+                if (__object_collection.objects.Keys.Contains(objectData.index) == false ||
+                    __object_collection.objects[objectData.index] != objectData)
+                    throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_OBJECT_REFERENCE_ID_IN_PDO, null);
+            }
+            __object_data_area_verification(area, objectData);
         }
 
         public void Load(string ioList)
@@ -790,7 +810,13 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
         public string MCServerIPAddress
         {
             get { return __controller_information.mc_server_ip_address; }
-            set { __controller_information.mc_server_ip_address = value; }
+            set
+            {
+                if (Regex.IsMatch(value, @"^((2[0-4]\d|25[0-5]|[01]?\d\d?)\.){3}(2[0-4]\d|25[0-5]|[01]?\d\d?)$") == true)
+                    __controller_information.mc_server_ip_address = value;
+                else
+                    throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_MC_SERVER_IPV4_ADDRESS, null);
+            }
         }
 
         public ushort MCServerPort
@@ -1031,12 +1057,18 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
             }
         }
 
-        public void ReplacePDOMapping(IO_LIST_PDO_AREA_T area, int pos, IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T objectData)
+        public void ReplacePDOMapping(IO_LIST_PDO_AREA_T area, int pos, uint objectIndex)
+        {
+            var objectData = PdoObjectReferenceVerification(area, objectIndex);
+            ReplacePDOMapping(area, pos, objectData, false);           
+        }
+
+        public void ReplacePDOMapping(IO_LIST_PDO_AREA_T area, int pos, IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T objectData, bool objectDataReferenceVerify = true)
         {
             uint bitSize = 0, byteSize = 0;
             try
             {
-                PdoObjectReferenceVerification(area, objectData);
+                PdoObjectDataVerification(area, objectData, objectDataReferenceVerify);
                 IO_LIST_CONTROLLER_PDO_COLLECTION.PDO_DEFINITION_T pdo = __controller_pdo_collection.PDOs[area];
                 var oldObjectData = pdo.objects[pos];
 
@@ -1082,12 +1114,18 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
             }
         }
 
-        public void AppendPDOMapping(IO_LIST_PDO_AREA_T area, IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T objectData)
+        public void AppendPDOMapping(IO_LIST_PDO_AREA_T area, uint objectIndex)
+        {
+            var objectData = PdoObjectReferenceVerification(area, objectIndex);
+            AppendPDOMapping(area, objectData, false);
+        }
+
+        public void AppendPDOMapping(IO_LIST_PDO_AREA_T area, IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T objectData, bool objectDataReferenceVerify = true)
         {
             uint bitSize = 0, byteSize = 0;
             try
             {
-                PdoObjectReferenceVerification(area, objectData);
+                PdoObjectDataVerification(area, objectData, objectDataReferenceVerify);
                 IO_LIST_CONTROLLER_PDO_COLLECTION.PDO_DEFINITION_T pdo = __controller_pdo_collection.PDOs[area];
 
                 if (area == IO_LIST_PDO_AREA_T.RX_BIT || area == IO_LIST_PDO_AREA_T.TX_BIT)
@@ -1125,12 +1163,18 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
             }
         }
 
-        public void InsertPDOMapping(int pos, IO_LIST_PDO_AREA_T area, IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T objectData)
+        public void InsertPDOMapping(int pos, IO_LIST_PDO_AREA_T area, uint objectIndex)
+        {
+            var objectData = PdoObjectReferenceVerification(area, objectIndex);
+            InsertPDOMapping(pos, area, objectData, false);
+        }
+
+        public void InsertPDOMapping(int pos, IO_LIST_PDO_AREA_T area, IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T objectData, bool objectDataReferenceVerify = true)
         {
             uint bitSize = 0, byteSize = 0;
             try
-            {
-                PdoObjectReferenceVerification(area, objectData);
+            { 
+                PdoObjectDataVerification(area, objectData, objectDataReferenceVerify);
                 IO_LIST_CONTROLLER_PDO_COLLECTION.PDO_DEFINITION_T pdo = __controller_pdo_collection.PDOs[area];
 
                 if (area == IO_LIST_PDO_AREA_T.RX_BIT || area == IO_LIST_PDO_AREA_T.TX_BIT)
@@ -1208,6 +1252,185 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
             {
                 throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.FILE_DATA_EXCEPTION, e);
             }
+        }
+
+        public void Save(IEnumerable<string> extensionModules, IEnumerable<string> ethernetModules, IEnumerable<uint> objects, string fileName)
+        {
+            XmlDocument xmlDoc = new XmlDocument();
+            try
+            {
+                XmlDeclaration decl = xmlDoc.CreateXmlDeclaration("1.0", "UTF-8", null);
+                xmlDoc.AppendChild(decl);
+
+                XmlElement root = xmlDoc.CreateElement("AMECIOList");
+                root.SetAttribute("FormatVersion", __supported_file_format_version.ToString());
+
+                root.AppendChild(__create_target_information_node(xmlDoc));
+                root.AppendChild(__create_controller_information_node(xmlDoc, extensionModules, ethernetModules));
+
+
+                xmlDoc.AppendChild(root);
+                xmlDoc.Save(fileName);
+            }
+            catch (IOListParseExcepetion e)
+            {
+                throw e;
+            }
+            catch (Exception e)
+            {
+                throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.FILE_DATA_EXCEPTION, e);
+            }
+        }
+
+        private XmlElement __create_target_information_node(XmlDocument doc)
+        {
+            XmlElement targetInfo = doc.CreateElement("TargetInfo");
+
+            XmlElement sub = doc.CreateElement("Name");
+            sub.AppendChild(doc.CreateTextNode(TargetInformation.name));
+            targetInfo.AppendChild(sub);
+
+            sub = doc.CreateElement("Description");
+            sub.AppendChild(doc.CreateTextNode(TargetInformation.description));
+            targetInfo.AppendChild(sub);
+
+            return targetInfo;
+        }
+
+        private XmlElement __create_controller_information_node(XmlDocument doc, IEnumerable<string> extensionModules, IEnumerable<string> ethernetModules)
+        {
+            XmlElement controller = doc.CreateElement("ControllerInfo");
+            controller.AppendChild(__create_mc_server_information_node(doc));
+            controller.AppendChild(__create_extension_modules_node(doc, extensionModules));
+            controller.AppendChild(__create_ethernet_modules_node(doc, ethernetModules));
+            return controller;
+        }
+
+        private XmlElement __create_mc_server_information_node(XmlDocument doc)
+        {
+            XmlElement mcserver = doc.CreateElement("MCServer");
+
+            XmlElement sub = doc.CreateElement("IP");
+            sub.AppendChild(doc.CreateTextNode(__controller_information.mc_server_ip_address));
+            mcserver.AppendChild(sub);
+
+            sub = doc.CreateElement("Port");
+            sub.AppendChild(doc.CreateTextNode(__controller_information.mc_server_port.ToString()));
+            mcserver.AppendChild(sub);
+
+            return mcserver;
+        }
+
+        private XmlElement __create_extension_modules_node(XmlDocument doc, IEnumerable<string> extensionModules)
+        {
+            XmlElement extensions = doc.CreateElement("ExtensionModules");
+            XmlElement extension;
+            if (extensionModules == null)
+            {
+                foreach(var module in __controller_information.modules.Values)
+                {
+                    if (module.model is ControllerExtensionModel)
+                    {
+                        extension = doc.CreateElement("ExtensionModule");
+
+                        XmlElement sub = doc.CreateElement("ID");
+                        sub.AppendChild(doc.CreateTextNode("0x" + module.model.ID.ToString("X4")));
+                        extension.AppendChild(sub);
+
+                        sub = doc.CreateElement("Name");
+                        sub.AppendChild(doc.CreateTextNode(module.reference_name));
+                        extension.AppendChild(sub);
+
+                        sub = doc.CreateElement("Address");
+                        sub.AppendChild(doc.CreateTextNode("0x" + module.local_address.ToString("X4")));
+                        extension.AppendChild(sub);
+
+                        extensions.AppendChild(extension);
+                    }
+                }
+            }
+            else
+            {
+                foreach(var reference in extensionModules)
+                {
+                    extension = doc.CreateElement("ExtensionModule");
+
+                    XmlElement sub = doc.CreateElement("ID");
+                    sub.AppendChild(doc.CreateTextNode("0x"+__controller_information.modules[reference].model.ID.ToString("X4")));
+                    extension.AppendChild(sub);
+
+                    sub = doc.CreateElement("Name");
+                    sub.AppendChild(doc.CreateTextNode(reference));
+                    extension.AppendChild(sub);
+
+                    sub = doc.CreateElement("Address");
+                    sub.AppendChild(doc.CreateTextNode("0x"+__controller_information.modules[reference].local_address.ToString("X4")));
+                    extension.AppendChild(sub);
+
+                    extensions.AppendChild(extension);
+                }
+            }
+            return extensions;
+        }
+
+        private XmlElement __create_ethernet_modules_node(XmlDocument doc, IEnumerable<string> ethernetModules)
+        {
+            XmlElement ethernets = doc.CreateElement("EthernetModules");
+            XmlElement ethernet;
+            if (ethernetModules == null)
+            {
+                foreach (var module in __controller_information.modules.Values)
+                {
+                    if (module.model is ControllerEthernetModel)
+                    {
+                        ethernet = doc.CreateElement("EthernetModule");
+
+                        XmlElement sub = doc.CreateElement("ID");
+                        sub.AppendChild(doc.CreateTextNode("0x" + module.model.ID.ToString("X4")));
+                        ethernet.AppendChild(sub);
+
+                        sub = doc.CreateElement("Name");
+                        sub.AppendChild(doc.CreateTextNode(module.reference_name));
+                        ethernet.AppendChild(sub);
+
+                        sub = doc.CreateElement("IP");
+                        sub.AppendChild(doc.CreateTextNode(module.ip_address));
+                        ethernet.AppendChild(sub);
+
+                        sub = doc.CreateElement("Port");
+                        sub.AppendChild(doc.CreateTextNode(module.port.ToString()));
+                        ethernet.AppendChild(sub);
+
+                        ethernets.AppendChild(ethernet);
+                    }
+                }
+            }
+            else
+            {
+                foreach (var reference in ethernetModules)
+                {
+                    ethernet = doc.CreateElement("EthernetModule");
+
+                    XmlElement sub = doc.CreateElement("ID");
+                    sub.AppendChild(doc.CreateTextNode("0x" + __controller_information.modules[reference].model.ID.ToString("X4")));
+                    ethernet.AppendChild(sub);
+
+                    sub = doc.CreateElement("Name");
+                    sub.AppendChild(doc.CreateTextNode(reference));
+                    ethernet.AppendChild(sub);
+
+                    sub = doc.CreateElement("IP");
+                    sub.AppendChild(doc.CreateTextNode(__controller_information.modules[reference].ip_address));
+                    ethernet.AppendChild(sub);
+
+                    sub = doc.CreateElement("Port");
+                    sub.AppendChild(doc.CreateTextNode(__controller_information.modules[reference].port.ToString()));
+                    ethernet.AppendChild(sub);
+
+                    ethernets.AppendChild(ethernet);
+                }
+            }
+            return ethernets;
         }
     }
 
