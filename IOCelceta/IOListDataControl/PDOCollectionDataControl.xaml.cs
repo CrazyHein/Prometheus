@@ -331,5 +331,13 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
                 __available_objects_view.Refresh();
             }
         }
+
+        private void __on_data_binding_error(object sender, ValidationErrorEventArgs e)
+        {
+            if (e.Action == ValidationErrorEventAction.Added)
+                (DataContext as PDOCollectionDataModel).FieldDataBindingErrors++;
+            else if (e.Action == ValidationErrorEventAction.Removed)
+                (DataContext as PDOCollectionDataModel).FieldDataBindingErrors--;
+        }
     }
 }

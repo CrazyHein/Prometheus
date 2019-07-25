@@ -154,6 +154,22 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                 return;
             }
 
+            ObjectCollectionDataModel objectsInfo = (__tab_object_collection.Content as ObjectCollectionDataControl).DataContext as ObjectCollectionDataModel;
+
+            if (objectsInfo.FieldDataBindingErrors != 0)
+            {
+                MessageBox.Show("Invalid User Input ... (Object Collection)", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            PDOCollectionDataModel pdoMappingsInfo = (__tab_pdo_collection.Content as PDOCollectionDataControl).DataContext as PDOCollectionDataModel;
+
+            if (pdoMappingsInfo.FieldDataBindingErrors != 0)
+            {
+                MessageBox.Show("Invalid User Input ... (PDO Mapping Collection)", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
             System.Windows.Forms.SaveFileDialog save = new System.Windows.Forms.SaveFileDialog();
             save.Filter = "Extensible Markup Language(*.xml)|*.xml";
             save.AddExtension = true;
@@ -163,13 +179,16 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
             {
                 targetInfo.UpdateDataHelper();
                 controllerInfo.UpdateDataHelper();
+                objectsInfo.UpdateDataHelper();
+                pdoMappingsInfo.UpdateDataHelper();
 
                 string message;
                 try
                 {  
-                    __io_list_data_helper.Save(controllerInfo.ExtensionModules.Select((dataModel => dataModel.ReferenceName)),
-                        controllerInfo.EthernetModules.Select((dataModel => dataModel.ReferenceName)), 
-                        null, save.FileName);
+                    __io_list_data_helper.Save(controllerInfo.ExtensionModules.Select(dataModel => dataModel.ReferenceName),
+                        controllerInfo.EthernetModules.Select(dataModel => dataModel.ReferenceName),
+                        objectsInfo.Objects.Select(dataModel => dataModel.Index), 
+                        save.FileName);
                 }
                 catch (IOListParseExcepetion exp)
                 {

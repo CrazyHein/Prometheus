@@ -185,7 +185,7 @@
             <TextBlock Text="PDO Mappings : " FontWeight="Bold" FontSize="20" FontStyle="Italic" Margin="8,4,4,8"/>
             <TextBlock Text="Object Viewer :" Grid.Column="2" FontWeight="Bold" FontSize="20" FontStyle="Italic" Margin="8,4,4,8"/>
             <GridSplitter Grid.Column="1" Grid.RowSpan="2" Background="Gray" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="4,0,4,0"/>
-            <TabControl TabStripPlacement="Left" Name="__tab_pdo_container" Grid.Row ="1">
+            <TabControl TabStripPlacement="Left" Name="__tab_pdo_container" Grid.Row ="1" Validation.Error ="__on_data_binding_error" >
                 <TabControl.Resources>
                     <Style TargetType="{x:Type TabItem}">
                         <Setter Property="Padding" Value="4" />

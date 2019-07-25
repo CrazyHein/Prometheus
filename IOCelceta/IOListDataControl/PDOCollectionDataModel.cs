@@ -192,30 +192,37 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
         {
             switch (area)
             {
-                case IO_LIST_PDO_AREA_T.TX_DIAGNOSTIC:
+                case IO_LIST_PDO_AREA_T.TX_DIAGNOSTIC:            
                     _data_helper.TxDiagnosticAreaSize = TxDiagnosticAreaSizeInWord;
+                    _data_helper.TxDiagnosticAreaOffset = TxDiagnosticAreaOffsetInWord;
                     break;
                 case IO_LIST_PDO_AREA_T.TX_BIT:
                     _data_helper.TxBitAreaSize = TxBitAreaSizeInWord;
+                    _data_helper.TxBitAreaOffset = TxBitAreaOffsetInWord;
                     break;
                 case IO_LIST_PDO_AREA_T.TX_BLOCK:
                     _data_helper.TxBlockAreaSize = TxBlockAreaSizeInWord;
+                    _data_helper.TxBlockAreaOffset = TxBlockAreaOffsetInWord;
                     break;
                 case IO_LIST_PDO_AREA_T.RX_CONTROL:
-                    RxControlAreaActualSizeInByte = RxControlAreaSizeInWord;
+                    _data_helper.RxControlAreaSize = RxControlAreaSizeInWord;
+                    _data_helper.RxControlAreaOffset = RxControlAreaOffsetInWord;
                     break;
                 case IO_LIST_PDO_AREA_T.RX_BIT:
                     _data_helper.RxBitAreaSize = RxBitAreaSizeInWord;
+                    _data_helper.RxBitAreaOffset = RxBitAreaOffsetInWord;
                     break;
                 case IO_LIST_PDO_AREA_T.RX_BLOCK:
                     _data_helper.RxBlockAreaSize = RxBlockAreaSizeInWord;
+                    _data_helper.RxBlockAreaOffset = RxBlockAreaOffsetInWord;
                     break;
             }
         }
 
         public override void UpdateDataHelper()
         {
-            throw new NotImplementedException();
+            foreach (var area in Enum.GetValues(typeof(IO_LIST_PDO_AREA_T)))
+                __updata_area_size((IO_LIST_PDO_AREA_T)area);
         }
 
         public override void UpdateDataModel()

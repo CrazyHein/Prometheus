@@ -1256,6 +1256,24 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
 
         public void Save(IEnumerable<string> extensionModules, IEnumerable<string> ethernetModules, IEnumerable<uint> objects, string fileName)
         {
+            bool overlap = __overlap_detector(new Tuple<uint, uint>[] {
+                    new Tuple<uint, uint>(__controller_pdo_collection.tx_pdo_diagnostic_area.offset_in_word, __controller_pdo_collection.tx_pdo_diagnostic_area.size_in_word),
+                    new Tuple<uint, uint>(__controller_pdo_collection.tx_pdo_bit_area.offset_in_word, __controller_pdo_collection.tx_pdo_bit_area.size_in_word),
+                    new Tuple<uint, uint>(__controller_pdo_collection.tx_pdo_block_area.offset_in_word, __controller_pdo_collection.tx_pdo_block_area.size_in_word),
+                    new Tuple<uint, uint>(__controller_pdo_collection.rx_pdo_control_area.offset_in_word, __controller_pdo_collection.rx_pdo_control_area.size_in_word),
+                    new Tuple<uint, uint>(__controller_pdo_collection.rx_pdo_bit_area.offset_in_word, __controller_pdo_collection.rx_pdo_bit_area.size_in_word),
+                    new Tuple<uint, uint>(__controller_pdo_collection.rx_pdo_block_area.offset_in_word, __controller_pdo_collection.rx_pdo_block_area.size_in_word)});
+            if (overlap == true)
+                throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.PDO_AREA_OVERLAPPED, null);
+
+            if(__controller_pdo_collection.tx_pdo_diagnostic_area.size_in_word * 2 < __controller_pdo_collection.tx_pdo_diagnostic_area.actual_size_in_byte ||
+                __controller_pdo_collection.tx_pdo_bit_area.size_in_word * 2 < __controller_pdo_collection.tx_pdo_bit_area.actual_size_in_byte ||
+                __controller_pdo_collection.tx_pdo_block_area.size_in_word * 2 < __controller_pdo_collection.tx_pdo_block_area.actual_size_in_byte ||
+                __controller_pdo_collection.rx_pdo_control_area.size_in_word * 2 < __controller_pdo_collection.rx_pdo_control_area.actual_size_in_byte ||
+                __controller_pdo_collection.rx_pdo_bit_area.size_in_word * 2 < __controller_pdo_collection.rx_pdo_bit_area.actual_size_in_byte ||
+                __controller_pdo_collection.rx_pdo_block_area.size_in_word * 2 < __controller_pdo_collection.rx_pdo_block_area.actual_size_in_byte)
+                throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.PDO_AREA_OUT_OF_RANGE, null);
+
             XmlDocument xmlDoc = new XmlDocument();
             try
             {
@@ -1267,7 +1285,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
 
                 root.AppendChild(__create_target_information_node(xmlDoc));
                 root.AppendChild(__create_controller_information_node(xmlDoc, extensionModules, ethernetModules));
-
+                root.AppendChild(__create_objects_node(xmlDoc, objects));
 
                 xmlDoc.AppendChild(root);
                 xmlDoc.Save(fileName);
@@ -1431,6 +1449,105 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                 }
             }
             return ethernets;
+        }
+
+        private XmlElement __create_objects_node(XmlDocument doc, IEnumerable<uint> objects)
+        {
+            XmlElement objectsNode = doc.CreateElement("Objects");
+            XmlElement objectNode;
+            if(objects == null)
+            {
+                foreach(var objectData in __object_collection.objects.Values)
+                {
+                    objectNode = doc.CreateElement("Object");
+
+                    XmlElement sub = doc.CreateElement("Index");
+                    sub.AppendChild(doc.CreateTextNode("0x" + objectData.index.ToString("X8")));
+                    objectNode.AppendChild(sub);
+
+                    sub = doc.CreateElement("Name");
+                    sub.AppendChild(doc.CreateTextNode(objectData.friendly_name));
+                    objectNode.AppendChild(sub);
+
+                    sub = doc.CreateElement("DataType");
+                    sub.AppendChild(doc.CreateTextNode(objectData.data_type.Name));
+                    objectNode.AppendChild(sub);
+
+                    if (objectData.binding.enabled == true)
+                        objectNode.AppendChild(__create_object_binding_node(doc, objectData.binding));
+
+                    if (objectData.converter.enabled == true)
+                        objectNode.AppendChild(__create_object_converter_node(doc, objectData.converter));
+
+                    objectsNode.AppendChild(objectNode);
+                }
+            }
+            else
+            {
+                foreach (var index in objects)
+                {
+                    objectNode = doc.CreateElement("Object");
+
+                    XmlElement sub = doc.CreateElement("Index");
+                    sub.AppendChild(doc.CreateTextNode("0x" + __object_collection.objects[index].index.ToString("X8")));
+                    objectNode.AppendChild(sub);
+
+                    sub = doc.CreateElement("Name");
+                    sub.AppendChild(doc.CreateTextNode(__object_collection.objects[index].friendly_name));
+                    objectNode.AppendChild(sub);
+
+                    sub = doc.CreateElement("DataType");
+                    sub.AppendChild(doc.CreateTextNode(__object_collection.objects[index].data_type.Name));
+                    objectNode.AppendChild(sub);
+
+                    if (__object_collection.objects[index].binding.enabled == true)
+                        objectNode.AppendChild(__create_object_binding_node(doc, __object_collection.objects[index].binding));
+
+                    if (__object_collection.objects[index].converter.enabled == true)
+                        objectNode.AppendChild(__create_object_converter_node(doc, __object_collection.objects[index].converter));
+
+                    objectsNode.AppendChild(objectNode);
+                }
+            }
+            return objectsNode;
+        }
+
+        private XmlElement __create_object_binding_node(XmlDocument doc, IO_LIST_OBJECT_COLLECTION_T.MODULE_BINDING_T bindingInfo)
+        {
+            XmlElement binding = doc.CreateElement("Binding");
+
+            XmlElement sub = doc.CreateElement("Module");
+            sub.AppendChild(doc.CreateTextNode(bindingInfo.module.reference_name));
+            binding.AppendChild(sub);
+
+            sub = doc.CreateElement(bindingInfo.channel_name);
+            sub.AppendChild(doc.CreateTextNode(bindingInfo.channel_index.ToString()));
+            binding.AppendChild(sub);
+
+            return binding;
+        }
+
+        private XmlElement __create_object_converter_node(XmlDocument doc, IO_LIST_OBJECT_COLLECTION_T.VALUE_CONVERTER_T converterInfo)
+        {
+            XmlElement converter = doc.CreateElement("Converter");
+
+            XmlElement sub = doc.CreateElement("DataType");
+            sub.AppendChild(doc.CreateTextNode(converterInfo.data_type.Name));
+            converter.AppendChild(sub);
+
+            sub = doc.CreateElement("Unit");
+            sub.AppendChild(doc.CreateTextNode(converterInfo.unit_name));
+            converter.AppendChild(sub);
+
+            sub = doc.CreateElement("UpScale");
+            sub.AppendChild(doc.CreateTextNode(converterInfo.up_scale.ToString()));
+            converter.AppendChild(sub);
+
+            sub = doc.CreateElement("DownScale");
+            sub.AppendChild(doc.CreateTextNode(converterInfo.down_scale.ToString()));
+            converter.AppendChild(sub);
+
+            return converter;
         }
     }
 
