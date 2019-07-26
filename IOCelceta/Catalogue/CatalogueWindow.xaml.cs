@@ -26,11 +26,18 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.Catalogue
             if (dataModel.UsedForDataTypesOnly == true)
             {
                 __tab_controller_module_catalogue.Visibility = Visibility.Collapsed;
+                __tab_variable_catalogue.Visibility = Visibility.Collapsed;
                 __tab_control_catalogue.SelectedIndex = 1;
+
+                __lsv_data_type_catalogue.ItemsSource = dataModel.DataTypes;
             }
-            __lsv_data_type_catalogue.ItemsSource = dataModel.DataTypes;
-            __lsv_controller_extension_module_catalogue.ItemsSource = dataModel.ExtensionModules;
-            __lsv_controller_ethernet_module_catalogue.ItemsSource = dataModel.EthernetModules;
+            else
+            {
+                __lsv_data_type_catalogue.ItemsSource = dataModel.DataTypes;
+                __lsv_controller_extension_module_catalogue.ItemsSource = dataModel.ExtensionModules;
+                __lsv_controller_ethernet_module_catalogue.ItemsSource = dataModel.EthernetModules;
+                __lsv_variable_catalogue.ItemsSource = dataModel.Variables;
+            }
         }
 
         private void SubItemDetailInformation_Click(object sender, RoutedEventArgs e)

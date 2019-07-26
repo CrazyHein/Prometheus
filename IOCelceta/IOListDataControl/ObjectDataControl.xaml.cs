@@ -30,7 +30,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             __insert_pos = insertPos;
             __original_object_index = dataModel.Index;
 
-            __cmb_basic_data_type_selection.ItemsSource = dataModel.Host.DataHelper.DataTypeCatalogue.DataTypes.Values;
+            //__cmb_basic_data_type_selection.ItemsSource = dataModel.Host.DataHelper.DataTypeCatalogue.DataTypes.Values;
             __cmb_coverter_data_type_selection.ItemsSource = dataModel.Host.DataHelper.DataTypeCatalogue.DataTypes.Values;
 
             __cmb_binding_module_selection.ItemsSource = dataModel.Host.DataHelper.ControllerModuleCollection;

@@ -21,7 +21,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
         public IReadOnlyList<ObjectItemDataModel> AvailableObjects { get { return __object_collection_data_model.Objects; }}
         public ObjectItemFilter AvailableObjectItemFilter { get; private set; }
         public string FilterDataTypeName { get; set; }
-        public string FilterFriendlyName { get; set; }
+        public string FilterVariableName { get; set; }
         public string FilterModuleName { get; set; }
 
         private ObservableCollection<ObjectItemDataModel> __tx_diagnostic_area;
@@ -61,10 +61,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
 
             __object_collection_data_model = objectCollectionDataModel;
 
-            FilterFriendlyName = "";
+            FilterVariableName = "";
             FilterDataTypeName = "";
             FilterModuleName = "";
-            AvailableObjectItemFilter = new ObjectItemFilter(null, FilterModuleName, FilterFriendlyName);
+            AvailableObjectItemFilter = new ObjectItemFilter(null, FilterModuleName, FilterVariableName);
         }
 
         public uint TxDiagnosticAreaOffsetInWord

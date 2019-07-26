@@ -10,47 +10,37 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.Catalogue
 {
     public class CatalogueWindowDataModel
     {
-        private readonly IEnumerable<DataTypeDefinition> __data_types;
-        private readonly IEnumerable<ControllerExtensionModel> __extension_modules;
-        private readonly IEnumerable<ControllerEthernetModel> __ethernet_modules;
-
         public bool UsedForDataTypesOnly { get; private set; }
 
         public CatalogueWindowDataModel(DataTypeCatalogue dataTypes)
         {
-            __data_types = dataTypes.DataTypes.Values;
+            DataTypes = dataTypes.DataTypes.Values;
             UsedForDataTypesOnly = true;
         }
 
         public CatalogueWindowDataModel(IReadOnlyList<DataTypeDefinition> list)
         {
-            __data_types = list;
+            DataTypes = list;
             UsedForDataTypesOnly = true;
         }
 
-        public CatalogueWindowDataModel(ControllerModelCatalogue modules, DataTypeCatalogue dataTypes)
+        public CatalogueWindowDataModel(ControllerModelCatalogue modules, DataTypeCatalogue dataTypes, VariableCatalogue variables)
         {
-            __data_types = dataTypes.DataTypes.Values;
-            __extension_modules = modules.ExtensionModels.Values;
-            __ethernet_modules = modules.EthernetModels.Values;
+            DataTypes = dataTypes.DataTypes.Values;
+            ExtensionModules = modules.ExtensionModels.Values;
+            EthernetModules = modules.EthernetModels.Values;
+            Variables = variables.Variables.Values;
             UsedForDataTypesOnly = false;
         }
 
 
-        public IEnumerable<DataTypeDefinition> DataTypes
-        {
-            get { return __data_types; }
-        }
+        public IEnumerable<DataTypeDefinition> DataTypes { get; }
 
-        public IEnumerable<ControllerExtensionModel> ExtensionModules
-        {
-            get { return __extension_modules; }
-        }
+        public IEnumerable<ControllerExtensionModel> ExtensionModules { get; }
 
-        public IEnumerable<ControllerEthernetModel> EthernetModules
-        {
-            get { return __ethernet_modules; }
-        }
+        public IEnumerable<ControllerEthernetModel> EthernetModules { get; }
+
+        public IEnumerable<VariableDefinition> Variables { get; }
     }
 
     class DataTypeSubItemsToBool : IValueConverter

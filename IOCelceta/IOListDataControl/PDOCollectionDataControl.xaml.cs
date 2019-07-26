@@ -45,7 +45,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
 
             __available_objects_view.LiveFilteringProperties.Add(ObjectCollectionDataModel.DataTypePropertyName);
             __available_objects_view.LiveFilteringProperties.Add(ObjectCollectionDataModel.BindingModulePropertyName);
-            __available_objects_view.LiveFilteringProperties.Add(ObjectCollectionDataModel.FriendlyNamePropertyName);
+            __available_objects_view.LiveFilteringProperties.Add(ObjectCollectionDataModel.VariablePropertyName);
             __available_objects_view.IsLiveFiltering = true;
 
         }
@@ -251,15 +251,15 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             }
         }
 
-        private void __on_enable_friendly_name_filter_click(object sender, RoutedEventArgs e)
+        private void __on_enable_variable_name_filter_click(object sender, RoutedEventArgs e)
         {
-            if (__chk_enable_friendly_name_filter.IsChecked == true)
+            if (__chk_enable_variable_name_filter.IsChecked == true)
             {
-                __object_item_filter.FriendlyName = (DataContext as PDOCollectionDataModel).FilterFriendlyName;
-                __object_item_filter.EnableFriendlyNameFilter();
+                __object_item_filter.VariableName = (DataContext as PDOCollectionDataModel).FilterVariableName;
+                __object_item_filter.EnableVariableNameFilter();
             }
             else
-                __object_item_filter.DisableFriendlyNameFilter();
+                __object_item_filter.DisableVariableNameFilter();
 
             __available_objects_view.Refresh();
         }
@@ -294,13 +294,13 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             __available_objects_view.Refresh();
         }
 
-        private void __on_new_filter_friendly_name_enter(object sender, KeyEventArgs e)
+        private void __on_new_filter_variable_name_enter(object sender, KeyEventArgs e)
         {
             if(e.Key == Key.Enter)
             {
                 BindingExpression binging = (sender as TextBox).GetBindingExpression(TextBox.TextProperty);
                 binging.UpdateSource();
-                __object_item_filter.FriendlyName = (DataContext as PDOCollectionDataModel).FilterFriendlyName;
+                __object_item_filter.VariableName = (DataContext as PDOCollectionDataModel).FilterVariableName;
                 __available_objects_view.Refresh();
             }
         }

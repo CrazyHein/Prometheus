@@ -137,5 +137,48 @@
                 </ListView.View>
             </ListView>
         </TabItem>
+        <TabItem Width="200" Name="__tab_variable_catalogue">
+            <TabItem.Header>
+                <StackPanel Orientation="Horizontal">
+                    <Image Source="../img/variables.png" Height="24" Margin="2,2,8,2"/>
+                    <TextBlock Text="Variables" VerticalAlignment="Center"/>
+                </StackPanel>
+            </TabItem.Header>
+            <ListView Name="__lsv_variable_catalogue">
+                <ListView.Resources>
+                    <Style TargetType="ListViewItem">
+                        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                    </Style>
+                    <DataTemplate x:Key="IDHeadTemplate">
+                        <TextBlock FontWeight="Bold" Text="ID"/>
+                    </DataTemplate>
+                    <DataTemplate x:Key="IDContentTemplate">
+                        <TextBlock Text="{Binding Path=ID}" Margin="4" HorizontalAlignment="Left"/>
+                    </DataTemplate>
+                    
+                    <DataTemplate x:Key="NameHeadTemplate">
+                        <TextBlock FontWeight="Bold" Text="Name"/>
+                    </DataTemplate>
+                    <DataTemplate x:Key="NameContentTemplate">
+                        <TextBlock Text="{Binding Path=Name}" Margin="4" HorizontalAlignment="Left"/>
+                    </DataTemplate>
+
+                    <DataTemplate x:Key="DataTypeHeadTemplate">
+                        <TextBlock FontWeight="Bold" Text="Data Type"/>
+                    </DataTemplate>
+                    <DataTemplate x:Key="DataTypeContentTemplate">
+                        <TextBlock Text="{Binding Path=DataType}" Margin="4" HorizontalAlignment="Left"/>
+                    </DataTemplate>
+
+                </ListView.Resources>
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn Width="100" HeaderTemplate="{StaticResource IDHeadTemplate}" CellTemplate="{StaticResource IDContentTemplate}"/>
+                        <GridViewColumn Width="200" HeaderTemplate="{StaticResource NameHeadTemplate}" CellTemplate="{StaticResource NameContentTemplate}"/>
+                        <GridViewColumn Width="200" HeaderTemplate="{StaticResource DataTypeHeadTemplate}" CellTemplate="{StaticResource DataTypeContentTemplate}"/>
+                    </GridView>
+                </ListView.View>
+            </ListView>
+        </TabItem>
     </TabControl>
 </Window>

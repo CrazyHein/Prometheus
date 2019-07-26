@@ -25,10 +25,12 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
         private CatalogueWindowDataModel __catalogue_window_data_model;
         private DataTypeCatalogue __data_type_catalogue;
         private ControllerModelCatalogue __controller_model_catalogue;
+        private VariableCatalogue __variable_catalogue;
         private IOListDataHelper __io_list_data_helper;
         private Metadata __meta_data;
         private string __data_type_catalogue_exception = null;
         private string __controller_model_catalogue_exception = null;
+        private string __variable_catalogue_exception = null;
 
         public MainWindow()
         {
@@ -58,8 +60,21 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                     __controller_model_catalogue_exception = string.Format("At least one unexpected error occurred while reading [Controller Model Catalogue] file . \n{0}", e.ErrorCode.ToString());
             }
 
-            __catalogue_window_data_model = new CatalogueWindowDataModel(__controller_model_catalogue, __data_type_catalogue);
-            __io_list_data_helper = new IOListDataHelper(__controller_model_catalogue, __data_type_catalogue);
+            try
+            {
+                __variable_catalogue = new VariableCatalogue(__data_type_catalogue);
+                __variable_catalogue.Load(Metadata.VariableCatalogue);
+            }
+            catch(VariableCatalogueParseExcepetion e)
+            {
+                if (e.ErrorCode ==  VARIABLE_CATALOGUE_FILE_ERROR_CODE_T.FILE_DATA_EXCEPTION)
+                    __variable_catalogue_exception = string.Format("At least one unexpected error occurred while reading [Variable Catalogue] file . \n{0}", e.DataException.ToString());
+                else
+                    __variable_catalogue_exception = string.Format("At least one unexpected error occurred while reading [Variable Catalogue] file . \n{0}", e.ErrorCode.ToString());
+            }
+
+            __catalogue_window_data_model = new CatalogueWindowDataModel(__controller_model_catalogue, __data_type_catalogue, __variable_catalogue);
+            __io_list_data_helper = new IOListDataHelper(__controller_model_catalogue, __data_type_catalogue, __variable_catalogue);
             __meta_data = new Metadata(__io_list_data_helper);
         }
 
@@ -223,6 +238,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                 MessageBox.Show(__data_type_catalogue_exception, "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
             if(__controller_model_catalogue_exception != null)
                 MessageBox.Show(__controller_model_catalogue_exception, "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
+            if(__variable_catalogue_exception != null)
+                MessageBox.Show(__variable_catalogue_exception, "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
         }
 
         private void __save_io_list_file_can_executed(object sender, CanExecuteRoutedEventArgs e)

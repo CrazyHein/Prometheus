@@ -32,6 +32,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
         INVALID_OBJECT_BINDING_MODULE_CHANNEL_INDEX             = 0x00000025,
         INVALID_OBJECT_CONVERTER_DATA_TYPE                      = 0x00000026,
         INVALID_OBJECT_CONVERTER                                = 0x00000027,
+        INVALID_OBJECT_VARIABLE                                 = 0x00000028,
+        OBJECT_VARIABLE_DATA_TYPE_MISMATCH                      = 0x00000029,
         INVALID_BIT_OBJECT_INDEX                                = 0x00000030,
         INVALID_BLOCK_OBJECT_INDEX                              = 0x00000031,
 
@@ -84,7 +86,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
 
         public uint SupportedFileFormatVersion { get { return __supported_file_format_version; } }
 
-        public IOListDataHelper(ControllerModelCatalogue controllerCatalogue, DataTypeCatalogue dataTypeCatalogue)
+        public IOListDataHelper(ControllerModelCatalogue controllerCatalogue, DataTypeCatalogue dataTypeCatalogue, VariableCatalogue variableCatalogue)
         {
             __supported_file_format_version = 1;
             __module_reference_counter = new Dictionary<string, int>();
@@ -97,6 +99,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
 
             ControllerCatalogue = controllerCatalogue;
             DataTypeCatalogue = dataTypeCatalogue;
+            VariableCatalogue = variableCatalogue;
         }
 
         public void SetDefault()
@@ -112,6 +115,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
 
         public ControllerModelCatalogue ControllerCatalogue { get; }
         public DataTypeCatalogue DataTypeCatalogue { get; }
+        public VariableCatalogue VariableCatalogue { get; }
 
         private void __load_target_info(XmlNode basicNode)
         {
@@ -328,17 +332,13 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                                     mask |= 0x00000001;
                                     break;
                                 case "Name":
-                                    objectDefinition.friendly_name = node.FirstChild.Value;
-                                    mask |= 0x00000002;
-                                    break;
-                                case "DataType":
-                                    if (DataTypeCatalogue.DataTypes.Keys.Contains(node.FirstChild.Value))
+                                    if (VariableCatalogue.Variables.Keys.Contains(node.FirstChild.Value))
                                     {
-                                        objectDefinition.data_type = DataTypeCatalogue.DataTypes[node.FirstChild.Value];
-                                        mask |= 0x00000004;
+                                        objectDefinition.variable = VariableCatalogue.Variables[node.FirstChild.Value];
+                                        mask |= 0x00000002;
                                     }
                                     else
-                                        throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_OBJECT_DATA_TYPE, null);
+                                        throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_OBJECT_VARIABLE, null);
                                     break;
                                 case "Binding":
                                     __load_object_binding_info(node, objectDefinition.binding);
@@ -351,7 +351,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                             }
                         }
                         
-                        if ((mask & 0x00000007) != 0x00000007)
+                        if ((mask & 0x00000003) != 0x00000003)
                             throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.ELEMENT_MISSING, null);
 
                         ObjectDataVerification(objectDefinition);
@@ -489,7 +489,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
 
                             if (area == IO_LIST_PDO_AREA_T.RX_BIT || area == IO_LIST_PDO_AREA_T.TX_BIT)
                             {
-                                actualPdoSizeInBit += objectData.data_type.BitSize;
+                                actualPdoSizeInBit += objectData.variable.DataType.BitSize;
                                 if (actualPdoSizeInBit % 8 == 0)
                                     actualPdoSizeInByte = actualPdoSizeInBit / 8;
                                 else
@@ -497,7 +497,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                             }
                             else
                             {
-                                uint objectDataBitSize = objectData.converter.enabled == false ? objectData.data_type.BitSize : objectData.converter.data_type.BitSize;
+                                uint objectDataBitSize = objectData.converter.enabled == false ? objectData.variable.DataType.BitSize : objectData.converter.data_type.BitSize;
                                 if (objectDataBitSize % 8 == 0)
                                     actualPdoSizeInByte += objectDataBitSize / 8;
                                 else
@@ -569,9 +569,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
         {
             if (ignoreDuplicate == false && __object_collection.objects.Keys.Contains(objectData.index) == true)
                 throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.DUPLICATE_OBJECT_INDEX, null);
-            else if(objectData.data_type == null || DataTypeCatalogue.DataTypes.Values.Contains(objectData.data_type) == false)
-                throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_OBJECT_DATA_TYPE, null);
-            else if (objectData.data_type.BitSize == 1)
+            else if(objectData.variable == null || VariableCatalogue.Variables.Keys.Contains(objectData.variable.Name) == false || VariableCatalogue.Variables[objectData.variable.Name] != objectData.variable)
+                throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_OBJECT_VARIABLE, null);
+            else if (objectData.variable.DataType.BitSize == 1)
             {
                 uint index = objectData.index & 0x7FFFFFFF;
                 if(index > 0x00001FFF)
@@ -612,10 +612,12 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
 
             if (objectData.converter.enabled == true)
             {
-                if(objectData.data_type.BitSize == 1)
+                if(objectData.variable.DataType.BitSize == 1)
                     throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_OBJECT_CONVERTER, null);
                 else if (objectData.converter.data_type == null || DataTypeCatalogue.DataTypes.Values.Contains(objectData.converter.data_type) == false)
                     throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_OBJECT_CONVERTER_DATA_TYPE, null);
+                else if (objectData.converter.data_type != objectData.variable.DataType)
+                    throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.OBJECT_VARIABLE_DATA_TYPE_MISMATCH, null);
             }
         }
 
@@ -1075,8 +1077,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                 if (area == IO_LIST_PDO_AREA_T.RX_BIT || area == IO_LIST_PDO_AREA_T.TX_BIT)
                 {
                     bitSize = (uint)pdo.objects.Count();
-                    bitSize -= oldObjectData.data_type.BitSize;
-                    bitSize += objectData.data_type.BitSize;
+                    bitSize -= oldObjectData.variable.DataType.BitSize;
+                    bitSize += objectData.variable.DataType.BitSize;
                     if (bitSize % 8 == 0)
                         byteSize = bitSize / 8;
                     else
@@ -1085,8 +1087,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                 else
                 {
                     byteSize = pdo.actual_size_in_byte;
-                    uint oldObjectDataBitSize = oldObjectData.converter.enabled == false ? oldObjectData.data_type.BitSize : oldObjectData.converter.data_type.BitSize;
-                    uint newObjectDataBitSize = objectData.converter.enabled == false ? objectData.data_type.BitSize : objectData.converter.data_type.BitSize;
+                    uint oldObjectDataBitSize = oldObjectData.converter.enabled == false ? oldObjectData.variable.DataType.BitSize : oldObjectData.converter.data_type.BitSize;
+                    uint newObjectDataBitSize = objectData.converter.enabled == false ? objectData.variable.DataType.BitSize : objectData.converter.data_type.BitSize;
                     if (oldObjectDataBitSize % 8 == 0)
                         byteSize -= oldObjectDataBitSize / 8;
                     else
@@ -1131,7 +1133,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                 if (area == IO_LIST_PDO_AREA_T.RX_BIT || area == IO_LIST_PDO_AREA_T.TX_BIT)
                 {
                     bitSize = (uint)pdo.objects.Count();
-                    bitSize += objectData.data_type.BitSize;
+                    bitSize += objectData.variable.DataType.BitSize;
                     if (bitSize % 8 == 0)
                         byteSize = bitSize / 8;
                     else
@@ -1140,7 +1142,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                 else
                 {
                     byteSize = pdo.actual_size_in_byte;
-                    uint objectDataBitSize = objectData.converter.enabled == false ? objectData.data_type.BitSize : objectData.converter.data_type.BitSize;
+                    uint objectDataBitSize = objectData.converter.enabled == false ? objectData.variable.DataType.BitSize : objectData.converter.data_type.BitSize;
                     if (objectDataBitSize % 8 == 0)
                         byteSize += objectDataBitSize / 8;
                     else
@@ -1180,7 +1182,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                 if (area == IO_LIST_PDO_AREA_T.RX_BIT || area == IO_LIST_PDO_AREA_T.TX_BIT)
                 {
                     bitSize = (uint)pdo.objects.Count();
-                    bitSize += objectData.data_type.BitSize;
+                    bitSize += objectData.variable.DataType.BitSize;
                     if (bitSize % 8 == 0)
                         byteSize = bitSize / 8;
                     else
@@ -1189,7 +1191,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                 else
                 {
                     byteSize = pdo.actual_size_in_byte;
-                    uint objectDataBitSize = objectData.converter.enabled == false ? objectData.data_type.BitSize : objectData.converter.data_type.BitSize;
+                    uint objectDataBitSize = objectData.converter.enabled == false ? objectData.variable.DataType.BitSize : objectData.converter.data_type.BitSize;
                     if (objectDataBitSize % 8 == 0)
                         byteSize += objectDataBitSize / 8;
                     else
@@ -1224,7 +1226,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                 if (area == IO_LIST_PDO_AREA_T.RX_BIT || area == IO_LIST_PDO_AREA_T.TX_BIT)
                 {
                     bitSize = (uint)pdo.objects.Count();
-                    bitSize -= objectData.data_type.BitSize;
+                    bitSize -= objectData.variable.DataType.BitSize;
                     if (bitSize % 8 == 0)
                         byteSize = bitSize / 8;
                     else
@@ -1233,7 +1235,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                 else
                 {
                     byteSize = pdo.actual_size_in_byte;
-                    uint objectDataBitSize = objectData.converter.enabled == false ? objectData.data_type.BitSize : objectData.converter.data_type.BitSize;
+                    uint objectDataBitSize = objectData.converter.enabled == false ? objectData.variable.DataType.BitSize : objectData.converter.data_type.BitSize;
                     if (objectDataBitSize % 8 == 0)
                         byteSize -= objectDataBitSize / 8;
                     else
@@ -1286,6 +1288,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                 root.AppendChild(__create_target_information_node(xmlDoc));
                 root.AppendChild(__create_controller_information_node(xmlDoc, extensionModules, ethernetModules));
                 root.AppendChild(__create_objects_node(xmlDoc, objects));
+                root.AppendChild(__create_tx_pdo_mapping_node(xmlDoc));
+                root.AppendChild(__create_rx_pdo_mapping_node(xmlDoc));
 
                 xmlDoc.AppendChild(root);
                 xmlDoc.Save(fileName);
@@ -1466,11 +1470,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                     objectNode.AppendChild(sub);
 
                     sub = doc.CreateElement("Name");
-                    sub.AppendChild(doc.CreateTextNode(objectData.friendly_name));
-                    objectNode.AppendChild(sub);
-
-                    sub = doc.CreateElement("DataType");
-                    sub.AppendChild(doc.CreateTextNode(objectData.data_type.Name));
+                    sub.AppendChild(doc.CreateTextNode(objectData.variable.Name));
                     objectNode.AppendChild(sub);
 
                     if (objectData.binding.enabled == true)
@@ -1493,11 +1493,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                     objectNode.AppendChild(sub);
 
                     sub = doc.CreateElement("Name");
-                    sub.AppendChild(doc.CreateTextNode(__object_collection.objects[index].friendly_name));
-                    objectNode.AppendChild(sub);
-
-                    sub = doc.CreateElement("DataType");
-                    sub.AppendChild(doc.CreateTextNode(__object_collection.objects[index].data_type.Name));
+                    sub.AppendChild(doc.CreateTextNode(__object_collection.objects[index].variable.Name));
                     objectNode.AppendChild(sub);
 
                     if (__object_collection.objects[index].binding.enabled == true)
@@ -1548,6 +1544,65 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
             converter.AppendChild(sub);
 
             return converter;
+        }
+
+        private XmlElement __create_tx_pdo_mapping_node(XmlDocument doc)
+        {
+            XmlElement txpdo = doc.CreateElement("TxPDO");
+            txpdo.AppendChild(__create_pdo_mapping_area_node(doc, IO_LIST_PDO_AREA_T.TX_DIAGNOSTIC));
+            txpdo.AppendChild(__create_pdo_mapping_area_node(doc, IO_LIST_PDO_AREA_T.TX_BIT));
+            txpdo.AppendChild(__create_pdo_mapping_area_node(doc, IO_LIST_PDO_AREA_T.TX_BLOCK));
+
+            return txpdo;
+        }
+
+        private XmlElement __create_rx_pdo_mapping_node(XmlDocument doc)
+        {
+            XmlElement rxpdo = doc.CreateElement("RxPDO");
+            rxpdo.AppendChild(__create_pdo_mapping_area_node(doc, IO_LIST_PDO_AREA_T.RX_CONTROL));
+            rxpdo.AppendChild(__create_pdo_mapping_area_node(doc, IO_LIST_PDO_AREA_T.RX_BIT));
+            rxpdo.AppendChild(__create_pdo_mapping_area_node(doc, IO_LIST_PDO_AREA_T.RX_BLOCK));
+
+            return rxpdo;
+        }
+
+        private XmlElement __create_pdo_mapping_area_node(XmlDocument doc, IO_LIST_PDO_AREA_T area)
+        {
+            IO_LIST_CONTROLLER_PDO_COLLECTION.PDO_DEFINITION_T pdo = __controller_pdo_collection.PDOs[area]; ;
+            XmlElement pdoArea = null;
+            XmlElement index = null;
+            switch (area)
+            {
+                case IO_LIST_PDO_AREA_T.TX_DIAGNOSTIC:
+                    pdoArea = doc.CreateElement("DiagArea");
+                    break;
+                case IO_LIST_PDO_AREA_T.TX_BIT:
+                    pdoArea = doc.CreateElement("BitArea");
+                    break;
+                case IO_LIST_PDO_AREA_T.TX_BLOCK:
+                    pdoArea = doc.CreateElement("BlockArea");
+                    break;
+                case IO_LIST_PDO_AREA_T.RX_CONTROL:
+                    pdoArea = doc.CreateElement("ControlArea");
+                    break;
+                case IO_LIST_PDO_AREA_T.RX_BIT:
+                    pdoArea = doc.CreateElement("BitArea");
+                    break;
+                case IO_LIST_PDO_AREA_T.RX_BLOCK:
+                    pdoArea = doc.CreateElement("BlockArea");
+                    break;
+            }
+            pdoArea.SetAttribute("WordOffset", pdo.offset_in_word.ToString());
+            pdoArea.SetAttribute("WordSize", pdo.size_in_word.ToString());
+
+            foreach(var o in pdo.objects)
+            {
+                index = doc.CreateElement("Index");
+                index.AppendChild(doc.CreateTextNode("0x" + o.index.ToString("X8")));
+                pdoArea.AppendChild(index);
+            }
+
+            return pdoArea;
         }
     }
 
@@ -1673,15 +1728,17 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
         public class OBJECT_DEFINITION_T
         {
             public uint index;
-            public string friendly_name;
-            public DataTypeDefinition data_type;
+            //public string friendly_name;
+            public VariableDefinition variable;
+            //public DataTypeDefinition data_type;
             public MODULE_BINDING_T binding;
             public VALUE_CONVERTER_T converter;
 
             public OBJECT_DEFINITION_T()
             {
                 index = 0;
-                friendly_name = "New Object";
+                //friendly_name = "New Object";
+                variable = null;
                 binding = new MODULE_BINDING_T();
                 converter = new VALUE_CONVERTER_T();
             }

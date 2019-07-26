@@ -78,13 +78,13 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.Catalogue
             try
             {
                 xmlDoc.Load(catalogueConfiguration);
-                XmlNode rootNode = xmlDoc.SelectSingleNode("/AEMCDataTypes");
+                XmlNode rootNode = xmlDoc.SelectSingleNode("/AMECDataTypes");
                 FileFormatVersion = uint.Parse(rootNode.Attributes.GetNamedItem("FormatVersion").Value);
 
                 if (__supported_file_format_version < FileFormatVersion)
                     throw new DataTypeCatalogueParseExcepetion(DATA_TYPE_CATALOGUE_FILE_ERROR_CODE_T.UNSUPPORTED_FILE_FORMAT_VERSION, null);
 
-                XmlNode dataTypesNode = xmlDoc.SelectSingleNode("/AEMCDataTypes");
+                XmlNode dataTypesNode = xmlDoc.SelectSingleNode("/AMECDataTypes");
                 Load(dataTypesNode);
             }
             catch (DataTypeCatalogueParseExcepetion e)

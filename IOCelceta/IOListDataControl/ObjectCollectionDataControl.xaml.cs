@@ -105,9 +105,12 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
         {
             ObjectCollectionDataModel host = DataContext as ObjectCollectionDataModel;
 
-            if (host.DataHelper.DataTypeCatalogue.DataTypes.Count == 0)
-                MessageBox.Show("There is no available [Data Type] in [DataType Catalogue] .", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            ObjectItemDataModel newObjectItem = new ObjectItemDataModel(host, host.DataHelper.DataTypeCatalogue.DataTypes.Values.First());
+            //if (host.DataHelper.DataTypeCatalogue.DataTypes.Count == 0)
+                //MessageBox.Show("There is no available [Data Type] in [DataType Catalogue] .", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            if (host.DataHelper.VariableCatalogue.Variables.Count == 0)
+                MessageBox.Show("There is no available [Variable] in [Variable Catalogue] .", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            ObjectItemDataModel newObjectItem = new ObjectItemDataModel(host, 
+                host.DataHelper.VariableCatalogue.Variables.Values.First());
             ObjectDataControl objectDataControl = new ObjectDataControl(newObjectItem, true);
             objectDataControl.ShowDialog();
             e.Handled = true;
@@ -117,9 +120,12 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
         {
             ObjectCollectionDataModel host = DataContext as ObjectCollectionDataModel;
 
-            if (host.DataHelper.DataTypeCatalogue.DataTypes.Count == 0)
-                MessageBox.Show("There is no available [Data Type] in [DataType Catalogue] .", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            ObjectItemDataModel newObjectItem = new ObjectItemDataModel(host, host.DataHelper.DataTypeCatalogue.DataTypes.Values.First());
+            //if (host.DataHelper.DataTypeCatalogue.DataTypes.Count == 0)
+                //MessageBox.Show("There is no available [Data Type] in [DataType Catalogue] .", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            if (host.DataHelper.VariableCatalogue.Variables.Count == 0)
+                MessageBox.Show("There is no available [Variable] in [Variable Catalogue] .", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            ObjectItemDataModel newObjectItem = new ObjectItemDataModel(host,
+                host.DataHelper.VariableCatalogue.Variables.Values.First());
             ObjectDataControl objectDataControl = new ObjectDataControl(newObjectItem, true, __lsv_io_objects.SelectedIndex);
             objectDataControl.ShowDialog();
             e.Handled = true;

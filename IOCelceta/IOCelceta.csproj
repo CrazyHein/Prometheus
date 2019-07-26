@@ -227,5 +227,8 @@
   <ItemGroup>
     <Resource Include="title.ico" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="img\variables.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

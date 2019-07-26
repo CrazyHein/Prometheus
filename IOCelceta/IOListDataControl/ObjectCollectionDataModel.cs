@@ -19,7 +19,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
         public ObjectItemFilter ItemFilter { get; private set; }
         public static string DataTypePropertyName { get; private set; }
         public static string BindingModulePropertyName { get; private set; }
-        public static string FriendlyNamePropertyName { get; private set; }
+        public static string VariablePropertyName { get; private set; }
 
         public IReadOnlyDictionary<uint, ObjectItemDataModel> ObjectDictionary { get; private set; }
         public IReadOnlyList<ObjectItemDataModel> Objects { get; private set; }
@@ -29,9 +29,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
 
         static ObjectCollectionDataModel()
         {
-            DataTypePropertyName = "BasicDataTypeSelection";
+            DataTypePropertyName = "VariableDataType";
             BindingModulePropertyName = "BindingModuleSelection";
-            FriendlyNamePropertyName = "FriendlyName";
+            VariablePropertyName = "VariableName";
             DataTypeGroupDescription = new PropertyGroupDescription(DataTypePropertyName);
             BindingModuleGroupDescription = new PropertyGroupDescription(BindingModulePropertyName, new ObjectItemBindingModule());
         }
@@ -86,8 +86,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T objectItem = new IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T()
             {
                 index = dataModel.Index,
-                friendly_name = dataModel.FriendlyName,
-                data_type = dataModel.BasicDataTypeSelection,
+                variable = dataModel.VariableSelection,
                 binding = { enabled = dataModel.BindingEnable, module = dataModel.BindingModuleSelection, channel_name = dataModel.BindingChannelName, channel_index = dataModel.BindingChannelIndex },
                 converter = { enabled = dataModel.ConverterEnable, data_type = dataModel.ConverterDataTypeSelection, up_scale = dataModel.ConverterUpScale, down_scale = dataModel.ConverterDownScale, unit_name = dataModel.ConverterUnitName }
             };
@@ -104,8 +103,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T objectItem = new IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T()
             {
                 index = dataModel.Index,
-                friendly_name = dataModel.FriendlyName,
-                data_type = dataModel.BasicDataTypeSelection,
+                variable = dataModel.VariableSelection,
                 binding = { enabled = dataModel.BindingEnable, module = dataModel.BindingModuleSelection, channel_name = dataModel.BindingChannelName, channel_index = dataModel.BindingChannelIndex },
                 converter = { enabled = dataModel.ConverterEnable, data_type = dataModel.ConverterDataTypeSelection, up_scale = dataModel.ConverterUpScale, down_scale = dataModel.ConverterDownScale, unit_name = dataModel.ConverterUnitName }
             };
@@ -150,12 +148,11 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             OnPropertyChanged(propertyName);
         }
 
-        public ObjectItemDataModel(ObjectCollectionDataModel host, DataTypeDefinition dataType, uint index = 0, string friendlyName = "New Object")
+        public ObjectItemDataModel(ObjectCollectionDataModel host, VariableDefinition variable, uint index = 0)
         {
             Host = host;
             Index = index;
-            FriendlyName = friendlyName;
-            BasicDataTypeSelection = dataType;
+            VariableName = variable.Name;
         }
 
         public ObjectItemDataModel(ObjectCollectionDataModel host, IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T objectDefinition)
@@ -172,8 +169,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
         public void ImportObjectDefinition(IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T objectDefinition)
         {
             Index = objectDefinition.index;
-            FriendlyName = objectDefinition.friendly_name;
-            BasicDataTypeSelection = objectDefinition.data_type;
+            VariableName = objectDefinition.variable.Name;
 
             BindingEnable = objectDefinition.binding.enabled;
             if (BindingEnable == true)
@@ -191,8 +187,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
         }
 
         private uint __index;
-        private string __friendly_name;
-        private DataTypeDefinition __basic_data_type;
+        private VariableDefinition __variable_selection;
+        private string __variable_name;
+        private DataTypeDefinition __variable_data_type;
 
         private bool __binding_enable;
         private IO_LIST_CONTROLLER_INFORMATION_T.MODULE_T __binding_module;
@@ -210,15 +207,42 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             get { return __index; }
             set { SetProperty(ref __index, value); }
         }
-        public string FriendlyName
+
+        public VariableDefinition VariableSelection
         {
-            get { return __friendly_name; }
-            set { SetProperty(ref __friendly_name, value); }
+            get { return __variable_selection; }
         }
-        public DataTypeDefinition BasicDataTypeSelection
+
+        public string VariableName
         {
-            get { return __basic_data_type; }
-            set { SetProperty(ref __basic_data_type, value); }
+            get
+            {
+                if (__variable_selection != null)
+                    return __variable_selection.Name;
+                else
+                    return __variable_name;
+            }
+            set
+            {
+                SetProperty(ref __variable_name, value);
+                try
+                {
+                    __variable_selection =
+                        Host.DataHelper.VariableCatalogue.Variables[value];
+                    VariableDataType = __variable_selection.DataType;
+                }
+                catch
+                {
+                    __variable_selection = null;
+                    VariableDataType = null;
+                }
+            }
+        }
+
+        public DataTypeDefinition VariableDataType
+        {
+            get { return __variable_data_type; }
+            private set { SetProperty(ref __variable_data_type, value); }
         }
 
         public bool BindingEnable
@@ -346,14 +370,14 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
     {
         public DataTypeDefinition DataType { get; set; }
         public string BindingModule { get; set; }
-        public string FriendlyName { get; set; }
+        public string VariableName { get; set; }
         private byte __filter_mask { get; set; }
 
-        public ObjectItemFilter(DataTypeDefinition dataType, string bindingModule, string friendlyName)
+        public ObjectItemFilter(DataTypeDefinition dataType, string bindingModule, string variableName)
         {
             DataType = dataType;
             BindingModule = bindingModule;
-            FriendlyName = friendlyName;
+            VariableName = variableName;
             __filter_mask = 0;
         }
 
@@ -361,8 +385,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
         public void DisableDataTypeFilter() { __filter_mask &= 0xFE; }
         public void EnableBindingModuleFilter() { __filter_mask |= 0x02; }
         public void DisableBindingModuleFilter() { __filter_mask &= 0xFD; }
-        public void EnableFriendlyNameFilter() { __filter_mask |= 0x04; }
-        public void DisableFriendlyNameFilter() { __filter_mask &= 0xFB; }
+        public void EnableVariableNameFilter() { __filter_mask |= 0x04; }
+        public void DisableVariableNameFilter() { __filter_mask &= 0xFB; }
 
         public void DisableFilter() { __filter_mask = 0x00; }
         public void EnableFilter() { __filter_mask = 0x07; }
@@ -374,7 +398,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
                 return true;
 
             if ((__filter_mask & 0x01) != 0)
-                if ((item as ObjectItemDataModel).BasicDataTypeSelection == DataType)
+                if ((item as ObjectItemDataModel).VariableDataType == DataType)
                     res |= 0x01;
 
             if ((__filter_mask & 0x02) != 0)
@@ -382,7 +406,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
                     res |= 0x02;
 
             if ((__filter_mask & 0x04) != 0)
-                if ((item as ObjectItemDataModel).FriendlyName.ToLower().Contains(FriendlyName.ToLower()))
+                if ((item as ObjectItemDataModel).VariableName.ToLower().Contains(VariableName.ToLower()))
                     res |= 0x04;
 
             return res == __filter_mask;
