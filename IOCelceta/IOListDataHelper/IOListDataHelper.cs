@@ -1264,6 +1264,48 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
             }
         }
 
+        public void GroupPDOMappingByBindingModule(IO_LIST_PDO_AREA_T area)
+        {
+            try
+            {
+                IO_LIST_CONTROLLER_PDO_COLLECTION.PDO_DEFINITION_T pdo = __controller_pdo_collection.PDOs[area];
+
+                pdo.objects.Sort(__binding_module_comparison);
+            }
+            catch (IOListParseExcepetion e)
+            {
+                throw e;
+            }
+            catch (Exception e)
+            {
+                throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.FILE_DATA_EXCEPTION, e);
+            }
+        }
+
+        public int __binding_module_comparison(IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T objectData0, IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T objectData1)
+        {
+            if (objectData0.binding.enabled == false && objectData1.binding.enabled == false)
+                return 0;
+            else if (objectData0.binding.enabled == false && objectData1.binding.enabled == true)
+                return 1;
+            else if (objectData0.binding.enabled == true && objectData1.binding.enabled == false)
+                return -1;
+
+            int res = objectData0.binding.module.reference_name.CompareTo(objectData1.binding.module.reference_name);
+            if (res == 0)
+                res = objectData0.binding.channel_name.CompareTo(objectData1.binding.channel_name);
+            if (res == 0)
+            {
+                if (objectData0.binding.channel_index == objectData1.binding.channel_index)
+                    res = 0;
+                else if (objectData0.binding.channel_index > objectData1.binding.channel_index)
+                    res = 1;
+                else
+                    res = -1;
+            }
+            return res;
+        }
+
         public void Save(IEnumerable<string> extensionModules, IEnumerable<string> ethernetModules, IEnumerable<uint> objects, string fileName)
         {
             bool overlap = __overlap_detector(new Tuple<uint, uint>[] {

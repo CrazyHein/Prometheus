@@ -15,6 +15,7 @@
             <CommandBinding Command="local:IOListDataControlCommand.MoveElementDown" Executed="__on_move_down_element_command_executed" CanExecute="__on_move_down_element_can_executed"/>
             <CommandBinding Command="local:IOListDataControlCommand.InsertElementBefore" Executed="__on_insert_element_before_command_executed" CanExecute="__on_replace_element_can_executed"/>
             <CommandBinding Command="local:IOListDataControlCommand.ReplaceElement" Executed="__on_replace_element_command_executed" CanExecute="__on_replace_element_can_executed"/>
+            <CommandBinding Command="local:IOListDataControlCommand.GroupElementByBindingModule" Executed="__on_group_element_command_executed" CanExecute="__on_group_element_can_executed"/>
         </DockPanel.CommandBindings>
         <DockPanel.Resources>
             <ContextMenu x:Key="PDOContextMenu">
@@ -31,6 +32,11 @@
                 <MenuItem Command="local:IOListDataControlCommand.MoveElementDown">
                     <MenuItem.Icon>
                         <Image Source="../img/down.png"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Command="local:IOListDataControlCommand.GroupElementByBindingModule">
+                    <MenuItem.Icon>
+                        <Image Source="../img/group.png"/>
                     </MenuItem.Icon>
                 </MenuItem>
             </ContextMenu>
@@ -108,6 +114,14 @@
                     <StackPanel Orientation="Horizontal">
                         <Image Source="../img/down.png"/>
                         <TextBlock Text="Move Down" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Button.Content>
+            </Button>
+            <Button Command="local:IOListDataControlCommand.GroupElementByBindingModule">
+                <Button.Content>
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="../img/group.png"/>
+                        <TextBlock Text="Group" VerticalAlignment="Center"/>
                     </StackPanel>
                 </Button.Content>
             </Button>

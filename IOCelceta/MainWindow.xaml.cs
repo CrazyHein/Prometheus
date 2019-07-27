@@ -280,8 +280,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                 new KeyGesture(Key.C, ModifierKeys.Control, "Ctrl+C")
             };
             OpenIOListFile = new RoutedUICommand("Open", "OpenIOListFile", typeof(ConsoleControl), gestureOpenIOListFile);
-            NewIOListFile = new RoutedUICommand("New", "NewIOListFile", typeof(ConsoleControl), gestureSaveIOListFile);
-            SaveIOListFile = new RoutedUICommand("Save As", "SaveIOListFile", typeof(ConsoleControl), gestureNewIOListFile);
+            NewIOListFile = new RoutedUICommand("New", "NewIOListFile", typeof(ConsoleControl), gestureNewIOListFile);
+            SaveIOListFile = new RoutedUICommand("Save As", "SaveIOListFile", typeof(ConsoleControl), gestureSaveIOListFile);
             OpenAboutDialog = new RoutedUICommand("About", "OpenAboutDialog", typeof(ConsoleControl), gestureOpenAboutDialog);
             OpenCatalogueDialog = new RoutedUICommand("Catalogue", "OpenCatalogueDialog", typeof(ConsoleControl), gestureOpenCatalogueDialog);
         }

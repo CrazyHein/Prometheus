@@ -61,9 +61,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             {
                 string message;
                 if (exception.ErrorCode == IO_LIST_FILE_ERROR_T.FILE_DATA_EXCEPTION)
-                    message = string.Format("At least one unexpected error occurred while swapping controller pdo mappings . \n{0}", exception.DataException.ToString());
+                    message = string.Format("At least one unexpected error occurred while adding controller pdo mappings . \n{0}", exception.DataException.ToString());
                 else
-                    message = string.Format("At least one unexpected error occurred while swapping controller pdo mappings . \n{0}", exception.ErrorCode.ToString());
+                    message = string.Format("At least one unexpected error occurred while adding controller pdo mappings . \n{0}", exception.ErrorCode.ToString());
 
                 MessageBox.Show(message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
@@ -107,9 +107,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             {
                 string message;
                 if (exception.ErrorCode == IO_LIST_FILE_ERROR_T.FILE_DATA_EXCEPTION)
-                    message = string.Format("At least one unexpected error occurred while swapping controller pdo mappings . \n{0}", exception.DataException.ToString());
+                    message = string.Format("At least one unexpected error occurred while replacing controller pdo mappings . \n{0}", exception.DataException.ToString());
                 else
-                    message = string.Format("At least one unexpected error occurred while swapping controller pdo mappings . \n{0}", exception.ErrorCode.ToString());
+                    message = string.Format("At least one unexpected error occurred while replacing controller pdo mappings . \n{0}", exception.ErrorCode.ToString());
 
                 MessageBox.Show(message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
@@ -128,9 +128,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             {
                 string message;
                 if (exception.ErrorCode == IO_LIST_FILE_ERROR_T.FILE_DATA_EXCEPTION)
-                    message = string.Format("At least one unexpected error occurred while swapping controller pdo mappings . \n{0}", exception.DataException.ToString());
+                    message = string.Format("At least one unexpected error occurred while inserting controller pdo mappings . \n{0}", exception.DataException.ToString());
                 else
-                    message = string.Format("At least one unexpected error occurred while swapping controller pdo mappings . \n{0}", exception.ErrorCode.ToString());
+                    message = string.Format("At least one unexpected error occurred while inserting controller pdo mappings . \n{0}", exception.ErrorCode.ToString());
 
                 MessageBox.Show(message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
@@ -179,6 +179,29 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
                     message = string.Format("At least one unexpected error occurred while swapping controller pdo mappings . \n{0}", exception.ErrorCode.ToString());
 
                 MessageBox.Show(message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            e.Handled = true;
+        }
+
+        private void __on_group_element_command_executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            IO_LIST_PDO_AREA_T area = (IO_LIST_PDO_AREA_T)((__tab_pdo_container.SelectedItem as TabItem).Tag);
+            if (MessageBox.Show("Are you sure ?", "Question", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+            {
+                try
+                {
+                    (DataContext as PDOCollectionDataModel).GroupPDOMappingByBindingModule(area);
+                }
+                catch (IOListParseExcepetion exception)
+                {
+                    string message;
+                    if (exception.ErrorCode == IO_LIST_FILE_ERROR_T.FILE_DATA_EXCEPTION)
+                        message = string.Format("At least one unexpected error occurred while grouping controller pdo mappings . \n{0}", exception.DataException.ToString());
+                    else
+                        message = string.Format("At least one unexpected error occurred while grouping controller pdo mappings . \n{0}", exception.ErrorCode.ToString());
+
+                    MessageBox.Show(message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
             }
             e.Handled = true;
         }
@@ -244,6 +267,19 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
                 IO_LIST_PDO_AREA_T area = (IO_LIST_PDO_AREA_T)((__tab_pdo_container.SelectedItem as TabItem).Tag);
                 ListView view = __area_views[area];
                 e.CanExecute = view.SelectedItem != null && view.SelectedIndex + 1 < view.Items.Count;
+            }
+            catch
+            {
+                e.CanExecute = false;
+            }
+        }
+
+        private void __on_group_element_can_executed(object sender, CanExecuteRoutedEventArgs e)
+        {
+            try
+            {
+                IO_LIST_PDO_AREA_T area = (IO_LIST_PDO_AREA_T)((__tab_pdo_container.SelectedItem as TabItem).Tag);
+                e.CanExecute = area == IO_LIST_PDO_AREA_T.RX_BIT || area == IO_LIST_PDO_AREA_T.TX_BIT;
             }
             catch
             {

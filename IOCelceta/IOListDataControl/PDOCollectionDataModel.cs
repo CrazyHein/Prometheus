@@ -364,5 +364,36 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             __collection_areas[area].Insert(pos, objectDataModel);
             //__collection_areas[area][pos] = objectDataModel;
         }
+
+        public void GroupPDOMappingByBindingModule(IO_LIST_PDO_AREA_T area)
+        {
+            _data_helper.GroupPDOMappingByBindingModule(area);
+            IReadOnlyList<IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T> objectList = null;
+
+            switch (area)
+            {
+                case IO_LIST_PDO_AREA_T.TX_DIAGNOSTIC:
+                    objectList = _data_helper.TxBitArea;
+                    break;
+                case IO_LIST_PDO_AREA_T.TX_BIT:
+                    objectList = _data_helper.TxBitArea;
+                    break;
+                case IO_LIST_PDO_AREA_T.TX_BLOCK:
+                    objectList = _data_helper.TxBlockArea;
+                    break;
+                case IO_LIST_PDO_AREA_T.RX_CONTROL:
+                    objectList = _data_helper.RxControlArea;
+                    break;
+                case IO_LIST_PDO_AREA_T.RX_BIT:
+                    objectList = _data_helper.RxBitArea;
+                    break;
+                case IO_LIST_PDO_AREA_T.RX_BLOCK:
+                    objectList = _data_helper.RxBlockArea;
+                    break;
+            }
+            __collection_areas[area].Clear();
+            foreach (var o in objectList)
+                __collection_areas[area].Add(__object_collection_data_model.ObjectDictionary[o.index]);
+        }
     }
 }
