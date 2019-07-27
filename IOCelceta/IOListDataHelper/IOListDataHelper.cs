@@ -27,7 +27,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
         INVALID_OBJECT_DATA_TYPE                                = 0x00000020,
         DUPLICATE_OBJECT_INDEX                                  = 0x00000021,
         INVALID_OBJECT_BINDING_MODULE                           = 0x00000022,
-        INVALID_OBJECT_BINDING_MODULE_REFERENCE_NAME            = 0x00000023,
+        INVALID_OBJECT_BINDING_MODULE_REFERENCE                 = 0x00000023,
         INVALID_OBJECT_BINDING_MODULE_CHANNEL                   = 0x00000024,
         INVALID_OBJECT_BINDING_MODULE_CHANNEL_INDEX             = 0x00000025,
         INVALID_OBJECT_CONVERTER_DATA_TYPE                      = 0x00000026,
@@ -387,7 +387,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                         {
                             case "Module":
                                 if(__controller_information.modules.Keys.Contains(node.FirstChild.Value) == false)
-                                    throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_OBJECT_BINDING_MODULE_REFERENCE_NAME, null);
+                                    throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_OBJECT_BINDING_MODULE_REFERENCE, null);
                                 bindingData.module = __controller_information.modules[node.FirstChild.Value];
                                 mask |= 0x00000001;
                                 break;
@@ -429,6 +429,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                     {
                         switch (node.Name)
                         {
+                            /*
                             case "DataType":
                                 if (DataTypeCatalogue.DataTypes.Keys.Contains(node.FirstChild.Value))
                                 {
@@ -438,6 +439,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                                 else
                                     throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_OBJECT_DATA_TYPE, null);
                                 break;
+                                */
                             case "Unit":
                                 converterData.unit_name = node.FirstChild.Value;
                                 mask |= 0x00000002;
@@ -452,7 +454,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                                 break;
                         }
                     }
-                    if (mask != 15)
+                    if (mask != 0x0E)
                         throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.ELEMENT_MISSING, null);
                     else
                         converterData.enabled = true;
@@ -497,7 +499,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                             }
                             else
                             {
-                                uint objectDataBitSize = objectData.converter.enabled == false ? objectData.variable.DataType.BitSize : objectData.converter.data_type.BitSize;
+                                //uint objectDataBitSize = objectData.converter.enabled == false ? objectData.variable.DataType.BitSize : objectData.converter.data_type.BitSize;
+                                uint objectDataBitSize = objectData.variable.DataType.BitSize;
                                 if (objectDataBitSize % 8 == 0)
                                     actualPdoSizeInByte += objectDataBitSize / 8;
                                 else
@@ -599,7 +602,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                         variables = ControllerCatalogue.ExtensionModels[moduleID].RxVariables;
                 }
                 else
-                    throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_OBJECT_BINDING_MODULE_REFERENCE_NAME, null);
+                    throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_OBJECT_BINDING_MODULE_REFERENCE, null);
 
                 if (variables.Keys.Contains(objectData.binding.channel_name))
                 {
@@ -614,10 +617,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
             {
                 if(objectData.variable.DataType.BitSize == 1)
                     throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_OBJECT_CONVERTER, null);
-                else if (objectData.converter.data_type == null || DataTypeCatalogue.DataTypes.Values.Contains(objectData.converter.data_type) == false)
-                    throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_OBJECT_CONVERTER_DATA_TYPE, null);
-                else if (objectData.converter.data_type != objectData.variable.DataType)
-                    throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.OBJECT_VARIABLE_DATA_TYPE_MISMATCH, null);
+                //else if (objectData.converter.data_type == null || DataTypeCatalogue.DataTypes.Values.Contains(objectData.converter.data_type) == false)
+                    //throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_OBJECT_CONVERTER_DATA_TYPE, null);
+                //else if (objectData.converter.data_type != objectData.variable.DataType)
+                    //throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.OBJECT_VARIABLE_DATA_TYPE_MISMATCH, null);
             }
         }
 
@@ -1087,8 +1090,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                 else
                 {
                     byteSize = pdo.actual_size_in_byte;
-                    uint oldObjectDataBitSize = oldObjectData.converter.enabled == false ? oldObjectData.variable.DataType.BitSize : oldObjectData.converter.data_type.BitSize;
-                    uint newObjectDataBitSize = objectData.converter.enabled == false ? objectData.variable.DataType.BitSize : objectData.converter.data_type.BitSize;
+                    //uint oldObjectDataBitSize = oldObjectData.converter.enabled == false ? oldObjectData.variable.DataType.BitSize : oldObjectData.converter.data_type.BitSize;
+                    //uint newObjectDataBitSize = objectData.converter.enabled == false ? objectData.variable.DataType.BitSize : objectData.converter.data_type.BitSize;
+                    uint oldObjectDataBitSize = oldObjectData.variable.DataType.BitSize;
+                    uint newObjectDataBitSize = objectData.variable.DataType.BitSize;
                     if (oldObjectDataBitSize % 8 == 0)
                         byteSize -= oldObjectDataBitSize / 8;
                     else
@@ -1142,7 +1147,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                 else
                 {
                     byteSize = pdo.actual_size_in_byte;
-                    uint objectDataBitSize = objectData.converter.enabled == false ? objectData.variable.DataType.BitSize : objectData.converter.data_type.BitSize;
+                    //uint objectDataBitSize = objectData.converter.enabled == false ? objectData.variable.DataType.BitSize : objectData.converter.data_type.BitSize;
+                    uint objectDataBitSize = objectData.variable.DataType.BitSize;
                     if (objectDataBitSize % 8 == 0)
                         byteSize += objectDataBitSize / 8;
                     else
@@ -1191,7 +1197,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                 else
                 {
                     byteSize = pdo.actual_size_in_byte;
-                    uint objectDataBitSize = objectData.converter.enabled == false ? objectData.variable.DataType.BitSize : objectData.converter.data_type.BitSize;
+                    //uint objectDataBitSize = objectData.converter.enabled == false ? objectData.variable.DataType.BitSize : objectData.converter.data_type.BitSize;
+                    uint objectDataBitSize = objectData.variable.DataType.BitSize;
                     if (objectDataBitSize % 8 == 0)
                         byteSize += objectDataBitSize / 8;
                     else
@@ -1235,7 +1242,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                 else
                 {
                     byteSize = pdo.actual_size_in_byte;
-                    uint objectDataBitSize = objectData.converter.enabled == false ? objectData.variable.DataType.BitSize : objectData.converter.data_type.BitSize;
+                    //uint objectDataBitSize = objectData.converter.enabled == false ? objectData.variable.DataType.BitSize : objectData.converter.data_type.BitSize;
+                    uint objectDataBitSize = objectData.variable.DataType.BitSize;
                     if (objectDataBitSize % 8 == 0)
                         byteSize -= objectDataBitSize / 8;
                     else
@@ -1527,9 +1535,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
         {
             XmlElement converter = doc.CreateElement("Converter");
 
-            XmlElement sub = doc.CreateElement("DataType");
-            sub.AppendChild(doc.CreateTextNode(converterInfo.data_type.Name));
-            converter.AppendChild(sub);
+            XmlElement sub;
+            //XmlElement sub = doc.CreateElement("DataType");
+            //sub.AppendChild(doc.CreateTextNode(converterInfo.data_type.Name));
+            //converter.AppendChild(sub);
 
             sub = doc.CreateElement("Unit");
             sub.AppendChild(doc.CreateTextNode(converterInfo.unit_name));
@@ -1702,7 +1711,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
         public class VALUE_CONVERTER_T
         {
             public bool enabled;
-            public DataTypeDefinition data_type;
+            //public DataTypeDefinition data_type;
             public string unit_name;
             public int up_scale;
             public int down_scale;
@@ -1712,7 +1721,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                 if (enabled == false)
                     return "N/A";
                 else
-                    return string.Format("{0} -- [{1}, {2}] ({3})", data_type.Name, down_scale, up_scale, unit_name);
+                    //return string.Format("{0} -- [{1}, {2}] ({3})", data_type.Name, down_scale, up_scale, unit_name);
+                    return string.Format("[{0}, {1}] ({2})", down_scale, up_scale, unit_name);
             }
 
             public VALUE_CONVERTER_T()

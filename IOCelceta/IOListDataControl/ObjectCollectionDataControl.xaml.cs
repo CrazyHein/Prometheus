@@ -112,7 +112,11 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             ObjectItemDataModel newObjectItem = new ObjectItemDataModel(host, 
                 host.DataHelper.VariableCatalogue.Variables.Values.First());
             ObjectDataControl objectDataControl = new ObjectDataControl(newObjectItem, true);
-            objectDataControl.ShowDialog();
+            if (objectDataControl.ShowDialog() == true)
+            {
+                __lsv_io_objects.SelectedIndex = __lsv_io_objects.Items.Count - 1;
+                __lsv_io_objects.ScrollIntoView(__lsv_io_objects.SelectedItem);
+            }
             e.Handled = true;
         }
 

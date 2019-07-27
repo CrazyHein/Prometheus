@@ -95,12 +95,12 @@
                         <RowDefinition Height="auto"/>
                     </Grid.RowDefinitions>
                     <CheckBox Content="Enable" Margin="4" Name="__chk_enable_converter" IsChecked="{Binding ConverterEnable}"/>
-                    <TextBlock Text="Data Type : " Grid.Row="1"/>
+                    <!--TextBlock Text="Data Type : " Grid.Row="1"-->
                     <TextBlock Text="Up Scale :" Grid.Row="2"/>
                     <TextBlock Text="Dw Scale : " Grid.Row="3"/>
                     <TextBlock Text="Unit : " Grid.Row="4"/>
 
-                    <ComboBox Grid.Column="1" Grid.Row="1" Name="__cmb_coverter_data_type_selection" SelectedItem="{Binding Path=ConverterDataTypeSelection}" Height="24" IsEnabled="{Binding ElementName=__chk_enable_converter,Path=IsChecked}"/>
+                    <!--ComboBox Grid.Column="1" Grid.Row="1" Name="__cmb_coverter_data_type_selection" SelectedItem="{Binding Path=ConverterDataTypeSelection}" Height="24" IsEnabled="{Binding ElementName=__chk_enable_converter,Path=IsChecked}"-->
                     <TextBox Grid.Column="1" Grid.Row="2" IsEnabled="{Binding ElementName=__chk_enable_converter,Path=IsChecked}" Text="{Binding ConverterUpScale, NotifyOnValidationError=True}"/>
                     <TextBox Grid.Column="1" Grid.Row="3" IsEnabled="{Binding ElementName=__chk_enable_converter,Path=IsChecked}" Text="{Binding ConverterDownScale, NotifyOnValidationError=True}"/>
                     <TextBox Grid.Column="1" Grid.Row="4" IsEnabled="{Binding ElementName=__chk_enable_converter,Path=IsChecked}" Text="{Binding ConverterUnitName}"/>

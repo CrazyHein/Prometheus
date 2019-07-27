@@ -88,7 +88,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
                 index = dataModel.Index,
                 variable = dataModel.VariableSelection,
                 binding = { enabled = dataModel.BindingEnable, module = dataModel.BindingModuleSelection, channel_name = dataModel.BindingChannelName, channel_index = dataModel.BindingChannelIndex },
-                converter = { enabled = dataModel.ConverterEnable, data_type = dataModel.ConverterDataTypeSelection, up_scale = dataModel.ConverterUpScale, down_scale = dataModel.ConverterDownScale, unit_name = dataModel.ConverterUnitName }
+                //converter = { enabled = dataModel.ConverterEnable, data_type = dataModel.ConverterDataTypeSelection, up_scale = dataModel.ConverterUpScale, down_scale = dataModel.ConverterDownScale, unit_name = dataModel.ConverterUnitName }
+                converter = { enabled = dataModel.ConverterEnable, up_scale = dataModel.ConverterUpScale, down_scale = dataModel.ConverterDownScale, unit_name = dataModel.ConverterUnitName }
             };
             _data_helper.AddObjectData(objectItem);
             if(pos == -1)
@@ -105,7 +106,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
                 index = dataModel.Index,
                 variable = dataModel.VariableSelection,
                 binding = { enabled = dataModel.BindingEnable, module = dataModel.BindingModuleSelection, channel_name = dataModel.BindingChannelName, channel_index = dataModel.BindingChannelIndex },
-                converter = { enabled = dataModel.ConverterEnable, data_type = dataModel.ConverterDataTypeSelection, up_scale = dataModel.ConverterUpScale, down_scale = dataModel.ConverterDownScale, unit_name = dataModel.ConverterUnitName }
+                //converter = { enabled = dataModel.ConverterEnable, data_type = dataModel.ConverterDataTypeSelection, up_scale = dataModel.ConverterUpScale, down_scale = dataModel.ConverterDownScale, unit_name = dataModel.ConverterUnitName }
+                converter = { enabled = dataModel.ConverterEnable, up_scale = dataModel.ConverterUpScale, down_scale = dataModel.ConverterDownScale, unit_name = dataModel.ConverterUnitName }
             };
             _data_helper.ModifyObjectData(index, objectItem);
             var data = __object_dictionary[index];
@@ -152,7 +154,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
         {
             Host = host;
             Index = index;
-            VariableName = variable.Name;
+            VariableSelection = variable;
         }
 
         public ObjectItemDataModel(ObjectCollectionDataModel host, IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T objectDefinition)
@@ -169,7 +171,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
         public void ImportObjectDefinition(IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T objectDefinition)
         {
             Index = objectDefinition.index;
-            VariableName = objectDefinition.variable.Name;
+            VariableSelection = objectDefinition.variable;
 
             BindingEnable = objectDefinition.binding.enabled;
             if (BindingEnable == true)
@@ -180,7 +182,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             BindingChannelIndex = objectDefinition.binding.channel_index;
 
             ConverterEnable = objectDefinition.converter.enabled;
-            ConverterDataTypeSelection = objectDefinition.converter.data_type;
+            //ConverterDataTypeSelection = objectDefinition.converter.data_type;
             ConverterUpScale = objectDefinition.converter.up_scale;
             ConverterDownScale = objectDefinition.converter.down_scale;
             ConverterUnitName = objectDefinition.converter.unit_name;
@@ -197,7 +199,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
         private int __binding_channel_index;
 
         private bool __converter_enable;
-        private DataTypeDefinition __converter_data_type;
+        //private DataTypeDefinition __converter_data_type;
         private int __converter_up_scale;
         private int __converter_down_scale;
         private string __converter_unit_name;
@@ -211,16 +213,22 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
         public VariableDefinition VariableSelection
         {
             get { return __variable_selection; }
+            set
+            {
+                __variable_selection = value;
+                if(__variable_selection != null)
+                {
+                    VariableName = __variable_selection.Name;
+                    VariableDataType = __variable_selection.DataType;
+                }
+            }
         }
 
         public string VariableName
         {
             get
             {
-                if (__variable_selection != null)
-                    return __variable_selection.Name;
-                else
-                    return __variable_name;
+                return __variable_name;
             }
             set
             {
@@ -234,7 +242,6 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
                 catch
                 {
                     __variable_selection = null;
-                    VariableDataType = null;
                 }
             }
         }
@@ -281,11 +288,13 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             get { return __converter_enable; }
             set { SetProperty(ref __converter_enable, value); }
         }
+        /*
         public DataTypeDefinition ConverterDataTypeSelection
         {
             get { return __converter_data_type; }
             set { SetProperty(ref __converter_data_type, value); }
         }
+        */
         public int ConverterUpScale
         {
             get { return __converter_up_scale; }
@@ -308,7 +317,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
                 if (ConverterEnable == false)
                     return "N/A";
                 else
-                    return string.Format("{0} -- [{1}, {2}] ({3})", ConverterDataTypeSelection.Name, ConverterDownScale, ConverterUpScale, ConverterUnitName);
+                    //return string.Format("{0} -- [{1}, {2}] ({3})", ConverterDataTypeSelection.Name, ConverterDownScale, ConverterUpScale, ConverterUnitName);
+                    return string.Format("[{0}, {1}] ({2})", ConverterDownScale, ConverterUpScale, ConverterUnitName);
             }
         }
 
@@ -354,10 +364,16 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
     {
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {
+            /*
             if ((bool)values[0] == false || values[1] == null || values[4] == null)
                 return "N/A";
             else
                 return string.Format("{0} -- [{1}, {2}] ({3})", ((DataTypeDefinition)values[1]).Name, (int)values[2], (int)values[3], (string)values[4]);
+                */
+            if ((bool)values[0] == false || values[3] == null)
+                return "N/A";
+            else
+                return string.Format("[{0}, {1}] ({2})", (int)values[1], (int)values[2], (string)values[3]);
         }
 
         public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)

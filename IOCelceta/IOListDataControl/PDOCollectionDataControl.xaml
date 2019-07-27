@@ -173,7 +173,7 @@
                         <TextBlock.Text>
                             <MultiBinding Converter="{StaticResource ConverterString}">
                                 <Binding Path="ConverterEnable"/>
-                                <Binding Path="ConverterDataTypeSelection"/>
+                                <!--Binding Path="ConverterDataTypeSelection"-->
                                 <Binding Path="ConverterDownScale"/>
                                 <Binding Path="ConverterUpScale"/>
                                 <Binding Path="ConverterUnitName"/>

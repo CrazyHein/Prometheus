@@ -49,7 +49,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
                 ControllerModuleDataControl moduleDataControl = new ControllerModuleDataControl(data, null, -1);
                 if (moduleDataControl.ShowDialog() == true)
                 {
-
+                    __lsv_extension_modules.SelectedIndex = __lsv_extension_modules.Items.Count - 1;
+                    __lsv_extension_modules.ScrollIntoView(__lsv_extension_modules.SelectedItem);
                 }
             }
             e.Handled = true;
@@ -147,7 +148,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
                 ControllerModuleDataControl moduleDataControl = new ControllerModuleDataControl(data, null);
                 if (moduleDataControl.ShowDialog() == true)
                 {
-
+                    __lsv_ethernet_modules.SelectedIndex = __lsv_ethernet_modules.Items.Count - 1;
+                    __lsv_ethernet_modules.ScrollIntoView(__lsv_ethernet_modules.SelectedItem);
                 }
             }
             e.Handled = true;
