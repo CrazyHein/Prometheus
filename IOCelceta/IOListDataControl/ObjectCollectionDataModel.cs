@@ -370,7 +370,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             else
                 return string.Format("{0} -- [{1}, {2}] ({3})", ((DataTypeDefinition)values[1]).Name, (int)values[2], (int)values[3], (string)values[4]);
                 */
-            if ((bool)values[0] == false || values[3] == null)
+            if ((bool)values[0] == false)
                 return "N/A";
             else
                 return string.Format("[{0}, {1}] ({2})", (int)values[1], (int)values[2], (string)values[3]);

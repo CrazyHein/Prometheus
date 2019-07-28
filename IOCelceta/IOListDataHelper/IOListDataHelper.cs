@@ -34,19 +34,22 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
         INVALID_OBJECT_CONVERTER                                = 0x00000027,
         INVALID_OBJECT_VARIABLE                                 = 0x00000028,
         OBJECT_VARIABLE_DATA_TYPE_MISMATCH                      = 0x00000029,
+
         INVALID_BIT_OBJECT_INDEX                                = 0x00000030,
         INVALID_BLOCK_OBJECT_INDEX                              = 0x00000031,
 
-        INVALID_OBJECT_REFERENCE_IN_PDO                         = 0x00000040,
-        INVALID_OBJECT_REFERENCE_ID_IN_PDO                      = 0x00000041,
+        INVALID_OBJECT_DATA_IN_PDO                              = 0x00000040,
+        INVALID_OBJECT_REFERENCE_IN_PDO                         = 0x00000041,
 
         INVALID_OBJECT_REFERENCE_IN_PDO_AREA                    = 0x00000042,
         PDO_AREA_OUT_OF_RANGE                                   = 0x00000043,
         PDO_AREA_OVERLAPPED                                     = 0x00000044,
 
+        INVALID_OBJECT_REFERENCE_IN_INTERLOCK                   = 0x00000050,
+
         MODULE_IS_REFERENCED_BY_OBJECT                          = 0x000000F0,
         OBJECT_IS_REFERENCED_BY_PDO                             = 0x000000F1,
-        
+        OBJECT_IS_REFERENCED_BY_INTERLOCK                       = 0x000000F2
     }
 
     public enum IO_LIST_PDO_AREA_T : byte
@@ -58,6 +61,22 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
         RX_CONTROL              = 0x11,
         RX_BIT                  = 0x12,
         RX_BLOCK                = 0x13,
+    }
+
+    public enum IO_LIST_INTERLOCK_LOGIC_OPERATOR_T : byte
+    {
+        AND                     = 0x01,
+        OR                      = 0x02,
+        NOT                     = 0x10,
+        XOR                     = 0x03,
+        NAND                    = 0x11,
+        NOR                     = 0x12,
+    }
+
+    public enum IO_LIST_INTERLOCK_LOGIC_ELEMENT_TYPE : byte
+    {
+        OPERAND                 = 0x01,
+        EXPRESSION              = 0x02
     }
 
     public class IOListParseExcepetion : Exception
@@ -77,12 +96,14 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
         public uint FileFormatVersion { get; private set; }
         private readonly uint __supported_file_format_version;
         private Dictionary<string, int> __module_reference_counter;
-        private Dictionary<uint, int> __object_reference_counter;
+        private Dictionary<uint, int> __object_reference_counter_of_pdo;
+        private Dictionary<uint, int> __object_reference_counter_of_intlk;
 
         public IO_LIST_TARGET_INFORMATION_T TargetInformation;
         private IO_LIST_CONTROLLER_INFORMATION_T __controller_information;
         private IO_LIST_OBJECT_COLLECTION_T __object_collection;
-        private IO_LIST_CONTROLLER_PDO_COLLECTION __controller_pdo_collection;
+        private IO_LIST_CONTROLLER_PDO_COLLECTION_T __controller_pdo_collection;
+        protected IO_LIST_INTERLOCK_LOGIC_COLLECTION_T __controller_interlock_collection;
 
         public uint SupportedFileFormatVersion { get { return __supported_file_format_version; } }
 
@@ -90,12 +111,14 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
         {
             __supported_file_format_version = 1;
             __module_reference_counter = new Dictionary<string, int>();
-            __object_reference_counter = new Dictionary<uint, int>();
+            __object_reference_counter_of_pdo = new Dictionary<uint, int>();
+            __object_reference_counter_of_intlk = new Dictionary<uint, int>();
 
             TargetInformation = new IO_LIST_TARGET_INFORMATION_T();
             __controller_information = new IO_LIST_CONTROLLER_INFORMATION_T("127.0.0.1", 5010);
             __object_collection = new IO_LIST_OBJECT_COLLECTION_T();
-            __controller_pdo_collection = new IO_LIST_CONTROLLER_PDO_COLLECTION();
+            __controller_pdo_collection = new IO_LIST_CONTROLLER_PDO_COLLECTION_T();
+            __controller_interlock_collection = new IO_LIST_INTERLOCK_LOGIC_COLLECTION_T();
 
             ControllerCatalogue = controllerCatalogue;
             DataTypeCatalogue = dataTypeCatalogue;
@@ -105,7 +128,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
         public void SetDefault()
         {
             __module_reference_counter.Clear();
-            __object_reference_counter.Clear();
+            __object_reference_counter_of_pdo.Clear();
+            __object_reference_counter_of_intlk.Clear();
 
             TargetInformation.Clear();
             __controller_information.Clear();
@@ -166,6 +190,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                 {
                     foreach (XmlNode node in mcServerInfoNode.ChildNodes)
                     {
+                        if (node.NodeType != XmlNodeType.Element)
+                            continue;
                         switch (node.Name)
                         {
                             case "IP":
@@ -356,7 +382,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
 
                         ObjectDataVerification(objectDefinition);
                         __object_collection.objects.Add(objectDefinition.index, objectDefinition);
-                        __object_reference_counter.Add(objectDefinition.index, 0);
+                        __object_reference_counter_of_pdo.Add(objectDefinition.index, 0);
+                        __object_reference_counter_of_intlk.Add(objectDefinition.index, 0);
                         if (objectDefinition.binding.enabled == true)
                             __module_reference_counter[objectDefinition.binding.module.reference_name]++;
 
@@ -383,6 +410,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                 {
                     foreach (XmlNode node in bindingNode.ChildNodes)
                     {
+                        if (node.NodeType != XmlNodeType.Element)
+                            continue;
                         switch (node.Name)
                         {
                             case "Module":
@@ -427,6 +456,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                 {
                     foreach (XmlNode node in converterNode.ChildNodes)
                     {
+                        if (node.NodeType != XmlNodeType.Element)
+                            continue;
+
                         switch (node.Name)
                         {
                             /*
@@ -470,7 +502,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
             }
         }
 
-        private void __load_controller_pdo_collection(XmlNode areaNode, IO_LIST_CONTROLLER_PDO_COLLECTION.PDO_DEFINITION_T pdo, IO_LIST_PDO_AREA_T area)
+        private void __load_controller_pdo_collection(XmlNode areaNode, IO_LIST_CONTROLLER_PDO_COLLECTION_T.PDO_DEFINITION_T pdo, IO_LIST_PDO_AREA_T area)
         {
             uint actualPdoSizeInByte = 0;
             uint actualPdoSizeInBit = 0;
@@ -483,10 +515,17 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                     pdo.size_in_word = Convert.ToUInt32(areaNode.Attributes.GetNamedItem("WordSize").Value, 10);
                     foreach(XmlNode index in areaNode.ChildNodes)
                     {
-                        if(index.Name == "Index")
+                        if (index.NodeType != XmlNodeType.Element)
+                            continue;
+
+                        if (index.Name == "Index")
                         {
                             uint id = Convert.ToUInt32(index.FirstChild.Value, 16);
-                            IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T objectData = __object_collection.objects[id];
+                            IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T objectData = null;
+                            if (__object_collection.objects.Keys.Contains(id))
+                                objectData = __object_collection.objects[id];
+                            else
+                                throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_OBJECT_REFERENCE_IN_PDO, null);
                             PdoObjectDataVerification(area, objectData, false);
 
                             if (area == IO_LIST_PDO_AREA_T.RX_BIT || area == IO_LIST_PDO_AREA_T.TX_BIT)
@@ -510,7 +549,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                             if (actualPdoSizeInByte > (pdo.size_in_word *2))
                                 throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.PDO_AREA_OUT_OF_RANGE, null);
 
-                            __object_reference_counter[id]++;
+                            __object_reference_counter_of_pdo[id]++;
                             pdo.objects.Add(__object_collection.objects[id]);
                             pdo.actual_size_in_byte = actualPdoSizeInByte;
                         }
@@ -550,6 +589,68 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
             }
 
             return false;
+        }
+
+        private void __load_interlock_logics(XmlNode interlocksNode)
+        {
+            try
+            {
+                if (interlocksNode.NodeType == XmlNodeType.Element)
+                {
+                    foreach (XmlNode interlock in interlocksNode.ChildNodes)
+                    {
+                        if (interlock.NodeType != XmlNodeType.Element || interlock.Name != "Interlock")
+                            continue;
+
+                        string name = null;
+                        IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T objectData = null;
+                        IO_LIST_INTERLOCK_LOGIC_COLLECTION_T.LOGIC_STATEMENT_T statement = null;
+                        uint mask = 0;
+                        foreach (XmlNode node in interlock.ChildNodes)
+                        {
+                            if (node.NodeType != XmlNodeType.Element)
+                                continue;
+                            switch (node.Name)
+                            {
+                                case "Name":
+                                    name = node.FirstChild.Value;
+                                    mask |= 0x00000001;
+                                    break;
+                                case "Target":
+                                    uint id = Convert.ToUInt32(node.FirstChild.Value, 16);
+                                    if (__object_collection.objects.Keys.Contains(id) == false)
+                                        throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_OBJECT_REFERENCE_IN_INTERLOCK, null);
+                                    objectData = __object_collection.objects[id];
+                                    mask |= 0x00000002;
+                                    break;
+                                case "Statement":
+                                    statement = __load_interlock_logic_statement(node);
+                                    mask |= 0x00000004;
+                                    break;
+                            }
+                        }
+
+                        if(mask != 0x00000007)
+                            throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.ELEMENT_MISSING, null);
+                        __controller_interlock_collection.logic_loops.Add(
+                            new IO_LIST_INTERLOCK_LOGIC_COLLECTION_T.LOGIC_LOOP_T(name, objectData, statement));
+                        __object_reference_counter_of_intlk[objectData.index]++;
+                    }
+                }
+            }
+            catch (IOListParseExcepetion e)
+            {
+                throw e;
+            }
+            catch (Exception e)
+            {
+                throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.FILE_DATA_EXCEPTION, e);
+            }
+        }
+
+        private IO_LIST_INTERLOCK_LOGIC_COLLECTION_T.LOGIC_STATEMENT_T __load_interlock_logic_statement(XmlNode statementNode)
+        {
+            return null;
         }
 
         public void ModuleDataVerification(IO_LIST_CONTROLLER_INFORMATION_T.MODULE_T moduleData, bool ignoreDuplicate = false)
@@ -662,18 +763,18 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                 return objectData;
             }
             else
-                throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_OBJECT_REFERENCE_ID_IN_PDO, null);
+                throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_OBJECT_REFERENCE_IN_PDO, null);
         }
 
         public void PdoObjectDataVerification(IO_LIST_PDO_AREA_T area, IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T objectData, bool objectReferenceVerify = true)
         {
             if(objectData == null)
-                throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_OBJECT_REFERENCE_IN_PDO, null);
+                throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_OBJECT_DATA_IN_PDO, null);
             if (objectReferenceVerify)
             {
                 if (__object_collection.objects.Keys.Contains(objectData.index) == false ||
                     __object_collection.objects[objectData.index] != objectData)
-                    throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_OBJECT_REFERENCE_ID_IN_PDO, null);
+                    throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_OBJECT_REFERENCE_IN_PDO, null);
             }
             __object_data_area_verification(area, objectData);
         }
@@ -854,7 +955,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                 __object_collection.objects.Add(dataObject.index, dataObject);
                 if(dataObject.binding.enabled == true)
                     __module_reference_counter[dataObject.binding.module.reference_name]++;
-                __object_reference_counter.Add(dataObject.index, 0);
+                __object_reference_counter_of_pdo.Add(dataObject.index, 0);
+                __object_reference_counter_of_intlk.Add(dataObject.index, 0);
             }
             catch (Exception e)
             {
@@ -866,12 +968,15 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
         {
             try
             {
-                if (__object_reference_counter[index] != 0)
+                if (__object_reference_counter_of_pdo[index] != 0)
                     throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.OBJECT_IS_REFERENCED_BY_PDO, null);
+                else if (__object_reference_counter_of_intlk[index] != 0)
+                    throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.OBJECT_IS_REFERENCED_BY_INTERLOCK, null);
                 if (__object_collection.objects[index].binding.enabled == true)
                     __module_reference_counter[__object_collection.objects[index].binding.module.reference_name]--;
                 __object_collection.objects.Remove(index); 
-                __object_reference_counter.Remove(index);
+                __object_reference_counter_of_pdo.Remove(index);
+                __object_reference_counter_of_intlk.Remove(index);
             }
             catch (IOListParseExcepetion e)
             {
@@ -896,8 +1001,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                 ObjectDataVerification(dataObject, true);
                 try
                 {
-                    if (__object_reference_counter[index] != 0)
+                    if (__object_reference_counter_of_pdo[index] != 0)
                         throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.OBJECT_IS_REFERENCED_BY_PDO, null);
+                    else if(__object_reference_counter_of_intlk[index] != 0)
+                        throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.OBJECT_IS_REFERENCED_BY_INTERLOCK, null);
                     __object_collection.objects[index] = dataObject;
                 }
                 catch (IOListParseExcepetion e)
@@ -1047,7 +1154,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
         {
             try
             {
-                IO_LIST_CONTROLLER_PDO_COLLECTION.PDO_DEFINITION_T pdo = __controller_pdo_collection.PDOs[area];
+                IO_LIST_CONTROLLER_PDO_COLLECTION_T.PDO_DEFINITION_T pdo = __controller_pdo_collection.PDOs[area];
                 IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T temp = pdo.objects[first];
                 pdo.objects[first] = pdo.objects[second];
                 pdo.objects[second] = temp;
@@ -1074,7 +1181,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
             try
             {
                 PdoObjectDataVerification(area, objectData, objectDataReferenceVerify);
-                IO_LIST_CONTROLLER_PDO_COLLECTION.PDO_DEFINITION_T pdo = __controller_pdo_collection.PDOs[area];
+                IO_LIST_CONTROLLER_PDO_COLLECTION_T.PDO_DEFINITION_T pdo = __controller_pdo_collection.PDOs[area];
                 var oldObjectData = pdo.objects[pos];
 
                 if (area == IO_LIST_PDO_AREA_T.RX_BIT || area == IO_LIST_PDO_AREA_T.TX_BIT)
@@ -1108,8 +1215,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
 
                 pdo.objects[pos] = objectData;
                 pdo.actual_size_in_byte = byteSize;
-                __object_reference_counter[oldObjectData.index]--;
-                __object_reference_counter[objectData.index]++;
+                __object_reference_counter_of_pdo[oldObjectData.index]--;
+                __object_reference_counter_of_pdo[objectData.index]++;
             }
             catch (IOListParseExcepetion e)
             {
@@ -1133,7 +1240,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
             try
             {
                 PdoObjectDataVerification(area, objectData, objectDataReferenceVerify);
-                IO_LIST_CONTROLLER_PDO_COLLECTION.PDO_DEFINITION_T pdo = __controller_pdo_collection.PDOs[area];
+                IO_LIST_CONTROLLER_PDO_COLLECTION_T.PDO_DEFINITION_T pdo = __controller_pdo_collection.PDOs[area];
 
                 if (area == IO_LIST_PDO_AREA_T.RX_BIT || area == IO_LIST_PDO_AREA_T.TX_BIT)
                 {
@@ -1159,7 +1266,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
 
                 pdo.objects.Add(objectData);
                 pdo.actual_size_in_byte = byteSize;
-                __object_reference_counter[objectData.index]++;
+                __object_reference_counter_of_pdo[objectData.index]++;
             }
             catch (IOListParseExcepetion e)
             {
@@ -1183,7 +1290,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
             try
             { 
                 PdoObjectDataVerification(area, objectData, objectDataReferenceVerify);
-                IO_LIST_CONTROLLER_PDO_COLLECTION.PDO_DEFINITION_T pdo = __controller_pdo_collection.PDOs[area];
+                IO_LIST_CONTROLLER_PDO_COLLECTION_T.PDO_DEFINITION_T pdo = __controller_pdo_collection.PDOs[area];
 
                 if (area == IO_LIST_PDO_AREA_T.RX_BIT || area == IO_LIST_PDO_AREA_T.TX_BIT)
                 {
@@ -1209,7 +1316,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
 
                 pdo.objects.Insert(pos, objectData);
                 pdo.actual_size_in_byte = byteSize;
-                __object_reference_counter[objectData.index]++;
+                __object_reference_counter_of_pdo[objectData.index]++;
             }
             catch (IOListParseExcepetion e)
             {
@@ -1227,7 +1334,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
             IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T objectData;
             try
             {
-                IO_LIST_CONTROLLER_PDO_COLLECTION.PDO_DEFINITION_T pdo = __controller_pdo_collection.PDOs[area];
+                IO_LIST_CONTROLLER_PDO_COLLECTION_T.PDO_DEFINITION_T pdo = __controller_pdo_collection.PDOs[area];
                 objectData = pdo.objects[pos];
 
                 if (area == IO_LIST_PDO_AREA_T.RX_BIT || area == IO_LIST_PDO_AREA_T.TX_BIT)
@@ -1252,7 +1359,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
 
                 pdo.objects.RemoveAt(pos);
                 pdo.actual_size_in_byte = byteSize;
-                __object_reference_counter[objectData.index]--;
+                __object_reference_counter_of_pdo[objectData.index]--;
             }
             catch (IOListParseExcepetion e)
             {
@@ -1268,7 +1375,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
         {
             try
             {
-                IO_LIST_CONTROLLER_PDO_COLLECTION.PDO_DEFINITION_T pdo = __controller_pdo_collection.PDOs[area];
+                IO_LIST_CONTROLLER_PDO_COLLECTION_T.PDO_DEFINITION_T pdo = __controller_pdo_collection.PDOs[area];
 
                 pdo.objects.Sort(__binding_module_comparison);
             }
@@ -1619,7 +1726,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
 
         private XmlElement __create_pdo_mapping_area_node(XmlDocument doc, IO_LIST_PDO_AREA_T area)
         {
-            IO_LIST_CONTROLLER_PDO_COLLECTION.PDO_DEFINITION_T pdo = __controller_pdo_collection.PDOs[area]; ;
+            IO_LIST_CONTROLLER_PDO_COLLECTION_T.PDO_DEFINITION_T pdo = __controller_pdo_collection.PDOs[area]; ;
             XmlElement pdoArea = null;
             XmlElement index = null;
             switch (area)
@@ -1770,7 +1877,6 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
             public VALUE_CONVERTER_T()
             {
                 enabled = false;
-                enabled = false;
                 down_scale = 0;
                 up_scale = 0;
                 unit_name = "Any";
@@ -1809,7 +1915,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
         }
     }
 
-    public class IO_LIST_CONTROLLER_PDO_COLLECTION
+    public class IO_LIST_CONTROLLER_PDO_COLLECTION_T
     {
         public class PDO_DEFINITION_T
         {
@@ -1831,7 +1937,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
 
         public IReadOnlyDictionary<IO_LIST_PDO_AREA_T, PDO_DEFINITION_T> PDOs { get { return __area_pdo_definitions; } }
 
-        public IO_LIST_CONTROLLER_PDO_COLLECTION()
+        public IO_LIST_CONTROLLER_PDO_COLLECTION_T()
         {
             __area_pdo_definitions = new Dictionary<IO_LIST_PDO_AREA_T, PDO_DEFINITION_T>(6);
             __area_pdo_definitions.Add(IO_LIST_PDO_AREA_T.TX_DIAGNOSTIC, tx_pdo_diagnostic_area);
@@ -1871,6 +1977,68 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
             rx_pdo_block_area.objects.Clear();
             rx_pdo_block_area.offset_in_word = 0;
             rx_pdo_block_area.size_in_word = 0;
+        }
+    }
+
+    public class IO_LIST_INTERLOCK_LOGIC_COLLECTION_T
+    {
+        public static readonly int MAX_LAYER_OF_NESTED_LOGIC = 4;
+
+        public class LOGIC_LOOP_T
+        {
+            public string name;
+            public IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T target_object;
+            public LOGIC_STATEMENT_T statement;
+
+            public LOGIC_LOOP_T(string name, IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T target, LOGIC_STATEMENT_T statement)
+            {
+                this.name = name;
+                target_object = target;
+                this.statement = statement;
+            }
+        }
+
+        public class LOGIC_STATEMENT_T
+        {
+            public IO_LIST_INTERLOCK_LOGIC_OPERATOR_T logic_operator;
+            public List<LOGIC_ELEMEMT_T> elements;
+
+            public LOGIC_STATEMENT_T()
+            {
+                elements = new List<LOGIC_ELEMEMT_T>();
+            }
+        }
+
+        public abstract class LOGIC_ELEMEMT_T
+        {
+            public IO_LIST_INTERLOCK_LOGIC_ELEMENT_TYPE type { get; protected set; }  
+        }
+
+        public class LOGIC_OPERAND_T : LOGIC_ELEMEMT_T
+        {
+            public IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T Operand { get; private set; }
+            public LOGIC_OPERAND_T(IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T objectData)
+            {
+                type = IO_LIST_INTERLOCK_LOGIC_ELEMENT_TYPE.OPERAND;
+                Operand = objectData;
+            }
+        }
+
+        public class LOGIC_EXPRESSION_T : LOGIC_ELEMEMT_T
+        {
+            public LOGIC_STATEMENT_T expression { get; protected set; }
+            public LOGIC_EXPRESSION_T(LOGIC_STATEMENT_T expressionData)
+            {
+                type = IO_LIST_INTERLOCK_LOGIC_ELEMENT_TYPE.EXPRESSION;
+                expression = expressionData;
+            }
+        }
+
+        public List<LOGIC_LOOP_T> logic_loops = new List<LOGIC_LOOP_T>();
+
+        public void Clear()
+        {
+            logic_loops.Clear();
         }
     }
 }
