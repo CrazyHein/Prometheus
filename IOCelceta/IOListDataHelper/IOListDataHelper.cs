@@ -46,6 +46,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
         PDO_AREA_OVERLAPPED                                     = 0x00000044,
 
         INVALID_OBJECT_REFERENCE_IN_INTERLOCK                   = 0x00000050,
+        INVALID_INTERLOCK_LOGIC_STATEMENT                       = 0x00000051,
+        INVALID_INTERLOCK_LOGIC_NOT_EXPRESSION                  = 0x00000052,
+        INTERLOCK_LOGIC_STATEMENT_LAYER_OUT_OF_RANGE            = 0x00000053,
 
         MODULE_IS_REFERENCED_BY_OBJECT                          = 0x000000F0,
         OBJECT_IS_REFERENCED_BY_PDO                             = 0x000000F1,
@@ -71,6 +74,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
         XOR                     = 0x03,
         NAND                    = 0x11,
         NOR                     = 0x12,
+
+        NONE                    = 0xFF,
     }
 
     public enum IO_LIST_INTERLOCK_LOGIC_ELEMENT_TYPE : byte
@@ -135,6 +140,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
             __controller_information.Clear();
             __object_collection.Clear();
             __controller_pdo_collection.Clear();
+            __controller_interlock_collection.Clear();
         }
 
         public ControllerModelCatalogue ControllerCatalogue { get; }
@@ -604,7 +610,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
 
                         string name = null;
                         IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T objectData = null;
-                        IO_LIST_INTERLOCK_LOGIC_COLLECTION_T.LOGIC_STATEMENT_T statement = null;
+                        IO_LIST_INTERLOCK_LOGIC_COLLECTION_T.LOGIC_EXPRESSION_T statement = null;
                         uint mask = 0;
                         foreach (XmlNode node in interlock.ChildNodes)
                         {
@@ -624,8 +630,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                                     mask |= 0x00000002;
                                     break;
                                 case "Statement":
-                                    statement = __load_interlock_logic_statement(node);
-                                    mask |= 0x00000004;
+                                    statement = __load_interlock_logic_statement(node.FirstChild, null) as IO_LIST_INTERLOCK_LOGIC_COLLECTION_T.LOGIC_EXPRESSION_T;
+                                    if(statement != null)
+                                        mask |= 0x00000004;
                                     break;
                             }
                         }
@@ -634,6 +641,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                             throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.ELEMENT_MISSING, null);
                         __controller_interlock_collection.logic_loops.Add(
                             new IO_LIST_INTERLOCK_LOGIC_COLLECTION_T.LOGIC_LOOP_T(name, objectData, statement));
+                        __cal_logic_statement_object_reference(statement);
                         __object_reference_counter_of_intlk[objectData.index]++;
                     }
                 }
@@ -648,9 +656,90 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
             }
         }
 
-        private IO_LIST_INTERLOCK_LOGIC_COLLECTION_T.LOGIC_STATEMENT_T __load_interlock_logic_statement(XmlNode statementNode)
+        private IO_LIST_INTERLOCK_LOGIC_COLLECTION_T.LOGIC_ELEMEMT_T __load_interlock_logic_statement(XmlNode rootNode,
+            IO_LIST_INTERLOCK_LOGIC_COLLECTION_T.LOGIC_EXPRESSION_T rootExpression)
         {
-            return null;
+            try
+            {
+                if (rootNode.NodeType == XmlNodeType.Element)
+                {
+                    IO_LIST_INTERLOCK_LOGIC_COLLECTION_T.LOGIC_EXPRESSION_T expression = null;
+                    if (rootExpression != null)
+                    {
+                        if (rootNode.Name != "Index" && rootExpression.layer + 1 == IO_LIST_INTERLOCK_LOGIC_COLLECTION_T.MAX_LAYER_OF_NESTED_LOGIC - 1)
+                            throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INTERLOCK_LOGIC_STATEMENT_LAYER_OUT_OF_RANGE, null);
+                    }
+                    switch (rootNode.Name)
+                    {
+                        case "Index":
+                            uint id = Convert.ToUInt32(rootNode.FirstChild.Value, 16);
+                            if (rootExpression == null)
+                                throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_INTERLOCK_LOGIC_STATEMENT, null);
+                            else if (__object_collection.objects.Keys.Contains(id) == false)
+                                throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_OBJECT_REFERENCE_IN_INTERLOCK, null);
+                            return new IO_LIST_INTERLOCK_LOGIC_COLLECTION_T.LOGIC_OPERAND_T(__object_collection.objects[id], rootExpression);
+                        case "NOT":
+                            expression = new IO_LIST_INTERLOCK_LOGIC_COLLECTION_T.LOGIC_EXPRESSION_T(IO_LIST_INTERLOCK_LOGIC_OPERATOR_T.NOT, rootExpression);
+                            foreach (XmlNode node in rootNode.ChildNodes)
+                            {
+                                IO_LIST_INTERLOCK_LOGIC_COLLECTION_T.LOGIC_ELEMEMT_T element = __load_interlock_logic_statement(node, expression);
+                                if (expression.elements.Count == 0)
+                                    expression.elements.Add(element);
+                                else
+                                    throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_INTERLOCK_LOGIC_NOT_EXPRESSION, null);
+                            }
+                            return expression;
+                        case "AND":
+                            expression = new IO_LIST_INTERLOCK_LOGIC_COLLECTION_T.LOGIC_EXPRESSION_T(IO_LIST_INTERLOCK_LOGIC_OPERATOR_T.AND, rootExpression);
+                            foreach (XmlNode node in rootNode.ChildNodes)
+                                expression.elements.Add(__load_interlock_logic_statement(node, expression));
+                            return expression;
+                        case "OR":
+                            expression = new IO_LIST_INTERLOCK_LOGIC_COLLECTION_T.LOGIC_EXPRESSION_T(IO_LIST_INTERLOCK_LOGIC_OPERATOR_T.OR, rootExpression);
+                            foreach (XmlNode node in rootNode.ChildNodes)
+                                expression.elements.Add(__load_interlock_logic_statement(node, expression));
+                            return expression;
+                        case "NAND":
+                            expression = new IO_LIST_INTERLOCK_LOGIC_COLLECTION_T.LOGIC_EXPRESSION_T(IO_LIST_INTERLOCK_LOGIC_OPERATOR_T.NAND, rootExpression);
+                            foreach (XmlNode node in rootNode.ChildNodes)
+                                expression.elements.Add(__load_interlock_logic_statement(node, expression));
+                            return expression;
+                        case "NOR":
+                            expression = new IO_LIST_INTERLOCK_LOGIC_COLLECTION_T.LOGIC_EXPRESSION_T(IO_LIST_INTERLOCK_LOGIC_OPERATOR_T.NOR, rootExpression);
+                            foreach (XmlNode node in rootNode.ChildNodes)
+                                expression.elements.Add(__load_interlock_logic_statement(node, expression));
+                            return expression;
+                        case "XOR":
+                            expression = new IO_LIST_INTERLOCK_LOGIC_COLLECTION_T.LOGIC_EXPRESSION_T(IO_LIST_INTERLOCK_LOGIC_OPERATOR_T.XOR, rootExpression);
+                            foreach (XmlNode node in rootNode.ChildNodes)
+                                expression.elements.Add(__load_interlock_logic_statement(node, expression));
+                            return expression;
+                        default:
+                            throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_INTERLOCK_LOGIC_STATEMENT, null);
+                    }
+                }
+                else
+                    throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_INTERLOCK_LOGIC_STATEMENT, null);
+            }
+            catch (IOListParseExcepetion e)
+            {
+                throw e;
+            }
+            catch (Exception e)
+            {
+                throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.FILE_DATA_EXCEPTION, e);
+            }
+        }
+
+        private void __cal_logic_statement_object_reference(IO_LIST_INTERLOCK_LOGIC_COLLECTION_T.LOGIC_EXPRESSION_T statement)
+        {
+            foreach(var o in statement.elements)
+            {
+                if (o.type == IO_LIST_INTERLOCK_LOGIC_ELEMENT_TYPE.OPERAND)
+                    __object_reference_counter_of_intlk[(o as IO_LIST_INTERLOCK_LOGIC_COLLECTION_T.LOGIC_OPERAND_T).Operand.index]++;
+                else
+                    __cal_logic_statement_object_reference(o as IO_LIST_INTERLOCK_LOGIC_COLLECTION_T.LOGIC_EXPRESSION_T);
+            }
         }
 
         public void ModuleDataVerification(IO_LIST_CONTROLLER_INFORMATION_T.MODULE_T moduleData, bool ignoreDuplicate = false)
@@ -833,6 +922,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                     __controller_pdo_collection.Clear();
                     throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.PDO_AREA_OVERLAPPED, null);
                 }
+
+                infoNode = xmlDoc.SelectSingleNode("/AMECIOList/Interlocks");
+                __load_interlock_logics(infoNode);
             }
             catch (IOListParseExcepetion e)
             {
@@ -1389,7 +1481,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
             }
         }
 
-        public int __binding_module_comparison(IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T objectData0, IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T objectData1)
+        private int __binding_module_comparison(IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T objectData0, IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T objectData1)
         {
             if (objectData0.binding.enabled == false && objectData1.binding.enabled == false)
                 return 0;
@@ -1411,6 +1503,11 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                     res = -1;
             }
             return res;
+        }
+
+        public IReadOnlyList<IO_LIST_INTERLOCK_LOGIC_COLLECTION_T.LOGIC_LOOP_T> InterlockLoops
+        {
+            get { return __controller_interlock_collection.logic_loops; }
         }
 
         public void Save(IEnumerable<string> extensionModules, IEnumerable<string> ethernetModules, IEnumerable<uint> objects, string fileName)
@@ -1982,15 +2079,15 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
 
     public class IO_LIST_INTERLOCK_LOGIC_COLLECTION_T
     {
-        public static readonly int MAX_LAYER_OF_NESTED_LOGIC = 4;
+        public static readonly int MAX_LAYER_OF_NESTED_LOGIC = 5;
 
         public class LOGIC_LOOP_T
         {
-            public string name;
-            public IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T target_object;
-            public LOGIC_STATEMENT_T statement;
+            public string name { get; private set; }
+            public IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T target_object { get; private set; }
+            public LOGIC_EXPRESSION_T statement { get; private set; }
 
-            public LOGIC_LOOP_T(string name, IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T target, LOGIC_STATEMENT_T statement)
+            public LOGIC_LOOP_T(string name, IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T target, LOGIC_EXPRESSION_T statement)
             {
                 this.name = name;
                 target_object = target;
@@ -1998,39 +2095,40 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
             }
         }
 
-        public class LOGIC_STATEMENT_T
-        {
-            public IO_LIST_INTERLOCK_LOGIC_OPERATOR_T logic_operator;
-            public List<LOGIC_ELEMEMT_T> elements;
-
-            public LOGIC_STATEMENT_T()
-            {
-                elements = new List<LOGIC_ELEMEMT_T>();
-            }
-        }
-
         public abstract class LOGIC_ELEMEMT_T
         {
-            public IO_LIST_INTERLOCK_LOGIC_ELEMENT_TYPE type { get; protected set; }  
+            public IO_LIST_INTERLOCK_LOGIC_ELEMENT_TYPE type { get; private set; }
+            public LOGIC_EXPRESSION_T root { get; private set; }
+            public int layer { get; private set; }
+
+            public LOGIC_ELEMEMT_T(IO_LIST_INTERLOCK_LOGIC_ELEMENT_TYPE type, LOGIC_EXPRESSION_T root)
+            {
+                this.type = type;
+                this.root = root;
+                if (root == null)
+                    this.layer = 0;
+                else
+                    this.layer = root.layer + 1;
+            }
         }
 
         public class LOGIC_OPERAND_T : LOGIC_ELEMEMT_T
         {
             public IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T Operand { get; private set; }
-            public LOGIC_OPERAND_T(IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T objectData)
+            public LOGIC_OPERAND_T(IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T objectData, LOGIC_EXPRESSION_T root):base(IO_LIST_INTERLOCK_LOGIC_ELEMENT_TYPE.OPERAND, root)
             {
-                type = IO_LIST_INTERLOCK_LOGIC_ELEMENT_TYPE.OPERAND;
                 Operand = objectData;
             }
         }
 
         public class LOGIC_EXPRESSION_T : LOGIC_ELEMEMT_T
         {
-            public LOGIC_STATEMENT_T expression { get; protected set; }
-            public LOGIC_EXPRESSION_T(LOGIC_STATEMENT_T expressionData)
+            public List<LOGIC_ELEMEMT_T> elements { get; private set; }
+            public IO_LIST_INTERLOCK_LOGIC_OPERATOR_T logic_operator { get; private set; }
+            public LOGIC_EXPRESSION_T(IO_LIST_INTERLOCK_LOGIC_OPERATOR_T op, LOGIC_EXPRESSION_T root) : base(IO_LIST_INTERLOCK_LOGIC_ELEMENT_TYPE.EXPRESSION, root)
             {
-                type = IO_LIST_INTERLOCK_LOGIC_ELEMENT_TYPE.EXPRESSION;
-                expression = expressionData;
+                logic_operator = op;
+                elements = new List<LOGIC_ELEMEMT_T>();
             }
         }
 

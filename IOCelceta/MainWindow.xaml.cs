@@ -119,11 +119,14 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                 __tab_object_collection.Content = new ObjectCollectionDataControl(objectCollectionDataModel);
                 PDOCollectionDataModel pdoCollectionDataModel = new PDOCollectionDataModel(__io_list_data_helper, objectCollectionDataModel);
                 __tab_pdo_collection.Content = new PDOCollectionDataControl(pdoCollectionDataModel);
+                InterlockCollectionDataModel interlockCollectionDataModel = new InterlockCollectionDataModel(__io_list_data_helper, objectCollectionDataModel);
+                __tab_interlock_collection.Content = new InterlockCollectionDataControl(interlockCollectionDataModel);
 
                 ((__tab_target_inforamtion.Content as TargetInformationDataControl).DataContext as TargetInformationDataModel).UpdateDataModel();
                 ((__tab_controller_inforamtion.Content as ControllerInformationDataControl).DataContext as ControllerInformationDataModel).UpdateDataModel();
                 ((__tab_object_collection.Content as ObjectCollectionDataControl).DataContext as ObjectCollectionDataModel).UpdateDataModel();
                 ((__tab_pdo_collection.Content as PDOCollectionDataControl).DataContext as PDOCollectionDataModel).UpdateDataModel();
+                ((__tab_interlock_collection.Content as InterlockCollectionDataControl).DataContext as InterlockCollectionDataModel).UpdateDataModel();
             }
         }
 
@@ -144,11 +147,14 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
             __tab_object_collection.Content = new ObjectCollectionDataControl(objectCollectionDataModel);
             PDOCollectionDataModel pdoCollectionDataModel = new PDOCollectionDataModel(__io_list_data_helper, objectCollectionDataModel);
             __tab_pdo_collection.Content = new PDOCollectionDataControl(pdoCollectionDataModel);
+            InterlockCollectionDataModel interlockCollectionDataModel = new InterlockCollectionDataModel(__io_list_data_helper, objectCollectionDataModel);
+            __tab_interlock_collection.Content = new InterlockCollectionDataControl(interlockCollectionDataModel);
 
             ((__tab_target_inforamtion.Content as TargetInformationDataControl).DataContext as TargetInformationDataModel).UpdateDataModel();
             ((__tab_controller_inforamtion.Content as ControllerInformationDataControl).DataContext as ControllerInformationDataModel).UpdateDataModel();
             ((__tab_object_collection.Content as ObjectCollectionDataControl).DataContext as ObjectCollectionDataModel).UpdateDataModel();
             ((__tab_pdo_collection.Content as PDOCollectionDataControl).DataContext as PDOCollectionDataModel).UpdateDataModel();
+            ((__tab_interlock_collection.Content as InterlockCollectionDataControl).DataContext as InterlockCollectionDataModel).UpdateDataModel();
         }
 
         private void __save_io_list_file_executed(object sender, ExecutedRoutedEventArgs e)

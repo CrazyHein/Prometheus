@@ -76,6 +76,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="IOListDataControl\InterlockCollectionDataControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="IOListDataControl\ObjectCollectionDataControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -117,6 +121,10 @@
     <Compile Include="IOListDataControl\ControllerModuleDataControl.xaml.cs">
       <DependentUpon>ControllerModuleDataControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="IOListDataControl\InterlockCollectionDataControl.xaml.cs">
+      <DependentUpon>InterlockCollectionDataControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="IOListDataControl\InterlockCollectionDataModel.cs" />
     <Compile Include="IOListDataControl\IOListDataControlCommand.cs" />
     <Compile Include="IOListDataControl\IOListDataModel.cs" />
     <Compile Include="IOListDataControl\ObjectCollectionDataControl.xaml.cs">
@@ -232,6 +240,9 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="img\group.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="img\lock.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
