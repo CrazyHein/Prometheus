@@ -46,7 +46,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
         PDO_AREA_OVERLAPPED                                     = 0x00000044,
 
         INVALID_OBJECT_REFERENCE_IN_INTERLOCK                   = 0x00000050,
-        INVALID_INTERLOCK_LOGIC_STATEMENT                       = 0x00000051,
+        INVALID_INTERLOCK_LOGIC_EXPRESSION                       = 0x00000051,
         INVALID_INTERLOCK_LOGIC_NOT_EXPRESSION                  = 0x00000052,
         INTERLOCK_LOGIC_STATEMENT_LAYER_OUT_OF_RANGE            = 0x00000053,
 
@@ -609,7 +609,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                             continue;
 
                         string name = null;
-                        IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T objectData = null;
+                        List<IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T> objectDatas = null;
                         IO_LIST_INTERLOCK_LOGIC_COLLECTION_T.LOGIC_EXPRESSION_T statement = null;
                         uint mask = 0;
                         foreach (XmlNode node in interlock.ChildNodes)
@@ -623,10 +623,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                                     mask |= 0x00000001;
                                     break;
                                 case "Target":
-                                    uint id = Convert.ToUInt32(node.FirstChild.Value, 16);
-                                    if (__object_collection.objects.Keys.Contains(id) == false)
-                                        throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_OBJECT_REFERENCE_IN_INTERLOCK, null);
-                                    objectData = __object_collection.objects[id];
+                                    objectDatas = __load_interlock_logic_target(node);
                                     mask |= 0x00000002;
                                     break;
                                 case "Statement":
@@ -639,12 +636,43 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
 
                         if(mask != 0x00000007)
                             throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.ELEMENT_MISSING, null);
-                        __controller_interlock_collection.logic_loops.Add(
-                            new IO_LIST_INTERLOCK_LOGIC_COLLECTION_T.LOGIC_LOOP_T(name, objectData, statement));
+
+                        __controller_interlock_collection.logic_definitions.Add(
+                            new IO_LIST_INTERLOCK_LOGIC_COLLECTION_T.LOGIC_DEFINITION_T(name, objectDatas, statement));
                         __cal_logic_statement_object_reference(statement);
-                        __object_reference_counter_of_intlk[objectData.index]++;
+                        foreach(var o in objectDatas)
+                            __object_reference_counter_of_intlk[o.index]++;
                     }
                 }
+            }
+            catch (IOListParseExcepetion e)
+            {
+                throw e;
+            }
+            catch (Exception e)
+            {
+                throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.FILE_DATA_EXCEPTION, e);
+            }
+        }
+
+        private List<IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T> __load_interlock_logic_target(XmlNode rootNode)
+        {
+            try
+            {
+                var objects = new List<IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T>();
+                if(rootNode.NodeType == XmlNodeType.Element)
+                {
+                    foreach(XmlNode index in rootNode.ChildNodes)
+                    {
+                        if(index.Name == "Index" && index.NodeType == XmlNodeType.Element)
+                        {
+                            uint id = Convert.ToUInt32(index.FirstChild.Value, 16);
+                            InterlockLogicTargetObjectDataVerification(id);
+                            objects.Add(__object_collection.objects[id]);
+                        }
+                    }
+                }
+                return objects;
             }
             catch (IOListParseExcepetion e)
             {
@@ -674,9 +702,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                         case "Index":
                             uint id = Convert.ToUInt32(rootNode.FirstChild.Value, 16);
                             if (rootExpression == null)
-                                throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_INTERLOCK_LOGIC_STATEMENT, null);
-                            else if (__object_collection.objects.Keys.Contains(id) == false)
-                                throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_OBJECT_REFERENCE_IN_INTERLOCK, null);
+                                throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_INTERLOCK_LOGIC_EXPRESSION, null);
+                            InterlockLogicOperandDataVerification(id);
                             return new IO_LIST_INTERLOCK_LOGIC_COLLECTION_T.LOGIC_OPERAND_T(__object_collection.objects[id], rootExpression);
                         case "NOT":
                             expression = new IO_LIST_INTERLOCK_LOGIC_COLLECTION_T.LOGIC_EXPRESSION_T(IO_LIST_INTERLOCK_LOGIC_OPERATOR_T.NOT, rootExpression);
@@ -715,11 +742,11 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                                 expression.elements.Add(__load_interlock_logic_statement(node, expression));
                             return expression;
                         default:
-                            throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_INTERLOCK_LOGIC_STATEMENT, null);
+                            throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_INTERLOCK_LOGIC_EXPRESSION, null);
                     }
                 }
                 else
-                    throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_INTERLOCK_LOGIC_STATEMENT, null);
+                    throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_INTERLOCK_LOGIC_EXPRESSION, null);
             }
             catch (IOListParseExcepetion e)
             {
@@ -739,6 +766,64 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                     __object_reference_counter_of_intlk[(o as IO_LIST_INTERLOCK_LOGIC_COLLECTION_T.LOGIC_OPERAND_T).Operand.index]++;
                 else
                     __cal_logic_statement_object_reference(o as IO_LIST_INTERLOCK_LOGIC_COLLECTION_T.LOGIC_EXPRESSION_T);
+            }
+        }
+
+        public void InterlockLogicTargetObjectDataVerification(List<IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T> datas)
+        {
+            foreach(var o in datas)
+            {
+                if ((o.index & 0x80000000) != 0 || o.index  >= 0x00002000)
+                    throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_OBJECT_REFERENCE_IN_INTERLOCK, null);
+                else if (__object_collection.objects.Keys.Contains(o.index) == false)
+                    throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_OBJECT_REFERENCE_IN_INTERLOCK, null);
+                else if(__object_collection.objects[o.index] != o)
+                    throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_OBJECT_REFERENCE_IN_INTERLOCK, null);
+            }
+        }
+
+        public void InterlockLogicTargetObjectDataVerification(IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T data)
+        {
+            if(data == null)
+                throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_OBJECT_REFERENCE_IN_INTERLOCK, null);
+            else if ((data.index & 0x80000000) != 0 || data.index >= 0x00002000)
+                throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_OBJECT_REFERENCE_IN_INTERLOCK, null);
+            else if (__object_collection.objects.Keys.Contains(data.index) == false)
+                throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_OBJECT_REFERENCE_IN_INTERLOCK, null);
+            else if (__object_collection.objects[data.index] != data)
+                throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_OBJECT_REFERENCE_IN_INTERLOCK, null);
+        }
+
+        public void InterlockLogicTargetObjectDataVerification(uint objectIndex)
+        {
+            if ((objectIndex & 0x80000000) != 0 || objectIndex >= 0x00002000)
+                throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_OBJECT_REFERENCE_IN_INTERLOCK, null);
+            else if (__object_collection.objects.Keys.Contains(objectIndex) == false)
+                throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_OBJECT_REFERENCE_IN_INTERLOCK, null);
+        }
+
+        public void InterlockLogicOperandDataVerification(uint objectIndex)
+        {
+            uint id = objectIndex & 0x7FFFFFFF;
+            if (id >= 0x00002000)
+                throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_OBJECT_REFERENCE_IN_INTERLOCK, null);
+            else if (__object_collection.objects.Keys.Contains(objectIndex) == false)
+                throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_OBJECT_REFERENCE_IN_INTERLOCK, null);
+        }
+
+        public void InterlockLogicExpressionDataVerification(IO_LIST_INTERLOCK_LOGIC_COLLECTION_T.LOGIC_ELEMEMT_T element)
+        {
+            if(element == null)
+                throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_INTERLOCK_LOGIC_EXPRESSION, null);
+            else if (element.type == IO_LIST_INTERLOCK_LOGIC_ELEMENT_TYPE.OPERAND && element.root == null)
+                throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_INTERLOCK_LOGIC_EXPRESSION, null);
+            else if(element.type == IO_LIST_INTERLOCK_LOGIC_ELEMENT_TYPE.EXPRESSION)
+            {
+                IO_LIST_INTERLOCK_LOGIC_COLLECTION_T.LOGIC_EXPRESSION_T express = element as IO_LIST_INTERLOCK_LOGIC_COLLECTION_T.LOGIC_EXPRESSION_T;
+                if(express.logic_operator == IO_LIST_INTERLOCK_LOGIC_OPERATOR_T.NOT && express.elements.Count >= 1)
+                    throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_INTERLOCK_LOGIC_NOT_EXPRESSION, null);
+                foreach (var e in express.elements)
+                    InterlockLogicExpressionDataVerification(e);
             }
         }
 
@@ -1505,9 +1590,45 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
             return res;
         }
 
-        public IReadOnlyList<IO_LIST_INTERLOCK_LOGIC_COLLECTION_T.LOGIC_LOOP_T> InterlockLoops
+        public IReadOnlyList<IO_LIST_INTERLOCK_LOGIC_COLLECTION_T.LOGIC_DEFINITION_T> InterlockDefinitions
         {
-            get { return __controller_interlock_collection.logic_loops; }
+            get { return __controller_interlock_collection.logic_definitions; }
+        }
+
+        public void InsertInterlockLogicTargetObject(int logicIndex, int targetIndex, uint objectIndex)
+        {
+            InterlockLogicTargetObjectDataVerification(objectIndex);
+            try
+            {
+                __controller_interlock_collection.logic_definitions[logicIndex].target_objects.Insert(targetIndex, __object_collection.objects[objectIndex]);
+                __object_reference_counter_of_intlk[objectIndex]--;
+            }
+            catch (IOListParseExcepetion e)
+            {
+                throw e;
+            }
+            catch (Exception e)
+            {
+                throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.FILE_DATA_EXCEPTION, e);
+            }
+        }
+
+        public void AppendInterlockLogicTargetObject(int logicIndex, uint objectIndex)
+        {
+            InterlockLogicTargetObjectDataVerification(objectIndex);
+            try
+            {
+                __controller_interlock_collection.logic_definitions[logicIndex].target_objects.Add(__object_collection.objects[objectIndex]);
+                __object_reference_counter_of_intlk[objectIndex]--;
+            }
+            catch (IOListParseExcepetion e)
+            {
+                throw e;
+            }
+            catch (Exception e)
+            {
+                throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.FILE_DATA_EXCEPTION, e);
+            }
         }
 
         public void Save(IEnumerable<string> extensionModules, IEnumerable<string> ethernetModules, IEnumerable<uint> objects, string fileName)
@@ -2081,16 +2202,16 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
     {
         public static readonly int MAX_LAYER_OF_NESTED_LOGIC = 5;
 
-        public class LOGIC_LOOP_T
+        public class LOGIC_DEFINITION_T
         {
             public string name { get; private set; }
-            public IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T target_object { get; private set; }
+            public List<IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T> target_objects { get; private set; }
             public LOGIC_EXPRESSION_T statement { get; private set; }
 
-            public LOGIC_LOOP_T(string name, IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T target, LOGIC_EXPRESSION_T statement)
+            public LOGIC_DEFINITION_T(string name, List<IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T> target, LOGIC_EXPRESSION_T statement)
             {
                 this.name = name;
-                target_object = target;
+                target_objects = target;
                 this.statement = statement;
             }
         }
@@ -2132,11 +2253,11 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
             }
         }
 
-        public List<LOGIC_LOOP_T> logic_loops = new List<LOGIC_LOOP_T>();
+        public List<LOGIC_DEFINITION_T> logic_definitions = new List<LOGIC_DEFINITION_T>();
 
         public void Clear()
         {
-            logic_loops.Clear();
+            logic_definitions.Clear();
         }
     }
 }

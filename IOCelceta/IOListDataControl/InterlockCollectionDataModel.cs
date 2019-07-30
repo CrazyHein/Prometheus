@@ -10,12 +10,17 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
     public class InterlockCollectionDataModel : IOListDataModel
     {
         private ObjectCollectionDataModel __object_collection_data_model;
-        private ObservableCollection<InterlocklogicLoop> __interlock_logic_loops;
+        private ObservableCollection<InterlocklogicDefinition> __interlock_logic_definitions;
 
         public InterlockCollectionDataModel(IOListDataHelper helper, ObjectCollectionDataModel objectCollectionDataModel) : base(helper)
         {
             __object_collection_data_model = objectCollectionDataModel;
-            __interlock_logic_loops = new ObservableCollection<InterlocklogicLoop>();
+            __interlock_logic_definitions = new ObservableCollection<InterlocklogicDefinition>();
+        }
+
+        public IReadOnlyCollection<InterlocklogicDefinition> InterlockLogicDefinitions
+        {
+            get { return __interlock_logic_definitions; }
         }
 
         public override void UpdateDataHelper()
@@ -25,14 +30,16 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
 
         public override void UpdateDataModel()
         {
-            foreach(var loop in _data_helper.InterlockLoops)
+            foreach(var def in _data_helper.InterlockDefinitions)
             {
-                ObjectItemDataModel objectDataModel = __object_collection_data_model.ObjectDictionary[loop.target_object.index];
+                ObservableCollection<ObjectItemDataModel> objectDataModels = new ObservableCollection<ObjectItemDataModel>();
+                foreach (var o in def.target_objects)
+                    objectDataModels.Add(__object_collection_data_model.ObjectDictionary[o.index]);
 
                 InterlockLogicExpression expressionDataModel =
-                    __load_interlock_logic_statement(loop.statement, null) as InterlockLogicExpression;
+                    __load_interlock_logic_statement(def.statement, null) as InterlockLogicExpression;
 
-                __interlock_logic_loops.Add(new InterlocklogicLoop(loop.name, objectDataModel, expressionDataModel));
+                __interlock_logic_definitions.Add(new InterlocklogicDefinition(def.name, objectDataModels, expressionDataModel));
             }
         }
 
@@ -49,7 +56,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
                 IO_LIST_INTERLOCK_LOGIC_COLLECTION_T.LOGIC_EXPRESSION_T expression = element as IO_LIST_INTERLOCK_LOGIC_COLLECTION_T.LOGIC_EXPRESSION_T;
                 InterlockLogicExpression expressionDataModel = new InterlockLogicExpression(expression.logic_operator, root);
                 foreach (var e in expression.elements)
-                    expressionDataModel.elements.Add(__load_interlock_logic_statement(e, expressionDataModel));
+                    expressionDataModel.Elements.Add(__load_interlock_logic_statement(e, expressionDataModel));
                 return expressionDataModel;
             }
         }
@@ -83,25 +90,25 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
     public class InterlockLogicExpression : InterlockLogicElement
     {
         public IO_LIST_INTERLOCK_LOGIC_OPERATOR_T LogicOperator { get; private set; }
-        public ObservableCollection<InterlockLogicElement> elements { get; private set; }
+        public ObservableCollection<InterlockLogicElement> Elements { get; private set; }
 
         public InterlockLogicExpression(IO_LIST_INTERLOCK_LOGIC_OPERATOR_T op, InterlockLogicExpression root):base(IO_LIST_INTERLOCK_LOGIC_ELEMENT_TYPE.EXPRESSION, root)
         {
             LogicOperator = op;
-            elements = new ObservableCollection<InterlockLogicElement>();
+            Elements = new ObservableCollection<InterlockLogicElement>();
         }
     }
 
-    public class InterlocklogicLoop
+    public class InterlocklogicDefinition
     {
         public string Name { get; private set; }
-        public ObjectItemDataModel TargetObjectDataModel { get; private set; }
+        public ObservableCollection<ObjectItemDataModel> TargetObjects { get; private set; }
         public InterlockLogicExpression Statement { get; private set; }
 
-        public InterlocklogicLoop(string name, ObjectItemDataModel target, InterlockLogicExpression statement)
+        public InterlocklogicDefinition(string name, ObservableCollection<ObjectItemDataModel> targets, InterlockLogicExpression statement)
         {
             Name = name;
-            TargetObjectDataModel = target;
+            TargetObjects = targets;
             Statement = statement;
         }
     }

@@ -87,8 +87,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             {
                 index = dataModel.Index,
                 variable = dataModel.VariableSelection,
-                binding = { enabled = dataModel.BindingEnable, module = dataModel.BindingModuleSelection, channel_name = dataModel.BindingChannelName, channel_index = dataModel.BindingChannelIndex },
-                //converter = { enabled = dataModel.ConverterEnable, data_type = dataModel.ConverterDataTypeSelection, up_scale = dataModel.ConverterUpScale, down_scale = dataModel.ConverterDownScale, unit_name = dataModel.ConverterUnitName }
+                binding = { enabled = dataModel.BindingEnable, module = dataModel.BindingModuleSelection, channel_name = dataModel.BindingChannelName, channel_index = dataModel.BindingChannelIndex },       
                 converter = { enabled = dataModel.ConverterEnable, up_scale = dataModel.ConverterUpScale, down_scale = dataModel.ConverterDownScale, unit_name = dataModel.ConverterUnitName }
             };
             _data_helper.AddObjectData(objectItem);
@@ -106,7 +105,6 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
                 index = dataModel.Index,
                 variable = dataModel.VariableSelection,
                 binding = { enabled = dataModel.BindingEnable, module = dataModel.BindingModuleSelection, channel_name = dataModel.BindingChannelName, channel_index = dataModel.BindingChannelIndex },
-                //converter = { enabled = dataModel.ConverterEnable, data_type = dataModel.ConverterDataTypeSelection, up_scale = dataModel.ConverterUpScale, down_scale = dataModel.ConverterDownScale, unit_name = dataModel.ConverterUnitName }
                 converter = { enabled = dataModel.ConverterEnable, up_scale = dataModel.ConverterUpScale, down_scale = dataModel.ConverterDownScale, unit_name = dataModel.ConverterUnitName }
             };
             _data_helper.ModifyObjectData(index, objectItem);
@@ -323,6 +321,14 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
         }
 
         public ObjectCollectionDataModel Host { get; private set; }
+
+        public override string ToString()
+        {
+            if((Index & 0x80000000) == 0)
+                return string.Format("[0x{0:X8} : {1}] --> [{2} {3}]", Index, VariableName, Binding, Converter);
+            else
+                return string.Format("[0x{0:X8} : {1}] <-- [{2} {3}]", Index, VariableName, Binding, Converter);
+        }
     }
 
     class ObjectItemBindingModule : IValueConverter

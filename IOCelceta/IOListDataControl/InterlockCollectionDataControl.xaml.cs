@@ -24,6 +24,45 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
         {
             InitializeComponent();
             DataContext = dataModel;
+
+            __lsb_interlock_logic_definitions.ItemsSource = dataModel.InterlockLogicDefinitions;
+        }
+
+
+
+        private void __on_add_element_command_executed(object sender, ExecutedRoutedEventArgs e)
+        {  
+            if(sender is ListBox)
+            {
+                var lsb = sender as ListBox;
+            }        
+        }
+
+        private void __on_insert_element_before_command_executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            if (sender is ListBox)
+            {
+                var lsb = sender as ListBox;
+                string info = string.Format("Insert Before {0}", lsb.SelectedIndex);
+                MessageBox.Show(info);
+            }
+        }
+
+        private void __on_add_element_can_executed(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = true;
+        }
+
+        private void __on_insert_element_before_can_executed(object sender, CanExecuteRoutedEventArgs e)
+        {
+            if (sender is ListBox)
+            {
+                var lsb = sender as ListBox;
+                if (lsb.SelectedIndex != -1)
+                    e.CanExecute = true;
+            }
+            else
+                e.CanExecute = false;
         }
     }
 }
