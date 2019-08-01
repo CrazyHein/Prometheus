@@ -120,14 +120,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             if (itemDataModel is ControllerExtensionModuleItemDataModel)
             {
                 var dataModel = itemDataModel as ControllerExtensionModuleItemDataModel;
-                var module = new IO_LIST_CONTROLLER_INFORMATION_T.MODULE_T()
-                {
-                    model = dataModel.Model,
-                    reference_name = dataModel.ReferenceName,
-                    local_address = dataModel.LocalAddress,
-                    ip_address = "127.0.0.1",
-                    port = 5010
-                };
+                var module = new IO_LIST_CONTROLLER_INFORMATION_T.MODULE_T(dataModel.Model, dataModel.ReferenceName, dataModel.LocalAddress);
                 _data_helper.AddControllerModule(module);
                 if (pos == -1)
                     __extension_modules.Add(dataModel);
@@ -138,14 +131,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             else if (itemDataModel is ControllerEthernetModuleItemDataModel)
             {
                 var dataModel = itemDataModel as ControllerEthernetModuleItemDataModel;
-                var module = new IO_LIST_CONTROLLER_INFORMATION_T.MODULE_T()
-                {
-                    model = dataModel.Model,
-                    reference_name = dataModel.ReferenceName,
-                    local_address = 0,
-                    ip_address = dataModel.IPAddress,
-                    port = dataModel.Port
-                };
+                var module = new IO_LIST_CONTROLLER_INFORMATION_T.MODULE_T(dataModel.Model, dataModel.ReferenceName, dataModel.IPAddress, dataModel.Port);
                 _data_helper.AddControllerModule(module);
                 if (pos == -1)
                     __ethernet_modules.Add(dataModel);
@@ -161,14 +147,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             {
                 var sourceDataModel = dataModel as ControllerExtensionModuleItemDataModel;
                 var destDataModel = __controller_module_dictionary[referenceName] as ControllerExtensionModuleItemDataModel;
-                var module = new IO_LIST_CONTROLLER_INFORMATION_T.MODULE_T()
-                {
-                    model = sourceDataModel.Model,
-                    reference_name = sourceDataModel.ReferenceName,
-                    local_address = sourceDataModel.LocalAddress,
-                    ip_address = "127.0.0.1",
-                    port = 5010
-                };
+                var module = new IO_LIST_CONTROLLER_INFORMATION_T.MODULE_T(sourceDataModel.Model, sourceDataModel.ReferenceName, sourceDataModel.LocalAddress);
                 _data_helper.ModifyControllerModule(referenceName, module);
                 destDataModel.Model = sourceDataModel.Model;
                 destDataModel.ReferenceName = sourceDataModel.ReferenceName;
@@ -183,14 +162,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             {
                 var sourceDataModel = dataModel as ControllerEthernetModuleItemDataModel;
                 var destDataModel = __controller_module_dictionary[referenceName] as ControllerEthernetModuleItemDataModel;
-                var module = new IO_LIST_CONTROLLER_INFORMATION_T.MODULE_T()
-                {
-                    model = sourceDataModel.Model,
-                    reference_name = sourceDataModel.ReferenceName,
-                    local_address = 0,
-                    ip_address = sourceDataModel.IPAddress,
-                    port = sourceDataModel.Port
-                };
+                var module = new IO_LIST_CONTROLLER_INFORMATION_T.MODULE_T(sourceDataModel.Model, sourceDataModel.ReferenceName, sourceDataModel.IPAddress, sourceDataModel.Port);
                 _data_helper.ModifyControllerModule(referenceName, module);
                 destDataModel.Model = sourceDataModel.Model;
                 destDataModel.ReferenceName = sourceDataModel.ReferenceName;

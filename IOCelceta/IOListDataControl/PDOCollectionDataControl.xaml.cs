@@ -25,6 +25,16 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
         private ListCollectionView __available_objects_view;
         private ObjectItemFilter __object_item_filter;
 
+        enum __INTLK_LOGIC_DEFINITION_LIST_TASK
+        {
+            EDIT,
+            APPEND,
+            INSERT
+        }
+
+        private __INTLK_LOGIC_DEFINITION_LIST_TASK __task;
+        private int __task_parameter;
+
         public PDOCollectionDataControl(PDOCollectionDataModel dataModel)
         {
             InitializeComponent();
@@ -52,18 +62,29 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
 
         private void __on_add_element_command_executed(object sender, ExecutedRoutedEventArgs e)
         {
-            IO_LIST_PDO_AREA_T area = (IO_LIST_PDO_AREA_T)((__tab_pdo_container.SelectedItem as TabItem).Tag);
+            object tag = (__tab_pdo_container.SelectedItem as TabItem).Tag;   
             try
             {
-                (DataContext as PDOCollectionDataModel).AppendPDOMapping(area, __lsv_object_collection.SelectedItem as ObjectItemDataModel);
+                if (tag != null)
+                {
+                    IO_LIST_PDO_AREA_T area = (IO_LIST_PDO_AREA_T)((__tab_pdo_container.SelectedItem as TabItem).Tag);
+                    (DataContext as PDOCollectionDataModel).AppendPDOMapping(area, __lsv_object_collection.SelectedItem as ObjectItemDataModel);
+                }
+                else
+                {
+                    __task = __INTLK_LOGIC_DEFINITION_LIST_TASK.APPEND;
+                    __task_parameter = 0;
+                    __lsb_interlock_logic_definitions.IsEnabled = false;
+                    __grid_edit_intlk_logic_definition.IsEnabled = true;
+                }
             }
             catch (IOListParseExcepetion exception)
             {
                 string message;
                 if (exception.ErrorCode == IO_LIST_FILE_ERROR_T.FILE_DATA_EXCEPTION)
-                    message = string.Format("At least one unexpected error occurred while adding controller pdo mappings . \n{0}", exception.DataException.ToString());
+                    message = string.Format("At least one unexpected error occurred while adding controller pdo/intlk mappings . \n{0}", exception.DataException.ToString());
                 else
-                    message = string.Format("At least one unexpected error occurred while adding controller pdo mappings . \n{0}", exception.ErrorCode.ToString());
+                    message = string.Format("At least one unexpected error occurred while adding controller pdo/intlk mappings . \n{0}", exception.ErrorCode.ToString());
 
                 MessageBox.Show(message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
@@ -84,9 +105,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
                 {
                     string message;
                     if (exception.ErrorCode == IO_LIST_FILE_ERROR_T.FILE_DATA_EXCEPTION)
-                        message = string.Format("At least one unexpected error occurred while removing controller pdo mappings . \n{0}", exception.DataException.ToString());
+                        message = string.Format("At least one unexpected error occurred while removing controller pdo/intlk mappings . \n{0}", exception.DataException.ToString());
                     else
-                        message = string.Format("At least one unexpected error occurred while removing controller pdo mappings . \n{0}", exception.ErrorCode.ToString());
+                        message = string.Format("At least one unexpected error occurred while removing controller pdo/intlk mappings . \n{0}", exception.ErrorCode.ToString());
 
                     MessageBox.Show(message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
@@ -128,9 +149,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             {
                 string message;
                 if (exception.ErrorCode == IO_LIST_FILE_ERROR_T.FILE_DATA_EXCEPTION)
-                    message = string.Format("At least one unexpected error occurred while inserting controller pdo mappings . \n{0}", exception.DataException.ToString());
+                    message = string.Format("At least one unexpected error occurred while inserting controller pdo/intlk mappings . \n{0}", exception.DataException.ToString());
                 else
-                    message = string.Format("At least one unexpected error occurred while inserting controller pdo mappings . \n{0}", exception.ErrorCode.ToString());
+                    message = string.Format("At least one unexpected error occurred while inserting controller pdo/intlk mappings . \n{0}", exception.ErrorCode.ToString());
 
                 MessageBox.Show(message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
@@ -151,9 +172,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             {
                 string message;
                 if (exception.ErrorCode == IO_LIST_FILE_ERROR_T.FILE_DATA_EXCEPTION)
-                    message = string.Format("At least one unexpected error occurred while swapping controller pdo mappings . \n{0}", exception.DataException.ToString());
+                    message = string.Format("At least one unexpected error occurred while swapping controller pdo/intlk mappings . \n{0}", exception.DataException.ToString());
                 else
-                    message = string.Format("At least one unexpected error occurred while swapping controller pdo mappings . \n{0}", exception.ErrorCode.ToString());
+                    message = string.Format("At least one unexpected error occurred while swapping controller pdo/intlk mappings . \n{0}", exception.ErrorCode.ToString());
 
                 MessageBox.Show(message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
@@ -174,9 +195,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             {
                 string message;
                 if (exception.ErrorCode == IO_LIST_FILE_ERROR_T.FILE_DATA_EXCEPTION)
-                    message = string.Format("At least one unexpected error occurred while swapping controller pdo mappings . \n{0}", exception.DataException.ToString());
+                    message = string.Format("At least one unexpected error occurred while swapping controller pdo/intlk mappings . \n{0}", exception.DataException.ToString());
                 else
-                    message = string.Format("At least one unexpected error occurred while swapping controller pdo mappings . \n{0}", exception.ErrorCode.ToString());
+                    message = string.Format("At least one unexpected error occurred while swapping controller pdo/intlk mappings . \n{0}", exception.ErrorCode.ToString());
 
                 MessageBox.Show(message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
@@ -206,13 +227,51 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             e.Handled = true;
         }
 
+        private void __on_edit_element_command_executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            __task = __INTLK_LOGIC_DEFINITION_LIST_TASK.EDIT;
+            __task_parameter = __lsb_interlock_logic_definitions.SelectedIndex;
+
+            __txt_edit_intlk_logic_name.Text = (__lsb_interlock_logic_definitions.SelectedItem as IntlklogicDefinition).Name;
+            __txt_edit_intlk_logic_target.Text = (__lsb_interlock_logic_definitions.SelectedItem as IntlklogicDefinition).TargetObjectIndexList;
+            __txt_edit_intlk_logic_statement.Text = (__lsb_interlock_logic_definitions.SelectedItem as IntlklogicDefinition).Statement.ToString();
+
+            __lsb_interlock_logic_definitions.IsEnabled = false;
+            __grid_edit_intlk_logic_definition.IsEnabled = true;
+        }
+
+        private void __on_insert_element_before_can_executed(object sender, CanExecuteRoutedEventArgs e)
+        {
+            try
+            {
+                object tag = (__tab_pdo_container.SelectedItem as TabItem).Tag;
+                if (tag != null)
+                {
+                    IO_LIST_PDO_AREA_T area = (IO_LIST_PDO_AREA_T)((__tab_pdo_container.SelectedItem as TabItem).Tag);
+                    ListView view = __area_views[area];
+                    e.CanExecute = __lsv_object_collection.SelectedItem != null && view.SelectedItem != null;
+                }
+                else
+                    e.CanExecute = __lsb_interlock_logic_definitions.SelectedItem != null &&
+                        __lsb_interlock_logic_definitions.IsEnabled == true;
+            }
+            catch
+            {
+                e.CanExecute = false;
+            }
+        }
+
         private void __on_replace_element_can_executed(object sender, CanExecuteRoutedEventArgs e)
         {
             try
             {
-                IO_LIST_PDO_AREA_T area = (IO_LIST_PDO_AREA_T)((__tab_pdo_container.SelectedItem as TabItem).Tag);
-                ListView view = __area_views[area];
-                e.CanExecute = __lsv_object_collection.SelectedItem != null && view.SelectedItem != null;
+                object tag = (__tab_pdo_container.SelectedItem as TabItem).Tag;
+                if (tag != null)
+                {
+                    IO_LIST_PDO_AREA_T area = (IO_LIST_PDO_AREA_T)((__tab_pdo_container.SelectedItem as TabItem).Tag);
+                    ListView view = __area_views[area];
+                    e.CanExecute = __lsv_object_collection.SelectedItem != null && view.SelectedItem != null;
+                }
             }
             catch
             {
@@ -224,7 +283,11 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
         {
             try
             {
-                e.CanExecute = __lsv_object_collection.SelectedItem != null;
+                object tag = (__tab_pdo_container.SelectedItem as TabItem).Tag;
+                if (tag != null)
+                    e.CanExecute = __lsv_object_collection.SelectedItem != null;
+                else
+                    e.CanExecute = __lsb_interlock_logic_definitions.IsEnabled == true;
             }
             catch
             {
@@ -236,9 +299,16 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
         {
             try
             {
-                IO_LIST_PDO_AREA_T area = (IO_LIST_PDO_AREA_T)((__tab_pdo_container.SelectedItem as TabItem).Tag);
-                ListView view = __area_views[area];
-                e.CanExecute = view.SelectedItem != null;
+                object tag = (__tab_pdo_container.SelectedItem as TabItem).Tag;
+                if (tag != null)
+                {
+                    IO_LIST_PDO_AREA_T area = (IO_LIST_PDO_AREA_T)tag;
+                    ListView view = __area_views[area];
+                    e.CanExecute = view.SelectedItem != null;
+                }
+                else
+                    e.CanExecute = __lsb_interlock_logic_definitions.SelectedItem != null &&
+                        __lsb_interlock_logic_definitions.IsEnabled == true;
             }
             catch
             {
@@ -250,9 +320,16 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
         {
             try
             {
-                IO_LIST_PDO_AREA_T area = (IO_LIST_PDO_AREA_T)((__tab_pdo_container.SelectedItem as TabItem).Tag);
-                ListView view = __area_views[area];
-                e.CanExecute = view.SelectedItem != null && view.SelectedIndex - 1 >= 0;
+                object tag = (__tab_pdo_container.SelectedItem as TabItem).Tag;
+                if (tag != null)
+                {
+                    IO_LIST_PDO_AREA_T area = (IO_LIST_PDO_AREA_T)((__tab_pdo_container.SelectedItem as TabItem).Tag);
+                    ListView view = __area_views[area];
+                    e.CanExecute = view.SelectedItem != null && view.SelectedIndex - 1 >= 0;
+                }
+                else
+                    e.CanExecute = __lsb_interlock_logic_definitions.IsEnabled == true && 
+                        __lsb_interlock_logic_definitions.SelectedItem != null && __lsb_interlock_logic_definitions.SelectedIndex - 1 >= 0;
             }
             catch
             {
@@ -264,9 +341,17 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
         {
             try
             {
-                IO_LIST_PDO_AREA_T area = (IO_LIST_PDO_AREA_T)((__tab_pdo_container.SelectedItem as TabItem).Tag);
-                ListView view = __area_views[area];
-                e.CanExecute = view.SelectedItem != null && view.SelectedIndex + 1 < view.Items.Count;
+                object tag = (__tab_pdo_container.SelectedItem as TabItem).Tag;
+                if (tag != null)
+                {
+                    IO_LIST_PDO_AREA_T area = (IO_LIST_PDO_AREA_T)((__tab_pdo_container.SelectedItem as TabItem).Tag);
+                    ListView view = __area_views[area];
+                    e.CanExecute = view.SelectedItem != null && view.SelectedIndex + 1 < view.Items.Count;
+                }
+                else
+                    e.CanExecute = __lsb_interlock_logic_definitions.IsEnabled == true &&
+                        __lsb_interlock_logic_definitions.SelectedItem != null && 
+                        __lsb_interlock_logic_definitions.SelectedIndex + 1 < __lsb_interlock_logic_definitions.Items.Count;
             }
             catch
             {
@@ -278,14 +363,33 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
         {
             try
             {
-                IO_LIST_PDO_AREA_T area = (IO_LIST_PDO_AREA_T)((__tab_pdo_container.SelectedItem as TabItem).Tag);
-                e.CanExecute = area == IO_LIST_PDO_AREA_T.RX_BIT || area == IO_LIST_PDO_AREA_T.TX_BIT;
+                object tag = (__tab_pdo_container.SelectedItem as TabItem).Tag;
+                if (tag != null)
+                {
+                    IO_LIST_PDO_AREA_T area = (IO_LIST_PDO_AREA_T)((__tab_pdo_container.SelectedItem as TabItem).Tag);
+                    e.CanExecute = area == IO_LIST_PDO_AREA_T.RX_BIT || area == IO_LIST_PDO_AREA_T.TX_BIT;
+                }
+                else
+                    e.CanExecute = false;
             }
             catch
             {
                 e.CanExecute = false;
             }
         }
+        private void __on_edit_element_can_executed(object sender, CanExecuteRoutedEventArgs e)
+        {
+            try
+            {
+                e.CanExecute = (__tab_pdo_container.SelectedItem as TabItem).Tag == null &&
+                    __lsb_interlock_logic_definitions.IsEnabled == true && __lsb_interlock_logic_definitions.SelectedItem != null;
+            }
+            catch
+            {
+                e.CanExecute = false;
+            }
+        }
+
 
         private void __on_enable_variable_name_filter_click(object sender, RoutedEventArgs e)
         {
@@ -374,6 +478,38 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
                 (DataContext as PDOCollectionDataModel).FieldDataBindingErrors++;
             else if (e.Action == ValidationErrorEventAction.Removed)
                 (DataContext as PDOCollectionDataModel).FieldDataBindingErrors--;
+        }
+
+        private void __on_commit_intlk_logic_edit(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                switch (__task)
+                {
+                    case __INTLK_LOGIC_DEFINITION_LIST_TASK.APPEND:
+                        (DataContext as PDOCollectionDataModel).AppendIntlklogicDefinition(__txt_edit_intlk_logic_name.Text,
+                            __txt_edit_intlk_logic_target.Text, __txt_edit_intlk_logic_statement.Text);
+                        break;
+                }
+                __lsb_interlock_logic_definitions.IsEnabled = true;
+                __grid_edit_intlk_logic_definition.IsEnabled = false;
+            }
+            catch (IOListParseExcepetion exception)
+            {
+                string message;
+                if (exception.ErrorCode == IO_LIST_FILE_ERROR_T.FILE_DATA_EXCEPTION)
+                    message = string.Format("At least one unexpected error occurred while committing the edit . \n{0}", exception.DataException.ToString());
+                else
+                    message = string.Format("At least one unexpected error occurred while committing the edit . \n{0}", exception.ErrorCode.ToString());
+
+                MessageBox.Show(message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void __on_cancel_intlk_logic_edit(object sender, RoutedEventArgs e)
+        {
+            __lsb_interlock_logic_definitions.IsEnabled = true;
+            __grid_edit_intlk_logic_definition.IsEnabled = false;
         }
     }
 }

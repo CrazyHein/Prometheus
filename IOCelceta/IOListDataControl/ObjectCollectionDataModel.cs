@@ -83,13 +83,13 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
 
         public void AddDataModel(ObjectItemDataModel dataModel, int pos = -1)
         {
-            IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T objectItem = new IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T()
-            {
-                index = dataModel.Index,
-                variable = dataModel.VariableSelection,
-                binding = { enabled = dataModel.BindingEnable, module = dataModel.BindingModuleSelection, channel_name = dataModel.BindingChannelName, channel_index = dataModel.BindingChannelIndex },       
-                converter = { enabled = dataModel.ConverterEnable, up_scale = dataModel.ConverterUpScale, down_scale = dataModel.ConverterDownScale, unit_name = dataModel.ConverterUnitName }
-            };
+            IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T objectItem = new IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T
+            (
+                dataModel.Index,
+                dataModel.VariableSelection,
+                new IO_LIST_OBJECT_COLLECTION_T.MODULE_BINDING_T(dataModel.BindingEnable, dataModel.BindingModuleSelection, dataModel.BindingChannelName, dataModel.BindingChannelIndex),       
+                new IO_LIST_OBJECT_COLLECTION_T.VALUE_CONVERTER_T(dataModel.ConverterEnable, dataModel.ConverterUnitName, dataModel.ConverterUpScale, dataModel.ConverterDownScale)
+            );
             _data_helper.AddObjectData(objectItem);
             if(pos == -1)
                 __objects.Add(dataModel);
@@ -100,13 +100,13 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
 
         public void ModifyDataModel(uint index, ObjectItemDataModel dataModel)
         {
-            IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T objectItem = new IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T()
-            {
-                index = dataModel.Index,
-                variable = dataModel.VariableSelection,
-                binding = { enabled = dataModel.BindingEnable, module = dataModel.BindingModuleSelection, channel_name = dataModel.BindingChannelName, channel_index = dataModel.BindingChannelIndex },
-                converter = { enabled = dataModel.ConverterEnable, up_scale = dataModel.ConverterUpScale, down_scale = dataModel.ConverterDownScale, unit_name = dataModel.ConverterUnitName }
-            };
+            IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T objectItem = new IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T
+            (
+                dataModel.Index,
+                dataModel.VariableSelection,
+                new IO_LIST_OBJECT_COLLECTION_T.MODULE_BINDING_T(dataModel.BindingEnable, dataModel.BindingModuleSelection, dataModel.BindingChannelName, dataModel.BindingChannelIndex),
+                new IO_LIST_OBJECT_COLLECTION_T.VALUE_CONVERTER_T(dataModel.ConverterEnable, dataModel.ConverterUnitName, dataModel.ConverterUpScale, dataModel.ConverterDownScale)
+            );
             _data_helper.ModifyObjectData(index, objectItem);
             var data = __object_dictionary[index];
             data.ImportObjectDefinition(objectItem);

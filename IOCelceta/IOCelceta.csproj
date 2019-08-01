@@ -76,15 +76,15 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="IOListDataControl\InterlockCollectionDataControl.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="IOListDataControl\ObjectCollectionDataControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="IOListDataControl\ObjectDataControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="IOListDataControl\ObjectSelectorDataControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -121,10 +121,6 @@
     <Compile Include="IOListDataControl\ControllerModuleDataControl.xaml.cs">
       <DependentUpon>ControllerModuleDataControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="IOListDataControl\InterlockCollectionDataControl.xaml.cs">
-      <DependentUpon>InterlockCollectionDataControl.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="IOListDataControl\InterlockCollectionDataModel.cs" />
     <Compile Include="IOListDataControl\IOListDataControlCommand.cs" />
     <Compile Include="IOListDataControl\IOListDataModel.cs" />
     <Compile Include="IOListDataControl\ObjectCollectionDataControl.xaml.cs">
@@ -134,6 +130,10 @@
     <Compile Include="IOListDataControl\ObjectDataControl.xaml.cs">
       <DependentUpon>ObjectDataControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="IOListDataControl\ObjectSelectorDataControl.xaml.cs">
+      <DependentUpon>ObjectSelectorDataControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="IOListDataControl\ObjectSelectorDataModel.cs" />
     <Compile Include="IOListDataControl\PDOCollectionDataControl.xaml.cs">
       <DependentUpon>PDOCollectionDataControl.xaml</DependentUpon>
     </Compile>
@@ -246,6 +246,10 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="img\key.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="img\cancel.png" />
+    <Resource Include="img\ok.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

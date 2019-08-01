@@ -7,6 +7,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml;
 
 namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDataControl
 {
@@ -39,6 +40,11 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
 
         private Dictionary<IO_LIST_PDO_AREA_T, ObservableCollection<ObjectItemDataModel>> __collection_areas;
 
+        private ObservableCollection<IntlklogicDefinition> __intlk_logic_area;
+        public IReadOnlyList<IntlklogicDefinition> IntlkLogicArea { get { return __intlk_logic_area; } }
+
+
+
         private ObjectCollectionDataModel __object_collection_data_model;
 
         public PDOCollectionDataModel(IOListDataHelper helper, ObjectCollectionDataModel objectCollectionDataModel) : base(helper)
@@ -58,6 +64,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             __collection_areas.Add(IO_LIST_PDO_AREA_T.RX_BIT, __rx_bit_area);
             __collection_areas.Add(IO_LIST_PDO_AREA_T.RX_BLOCK, __rx_block_area);
 
+            __intlk_logic_area = new ObservableCollection<IntlklogicDefinition>();
 
             __object_collection_data_model = objectCollectionDataModel;
 
@@ -219,6 +226,36 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             }
         }
 
+        private IntlkLogicElement __load_interlock_logic_statement(IO_LIST_INTERLOCK_LOGIC_COLLECTION_T.LOGIC_ELEMEMT_T element,
+            IntlkLogicExpression root)
+        {
+            if (element.type == IO_LIST_INTERLOCK_LOGIC_ELEMENT_TYPE.OPERAND)
+            {
+                IO_LIST_INTERLOCK_LOGIC_COLLECTION_T.LOGIC_OPERAND_T operand = element as IO_LIST_INTERLOCK_LOGIC_COLLECTION_T.LOGIC_OPERAND_T;
+                return new IntlkLogicOperand(__object_collection_data_model.ObjectDictionary[operand.Operand.index], root);
+            }
+            else
+            {
+                IO_LIST_INTERLOCK_LOGIC_COLLECTION_T.LOGIC_EXPRESSION_T expression = element as IO_LIST_INTERLOCK_LOGIC_COLLECTION_T.LOGIC_EXPRESSION_T;
+                IntlkLogicExpression expressionDataModel = new IntlkLogicExpression(expression.logic_operator, root);
+                foreach (var e in expression.elements)
+                    expressionDataModel.Elements.Add(__load_interlock_logic_statement(e, expressionDataModel));
+                return expressionDataModel;
+            }
+        }
+
+        private IntlklogicDefinition __load_interlock_logic_definition(IO_LIST_INTERLOCK_LOGIC_COLLECTION_T.LOGIC_DEFINITION_T definition)
+        {
+            List<ObjectItemDataModel> objectDataModels = new List<ObjectItemDataModel>();
+            foreach (var o in definition.target_objects)
+                objectDataModels.Add(__object_collection_data_model.ObjectDictionary[o.index]);
+
+            IntlkLogicExpression expressionDataModel =
+                __load_interlock_logic_statement(definition.statement, null) as IntlkLogicExpression;
+
+            return new IntlklogicDefinition(definition.name, objectDataModels, expressionDataModel);
+        }
+
         public override void UpdateDataHelper()
         {
             foreach (var area in Enum.GetValues(typeof(IO_LIST_PDO_AREA_T)))
@@ -285,6 +322,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
                 //ObjectItemDataModel model = new ObjectItemDataModel(o);
                 __rx_block_area.Add(__object_collection_data_model.ObjectDictionary[o.index]);
             }
+
+            foreach (var def in _data_helper.InterlockDefinitions)
+                __intlk_logic_area.Add(__load_interlock_logic_definition(def));
         }
 
         public void SwapPDOMapping(IO_LIST_PDO_AREA_T area, int firstPos, int secondPos)
@@ -394,6 +434,132 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             __collection_areas[area].Clear();
             foreach (var o in objectList)
                 __collection_areas[area].Add(__object_collection_data_model.ObjectDictionary[o.index]);
+        }
+
+        private List<IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T> __import_interlock_logic_target_objects(string text)
+        {
+            try
+            {
+                List<IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T> list = new List<IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T>();
+
+                string[] objectIndexStrings = text.Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+                foreach(var str in objectIndexStrings)
+                {
+                    uint id = Convert.ToUInt32(str, 16);
+                    list.Add(_data_helper.IOObjectDictionary[id]);
+                }
+
+                return list;
+            }
+            catch(Exception e)
+            {
+                throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.FILE_DATA_EXCEPTION, e);
+            }
+        }
+
+        private IO_LIST_INTERLOCK_LOGIC_COLLECTION_T.LOGIC_EXPRESSION_T __import_interlock_logic_statement(string text)
+        {
+            return null;
+        }
+
+        public void AppendIntlklogicDefinition(string name, string targetString, string statementString)
+        {
+            IO_LIST_INTERLOCK_LOGIC_COLLECTION_T.LOGIC_DEFINITION_T def =
+                new IO_LIST_INTERLOCK_LOGIC_COLLECTION_T.LOGIC_DEFINITION_T(name,
+                __import_interlock_logic_target_objects(targetString),
+                __import_interlock_logic_statement(statementString));
+
+            _data_helper.AppendInterlockLogicDefinition(def);
+
+            List<ObjectItemDataModel> objectDataModels = new List<ObjectItemDataModel>();
+            foreach (var o in def.target_objects)
+                objectDataModels.Add(__object_collection_data_model.ObjectDictionary[o.index]);
+
+            IntlkLogicExpression expressionDataModel =
+                __load_interlock_logic_statement(def.statement, null) as IntlkLogicExpression;
+            __intlk_logic_area.Add(new IntlklogicDefinition(name, objectDataModels, expressionDataModel));
+        }
+    }
+
+    public abstract class IntlkLogicElement
+    {
+        public IO_LIST_INTERLOCK_LOGIC_ELEMENT_TYPE Type { get; private set; }
+        public IntlkLogicExpression Root { get; private set; }
+        public int Layer { get; private set; }
+        public IntlkLogicElement(IO_LIST_INTERLOCK_LOGIC_ELEMENT_TYPE type, IntlkLogicExpression root)
+        {
+            Type = type;
+            Root = root;
+            if (root == null)
+                Layer = 0;
+            else
+                Layer = root.Layer + 1;
+        }
+    }
+
+    public class IntlkLogicOperand : IntlkLogicElement
+    {
+        public ObjectItemDataModel ObjectDataModel { get; private set; }
+        public IntlkLogicOperand(ObjectItemDataModel objectDataModel, IntlkLogicExpression root) : base(IO_LIST_INTERLOCK_LOGIC_ELEMENT_TYPE.OPERAND, root)
+        {
+            ObjectDataModel = objectDataModel;
+        }
+
+        public override string ToString()
+        {
+            return "0x" + ObjectDataModel.Index.ToString("X8") + "\n";
+        }
+    }
+
+    public class IntlkLogicExpression : IntlkLogicElement
+    {
+        public IO_LIST_INTERLOCK_LOGIC_OPERATOR_T LogicOperator { get; private set; }
+        public List<IntlkLogicElement> Elements { get; private set; }
+
+        public IntlkLogicExpression(IO_LIST_INTERLOCK_LOGIC_OPERATOR_T op, IntlkLogicExpression root) : base(IO_LIST_INTERLOCK_LOGIC_ELEMENT_TYPE.EXPRESSION, root)
+        {
+            LogicOperator = op;
+            Elements = new List<IntlkLogicElement>();
+        }
+
+        public override string ToString()
+        {
+            string str = null;
+            foreach (var e in Elements)
+            {
+                if (e.Type == IO_LIST_INTERLOCK_LOGIC_ELEMENT_TYPE.EXPRESSION)
+                {
+                    str += (e as IntlkLogicExpression).LogicOperator.ToString() + "\n" + (e as IntlkLogicExpression).Elements.ToString();
+                }
+                else
+                    str += e.ToString();
+            }
+            return str;
+        }
+    }
+
+    public class IntlklogicDefinition
+    {
+        public string Name { get; private set; }
+        public List<ObjectItemDataModel> TargetObjects { get; private set; }
+        public IntlkLogicExpression Statement { get; private set; }
+
+        public IntlklogicDefinition(string name, List<ObjectItemDataModel> targets, IntlkLogicExpression statement)
+        {
+            Name = name;
+            TargetObjects = targets;
+            Statement = statement;
+        }
+
+        public string TargetObjectIndexList
+        {
+            get
+            {
+                string text = null;
+                foreach (ObjectItemDataModel target in TargetObjects)
+                    text += "0x" + target.Index.ToString("X8") + "\n";
+                return text;
+            }
         }
     }
 }

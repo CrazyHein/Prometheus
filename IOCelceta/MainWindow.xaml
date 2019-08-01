@@ -76,11 +76,11 @@
                     </StackPanel>
                 </TabItem.Header>
             </TabItem>
-            <TabItem Width="200" Name="__tab_pdo_collection">
+            <TabItem Width="200" Name="__tab_pdo_intlk_collection">
                 <TabItem.Header>
                     <StackPanel Orientation="Horizontal">
                         <Image Source="img/pdo.png" Height="32" Margin="2,2,8,2"/>
-                        <TextBlock Text="PDO Mapping Collection" VerticalAlignment="Center"/>
+                        <TextBlock Text="PDO &amp; Interlock" VerticalAlignment="Center"/>
                     </StackPanel>
                 </TabItem.Header>
             </TabItem>

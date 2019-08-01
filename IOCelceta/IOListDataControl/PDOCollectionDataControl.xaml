@@ -6,16 +6,17 @@
              xmlns:local="clr-namespace:AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDataControl"
              xmlns:root="clr-namespace:AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta"
              mc:Ignorable="d" 
-             d:DesignHeight="768" d:DesignWidth="2000">
+             d:DesignHeight="1080" d:DesignWidth="2000">
     <DockPanel LastChildFill="True">
         <DockPanel.CommandBindings>
             <CommandBinding Command="local:IOListDataControlCommand.AddElement" Executed="__on_add_element_command_executed" CanExecute="__on_add_element_can_executed"/>
             <CommandBinding Command="local:IOListDataControlCommand.RemoveElement" Executed="__on_remove_element_command_executed" CanExecute="__on_remove_element_can_executed"/>
             <CommandBinding Command="local:IOListDataControlCommand.MoveElementUp" Executed="__on_move_up_element_command_executed" CanExecute="__on_move_up_element_can_executed"/>
             <CommandBinding Command="local:IOListDataControlCommand.MoveElementDown" Executed="__on_move_down_element_command_executed" CanExecute="__on_move_down_element_can_executed"/>
-            <CommandBinding Command="local:IOListDataControlCommand.InsertElementBefore" Executed="__on_insert_element_before_command_executed" CanExecute="__on_replace_element_can_executed"/>
+            <CommandBinding Command="local:IOListDataControlCommand.InsertElementBefore" Executed="__on_insert_element_before_command_executed" CanExecute="__on_insert_element_before_can_executed"/>
             <CommandBinding Command="local:IOListDataControlCommand.ReplaceElement" Executed="__on_replace_element_command_executed" CanExecute="__on_replace_element_can_executed"/>
             <CommandBinding Command="local:IOListDataControlCommand.GroupElementByBindingModule" Executed="__on_group_element_command_executed" CanExecute="__on_group_element_can_executed"/>
+            <CommandBinding Command="local:IOListDataControlCommand.EditElement" Executed="__on_edit_element_command_executed" CanExecute="__on_edit_element_can_executed"/>
         </DockPanel.CommandBindings>
         <DockPanel.Resources>
             <ContextMenu x:Key="PDOContextMenu">
@@ -57,6 +58,33 @@
                     </MenuItem.Icon>
                 </MenuItem>
             </ContextMenu>
+            <ContextMenu x:Key="IntlkContextMenu">
+                <MenuItem Command="local:IOListDataControlCommand.AddElement">
+                    <MenuItem.Icon>
+                        <Image Source="../img/add.png"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Command="local:IOListDataControlCommand.RemoveElement">
+                    <MenuItem.Icon>
+                        <Image Source="../img/remove.png"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Command="local:IOListDataControlCommand.MoveElementUp">
+                    <MenuItem.Icon>
+                        <Image Source="../img/up.png"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Command="local:IOListDataControlCommand.MoveElementDown">
+                    <MenuItem.Icon>
+                        <Image Source="../img/down.png"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Command="local:IOListDataControlCommand.EditElement">
+                    <MenuItem.Icon>
+                        <Image Source="../img/detail.png"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+            </ContextMenu>
         </DockPanel.Resources>
         <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Right">
             <StackPanel.Resources>
@@ -81,7 +109,15 @@
                 <Button.Content>
                     <StackPanel Orientation="Horizontal">
                         <Image Source="../img/left.png"/>
-                        <TextBlock Text="Insert Before" VerticalAlignment="Center"/>
+                        <TextBlock Text="Insert" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Button.Content>
+            </Button>
+            <Button Command="local:IOListDataControlCommand.EditElement">
+                <Button.Content>
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="../img/detail.png"/>
+                        <TextBlock Text="Edit" VerticalAlignment="Center"/>
                     </StackPanel>
                 </Button.Content>
             </Button>
@@ -196,7 +232,7 @@
                     </TextBlock>
                 </DataTemplate>
             </Grid.Resources>
-            <TextBlock Text="PDO Mappings : " FontWeight="Bold" FontSize="20" FontStyle="Italic" Margin="8,4,4,8"/>
+            <TextBlock Text="PDO &amp; Interlock Mappings : " FontWeight="Bold" FontSize="20" FontStyle="Italic" Margin="8,4,4,8"/>
             <TextBlock Text="Object Viewer :" Grid.Column="2" FontWeight="Bold" FontSize="20" FontStyle="Italic" Margin="8,4,4,8"/>
             <GridSplitter Grid.Column="1" Grid.RowSpan="2" Background="Gray" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="4,0,4,0"/>
             <TabControl TabStripPlacement="Left" Name="__tab_pdo_container" Grid.Row ="1" Validation.Error ="__on_data_binding_error" >
@@ -415,6 +451,109 @@
                             </ListView>
                         </GroupBox>
                     </DockPanel>
+                </TabItem>
+                <TabItem>
+                    <TabItem.Header>
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="../img/lock.png" Height="24" Margin="2,2,8,2"/>
+                            <TextBlock Text="Intlk Area" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </TabItem.Header>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="2*"/>
+                            <RowDefinition Height="12"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <GridSplitter Grid.Row="1" Background="Gray" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="4,4,4,4"/>
+                        <ListBox Name="__lsb_interlock_logic_definitions" HorizontalContentAlignment="Stretch" Margin="4" ItemsSource="{Binding IntlkLogicArea}" ContextMenu="{StaticResource IntlkContextMenu}">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Margin="4" BorderThickness="1" BorderBrush="SteelBlue" CornerRadius="4">
+                                        <Grid Margin="3">
+                                            <Grid.Resources>
+                                                <Style TargetType="TextBlock">
+                                                    <Setter Property="Margin" Value="4"/>
+                                                </Style>
+                                            </Grid.Resources>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="auto"/>
+                                                <ColumnDefinition/>
+                                            </Grid.ColumnDefinitions>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition/>
+                                                <RowDefinition/>
+                                                <RowDefinition/>
+                                            </Grid.RowDefinitions>
+                                            <TextBlock Text="Name : " FontWeight="Bold" Margin="4"/>
+                                            <TextBlock Text="{Binding Name}" Grid.Column="1"/>
+                                            <TextBlock Text="Target : " Grid.Row="1" FontWeight="Bold"/>
+                                            <TextBlock Text="Statement : " Grid.Row="2" FontWeight="Bold"/>
+
+                                            <ListBox ItemsSource="{Binding TargetObjects}" Grid.Row="1" Grid.Column="1" Margin="4">
+                                                <ListBox.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <TextBlock Text="{Binding}" Margin="4"/>
+                                                    </DataTemplate>
+                                                </ListBox.ItemTemplate>
+                                            </ListBox>
+                                            <TreeView Margin="4" Grid.Column="1" Grid.Row="2">
+                                                <TreeView.Resources>
+                                                </TreeView.Resources>
+                                                <TreeViewItem ItemsSource="{Binding Statement.Elements}" Header="{Binding Statement.LogicOperator}">
+                                                    <TreeViewItem.Resources>
+                                                        <HierarchicalDataTemplate ItemsSource="{Binding Elements}" DataType="{x:Type local:IntlkLogicExpression}">
+                                                            <TextBlock Text="{Binding LogicOperator}" Margin="4"/>
+                                                        </HierarchicalDataTemplate>
+                                                        <HierarchicalDataTemplate DataType="{x:Type local:IntlkLogicOperand}">
+                                                            <TextBlock Text="{Binding ObjectDataModel}" Margin="4"/>
+                                                        </HierarchicalDataTemplate>
+                                                    </TreeViewItem.Resources>
+                                                </TreeViewItem>
+                                            </TreeView>
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                        <Grid Grid.Row="2" Name="__grid_edit_intlk_logic_definition" IsEnabled="False">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="auto"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="2*"/>
+                                <RowDefinition Height="auto"/>
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="auto"/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="Name : " FontWeight="Bold" Margin="4"/>
+                            <TextBlock Text="Target : " FontWeight="Bold" Grid.Row="1" Margin="4"/>
+                            <TextBlock Text="Statement : " FontWeight="Bold" Grid.Row="2" Margin="4"/>
+
+                            <TextBox Grid.Column="1" Margin="4" Name="__txt_edit_intlk_logic_name"/>
+                            <ScrollViewer Grid.Row="1" Grid.Column="1" Margin="4">
+                                <TextBox TextWrapping="Wrap" Name="__txt_edit_intlk_logic_target" AcceptsReturn="True"/>
+                            </ScrollViewer>
+                            <ScrollViewer Grid.Column="1" Margin="4" Grid.Row="2" >
+                                <TextBox TextWrapping="Wrap" Name="__txt_edit_intlk_logic_statement" AcceptsReturn="True"/>
+                            </ScrollViewer>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Grid.Column="1" Grid.Row="3">
+                                <Button Width="100" Margin="4" Height="32" Click="__on_commit_intlk_logic_edit">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Image Source="../img/ok.png" Height="24" Margin="2,2,8,2"/>
+                                        <TextBlock Text="Commit" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                </Button>
+                                <Button  Width="100" Margin="4" Height="32" Click="__on_cancel_intlk_logic_edit">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Image Source="../img/cancel.png" Height="24" Margin="2,2,8,2"/>
+                                        <TextBlock Text="Cancel" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                </Button>
+                            </StackPanel>
+                        </Grid>
+                    </Grid>
                 </TabItem>
             </TabControl>
             <DockPanel Grid.Column="2" Grid.Row="1">
