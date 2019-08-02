@@ -715,7 +715,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                     IO_LIST_INTERLOCK_LOGIC_COLLECTION_T.LOGIC_EXPRESSION_T expression = null;
                     if (rootExpression != null)
                     {
-                        if (rootNode.Name != "Index" && rootExpression.layer + 1 == IO_LIST_INTERLOCK_LOGIC_COLLECTION_T.MAX_LAYER_OF_NESTED_LOGIC - 1)
+                        if (rootExpression.layer == IO_LIST_INTERLOCK_LOGIC_COLLECTION_T.MAX_LAYER_OF_NESTED_LOGIC - 1)
                             throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INTERLOCK_LOGIC_STATEMENT_LAYER_OUT_OF_RANGE, null);
                     }
                     switch (rootNode.Name)
@@ -850,6 +850,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
         {
             if (element == null)
                 throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_INTERLOCK_LOGIC_EXPRESSION, null);
+            else if(element.layer > IO_LIST_INTERLOCK_LOGIC_COLLECTION_T.MAX_LAYER_OF_NESTED_LOGIC - 1)
+                throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INTERLOCK_LOGIC_STATEMENT_LAYER_OUT_OF_RANGE, null);
             else if (element.type == IO_LIST_INTERLOCK_LOGIC_ELEMENT_TYPE.OPERAND)
             {
                 if (element.root == null)
@@ -860,7 +862,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
             else if (element.type == IO_LIST_INTERLOCK_LOGIC_ELEMENT_TYPE.EXPRESSION)
             {
                 IO_LIST_INTERLOCK_LOGIC_COLLECTION_T.LOGIC_EXPRESSION_T express = element as IO_LIST_INTERLOCK_LOGIC_COLLECTION_T.LOGIC_EXPRESSION_T;
-                if (express.logic_operator == IO_LIST_INTERLOCK_LOGIC_OPERATOR_T.NOT && express.elements.Count >= 1)
+                if (express.logic_operator == IO_LIST_INTERLOCK_LOGIC_OPERATOR_T.NOT && express.elements.Count > 1)
                     throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_INTERLOCK_LOGIC_NOT_EXPRESSION, null);
                 foreach (var e in express.elements)
                     InterlockLogicExpressionDataVerification(e);
@@ -2288,6 +2290,126 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                 this.name = name;
                 target_objects = target;
                 this.statement = statement;
+            }
+
+            public LOGIC_DEFINITION_T(string name, string target, string statement, IReadOnlyDictionary<uint, IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T> objectDictionary)
+            {
+                this.name = name;
+                try
+                {
+                    target_objects = new List<IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T>();
+
+                    string[] targets = target.Split(Environment.NewLine.ToCharArray() , StringSplitOptions.RemoveEmptyEntries); 
+                    foreach (var str in targets)
+                    {
+                        uint id = Convert.ToUInt32(str, 16);
+                        IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T temp;
+                        if (objectDictionary.TryGetValue(id, out temp) == true)
+                            target_objects.Add(temp);
+                        else
+                            throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_OBJECT_REFERENCE_IN_INTERLOCK, null);
+                    }
+
+                    System.IO.StringReader sr = new System.IO.StringReader(statement);
+                    List<Tuple<string, int>> statements = new List<Tuple<string, int>>();
+                    while(true)
+                    {
+                        string line = sr.ReadLine();
+                        if (line != null)
+                        {
+                            int i = 0;
+                            for (; i < line.Count(); ++i)
+                                if (line[i] != '\t')
+                                    break;
+                            statements.Add(new Tuple<string, int>(line.Substring(i).TrimEnd(), i));
+                        }
+                        else
+                            break;
+                    }
+                    int start = 0;
+                    this.statement = __search_logic_element(statements, ref start, null, objectDictionary) as LOGIC_EXPRESSION_T;
+
+                    if(this.statement == null)
+                        throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_INTERLOCK_LOGIC_EXPRESSION, null);
+                }
+                catch (IOListParseExcepetion e)
+                {
+                    throw e;
+                }
+                catch (Exception e)
+                {
+                    throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.FILE_DATA_EXCEPTION, e);
+                }
+            }
+
+            private LOGIC_ELEMEMT_T __search_logic_element(List<Tuple<string, int>> statements, ref int start, LOGIC_EXPRESSION_T root, IReadOnlyDictionary<uint, IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T> objectDictionary)
+            {
+                if (root != null && root.layer == MAX_LAYER_OF_NESTED_LOGIC - 1)
+                    throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INTERLOCK_LOGIC_STATEMENT_LAYER_OUT_OF_RANGE, null);
+               
+                LOGIC_EXPRESSION_T expression = null;
+                var lineInfo = statements[start];
+                
+                switch(lineInfo.Item1)
+                {
+                    case "NOT":
+                        expression = new LOGIC_EXPRESSION_T(IO_LIST_INTERLOCK_LOGIC_OPERATOR_T.NOT, root);
+                        while(start + 1 < statements.Count)
+                        {
+                            if (statements[start + 1].Item2 == lineInfo.Item2 + 1)
+                            {
+                                start++;
+                                LOGIC_ELEMEMT_T element = __search_logic_element(statements, ref start, expression, objectDictionary);
+                                if (expression.elements.Count == 0)
+                                    expression.elements.Add(element);
+                                else
+                                    throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_INTERLOCK_LOGIC_NOT_EXPRESSION, null);
+                            }
+                            else if (statements[start + 1].Item2 > lineInfo.Item2 + 1)
+                                throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_INTERLOCK_LOGIC_EXPRESSION, null);
+                            else
+                                break;
+                        }
+                        return expression;
+                    case "AND":
+                        expression = new LOGIC_EXPRESSION_T(IO_LIST_INTERLOCK_LOGIC_OPERATOR_T.AND, root);
+                        break;
+                    case "OR":
+                        expression = new LOGIC_EXPRESSION_T(IO_LIST_INTERLOCK_LOGIC_OPERATOR_T.OR, root);
+                        break;
+                    case "NAND":
+                        expression = new LOGIC_EXPRESSION_T(IO_LIST_INTERLOCK_LOGIC_OPERATOR_T.NAND, root);
+                        break;
+                    case "NOR":
+                        expression = new LOGIC_EXPRESSION_T(IO_LIST_INTERLOCK_LOGIC_OPERATOR_T.NOR, root);
+                        break;
+                    case "XOR":
+                        expression = new LOGIC_EXPRESSION_T(IO_LIST_INTERLOCK_LOGIC_OPERATOR_T.XOR, root);
+                        break;
+                    default:
+                        uint id = Convert.ToUInt32(lineInfo.Item1, 16);
+                        if(root == null)
+                            throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_INTERLOCK_LOGIC_EXPRESSION, null);
+                        IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T temp;
+                        if (objectDictionary.TryGetValue(id, out temp) == true)
+                            return new LOGIC_OPERAND_T(temp, root);
+                        else
+                            throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_OBJECT_REFERENCE_IN_INTERLOCK, null);
+                }
+
+                while(start + 1 < statements.Count)
+                {
+                    if (statements[start + 1].Item2 == lineInfo.Item2 + 1)
+                    {
+                        start++;
+                        expression.elements.Add(__search_logic_element(statements, ref start, expression, objectDictionary));
+                    }
+                    else if (statements[start + 1].Item2 > lineInfo.Item2 + 1)
+                        throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_INTERLOCK_LOGIC_EXPRESSION, null);
+                    else
+                        break;
+                }
+                return expression;
             }
         }
 

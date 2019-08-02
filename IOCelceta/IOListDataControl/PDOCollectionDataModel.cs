@@ -436,38 +436,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
                 __collection_areas[area].Add(__object_collection_data_model.ObjectDictionary[o.index]);
         }
 
-        private List<IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T> __import_interlock_logic_target_objects(string text)
-        {
-            try
-            {
-                List<IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T> list = new List<IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T>();
-
-                string[] objectIndexStrings = text.Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
-                foreach(var str in objectIndexStrings)
-                {
-                    uint id = Convert.ToUInt32(str, 16);
-                    list.Add(_data_helper.IOObjectDictionary[id]);
-                }
-
-                return list;
-            }
-            catch(Exception e)
-            {
-                throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.FILE_DATA_EXCEPTION, e);
-            }
-        }
-
-        private IO_LIST_INTERLOCK_LOGIC_COLLECTION_T.LOGIC_EXPRESSION_T __import_interlock_logic_statement(string text)
-        {
-            return null;
-        }
-
         public void AppendIntlklogicDefinition(string name, string targetString, string statementString)
         {
             IO_LIST_INTERLOCK_LOGIC_COLLECTION_T.LOGIC_DEFINITION_T def =
-                new IO_LIST_INTERLOCK_LOGIC_COLLECTION_T.LOGIC_DEFINITION_T(name,
-                __import_interlock_logic_target_objects(targetString),
-                __import_interlock_logic_statement(statementString));
+                new IO_LIST_INTERLOCK_LOGIC_COLLECTION_T.LOGIC_DEFINITION_T(name, targetString, statementString, _data_helper.IOObjectDictionary);
 
             _data_helper.AppendInterlockLogicDefinition(def);
 
@@ -495,6 +467,28 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             else
                 Layer = root.Layer + 1;
         }
+
+        public override string ToString()
+        {
+            if (Type == IO_LIST_INTERLOCK_LOGIC_ELEMENT_TYPE.OPERAND)
+            {
+                IntlkLogicOperand op = this as IntlkLogicOperand;
+                string result = new string('\t', op.Layer);               
+                return result + "0x" + (this as IntlkLogicOperand).ObjectDataModel.Index.ToString("X8") + "\n";
+            }
+            else
+            {
+                IntlkLogicExpression ex = this as IntlkLogicExpression;
+                StringBuilder sb = new StringBuilder();
+                for (int i = 0; i < ex.Layer; ++i)
+                    sb.Append('\t');
+                sb.Append(ex.LogicOperator.ToString());
+                sb.Append('\n');
+                foreach (var e in ex.Elements)
+                    sb.Append(e.ToString());
+                return sb.ToString();
+            }
+        }
     }
 
     public class IntlkLogicOperand : IntlkLogicElement
@@ -503,11 +497,6 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
         public IntlkLogicOperand(ObjectItemDataModel objectDataModel, IntlkLogicExpression root) : base(IO_LIST_INTERLOCK_LOGIC_ELEMENT_TYPE.OPERAND, root)
         {
             ObjectDataModel = objectDataModel;
-        }
-
-        public override string ToString()
-        {
-            return "0x" + ObjectDataModel.Index.ToString("X8") + "\n";
         }
     }
 
@@ -520,21 +509,6 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
         {
             LogicOperator = op;
             Elements = new List<IntlkLogicElement>();
-        }
-
-        public override string ToString()
-        {
-            string str = null;
-            foreach (var e in Elements)
-            {
-                if (e.Type == IO_LIST_INTERLOCK_LOGIC_ELEMENT_TYPE.EXPRESSION)
-                {
-                    str += (e as IntlkLogicExpression).LogicOperator.ToString() + "\n" + (e as IntlkLogicExpression).Elements.ToString();
-                }
-                else
-                    str += e.ToString();
-            }
-            return str;
         }
     }
 
@@ -549,6 +523,11 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             Name = name;
             TargetObjects = targets;
             Statement = statement;
+        }
+
+        public IntlklogicDefinition(string name, string targetObjects, string statement)
+        {
+            Name = name;
         }
 
         public string TargetObjectIndexList

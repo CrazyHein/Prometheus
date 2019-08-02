@@ -536,7 +536,7 @@
                                 <TextBox TextWrapping="Wrap" Name="__txt_edit_intlk_logic_target" AcceptsReturn="True"/>
                             </ScrollViewer>
                             <ScrollViewer Grid.Column="1" Margin="4" Grid.Row="2" >
-                                <TextBox TextWrapping="Wrap" Name="__txt_edit_intlk_logic_statement" AcceptsReturn="True"/>
+                                <TextBox TextWrapping="Wrap" Name="__txt_edit_intlk_logic_statement" AcceptsReturn="True" AcceptsTab="True"/>
                             </ScrollViewer>
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Grid.Column="1" Grid.Row="3">
                                 <Button Width="100" Margin="4" Height="32" Click="__on_commit_intlk_logic_edit">
