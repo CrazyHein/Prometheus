@@ -451,6 +451,60 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
                 __load_interlock_logic_statement(def.statement, null) as IntlkLogicExpression;
             __intlk_logic_area.Add(new IntlklogicDefinition(name, objectDataModels, expressionDataModel));
         }
+
+        public void RemoveIntlklogicDefinition(int pos)
+        {
+            _data_helper.RemoveInterlockLogicDefinition(pos);
+            __intlk_logic_area.RemoveAt(pos);
+        }
+
+        public void InsertIntlklogicDefinition(int pos, string name, string targetString, string statementString)
+        {
+            IO_LIST_INTERLOCK_LOGIC_COLLECTION_T.LOGIC_DEFINITION_T def =
+                new IO_LIST_INTERLOCK_LOGIC_COLLECTION_T.LOGIC_DEFINITION_T(name, targetString, statementString, _data_helper.IOObjectDictionary);
+
+            _data_helper.InsertInterlockLogicDefinition(pos, def);
+
+            List<ObjectItemDataModel> objectDataModels = new List<ObjectItemDataModel>();
+            foreach (var o in def.target_objects)
+                objectDataModels.Add(__object_collection_data_model.ObjectDictionary[o.index]);
+
+            IntlkLogicExpression expressionDataModel =
+                __load_interlock_logic_statement(def.statement, null) as IntlkLogicExpression;
+            __intlk_logic_area.Insert(pos, new IntlklogicDefinition(name, objectDataModels, expressionDataModel));
+        }
+
+        public void SwapIntlklogicDefinition(int firstPos, int secondPos)
+        {
+            _data_helper.SwapInterlockLogicDefinition(firstPos, secondPos);
+            if (firstPos < secondPos)
+            {
+                __intlk_logic_area.Move(secondPos, firstPos);
+                __intlk_logic_area.Move(firstPos + 1, secondPos);
+            }
+            else if (firstPos > secondPos)
+            {
+                __intlk_logic_area.Move(firstPos, secondPos);
+                __intlk_logic_area.Move(secondPos + 1, firstPos);
+            }
+        }
+
+        public void ModifyIntlklogicDefinition(int pos, string name, string targetString, string statementString)
+        {
+            IO_LIST_INTERLOCK_LOGIC_COLLECTION_T.LOGIC_DEFINITION_T def =
+                new IO_LIST_INTERLOCK_LOGIC_COLLECTION_T.LOGIC_DEFINITION_T(name, targetString, statementString, _data_helper.IOObjectDictionary);
+            _data_helper.ModifyInterlockLogicDefinition(pos, def);
+
+            List<ObjectItemDataModel> objectDataModels = new List<ObjectItemDataModel>();
+            foreach (var o in def.target_objects)
+                objectDataModels.Add(__object_collection_data_model.ObjectDictionary[o.index]);
+
+            IntlkLogicExpression expressionDataModel =
+                __load_interlock_logic_statement(def.statement, null) as IntlkLogicExpression;
+
+            __intlk_logic_area.RemoveAt(pos);
+            __intlk_logic_area.Insert(pos, new IntlklogicDefinition(name, objectDataModels, expressionDataModel));
+        }
     }
 
     public abstract class IntlkLogicElement

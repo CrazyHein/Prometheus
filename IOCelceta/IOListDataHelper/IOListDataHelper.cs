@@ -661,8 +661,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
 
                         __controller_interlock_collection.logic_definitions.Add(
                             new IO_LIST_INTERLOCK_LOGIC_COLLECTION_T.LOGIC_DEFINITION_T(name, objectDatas, statement));
-                        __cal_logic_statement_object_reference(statement);
-                        __cal_logic_target_object_reference(objectDatas);
+                        __add_logic_statement_object_reference(statement);
+                        __add_logic_target_object_reference(objectDatas);
                     }
                 }
             }
@@ -779,27 +779,50 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
             }
         }
 
-        private void __cal_logic_statement_object_reference(IO_LIST_INTERLOCK_LOGIC_COLLECTION_T.LOGIC_EXPRESSION_T statement)
+        private void __add_logic_statement_object_reference(IO_LIST_INTERLOCK_LOGIC_COLLECTION_T.LOGIC_EXPRESSION_T statement)
         {
             foreach(var o in statement.elements)
             {
                 if (o.type == IO_LIST_INTERLOCK_LOGIC_ELEMENT_TYPE.OPERAND)
                     __object_reference_counter_of_intlk[(o as IO_LIST_INTERLOCK_LOGIC_COLLECTION_T.LOGIC_OPERAND_T).Operand.index]++;
                 else
-                    __cal_logic_statement_object_reference(o as IO_LIST_INTERLOCK_LOGIC_COLLECTION_T.LOGIC_EXPRESSION_T);
+                    __add_logic_statement_object_reference(o as IO_LIST_INTERLOCK_LOGIC_COLLECTION_T.LOGIC_EXPRESSION_T);
             }
         }
 
-        private void __cal_logic_target_object_reference(List<IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T> targets)
+        private void __remove_logic_statement_object_reference(IO_LIST_INTERLOCK_LOGIC_COLLECTION_T.LOGIC_EXPRESSION_T statement)
+        {
+            foreach (var o in statement.elements)
+            {
+                if (o.type == IO_LIST_INTERLOCK_LOGIC_ELEMENT_TYPE.OPERAND)
+                    __object_reference_counter_of_intlk[(o as IO_LIST_INTERLOCK_LOGIC_COLLECTION_T.LOGIC_OPERAND_T).Operand.index]--;
+                else
+                    __remove_logic_statement_object_reference(o as IO_LIST_INTERLOCK_LOGIC_COLLECTION_T.LOGIC_EXPRESSION_T);
+            }
+        }
+
+        private void __add_logic_target_object_reference(List<IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T> targets)
         {
             foreach (var o in targets)
                 __object_reference_counter_of_intlk[o.index]++;
         }
 
-        private void __cal_logic_object_reference(IO_LIST_INTERLOCK_LOGIC_COLLECTION_T.LOGIC_DEFINITION_T logic)
+        private void __remove_logic_target_object_reference(List<IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T> targets)
         {
-            __cal_logic_target_object_reference(logic.target_objects);
-            __cal_logic_statement_object_reference(logic.statement);
+            foreach (var o in targets)
+                __object_reference_counter_of_intlk[o.index]--;
+        }
+
+        private void __add_logic_object_reference(IO_LIST_INTERLOCK_LOGIC_COLLECTION_T.LOGIC_DEFINITION_T logic)
+        {
+            __add_logic_target_object_reference(logic.target_objects);
+            __add_logic_statement_object_reference(logic.statement);
+        }
+
+        private void __remove_logic_object_reference(IO_LIST_INTERLOCK_LOGIC_COLLECTION_T.LOGIC_DEFINITION_T logic)
+        {
+            __remove_logic_target_object_reference(logic.target_objects);
+            __remove_logic_statement_object_reference(logic.statement);
         }
 
         public void InterlockLogicTargetObjectDataVerification(List<IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T> datas)
@@ -1404,41 +1427,53 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
             ReplacePDOMapping(area, pos, objectData, false);           
         }
 
-        public void ReplacePDOMapping(IO_LIST_PDO_AREA_T area, int pos, IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T objectData, bool objectDataReferenceVerify = true)
+        private uint __cal_pdo_actual_size_in_byte(IO_LIST_CONTROLLER_PDO_COLLECTION_T.PDO_DEFINITION_T pdo,
+            IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T addedObject, IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T removedObject)
         {
             uint bitSize = 0, byteSize = 0;
+            if (pdo.area == IO_LIST_PDO_AREA_T.RX_BIT || pdo.area == IO_LIST_PDO_AREA_T.TX_BIT)
+            {
+                bitSize = (uint)pdo.objects.Count();
+                if(removedObject != null)
+                    bitSize -= removedObject.variable.DataType.BitSize;
+                if(addedObject != null)
+                    bitSize += addedObject.variable.DataType.BitSize;
+                if (bitSize % 8 == 0)
+                    byteSize = bitSize / 8;
+                else
+                    byteSize = bitSize / 8 + 1;
+            }
+            else
+            {
+                byteSize = pdo.actual_size_in_byte;
+                if (removedObject != null)
+                {
+                    if (removedObject.variable.DataType.BitSize % 8 == 0)
+                        byteSize -= removedObject.variable.DataType.BitSize / 8;
+                    else
+                        byteSize -= removedObject.variable.DataType.BitSize / 8 + 1;
+                }
+                if(addedObject != null)
+                {
+                    if (addedObject.variable.DataType.BitSize % 8 == 0)
+                        byteSize += addedObject.variable.DataType.BitSize / 8;
+                    else
+                        byteSize += addedObject.variable.DataType.BitSize / 8 + 1;
+                }
+            }
+
+            return byteSize;
+        }
+
+        public void ReplacePDOMapping(IO_LIST_PDO_AREA_T area, int pos, IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T objectData, bool objectDataReferenceVerify = true)
+        {
+            uint byteSize = 0;
             try
             {
                 PdoObjectDataVerification(area, objectData, objectDataReferenceVerify);
                 IO_LIST_CONTROLLER_PDO_COLLECTION_T.PDO_DEFINITION_T pdo = __controller_pdo_collection.PDOs[area];
                 var oldObjectData = pdo.objects[pos];
-
-                if (area == IO_LIST_PDO_AREA_T.RX_BIT || area == IO_LIST_PDO_AREA_T.TX_BIT)
-                {
-                    bitSize = (uint)pdo.objects.Count();
-                    bitSize -= oldObjectData.variable.DataType.BitSize;
-                    bitSize += objectData.variable.DataType.BitSize;
-                    if (bitSize % 8 == 0)
-                        byteSize = bitSize / 8;
-                    else
-                        byteSize = bitSize / 8 + 1;
-                }
-                else
-                {
-                    byteSize = pdo.actual_size_in_byte;
-                    //uint oldObjectDataBitSize = oldObjectData.converter.enabled == false ? oldObjectData.variable.DataType.BitSize : oldObjectData.converter.data_type.BitSize;
-                    //uint newObjectDataBitSize = objectData.converter.enabled == false ? objectData.variable.DataType.BitSize : objectData.converter.data_type.BitSize;
-                    uint oldObjectDataBitSize = oldObjectData.variable.DataType.BitSize;
-                    uint newObjectDataBitSize = objectData.variable.DataType.BitSize;
-                    if (oldObjectDataBitSize % 8 == 0)
-                        byteSize -= oldObjectDataBitSize / 8;
-                    else
-                        byteSize -= oldObjectDataBitSize / 8 + 1;
-                    if (newObjectDataBitSize % 8 == 0)
-                        byteSize += newObjectDataBitSize / 8;
-                    else
-                        byteSize += newObjectDataBitSize / 8 + 1;
-                }
+                byteSize = __cal_pdo_actual_size_in_byte(pdo, objectData, oldObjectData);
                 if (byteSize > (pdo.size_in_word * 2))
                     throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.PDO_AREA_OUT_OF_RANGE, null);
 
@@ -1465,31 +1500,12 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
 
         public void AppendPDOMapping(IO_LIST_PDO_AREA_T area, IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T objectData, bool objectDataReferenceVerify = true)
         {
-            uint bitSize = 0, byteSize = 0;
+            uint byteSize = 0;
             try
             {
                 PdoObjectDataVerification(area, objectData, objectDataReferenceVerify);
                 IO_LIST_CONTROLLER_PDO_COLLECTION_T.PDO_DEFINITION_T pdo = __controller_pdo_collection.PDOs[area];
-
-                if (area == IO_LIST_PDO_AREA_T.RX_BIT || area == IO_LIST_PDO_AREA_T.TX_BIT)
-                {
-                    bitSize = (uint)pdo.objects.Count();
-                    bitSize += objectData.variable.DataType.BitSize;
-                    if (bitSize % 8 == 0)
-                        byteSize = bitSize / 8;
-                    else
-                        byteSize = bitSize / 8 + 1;
-                }
-                else
-                {
-                    byteSize = pdo.actual_size_in_byte;
-                    //uint objectDataBitSize = objectData.converter.enabled == false ? objectData.variable.DataType.BitSize : objectData.converter.data_type.BitSize;
-                    uint objectDataBitSize = objectData.variable.DataType.BitSize;
-                    if (objectDataBitSize % 8 == 0)
-                        byteSize += objectDataBitSize / 8;
-                    else
-                        byteSize += objectDataBitSize / 8 + 1;
-                }
+                byteSize = __cal_pdo_actual_size_in_byte(pdo, objectData, null);
                 if (byteSize > (pdo.size_in_word * 2))
                     throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.PDO_AREA_OUT_OF_RANGE, null);
 
@@ -1515,31 +1531,12 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
 
         public void InsertPDOMapping(int pos, IO_LIST_PDO_AREA_T area, IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T objectData, bool objectDataReferenceVerify = true)
         {
-            uint bitSize = 0, byteSize = 0;
+            uint byteSize = 0;
             try
             { 
                 PdoObjectDataVerification(area, objectData, objectDataReferenceVerify);
                 IO_LIST_CONTROLLER_PDO_COLLECTION_T.PDO_DEFINITION_T pdo = __controller_pdo_collection.PDOs[area];
-
-                if (area == IO_LIST_PDO_AREA_T.RX_BIT || area == IO_LIST_PDO_AREA_T.TX_BIT)
-                {
-                    bitSize = (uint)pdo.objects.Count();
-                    bitSize += objectData.variable.DataType.BitSize;
-                    if (bitSize % 8 == 0)
-                        byteSize = bitSize / 8;
-                    else
-                        byteSize = bitSize / 8 + 1;
-                }
-                else
-                {
-                    byteSize = pdo.actual_size_in_byte;
-                    //uint objectDataBitSize = objectData.converter.enabled == false ? objectData.variable.DataType.BitSize : objectData.converter.data_type.BitSize;
-                    uint objectDataBitSize = objectData.variable.DataType.BitSize;
-                    if (objectDataBitSize % 8 == 0)
-                        byteSize += objectDataBitSize / 8;
-                    else
-                        byteSize += objectDataBitSize / 8 + 1;
-                }
+                byteSize = __cal_pdo_actual_size_in_byte(pdo, objectData, null);
                 if (byteSize > (pdo.size_in_word * 2))
                     throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.PDO_AREA_OUT_OF_RANGE, null);
 
@@ -1559,32 +1556,13 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
 
         public void RemovePDOMapping(int pos, IO_LIST_PDO_AREA_T area)
         {
-            uint bitSize = 0, byteSize = 0;
+            uint byteSize = 0;
             IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T objectData;
             try
             {
                 IO_LIST_CONTROLLER_PDO_COLLECTION_T.PDO_DEFINITION_T pdo = __controller_pdo_collection.PDOs[area];
                 objectData = pdo.objects[pos];
-
-                if (area == IO_LIST_PDO_AREA_T.RX_BIT || area == IO_LIST_PDO_AREA_T.TX_BIT)
-                {
-                    bitSize = (uint)pdo.objects.Count();
-                    bitSize -= objectData.variable.DataType.BitSize;
-                    if (bitSize % 8 == 0)
-                        byteSize = bitSize / 8;
-                    else
-                        byteSize = bitSize / 8 + 1;
-                }
-                else
-                {
-                    byteSize = pdo.actual_size_in_byte;
-                    //uint objectDataBitSize = objectData.converter.enabled == false ? objectData.variable.DataType.BitSize : objectData.converter.data_type.BitSize;
-                    uint objectDataBitSize = objectData.variable.DataType.BitSize;
-                    if (objectDataBitSize % 8 == 0)
-                        byteSize -= objectDataBitSize / 8;
-                    else
-                        byteSize -= objectDataBitSize / 8 + 1;
-                }
+                byteSize = __cal_pdo_actual_size_in_byte(pdo, null, objectData);
 
                 pdo.objects.RemoveAt(pos);
                 pdo.actual_size_in_byte = byteSize;
@@ -1654,7 +1632,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                 InterlockLogicDataVerification(definition);
 
                 __controller_interlock_collection.logic_definitions.Add(definition);
-                __cal_logic_object_reference(definition);
+                __add_logic_object_reference(definition);
             }
             catch (IOListParseExcepetion e)
             {
@@ -1665,6 +1643,82 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                 throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.FILE_DATA_EXCEPTION, e);
             }
         }
+
+        public void InsertInterlockLogicDefinition(int pos, IO_LIST_INTERLOCK_LOGIC_COLLECTION_T.LOGIC_DEFINITION_T definition)
+        {
+            try
+            {
+                InterlockLogicDataVerification(definition);
+
+                __controller_interlock_collection.logic_definitions.Insert(pos, definition);
+                __add_logic_object_reference(definition);
+            }
+            catch (IOListParseExcepetion e)
+            {
+                throw e;
+            }
+            catch (Exception e)
+            {
+                throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.FILE_DATA_EXCEPTION, e);
+            }
+        }
+
+        public void RemoveInterlockLogicDefinition(int pos)
+        {
+            try
+            {
+                IO_LIST_INTERLOCK_LOGIC_COLLECTION_T.LOGIC_DEFINITION_T temp = __controller_interlock_collection.logic_definitions[pos];
+                __controller_interlock_collection.logic_definitions.RemoveAt(pos);
+                __remove_logic_object_reference(temp);
+            }
+            catch (IOListParseExcepetion e)
+            {
+                throw e;
+            }
+            catch (Exception e)
+            {
+                throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.FILE_DATA_EXCEPTION, e);
+            }
+        }
+
+        public void SwapInterlockLogicDefinition(int first, int second)
+        {
+            try
+            {
+                IO_LIST_INTERLOCK_LOGIC_COLLECTION_T.LOGIC_DEFINITION_T temp = __controller_interlock_collection.logic_definitions[first];
+                __controller_interlock_collection.logic_definitions[first] = __controller_interlock_collection.logic_definitions[second];
+                __controller_interlock_collection.logic_definitions[second] = temp;
+            }
+            catch (IOListParseExcepetion e)
+            {
+                throw e;
+            }
+            catch (Exception e)
+            {
+                throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.FILE_DATA_EXCEPTION, e);
+            }
+        }
+
+        public void ModifyInterlockLogicDefinition(int pos, IO_LIST_INTERLOCK_LOGIC_COLLECTION_T.LOGIC_DEFINITION_T logic)
+        {
+            try
+            {
+                InterlockLogicDataVerification(logic);
+                IO_LIST_INTERLOCK_LOGIC_COLLECTION_T.LOGIC_DEFINITION_T temp = __controller_interlock_collection.logic_definitions[pos];
+                __controller_interlock_collection.logic_definitions[pos] = logic;
+                __remove_logic_object_reference(temp);
+                __add_logic_object_reference(logic);
+            }
+            catch (IOListParseExcepetion e)
+            {
+                throw e;
+            }
+            catch (Exception e)
+            {
+                throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.FILE_DATA_EXCEPTION, e);
+            }
+        }
+
 
         public void Save(IEnumerable<string> extensionModules, IEnumerable<string> ethernetModules, IEnumerable<uint> objects, string fileName)
         {
@@ -1700,6 +1754,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                 root.AppendChild(__create_objects_node(xmlDoc, objects));
                 root.AppendChild(__create_tx_pdo_mapping_node(xmlDoc));
                 root.AppendChild(__create_rx_pdo_mapping_node(xmlDoc));
+                root.AppendChild(__create_interlock_logics_node(xmlDoc));
 
                 xmlDoc.AppendChild(root);
                 xmlDoc.Save(fileName);
@@ -1766,7 +1821,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                         extension = doc.CreateElement("ExtensionModule");
 
                         XmlElement sub = doc.CreateElement("ID");
-                        sub.AppendChild(doc.CreateTextNode("0x" + module.model.ID.ToString("X4")));
+                        sub.AppendChild(doc.CreateTextNode($"0x{module.model.ID:X4}"));
                         extension.AppendChild(sub);
 
                         sub = doc.CreateElement("Name");
@@ -1774,7 +1829,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                         extension.AppendChild(sub);
 
                         sub = doc.CreateElement("Address");
-                        sub.AppendChild(doc.CreateTextNode("0x" + module.local_address.ToString("X4")));
+                        sub.AppendChild(doc.CreateTextNode($"0x{module.local_address:X4}"));
                         extension.AppendChild(sub);
 
                         extensions.AppendChild(extension);
@@ -1788,7 +1843,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                     extension = doc.CreateElement("ExtensionModule");
 
                     XmlElement sub = doc.CreateElement("ID");
-                    sub.AppendChild(doc.CreateTextNode("0x"+__controller_information.modules[reference].model.ID.ToString("X4")));
+                    sub.AppendChild(doc.CreateTextNode($"0x{__controller_information.modules[reference].model.ID:X4}"));
                     extension.AppendChild(sub);
 
                     sub = doc.CreateElement("Name");
@@ -1796,7 +1851,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                     extension.AppendChild(sub);
 
                     sub = doc.CreateElement("Address");
-                    sub.AppendChild(doc.CreateTextNode("0x"+__controller_information.modules[reference].local_address.ToString("X4")));
+                    sub.AppendChild(doc.CreateTextNode($"0x{__controller_information.modules[reference].local_address:X4}"));
                     extension.AppendChild(sub);
 
                     extensions.AppendChild(extension);
@@ -1818,7 +1873,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                         ethernet = doc.CreateElement("EthernetModule");
 
                         XmlElement sub = doc.CreateElement("ID");
-                        sub.AppendChild(doc.CreateTextNode("0x" + module.model.ID.ToString("X4")));
+                        sub.AppendChild(doc.CreateTextNode($"0x{module.model.ID:X4}"));
                         ethernet.AppendChild(sub);
 
                         sub = doc.CreateElement("Name");
@@ -1844,7 +1899,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                     ethernet = doc.CreateElement("EthernetModule");
 
                     XmlElement sub = doc.CreateElement("ID");
-                    sub.AppendChild(doc.CreateTextNode("0x" + __controller_information.modules[reference].model.ID.ToString("X4")));
+                    sub.AppendChild(doc.CreateTextNode($"0x{__controller_information.modules[reference].model.ID:X4}"));
                     ethernet.AppendChild(sub);
 
                     sub = doc.CreateElement("Name");
@@ -1876,7 +1931,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                     objectNode = doc.CreateElement("Object");
 
                     XmlElement sub = doc.CreateElement("Index");
-                    sub.AppendChild(doc.CreateTextNode("0x" + objectData.index.ToString("X8")));
+                    sub.AppendChild(doc.CreateTextNode($"0x{objectData.index:X8}"));
                     objectNode.AppendChild(sub);
 
                     sub = doc.CreateElement("Name");
@@ -1899,7 +1954,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                     objectNode = doc.CreateElement("Object");
 
                     XmlElement sub = doc.CreateElement("Index");
-                    sub.AppendChild(doc.CreateTextNode("0x" + __object_collection.objects[index].index.ToString("X8")));
+                    sub.AppendChild(doc.CreateTextNode($"0x{__object_collection.objects[index].index:X8}"));
                     objectNode.AppendChild(sub);
 
                     sub = doc.CreateElement("Name");
@@ -2009,11 +2064,58 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
             foreach(var o in pdo.objects)
             {
                 index = doc.CreateElement("Index");
-                index.AppendChild(doc.CreateTextNode("0x" + o.index.ToString("X8")));
+                index.AppendChild(doc.CreateTextNode($"0x{o.index:X8}"));
                 pdoArea.AppendChild(index);
             }
 
             return pdoArea;
+        }
+
+        private XmlElement __create_interlock_logics_node(XmlDocument doc)
+        {
+            XmlElement interlocks = doc.CreateElement("Interlocks");
+            foreach(var i in __controller_interlock_collection.logic_definitions)
+            {
+                XmlElement interlock = doc.CreateElement("Interlock");
+
+                XmlElement e = doc.CreateElement("Name");
+                e.AppendChild(doc.CreateTextNode(i.name));
+                interlock.AppendChild(e);
+
+                e = doc.CreateElement("Target");
+                foreach (var o in i.target_objects)
+                {
+                    XmlElement index = doc.CreateElement("Index");
+                    index.AppendChild(doc.CreateTextNode($"0x{o.index:X8}"));
+                    e.AppendChild(index);
+                }
+                interlock.AppendChild(e);
+
+                e = doc.CreateElement("Statement");
+                e.AppendChild(__create_interlock_logic_statement_element(doc, i.statement));
+                interlock.AppendChild(e);
+
+                interlocks.AppendChild(interlock);
+            }
+            return interlocks;
+        }
+
+        private XmlElement __create_interlock_logic_statement_element(XmlDocument doc, IO_LIST_INTERLOCK_LOGIC_COLLECTION_T.LOGIC_ELEMEMT_T elememt)
+        {
+            XmlElement e;
+            if (elememt.type == IO_LIST_INTERLOCK_LOGIC_ELEMENT_TYPE.OPERAND)
+            {
+                e = doc.CreateElement("Index");
+                e.AppendChild(doc.CreateTextNode($"0x{(elememt as IO_LIST_INTERLOCK_LOGIC_COLLECTION_T.LOGIC_OPERAND_T).Operand.index:X8}"));
+                return e;
+            }
+            else
+            {
+                e = doc.CreateElement((elememt as IO_LIST_INTERLOCK_LOGIC_COLLECTION_T.LOGIC_EXPRESSION_T).logic_operator.ToString());
+                foreach (var el in (elememt as IO_LIST_INTERLOCK_LOGIC_COLLECTION_T.LOGIC_EXPRESSION_T).elements)
+                    e.AppendChild(__create_interlock_logic_statement_element(doc, el));
+                return e;
+            }
         }
     }
 
@@ -2214,19 +2316,26 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
     {
         public class PDO_DEFINITION_T
         {
+            public IO_LIST_PDO_AREA_T area { get; private set; }
             public uint offset_in_word = 0;
             public uint size_in_word = 0;
             public uint actual_size_in_byte = 0;
-            public List<IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T> objects = new List<IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T>();
+            public List<IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T> objects;
+
+            public PDO_DEFINITION_T(IO_LIST_PDO_AREA_T area)
+            {
+                this.area = area;
+                objects = new List<IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T>();
+            }
         }
 
-        public PDO_DEFINITION_T tx_pdo_diagnostic_area = new PDO_DEFINITION_T() { offset_in_word = 0, size_in_word = 128 };
-        public PDO_DEFINITION_T tx_pdo_bit_area = new PDO_DEFINITION_T() { offset_in_word = 128, size_in_word = 32 };
-        public PDO_DEFINITION_T tx_pdo_block_area = new PDO_DEFINITION_T() { offset_in_word = 160, size_in_word = 512 };
+        public PDO_DEFINITION_T tx_pdo_diagnostic_area = new PDO_DEFINITION_T(IO_LIST_PDO_AREA_T.TX_DIAGNOSTIC) { offset_in_word = 0, size_in_word = 128};
+        public PDO_DEFINITION_T tx_pdo_bit_area = new PDO_DEFINITION_T(IO_LIST_PDO_AREA_T.TX_BIT) { offset_in_word = 128, size_in_word = 32 };
+        public PDO_DEFINITION_T tx_pdo_block_area = new PDO_DEFINITION_T(IO_LIST_PDO_AREA_T.TX_BLOCK) { offset_in_word = 160, size_in_word = 512 };
 
-        public PDO_DEFINITION_T rx_pdo_control_area = new PDO_DEFINITION_T() { offset_in_word = 672, size_in_word = 128 };
-        public PDO_DEFINITION_T rx_pdo_bit_area = new PDO_DEFINITION_T() { offset_in_word = 800, size_in_word = 32 };
-        public PDO_DEFINITION_T rx_pdo_block_area = new PDO_DEFINITION_T() { offset_in_word = 832, size_in_word = 512 };
+        public PDO_DEFINITION_T rx_pdo_control_area = new PDO_DEFINITION_T(IO_LIST_PDO_AREA_T.RX_CONTROL) { offset_in_word = 672, size_in_word = 128 };
+        public PDO_DEFINITION_T rx_pdo_bit_area = new PDO_DEFINITION_T(IO_LIST_PDO_AREA_T.RX_BIT) { offset_in_word = 800, size_in_word = 32 };
+        public PDO_DEFINITION_T rx_pdo_block_area = new PDO_DEFINITION_T(IO_LIST_PDO_AREA_T.RX_BLOCK) { offset_in_word = 832, size_in_word = 512 };
 
         private Dictionary<IO_LIST_PDO_AREA_T, PDO_DEFINITION_T> __area_pdo_definitions;
 

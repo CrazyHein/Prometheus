@@ -466,53 +466,65 @@
                             <RowDefinition Height="*"/>
                         </Grid.RowDefinitions>
                         <GridSplitter Grid.Row="1" Background="Gray" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="4,4,4,4"/>
-                        <ListBox Name="__lsb_interlock_logic_definitions" HorizontalContentAlignment="Stretch" Margin="4" ItemsSource="{Binding IntlkLogicArea}" ContextMenu="{StaticResource IntlkContextMenu}">
+                        <ListBox Name="__lsb_interlock_logic_definitions" HorizontalContentAlignment="Stretch" Margin="4" ItemsSource="{Binding IntlkLogicArea}" ContextMenu="{StaticResource IntlkContextMenu}" ScrollViewer.CanContentScroll="False">
+                            <ListBox.ItemContainerStyle>
+                                <Style>
+                                    <Setter Property="Control.Padding" Value="0"/>
+                                    <Style.Triggers>
+                                        <Trigger Property="ListBoxItem.IsSelected" Value="True">
+                                            <Setter Property="ListBoxItem.Background" Value="LightYellow"/>
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </ListBox.ItemContainerStyle>
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
-                                    <Border Margin="4" BorderThickness="1" BorderBrush="SteelBlue" CornerRadius="4">
-                                        <Grid Margin="3">
-                                            <Grid.Resources>
-                                                <Style TargetType="TextBlock">
-                                                    <Setter Property="Margin" Value="4"/>
-                                                </Style>
-                                            </Grid.Resources>
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="auto"/>
-                                                <ColumnDefinition/>
-                                            </Grid.ColumnDefinitions>
-                                            <Grid.RowDefinitions>
-                                                <RowDefinition/>
-                                                <RowDefinition/>
-                                                <RowDefinition/>
-                                            </Grid.RowDefinitions>
-                                            <TextBlock Text="Name : " FontWeight="Bold" Margin="4"/>
-                                            <TextBlock Text="{Binding Name}" Grid.Column="1"/>
-                                            <TextBlock Text="Target : " Grid.Row="1" FontWeight="Bold"/>
-                                            <TextBlock Text="Statement : " Grid.Row="2" FontWeight="Bold"/>
+                                    <Grid Margin="0" Background="White">
+                                        <Border Margin="4" BorderThickness="1" BorderBrush="SteelBlue" CornerRadius="4" Background="{Binding Path=Background, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type :ListBoxItem}}}">
+                                            <Grid Margin="3">
+                                                <Grid.Resources>
+                                                    <Style TargetType="TextBlock">
+                                                        <Setter Property="Margin" Value="4"/>
+                                                    </Style>
+                                                </Grid.Resources>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="auto"/>
+                                                    <ColumnDefinition/>
+                                                </Grid.ColumnDefinitions>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition/>
+                                                    <RowDefinition/>
+                                                    <RowDefinition/>
+                                                </Grid.RowDefinitions>
+                                                <TextBlock Text="Name : " FontWeight="Bold" Margin="4"/>
+                                                <TextBlock Text="{Binding Name}" Grid.Column="1"/>
+                                                <TextBlock Text="Target : " Grid.Row="1" FontWeight="Bold"/>
+                                                <TextBlock Text="Statement : " Grid.Row="2" FontWeight="Bold"/>
 
-                                            <ListBox ItemsSource="{Binding TargetObjects}" Grid.Row="1" Grid.Column="1" Margin="4">
-                                                <ListBox.ItemTemplate>
-                                                    <DataTemplate>
-                                                        <TextBlock Text="{Binding}" Margin="4"/>
-                                                    </DataTemplate>
-                                                </ListBox.ItemTemplate>
-                                            </ListBox>
-                                            <TreeView Margin="4" Grid.Column="1" Grid.Row="2">
-                                                <TreeView.Resources>
-                                                </TreeView.Resources>
-                                                <TreeViewItem ItemsSource="{Binding Statement.Elements}" Header="{Binding Statement.LogicOperator}">
-                                                    <TreeViewItem.Resources>
-                                                        <HierarchicalDataTemplate ItemsSource="{Binding Elements}" DataType="{x:Type local:IntlkLogicExpression}">
-                                                            <TextBlock Text="{Binding LogicOperator}" Margin="4"/>
-                                                        </HierarchicalDataTemplate>
-                                                        <HierarchicalDataTemplate DataType="{x:Type local:IntlkLogicOperand}">
-                                                            <TextBlock Text="{Binding ObjectDataModel}" Margin="4"/>
-                                                        </HierarchicalDataTemplate>
-                                                    </TreeViewItem.Resources>
-                                                </TreeViewItem>
-                                            </TreeView>
-                                        </Grid>
-                                    </Border>
+                                                <ListBox ItemsSource="{Binding TargetObjects}" Grid.Row="1" Grid.Column="1" Margin="4">
+                                                    <ListBox.ItemTemplate>
+                                                        <DataTemplate>
+                                                            <TextBlock Text="{Binding}" Margin="4"/>
+                                                        </DataTemplate>
+                                                    </ListBox.ItemTemplate>
+                                                </ListBox>
+                                                <TreeView Margin="4" Grid.Column="1" Grid.Row="2">
+                                                    <TreeView.Resources>
+                                                    </TreeView.Resources>
+                                                    <TreeViewItem ItemsSource="{Binding Statement.Elements}" Header="{Binding Statement.LogicOperator}">
+                                                        <TreeViewItem.Resources>
+                                                            <HierarchicalDataTemplate ItemsSource="{Binding Elements}" DataType="{x:Type local:IntlkLogicExpression}">
+                                                                <TextBlock Text="{Binding LogicOperator}" Margin="4"/>
+                                                            </HierarchicalDataTemplate>
+                                                            <HierarchicalDataTemplate DataType="{x:Type local:IntlkLogicOperand}">
+                                                                <TextBlock Text="{Binding ObjectDataModel}" Margin="4"/>
+                                                            </HierarchicalDataTemplate>
+                                                        </TreeViewItem.Resources>
+                                                    </TreeViewItem>
+                                                </TreeView>
+                                            </Grid>
+                                        </Border>
+                                    </Grid>
                                 </DataTemplate>
                             </ListBox.ItemTemplate>
                         </ListBox>

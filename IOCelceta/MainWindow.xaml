@@ -84,14 +84,6 @@
                     </StackPanel>
                 </TabItem.Header>
             </TabItem>
-            <TabItem Width="200" Name="__tab_interlock_collection">
-                <TabItem.Header>
-                    <StackPanel Orientation="Horizontal">
-                        <Image Source="img/lock.png" Height="32" Margin="2,2,8,2"/>
-                        <TextBlock Text="Interlock Collection" VerticalAlignment="Center"/>
-                    </StackPanel>
-                </TabItem.Header>
-            </TabItem>
         </TabControl>
     </Grid>
 </Window>

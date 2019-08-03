@@ -67,8 +67,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             {
                 if (tag != null)
                 {
-                    IO_LIST_PDO_AREA_T area = (IO_LIST_PDO_AREA_T)((__tab_pdo_container.SelectedItem as TabItem).Tag);
+                    IO_LIST_PDO_AREA_T area = (IO_LIST_PDO_AREA_T)(tag);
                     (DataContext as PDOCollectionDataModel).AppendPDOMapping(area, __lsv_object_collection.SelectedItem as ObjectItemDataModel);
+                    __area_views[area].SelectedIndex = __area_views[area].Items.Count - 1;
+                    __area_views[area].ScrollIntoView(__area_views[area].SelectedItem);
                 }
                 else
                 {
@@ -93,13 +95,19 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
 
         private void __on_remove_element_command_executed(object sender, ExecutedRoutedEventArgs e)
         {
-            IO_LIST_PDO_AREA_T area = (IO_LIST_PDO_AREA_T)((__tab_pdo_container.SelectedItem as TabItem).Tag);
-            int selectedIndex = __area_views[area].SelectedIndex;
             if (MessageBox.Show("Are you sure ?", "Question", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
             {
+                object tag = (__tab_pdo_container.SelectedItem as TabItem).Tag;
                 try
                 {
-                    (DataContext as PDOCollectionDataModel).RemovePDOMapping(selectedIndex, area);
+                    if (tag != null)
+                    {
+                        IO_LIST_PDO_AREA_T area = (IO_LIST_PDO_AREA_T)(tag);
+                        int selectedIndex = __area_views[area].SelectedIndex;
+                        (DataContext as PDOCollectionDataModel).RemovePDOMapping(selectedIndex, area);
+                    }
+                    else
+                        (DataContext as PDOCollectionDataModel).RemoveIntlklogicDefinition(__lsb_interlock_logic_definitions.SelectedIndex);
                 }
                 catch (IOListParseExcepetion exception)
                 {
@@ -139,11 +147,24 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
 
         private void __on_insert_element_before_command_executed(object sender, ExecutedRoutedEventArgs e)
         {
-            IO_LIST_PDO_AREA_T area = (IO_LIST_PDO_AREA_T)((__tab_pdo_container.SelectedItem as TabItem).Tag);
-            int selectedIndex = __area_views[area].SelectedIndex;    
+            object tag = (__tab_pdo_container.SelectedItem as TabItem).Tag;
             try
             {
-                (DataContext as PDOCollectionDataModel).InsertPDOMapping(selectedIndex, area, __lsv_object_collection.SelectedItem as ObjectItemDataModel);
+                if(tag != null)
+                {
+                    IO_LIST_PDO_AREA_T area = (IO_LIST_PDO_AREA_T)(tag);
+                    int selectedIndex = __area_views[area].SelectedIndex;
+                    (DataContext as PDOCollectionDataModel).InsertPDOMapping(selectedIndex, area, __lsv_object_collection.SelectedItem as ObjectItemDataModel);
+                    __area_views[area].SelectedIndex = selectedIndex;
+                    __area_views[area].ScrollIntoView(__area_views[area].SelectedItem);
+                }
+                else
+                {
+                    __task = __INTLK_LOGIC_DEFINITION_LIST_TASK.INSERT;
+                    __task_parameter = __lsb_interlock_logic_definitions.SelectedIndex;
+                    __lsb_interlock_logic_definitions.IsEnabled = false;
+                    __grid_edit_intlk_logic_definition.IsEnabled = true;
+                }
             }
             catch (IOListParseExcepetion exception)
             {
@@ -160,13 +181,26 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
 
         private void __on_move_up_element_command_executed(object sender, ExecutedRoutedEventArgs e)
         {
-            IO_LIST_PDO_AREA_T area = (IO_LIST_PDO_AREA_T)((__tab_pdo_container.SelectedItem as TabItem).Tag);
-            ListView view = __area_views[area];
-            int selectedIndex = view.SelectedIndex;
+            int selectedIndex;
+            object tag = (__tab_pdo_container.SelectedItem as TabItem).Tag;
             try
             {
-                (DataContext as PDOCollectionDataModel).SwapPDOMapping(area, selectedIndex, selectedIndex - 1);
-                view.SelectedIndex = selectedIndex - 1;
+                if(tag != null)
+                {
+                    IO_LIST_PDO_AREA_T area = (IO_LIST_PDO_AREA_T)(tag);
+                    ListView view = __area_views[area];
+                    selectedIndex = view.SelectedIndex;
+                    (DataContext as PDOCollectionDataModel).SwapPDOMapping(area, selectedIndex, selectedIndex - 1);
+                    view.SelectedIndex = selectedIndex - 1;
+                    view.ScrollIntoView(view.SelectedItem);
+                }
+                else
+                {
+                    selectedIndex = __lsb_interlock_logic_definitions.SelectedIndex;
+                    (DataContext as PDOCollectionDataModel).SwapIntlklogicDefinition(selectedIndex, selectedIndex - 1);
+                    __lsb_interlock_logic_definitions.SelectedIndex = selectedIndex - 1;
+                    __lsb_interlock_logic_definitions.ScrollIntoView(__lsb_interlock_logic_definitions.SelectedItem);
+                } 
             }
             catch (IOListParseExcepetion exception)
             {
@@ -183,13 +217,27 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
 
         private void __on_move_down_element_command_executed(object sender, ExecutedRoutedEventArgs e)
         {
-            IO_LIST_PDO_AREA_T area = (IO_LIST_PDO_AREA_T)((__tab_pdo_container.SelectedItem as TabItem).Tag);
-            ListView view = __area_views[area];
-            int selectedIndex = view.SelectedIndex;
+            int selectedIndex;
+            object tag = (__tab_pdo_container.SelectedItem as TabItem).Tag;
             try
             {
-                (DataContext as PDOCollectionDataModel).SwapPDOMapping(area, selectedIndex, selectedIndex + 1);
-                view.SelectedIndex = selectedIndex + 1;
+                if(tag != null)
+                {
+                    IO_LIST_PDO_AREA_T area = (IO_LIST_PDO_AREA_T)((__tab_pdo_container.SelectedItem as TabItem).Tag);
+                    ListView view = __area_views[area];
+                    selectedIndex = view.SelectedIndex;
+                    (DataContext as PDOCollectionDataModel).SwapPDOMapping(area, selectedIndex, selectedIndex + 1);
+                    view.SelectedIndex = selectedIndex + 1;
+                    view.ScrollIntoView(view.SelectedItem);
+                }
+                else
+                {
+                    selectedIndex = __lsb_interlock_logic_definitions.SelectedIndex;
+                    (DataContext as PDOCollectionDataModel).SwapIntlklogicDefinition(selectedIndex, selectedIndex + 1);
+                    __lsb_interlock_logic_definitions.SelectedIndex = selectedIndex + 1;
+                    __lsb_interlock_logic_definitions.ScrollIntoView(__lsb_interlock_logic_definitions.SelectedItem);
+                }
+
             }
             catch (IOListParseExcepetion exception)
             {
@@ -489,6 +537,20 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
                     case __INTLK_LOGIC_DEFINITION_LIST_TASK.APPEND:
                         (DataContext as PDOCollectionDataModel).AppendIntlklogicDefinition(__txt_edit_intlk_logic_name.Text,
                             __txt_edit_intlk_logic_target.Text, __txt_edit_intlk_logic_statement.Text);
+                        __lsb_interlock_logic_definitions.SelectedIndex = __lsb_interlock_logic_definitions.Items.Count - 1;
+                        __lsb_interlock_logic_definitions.ScrollIntoView(__lsb_interlock_logic_definitions.SelectedItem);
+                        break;
+                    case __INTLK_LOGIC_DEFINITION_LIST_TASK.INSERT:
+                        (DataContext as PDOCollectionDataModel).InsertIntlklogicDefinition(__task_parameter, __txt_edit_intlk_logic_name.Text,
+                            __txt_edit_intlk_logic_target.Text, __txt_edit_intlk_logic_statement.Text);
+                        __lsb_interlock_logic_definitions.SelectedIndex = __task_parameter;
+                        __lsb_interlock_logic_definitions.ScrollIntoView(__lsb_interlock_logic_definitions.SelectedItem);
+                        break;
+                    case __INTLK_LOGIC_DEFINITION_LIST_TASK.EDIT:
+                        (DataContext as PDOCollectionDataModel).ModifyIntlklogicDefinition(__task_parameter, __txt_edit_intlk_logic_name.Text,
+                            __txt_edit_intlk_logic_target.Text, __txt_edit_intlk_logic_statement.Text);
+                        __lsb_interlock_logic_definitions.SelectedIndex = __task_parameter;
+                        __lsb_interlock_logic_definitions.ScrollIntoView(__lsb_interlock_logic_definitions.SelectedItem);
                         break;
                 }
                 __lsb_interlock_logic_definitions.IsEnabled = true;
