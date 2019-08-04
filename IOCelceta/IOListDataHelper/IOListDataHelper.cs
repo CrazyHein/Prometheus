@@ -2408,10 +2408,17 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                 {
                     target_objects = new List<IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T>();
 
-                    string[] targets = target.Split(Environment.NewLine.ToCharArray() , StringSplitOptions.RemoveEmptyEntries); 
-                    foreach (var str in targets)
+                    System.IO.StringReader sr = new System.IO.StringReader(target);
+                    while(true)
                     {
-                        uint id = Convert.ToUInt32(str, 16);
+                        string line = sr.ReadLine();
+                        if (line == null)
+                            break;
+                        else
+                            line = line.Trim();
+                        if (line == string.Empty)
+                            continue;
+                        uint id = Convert.ToUInt32(line, 16);
                         IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T temp;
                         if (objectDictionary.TryGetValue(id, out temp) == true)
                             target_objects.Add(temp);
@@ -2419,12 +2426,16 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                             throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_OBJECT_REFERENCE_IN_INTERLOCK, null);
                     }
 
-                    System.IO.StringReader sr = new System.IO.StringReader(statement);
+                    sr = new System.IO.StringReader(statement);
                     List<Tuple<string, int>> statements = new List<Tuple<string, int>>();
                     while(true)
                     {
                         string line = sr.ReadLine();
-                        if (line != null)
+                        if (line == null)
+                            break;
+                        else if (line.Trim() == string.Empty)
+                            continue;
+                        else
                         {
                             int i = 0;
                             for (; i < line.Count(); ++i)
@@ -2432,8 +2443,6 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                                     break;
                             statements.Add(new Tuple<string, int>(line.Substring(i).TrimEnd(), i));
                         }
-                        else
-                            break;
                     }
                     int start = 0;
                     this.statement = __search_logic_element(statements, ref start, null, objectDictionary) as LOGIC_EXPRESSION_T;
