@@ -190,6 +190,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
         private VariableDefinition __variable_selection;
         private string __variable_name;
         private DataTypeDefinition __variable_data_type;
+        private string __variable_unit;
+        private string __variable_comment;
 
         private bool __binding_enable;
         private IO_LIST_CONTROLLER_INFORMATION_T.MODULE_T __binding_module;
@@ -217,7 +219,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
                 if(__variable_selection != null)
                 {
                     VariableName = __variable_selection.Name;
-                    VariableDataType = __variable_selection.DataType;
+                    //VariableDataType = __variable_selection.DataType;
                 }
             }
         }
@@ -236,6 +238,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
                     __variable_selection =
                         Host.DataHelper.VariableCatalogue.Variables[value];
                     VariableDataType = __variable_selection.DataType;
+                    VariableUnit = __variable_selection.Unit;
+                    VariableComment = __variable_selection.Comment;
                 }
                 catch
                 {
@@ -248,6 +252,18 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
         {
             get { return __variable_data_type; }
             private set { SetProperty(ref __variable_data_type, value); }
+        }
+
+        public string VariableUnit
+        {
+            get { return __variable_unit; }
+            private set { SetProperty(ref __variable_unit, value); }
+        }
+
+        public string VariableComment
+        {
+            get { return __variable_comment; }
+            private set { SetProperty(ref __variable_comment, value); }
         }
 
         public bool BindingEnable

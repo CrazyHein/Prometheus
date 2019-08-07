@@ -85,6 +85,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.Catalogue
                         uint id = 0;
                         string name = null;
                         DataTypeDefinition dataType = null;
+                        string unit = null, comment = null;
                         uint mask = 0;
                         foreach (XmlNode node in variableNode.ChildNodes)
                         {
@@ -107,10 +108,17 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.Catalogue
                                     else
                                         throw new VariableCatalogueParseExcepetion(VARIABLE_CATALOGUE_FILE_ERROR_CODE_T.INVALID_VARIABLE_DATA_TYPE, null);
                                     break;
+                                case "Unit":
+                                    unit = node.FirstChild.Value;
+                                    mask |= 0x00000008;
+                                    break;
+                                case "Comment":
+                                    comment = node.FirstChild.Value;
+                                    break;
                             }
                         }
-                        if ((mask & 0x00000007) == 0x00000007)
-                            __variables.Add(name, new VariableDefinition(id, name, dataType));
+                        if ((mask & 0x0000000F) == 0x0000000F)
+                            __variables.Add(name, new VariableDefinition(id, name, dataType, unit, comment));
                         else
                             throw new VariableCatalogueParseExcepetion(VARIABLE_CATALOGUE_FILE_ERROR_CODE_T.ELEMENT_MISSING, null);
                     }
@@ -136,12 +144,19 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.Catalogue
         public DataTypeDefinition DataType { get; private set; }
         public string Name { get; private set; }
         public uint ID { get; private set; }
+        public string Unit { get; private set; }
+        public string Comment { get; private set; }
 
-        public VariableDefinition(uint id, string name, DataTypeDefinition dataType)
+        public VariableDefinition(uint id, string name, DataTypeDefinition dataType, string unit, string comment)
         {
             ID = id;
             Name = name;
             DataType = dataType;
+            Unit = unit;
+            if (comment != null && comment != string.Empty)
+                Comment = comment;
+            else
+                Comment = "N/A";
         }
 
         public override string ToString()

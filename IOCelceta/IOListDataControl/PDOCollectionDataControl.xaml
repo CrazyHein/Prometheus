@@ -190,7 +190,11 @@
                     <TextBlock FontWeight="Bold" Text="Variable Name"/>
                 </DataTemplate>
                 <DataTemplate x:Key="VariableNameContentTemplate">
-                    <TextBlock Text="{Binding Path=VariableName}" Margin="4" HorizontalAlignment="Left"/>
+                    <TextBlock Text="{Binding Path=VariableName}" Margin="4" HorizontalAlignment="Left">
+                        <TextBlock.ToolTip>
+                            <TextBlock Text="{Binding Path=VariableComment}"/>
+                        </TextBlock.ToolTip>
+                    </TextBlock>
                 </DataTemplate>
 
                 <DataTemplate x:Key="DataTypeHeadTemplate">
@@ -198,6 +202,13 @@
                 </DataTemplate>
                 <DataTemplate x:Key="DataTypeContentTemplate">
                     <TextBlock Text="{Binding Path=VariableDataType}" Margin="4" HorizontalAlignment="Left"/>
+                </DataTemplate>
+
+                <DataTemplate x:Key="UnitHeadTemplate">
+                    <TextBlock FontWeight="Bold" Text="Unit"/>
+                </DataTemplate>
+                <DataTemplate x:Key="UnitContentTemplate">
+                    <TextBlock Text="{Binding Path=VariableUnit}" Margin="4" HorizontalAlignment="Left"/>
                 </DataTemplate>
 
                 <DataTemplate x:Key="BindingHeadTemplate">
@@ -279,6 +290,7 @@
                                         <GridViewColumn Width="100" HeaderTemplate="{StaticResource IndexHeadTemplate}" CellTemplate="{StaticResource IndexContentTemplate}"/>
                                         <GridViewColumn Width="200" HeaderTemplate="{StaticResource VariableNameHeadTemplate}" CellTemplate="{StaticResource VariableNameContentTemplate}"/>
                                         <GridViewColumn Width="100" HeaderTemplate="{StaticResource DataTypeHeadTemplate}" CellTemplate="{StaticResource DataTypeContentTemplate}"/>
+                                        <GridViewColumn Width="100" HeaderTemplate="{StaticResource UnitHeadTemplate}" CellTemplate="{StaticResource UnitContentTemplate}"/>
                                         <GridViewColumn Width="200" HeaderTemplate="{StaticResource BindingHeadTemplate}" CellTemplate="{StaticResource BindingContentTemplate}"/>
                                         <GridViewColumn Width="200" HeaderTemplate="{StaticResource ConverterHeadTemplate}" CellTemplate="{StaticResource ConverterContentTemplate}"/>
                                     </GridView>
@@ -312,6 +324,7 @@
                                         <GridViewColumn Width="100" HeaderTemplate="{StaticResource IndexHeadTemplate}" CellTemplate="{StaticResource IndexContentTemplate}"/>
                                         <GridViewColumn Width="200" HeaderTemplate="{StaticResource VariableNameHeadTemplate}" CellTemplate="{StaticResource VariableNameContentTemplate}"/>
                                         <GridViewColumn Width="100" HeaderTemplate="{StaticResource DataTypeHeadTemplate}" CellTemplate="{StaticResource DataTypeContentTemplate}"/>
+                                        <GridViewColumn Width="100" HeaderTemplate="{StaticResource UnitHeadTemplate}" CellTemplate="{StaticResource UnitContentTemplate}"/>
                                         <GridViewColumn Width="200" HeaderTemplate="{StaticResource BindingHeadTemplate}" CellTemplate="{StaticResource BindingContentTemplate}"/>
                                         <GridViewColumn Width="200" HeaderTemplate="{StaticResource ConverterHeadTemplate}" CellTemplate="{StaticResource ConverterContentTemplate}"/>
                                     </GridView>
@@ -345,6 +358,7 @@
                                         <GridViewColumn Width="100" HeaderTemplate="{StaticResource IndexHeadTemplate}" CellTemplate="{StaticResource IndexContentTemplate}"/>
                                         <GridViewColumn Width="200" HeaderTemplate="{StaticResource VariableNameHeadTemplate}" CellTemplate="{StaticResource VariableNameContentTemplate}"/>
                                         <GridViewColumn Width="100" HeaderTemplate="{StaticResource DataTypeHeadTemplate}" CellTemplate="{StaticResource DataTypeContentTemplate}"/>
+                                        <GridViewColumn Width="100" HeaderTemplate="{StaticResource UnitHeadTemplate}" CellTemplate="{StaticResource UnitContentTemplate}"/>
                                         <GridViewColumn Width="200" HeaderTemplate="{StaticResource BindingHeadTemplate}" CellTemplate="{StaticResource BindingContentTemplate}"/>
                                         <GridViewColumn Width="200" HeaderTemplate="{StaticResource ConverterHeadTemplate}" CellTemplate="{StaticResource ConverterContentTemplate}"/>
                                     </GridView>
@@ -378,6 +392,7 @@
                                         <GridViewColumn Width="100" HeaderTemplate="{StaticResource IndexHeadTemplate}" CellTemplate="{StaticResource IndexContentTemplate}"/>
                                         <GridViewColumn Width="200" HeaderTemplate="{StaticResource VariableNameHeadTemplate}" CellTemplate="{StaticResource VariableNameContentTemplate}"/>
                                         <GridViewColumn Width="100" HeaderTemplate="{StaticResource DataTypeHeadTemplate}" CellTemplate="{StaticResource DataTypeContentTemplate}"/>
+                                        <GridViewColumn Width="100" HeaderTemplate="{StaticResource UnitHeadTemplate}" CellTemplate="{StaticResource UnitContentTemplate}"/>
                                         <GridViewColumn Width="200" HeaderTemplate="{StaticResource BindingHeadTemplate}" CellTemplate="{StaticResource BindingContentTemplate}"/>
                                         <GridViewColumn Width="200" HeaderTemplate="{StaticResource ConverterHeadTemplate}" CellTemplate="{StaticResource ConverterContentTemplate}"/>
                                     </GridView>
@@ -411,6 +426,7 @@
                                         <GridViewColumn Width="100" HeaderTemplate="{StaticResource IndexHeadTemplate}" CellTemplate="{StaticResource IndexContentTemplate}"/>
                                         <GridViewColumn Width="200" HeaderTemplate="{StaticResource VariableNameHeadTemplate}" CellTemplate="{StaticResource VariableNameContentTemplate}"/>
                                         <GridViewColumn Width="100" HeaderTemplate="{StaticResource DataTypeHeadTemplate}" CellTemplate="{StaticResource DataTypeContentTemplate}"/>
+                                        <GridViewColumn Width="100" HeaderTemplate="{StaticResource UnitHeadTemplate}" CellTemplate="{StaticResource UnitContentTemplate}"/>
                                         <GridViewColumn Width="200" HeaderTemplate="{StaticResource BindingHeadTemplate}" CellTemplate="{StaticResource BindingContentTemplate}"/>
                                         <GridViewColumn Width="200" HeaderTemplate="{StaticResource ConverterHeadTemplate}" CellTemplate="{StaticResource ConverterContentTemplate}"/>
                                     </GridView>
@@ -444,6 +460,7 @@
                                         <GridViewColumn Width="100" HeaderTemplate="{StaticResource IndexHeadTemplate}" CellTemplate="{StaticResource IndexContentTemplate}"/>
                                         <GridViewColumn Width="200" HeaderTemplate="{StaticResource VariableNameHeadTemplate}" CellTemplate="{StaticResource VariableNameContentTemplate}"/>
                                         <GridViewColumn Width="100" HeaderTemplate="{StaticResource DataTypeHeadTemplate}" CellTemplate="{StaticResource DataTypeContentTemplate}"/>
+                                        <GridViewColumn Width="100" HeaderTemplate="{StaticResource UnitHeadTemplate}" CellTemplate="{StaticResource UnitContentTemplate}"/>
                                         <GridViewColumn Width="200" HeaderTemplate="{StaticResource BindingHeadTemplate}" CellTemplate="{StaticResource BindingContentTemplate}"/>
                                         <GridViewColumn Width="200" HeaderTemplate="{StaticResource ConverterHeadTemplate}" CellTemplate="{StaticResource ConverterContentTemplate}"/>
                                     </GridView>
@@ -480,7 +497,7 @@
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
                                     <Grid Margin="0" Background="White">
-                                        <Border Margin="4" BorderThickness="1" BorderBrush="SteelBlue" CornerRadius="4" Background="{Binding Path=Background, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type :ListBoxItem}}}">
+                                        <Border Margin="4" BorderThickness="1" BorderBrush="SteelBlue" CornerRadius="4" Background="{Binding Path=Background, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ListBoxItem}}}">
                                             <Grid Margin="3">
                                                 <Grid.Resources>
                                                     <Style TargetType="TextBlock">
@@ -596,6 +613,7 @@
                                 <GridViewColumn Width="100" HeaderTemplate="{StaticResource IndexHeadTemplate}" CellTemplate="{StaticResource IndexContentTemplate}"/>
                                 <GridViewColumn Width="200" HeaderTemplate="{StaticResource VariableNameHeadTemplate}" CellTemplate="{StaticResource VariableNameContentTemplate}"/>
                                 <GridViewColumn Width="100" HeaderTemplate="{StaticResource DataTypeHeadTemplate}" CellTemplate="{StaticResource DataTypeContentTemplate}"/>
+                                <GridViewColumn Width="100" HeaderTemplate="{StaticResource UnitHeadTemplate}" CellTemplate="{StaticResource UnitContentTemplate}"/>
                                 <GridViewColumn Width="200" HeaderTemplate="{StaticResource BindingHeadTemplate}" CellTemplate="{StaticResource BindingContentTemplate}"/>
                                 <GridViewColumn Width="200" HeaderTemplate="{StaticResource ConverterHeadTemplate}" CellTemplate="{StaticResource ConverterContentTemplate}"/>
                             </GridView>

@@ -114,6 +114,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             ObjectDataControl objectDataControl = new ObjectDataControl(newObjectItem, true);
             if (objectDataControl.ShowDialog() == true)
             {
+                //Decorator decorator = (Decorator)VisualTreeHelper.GetChild(__lsv_io_objects, 0);
+                //((ScrollViewer)decorator.Child).ScrollToBottom();
                 __lsv_io_objects.SelectedIndex = __lsv_io_objects.Items.Count - 1;
                 __lsv_io_objects.ScrollIntoView(__lsv_io_objects.SelectedItem);
             }
@@ -131,7 +133,11 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             ObjectItemDataModel newObjectItem = new ObjectItemDataModel(host,
                 host.DataHelper.VariableCatalogue.Variables.Values.First());
             ObjectDataControl objectDataControl = new ObjectDataControl(newObjectItem, true, __lsv_io_objects.SelectedIndex);
-            objectDataControl.ShowDialog();
+            if (objectDataControl.ShowDialog() == true)
+            {
+                __lsv_io_objects.SelectedIndex = __lsv_io_objects.SelectedIndex - 1;
+                __lsv_io_objects.ScrollIntoView(__lsv_io_objects.SelectedItem);
+            }
             e.Handled = true;
         }
 

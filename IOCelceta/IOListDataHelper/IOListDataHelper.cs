@@ -965,7 +965,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
 
             if (objectData.converter.enabled == true)
             {
-                if(objectData.variable.DataType.BitSize == 1 || objectData.converter.unit_name == null)
+                if(objectData.variable.DataType.BitSize == 1 || objectData.converter.unit_name == null || objectData.converter.down_scale == objectData.converter.up_scale)
                     throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_OBJECT_CONVERTER, null);
                 //else if (objectData.converter.data_type == null || DataTypeCatalogue.DataTypes.Values.Contains(objectData.converter.data_type) == false)
                     //throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_OBJECT_CONVERTER_DATA_TYPE, null);

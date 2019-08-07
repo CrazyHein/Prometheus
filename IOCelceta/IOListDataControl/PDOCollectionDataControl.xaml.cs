@@ -69,8 +69,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
                 {
                     IO_LIST_PDO_AREA_T area = (IO_LIST_PDO_AREA_T)(tag);
                     (DataContext as PDOCollectionDataModel).AppendPDOMapping(area, __lsv_object_collection.SelectedItem as ObjectItemDataModel);
+                    Decorator decorator = (Decorator)VisualTreeHelper.GetChild(__area_views[area], 0);
+                    ((ScrollViewer)decorator.Child).ScrollToBottom();
                     __area_views[area].SelectedIndex = __area_views[area].Items.Count - 1;
-                    __area_views[area].ScrollIntoView(__area_views[area].SelectedItem);
+                    //__area_views[area].ScrollIntoView(__area_views[area].SelectedItem);
                 }
                 else
                 {
@@ -155,8 +157,14 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
                     IO_LIST_PDO_AREA_T area = (IO_LIST_PDO_AREA_T)(tag);
                     int selectedIndex = __area_views[area].SelectedIndex;
                     (DataContext as PDOCollectionDataModel).InsertPDOMapping(selectedIndex, area, __lsv_object_collection.SelectedItem as ObjectItemDataModel);
+                    Decorator decorator = (Decorator)VisualTreeHelper.GetChild(__area_views[area], 0);
+                    ScrollViewer v = ((ScrollViewer)decorator.Child);
+                    if (v.VerticalOffset > selectedIndex)
+                        v.ScrollToVerticalOffset(selectedIndex);
+                    else if (v.VerticalOffset + v.ViewportHeight < selectedIndex)
+                        v.ScrollToVerticalOffset(selectedIndex - v.ViewportHeight);
                     __area_views[area].SelectedIndex = selectedIndex;
-                    __area_views[area].ScrollIntoView(__area_views[area].SelectedItem);
+                    //__area_views[area].ScrollIntoView(__area_views[area].SelectedItem);
                 }
                 else
                 {
