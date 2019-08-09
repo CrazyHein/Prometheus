@@ -20,6 +20,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             if (object.Equals(storage, value))
                 return;
             storage = value;
+            Dirty = true;
             OnPropertyChanged(propertyName);
         }
 
@@ -38,5 +39,6 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
         public abstract void UpdateDataHelper();
 
         public int FieldDataBindingErrors { get; set; }
+        public bool Dirty { get; protected set; }
     }
 }

@@ -9,6 +9,7 @@
     <Window.CommandBindings>
         <CommandBinding Command="local:ConsoleControl.OpenIOListFile" Executed="__open_io_list_file_executed"/>
         <CommandBinding Command="local:ConsoleControl.NewIOListFile" Executed="__new_io_list_file_executed"/>
+        <CommandBinding Command="local:ConsoleControl.SaveIOListFileAs" Executed="__save_io_list_file_as_executed" CanExecute="__save_io_list_file_as_can_executed"/>
         <CommandBinding Command="local:ConsoleControl.SaveIOListFile" Executed="__save_io_list_file_executed" CanExecute="__save_io_list_file_can_executed"/>
         <CommandBinding Command="local:ConsoleControl.OpenAboutDialog" Executed="__open_about_dialog_executed"/>
         <CommandBinding Command="local:ConsoleControl.OpenCatalogueDialog" Executed="__open_catalogue_dialog_executed"/>
@@ -34,7 +35,12 @@
                 </MenuItem>
                 <MenuItem Command="local:ConsoleControl.SaveIOListFile">
                     <MenuItem.Icon>
-                        <Image Source="img/save_file.png"/>
+                        <Image Source="img/save.png"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Command="local:ConsoleControl.SaveIOListFileAs">
+                    <MenuItem.Icon>
+                        <Image Source="img/save_as.png"/>
                     </MenuItem.Icon>
                 </MenuItem>
             </MenuItem>

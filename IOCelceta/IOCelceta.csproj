@@ -239,9 +239,6 @@
     <Resource Include="img\recycle.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="img\save_file.png" />
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="img\info.png" />
   </ItemGroup>
   <ItemGroup>
@@ -277,6 +274,10 @@
       <ProductName>.NET Framework 3.5 SP1</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="img\save.png" />
+    <Resource Include="img\save_as.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

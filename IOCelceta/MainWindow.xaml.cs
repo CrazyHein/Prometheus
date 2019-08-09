@@ -31,10 +31,13 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
         private string __data_type_catalogue_exception = null;
         private string __controller_model_catalogue_exception = null;
         private string __variable_catalogue_exception = null;
+        private string __io_list_file_name;
+        private string __main_window_title;
 
         public MainWindow()
         {
             InitializeComponent();
+            __main_window_title = Title;
             try
             {
                 __data_type_catalogue = new DataTypeCatalogue();
@@ -78,6 +81,18 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
             __meta_data = new Metadata(__io_list_data_helper);
         }
 
+        private bool __io_list_file_dirty()
+        {
+            if (__tab_target_inforamtion.Content == null)
+                return false;
+            else
+                return (__io_list_file_name == null) ||
+                    ((__tab_target_inforamtion.Content as TargetInformationDataControl).DataContext as TargetInformationDataModel).Dirty == true ||
+                    ((__tab_controller_inforamtion.Content as ControllerInformationDataControl).DataContext as ControllerInformationDataModel).Dirty == true ||
+                    ((__tab_object_collection.Content as ObjectCollectionDataControl).DataContext as ObjectCollectionDataModel).Dirty == true ||
+                    ((__tab_pdo_intlk_collection.Content as PDOCollectionDataControl).DataContext as PDOCollectionDataModel).Dirty == true;
+        }
+
         private void __open_catalogue_dialog_executed(object sender, ExecutedRoutedEventArgs e)
         {
             var window = new CatalogueWindow(__catalogue_window_data_model);
@@ -86,7 +101,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
 
         private void __open_io_list_file_executed(object sender, ExecutedRoutedEventArgs e)
         {
-            if (__tab_target_inforamtion.Content != null)
+            if (__io_list_file_dirty() == true)
             {
                 if (MessageBox.Show("Discard the changes you have made ?", "Question", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.No)
                     return;
@@ -99,7 +114,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                 string message;
                 try
                 {
-                    __io_list_data_helper.Load(open.FileName);
+                    __io_list_data_helper.Load(open.FileName);    
                 }
                 catch (IOListParseExcepetion exp)
                 {
@@ -109,6 +124,11 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                         message = string.Format("At least one unexpected error occurred while reading [IO List] file . \n{0}", exp.ErrorCode.ToString());
 
                     MessageBox.Show(message, "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
+                }
+                finally
+                {
+                    __io_list_file_name = open.FileName;
+                    Title = $"{__main_window_title} --- {__io_list_file_name}";
                 }
 
                 TargetInformationDataModel targetInfoDataModel = new TargetInformationDataModel(__io_list_data_helper);
@@ -132,11 +152,14 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
 
         private void __new_io_list_file_executed(object sender, ExecutedRoutedEventArgs e)
         {
-            if (__tab_target_inforamtion.Content != null)
+            if (__io_list_file_dirty() == true)
             {
                 if (MessageBox.Show("Discard the changes you have made ?", "Question", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.No)
                     return;
             }
+            __io_list_file_name = null;
+            Title = $"{__main_window_title} --- New";
+
             __io_list_data_helper.SetDefault();
 
             TargetInformationDataModel targetInfoDataModel = new TargetInformationDataModel(__io_list_data_helper);
@@ -191,6 +214,64 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                 return;
             }
 
+            targetInfo.UpdateDataHelper();
+            controllerInfo.UpdateDataHelper();
+            objectsInfo.UpdateDataHelper();
+            pdoMappingsInfo.UpdateDataHelper();
+
+            string message;
+            try
+            {
+                __io_list_data_helper.Save(controllerInfo.ExtensionModules.Select(dataModel => dataModel.ReferenceName),
+                    controllerInfo.EthernetModules.Select(dataModel => dataModel.ReferenceName),
+                    objectsInfo.Objects.Select(dataModel => dataModel.Index),
+                    __io_list_file_name);
+            }
+            catch (IOListParseExcepetion exp)
+            {
+                if (exp.ErrorCode == IO_LIST_FILE_ERROR_T.FILE_DATA_EXCEPTION)
+                    message = string.Format("At least one unexpected error occurred while reading [IO List] file . \n{0}", exp.DataException.ToString());
+                else
+                    message = string.Format("At least one unexpected error occurred while reading [IO List] file . \n{0}", exp.ErrorCode.ToString());
+
+                MessageBox.Show(message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void __save_io_list_file_as_executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            TargetInformationDataModel targetInfo = (__tab_target_inforamtion.Content as TargetInformationDataControl).DataContext as TargetInformationDataModel;
+
+            if (targetInfo.FieldDataBindingErrors != 0)
+            {
+                MessageBox.Show("Invalid User Input ... (Target Information)", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            ControllerInformationDataModel controllerInfo = (__tab_controller_inforamtion.Content as ControllerInformationDataControl).DataContext as ControllerInformationDataModel;
+
+            if (controllerInfo.FieldDataBindingErrors != 0)
+            {
+                MessageBox.Show("Invalid User Input ... (Controller Information)", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            ObjectCollectionDataModel objectsInfo = (__tab_object_collection.Content as ObjectCollectionDataControl).DataContext as ObjectCollectionDataModel;
+
+            if (objectsInfo.FieldDataBindingErrors != 0)
+            {
+                MessageBox.Show("Invalid User Input ... (Object Collection)", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            PDOCollectionDataModel pdoMappingsInfo = (__tab_pdo_intlk_collection.Content as PDOCollectionDataControl).DataContext as PDOCollectionDataModel;
+
+            if (pdoMappingsInfo.FieldDataBindingErrors != 0)
+            {
+                MessageBox.Show("Invalid User Input ... (PDO Mapping Collection)", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
             System.Windows.Forms.SaveFileDialog save = new System.Windows.Forms.SaveFileDialog();
             save.Filter = "Extensible Markup Language(*.xml)|*.xml";
             save.AddExtension = true;
@@ -210,6 +291,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                         controllerInfo.EthernetModules.Select(dataModel => dataModel.ReferenceName),
                         objectsInfo.Objects.Select(dataModel => dataModel.Index), 
                         save.FileName);
+                    __io_list_file_name = save.FileName;
+                    Title = $"{__main_window_title} --- {__io_list_file_name}";
                 }
                 catch (IOListParseExcepetion exp)
                 {
@@ -231,7 +314,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
 
         private void __on_main_window_closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            if (__tab_target_inforamtion.Content != null)
+            if (__io_list_file_dirty() == true)
             {
                 if (MessageBox.Show("Discard the changes you have made ?", "Question", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.No)
                     e.Cancel = true;
@@ -248,9 +331,14 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                 MessageBox.Show(__variable_catalogue_exception, "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
         }
 
-        private void __save_io_list_file_can_executed(object sender, CanExecuteRoutedEventArgs e)
+        private void __save_io_list_file_as_can_executed(object sender, CanExecuteRoutedEventArgs e)
         {
             e.CanExecute = __tab_target_inforamtion.Content != null;
+        }
+
+        private void __save_io_list_file_can_executed(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = __tab_target_inforamtion.Content != null && __io_list_file_name != null;
         }
     }
 
@@ -262,6 +350,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
         public static RoutedUICommand OpenAboutDialog { get; private set; }
 
         public static RoutedUICommand OpenCatalogueDialog { get; private set; }
+
+        public static RoutedUICommand SaveIOListFileAs { get; private set; }
 
         static ConsoleControl()
         {
@@ -277,6 +367,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
             {
                 new KeyGesture(Key.S, ModifierKeys.Control, "Ctrl+S")
             };
+            InputGestureCollection gestureSaveIOListFileAs = new InputGestureCollection
+            {
+                new KeyGesture(Key.S, ModifierKeys.Control|ModifierKeys.Shift, "Ctrl+Shift+S")
+            };
             InputGestureCollection gestureOpenAboutDialog = new InputGestureCollection
             {
                 new KeyGesture(Key.A, ModifierKeys.Control, "Ctrl+A")
@@ -287,7 +381,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
             };
             OpenIOListFile = new RoutedUICommand("Open", "OpenIOListFile", typeof(ConsoleControl), gestureOpenIOListFile);
             NewIOListFile = new RoutedUICommand("New", "NewIOListFile", typeof(ConsoleControl), gestureNewIOListFile);
-            SaveIOListFile = new RoutedUICommand("Save As", "SaveIOListFile", typeof(ConsoleControl), gestureSaveIOListFile);
+            SaveIOListFileAs = new RoutedUICommand("Save As", "SaveIOListFileAs", typeof(ConsoleControl), gestureSaveIOListFileAs);
+            SaveIOListFile = new RoutedUICommand("Save", "SaveIOListFile", typeof(ConsoleControl), gestureSaveIOListFile);
             OpenAboutDialog = new RoutedUICommand("About", "OpenAboutDialog", typeof(ConsoleControl), gestureOpenAboutDialog);
             OpenCatalogueDialog = new RoutedUICommand("Catalogue", "OpenCatalogueDialog", typeof(ConsoleControl), gestureOpenCatalogueDialog);
         }

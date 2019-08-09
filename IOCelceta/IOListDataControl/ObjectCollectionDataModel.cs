@@ -47,7 +47,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
 
         public override void UpdateDataHelper()
         {
-            
+            Dirty = false;
         }
 
         public override void UpdateDataModel()
@@ -60,6 +60,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
                 __objects.Add(temp);
                 __object_dictionary.Add(o.index, temp);
             }
+            Dirty = false;
         }
 
         public void SwapDataModel(int firstPos, int secondPos)
@@ -74,6 +75,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
                 __objects.Move(firstPos, secondPos);
                 __objects.Move(secondPos + 1, firstPos);
             }
+            Dirty = true;
         }
 
         public void SwapDataModel(ObjectItemDataModel first, ObjectItemDataModel second)
@@ -96,6 +98,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             else
                 __objects.Insert(pos, dataModel);
             __object_dictionary.Add(dataModel.Index, dataModel);
+            Dirty = true;
         }
 
         public void ModifyDataModel(uint index, ObjectItemDataModel dataModel)
@@ -115,6 +118,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
                 __object_dictionary.Remove(index);
                 __object_dictionary.Add(data.Index, data);
             }
+            Dirty = true;
         }
 
         public void RemoveDataModel(ObjectItemDataModel dataModel)
@@ -122,6 +126,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             _data_helper.RemoveObjectData(dataModel.Index);
             __objects.Remove(dataModel);
             __object_dictionary.Remove(dataModel.Index);
+            Dirty = true;
         }
 
         public void RemoveDataModel(int listPos)
@@ -130,6 +135,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             _data_helper.RemoveObjectData(dataModel.Index);
             __objects.RemoveAt(listPos);
             __object_dictionary.Remove(dataModel.Index);
+            Dirty = true;
         }
     }
 

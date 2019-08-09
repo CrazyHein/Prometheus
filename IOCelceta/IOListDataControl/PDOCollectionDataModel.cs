@@ -260,6 +260,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
         {
             foreach (var area in Enum.GetValues(typeof(IO_LIST_PDO_AREA_T)))
                 __updata_area_size((IO_LIST_PDO_AREA_T)area);
+            Dirty = false;
         }
 
         public override void UpdateDataModel()
@@ -325,6 +326,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
 
             foreach (var def in _data_helper.InterlockDefinitions)
                 __intlk_logic_area.Add(__load_interlock_logic_definition(def));
+            Dirty = false;
         }
 
         public void SwapPDOMapping(IO_LIST_PDO_AREA_T area, int firstPos, int secondPos)
@@ -340,6 +342,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
                 __collection_areas[area].Move(firstPos, secondPos);
                 __collection_areas[area].Move(secondPos + 1, firstPos);
             }
+            Dirty = true;
         }
 
         public void InsertPDOMapping(int pos, IO_LIST_PDO_AREA_T area, uint objectIndex)
@@ -348,6 +351,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             _data_helper.InsertPDOMapping(pos, area, objectIndex);
             __updata_area_actual_size(area);
             __collection_areas[area].Insert(pos, __object_collection_data_model.ObjectDictionary[objectIndex]);
+            Dirty = true;
         }
 
         public void InsertPDOMapping(int pos, IO_LIST_PDO_AREA_T area, ObjectItemDataModel objectDataModel)
@@ -357,6 +361,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             _data_helper.InsertPDOMapping(pos, area, objectData, false);
             __updata_area_actual_size(area);
             __collection_areas[area].Insert(pos, objectDataModel);
+            Dirty = true;
         }
 
         public void RemovePDOMapping(int pos, IO_LIST_PDO_AREA_T area)
@@ -365,6 +370,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             _data_helper.RemovePDOMapping(pos, area);
             __updata_area_actual_size(area);
             __collection_areas[area].RemoveAt(pos);
+            Dirty = true;
         }
 
         public void AppendPDOMapping(IO_LIST_PDO_AREA_T area, uint objectIndex)
@@ -373,6 +379,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             _data_helper.AppendPDOMapping(area, objectIndex);
             __updata_area_actual_size(area);
             __collection_areas[area].Add(__object_collection_data_model.ObjectDictionary[objectIndex]);
+            Dirty = true;
         }
 
         public void AppendPDOMapping(IO_LIST_PDO_AREA_T area, ObjectItemDataModel objectDataModel)
@@ -382,6 +389,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             _data_helper.AppendPDOMapping(area, objectData, false);
             __updata_area_actual_size(area);
             __collection_areas[area].Add(objectDataModel);
+            Dirty = true;
         }
 
         public void ReplacePDOMapping(IO_LIST_PDO_AREA_T area, int pos, uint objectIndex)
@@ -392,6 +400,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             __collection_areas[area].RemoveAt(pos);
             __collection_areas[area].Insert(pos, __object_collection_data_model.ObjectDictionary[objectIndex]);
             //__collection_areas[area][pos] = __object_collection_data_model.ObjectDictionary[objectIndex];
+            Dirty = true;
         }
 
         public void ReplacePDOMapping(IO_LIST_PDO_AREA_T area, int pos, ObjectItemDataModel objectDataModel)
@@ -403,6 +412,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             __collection_areas[area].RemoveAt(pos);
             __collection_areas[area].Insert(pos, objectDataModel);
             //__collection_areas[area][pos] = objectDataModel;
+            Dirty = true;
         }
 
         public void GroupPDOMappingByBindingModule(IO_LIST_PDO_AREA_T area)
@@ -434,6 +444,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             __collection_areas[area].Clear();
             foreach (var o in objectList)
                 __collection_areas[area].Add(__object_collection_data_model.ObjectDictionary[o.index]);
+            Dirty = true;
         }
 
         public void AppendIntlklogicDefinition(string name, string targetString, string statementString)
@@ -450,12 +461,14 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             IntlkLogicExpression expressionDataModel =
                 __load_interlock_logic_statement(def.statement, null) as IntlkLogicExpression;
             __intlk_logic_area.Add(new IntlklogicDefinition(name, objectDataModels, expressionDataModel));
+            Dirty = true;
         }
 
         public void RemoveIntlklogicDefinition(int pos)
         {
             _data_helper.RemoveInterlockLogicDefinition(pos);
             __intlk_logic_area.RemoveAt(pos);
+            Dirty = true;
         }
 
         public void InsertIntlklogicDefinition(int pos, string name, string targetString, string statementString)
@@ -472,6 +485,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             IntlkLogicExpression expressionDataModel =
                 __load_interlock_logic_statement(def.statement, null) as IntlkLogicExpression;
             __intlk_logic_area.Insert(pos, new IntlklogicDefinition(name, objectDataModels, expressionDataModel));
+            Dirty = true;
         }
 
         public void SwapIntlklogicDefinition(int firstPos, int secondPos)
@@ -487,6 +501,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
                 __intlk_logic_area.Move(firstPos, secondPos);
                 __intlk_logic_area.Move(secondPos + 1, firstPos);
             }
+            Dirty = true;
         }
 
         public void ModifyIntlklogicDefinition(int pos, string name, string targetString, string statementString)
@@ -504,6 +519,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
 
             __intlk_logic_area.RemoveAt(pos);
             __intlk_logic_area.Insert(pos, new IntlklogicDefinition(name, objectDataModels, expressionDataModel));
+            Dirty = true;
         }
     }
 

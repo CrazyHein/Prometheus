@@ -61,12 +61,14 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
                     __controller_module_dictionary.Add(temp.ReferenceName, temp);
                 }
             }
+            Dirty = false;
         }
 
         public override void UpdateDataHelper()
         {
             _data_helper.MCServerIPAddress = MCServerIPAddress;
             _data_helper.MCServerPort = MCServerPort;
+            Dirty = false;
         }
 
         public string MCServerIPAddress
@@ -99,6 +101,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
                 __extension_modules.Move(firstPos, secondPos);
                 __extension_modules.Move(secondPos + 1, firstPos);
             }
+            Dirty = true;
         }
 
         public void SwapEthernetDataModel(int firstPos, int secondPos)
@@ -113,6 +116,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
                 __ethernet_modules.Move(firstPos, secondPos);
                 __ethernet_modules.Move(secondPos + 1, firstPos);
             }
+            Dirty = true;
         }
 
         public void AddDataModel(ControllerModuleItemDataModel itemDataModel, int pos = -1)
@@ -139,6 +143,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
                     __ethernet_modules.Insert(pos, dataModel);
                 __controller_module_dictionary.Add(dataModel.ReferenceName, dataModel);
             }
+            Dirty = true;
         }
 
         public void ModifyDataModel(string referenceName, ControllerModuleItemDataModel dataModel)
@@ -174,6 +179,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
                     __controller_module_dictionary.Add(destDataModel.ReferenceName, destDataModel);
                 }
             }
+            Dirty = true;
         }
 
         public void RemoveDataModel(ControllerModuleItemDataModel dataModel)
@@ -190,6 +196,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
                 __ethernet_modules.Remove(dataModel as ControllerEthernetModuleItemDataModel);
                 __controller_module_dictionary.Remove(dataModel.ReferenceName);
             }
+            Dirty = true;
         }
 
         public void RemoveExtensionDataModel(int listPos)
@@ -198,6 +205,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             _data_helper.RemoveControllerModule(dataModel.ReferenceName);
             __extension_modules.RemoveAt(listPos);
             __controller_module_dictionary.Remove(dataModel.ReferenceName);
+            Dirty = true;
         }
 
         public void RemoveEthernetDataModel(int listPos)
@@ -206,6 +214,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             _data_helper.RemoveControllerModule(dataModel.ReferenceName);
             __ethernet_modules.RemoveAt(listPos);
             __controller_module_dictionary.Remove(dataModel.ReferenceName);
+            Dirty = true;
         }
     }
 
