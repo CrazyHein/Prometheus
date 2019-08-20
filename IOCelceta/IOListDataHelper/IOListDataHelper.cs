@@ -946,10 +946,20 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                     __controller_information.modules[objectData.binding.module.reference_name] == objectData.binding.module)
                 {
                     moduleID = __controller_information.modules[objectData.binding.module.reference_name].model.ID;
-                    if ((objectData.index & 0x80000000) != 0)
-                        variables = ControllerCatalogue.ExtensionModels[moduleID].TxVariables;
+                    if (objectData.binding.module.model is ControllerExtensionModel)
+                    {
+                        if ((objectData.index & 0x80000000) != 0)
+                            variables = ControllerCatalogue.ExtensionModels[moduleID].TxVariables;
+                        else
+                            variables = ControllerCatalogue.ExtensionModels[moduleID].RxVariables;
+                    }
                     else
-                        variables = ControllerCatalogue.ExtensionModels[moduleID].RxVariables;
+                    {
+                        if ((objectData.index & 0x80000000) != 0)
+                            variables = ControllerCatalogue.EthernetModels[moduleID].TxVariables;
+                        else
+                            variables = ControllerCatalogue.EthernetModels[moduleID].RxVariables;
+                    }
                 }
                 else
                     throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_OBJECT_BINDING_MODULE_REFERENCE, null);
