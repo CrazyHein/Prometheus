@@ -9,6 +9,10 @@ using System.Xml;
 
 namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
 {
+    public enum IO_LIST_CONSTANT_T : uint
+    {
+        NOT_A_VALID_OBJECT_INDEX                                = 0xFFFFFFFF
+    }
     public enum IO_LIST_FILE_ERROR_T : int
     {
         NO_ERROR                                                = 0x00000000,
@@ -34,6 +38,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
         INVALID_OBJECT_CONVERTER                                = 0x00000027,
         INVALID_OBJECT_VARIABLE                                 = 0x00000028,
         OBJECT_VARIABLE_DATA_TYPE_MISMATCH                      = 0x00000029,
+        INVALID_OBJECT_INDEX                                    = 0x0000002A,
 
         INVALID_BIT_OBJECT_INDEX                                = 0x00000030,
         INVALID_BLOCK_OBJECT_INDEX                              = 0x00000031,
@@ -920,6 +925,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
 
         public void ObjectDataVerification(IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T objectData, bool ignoreDuplicate = false)
         {
+            if(objectData.index == (uint)IO_LIST_CONSTANT_T.NOT_A_VALID_OBJECT_INDEX)
+                throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_OBJECT_INDEX, null);
             if (ignoreDuplicate == false && __object_collection.objects.Keys.Contains(objectData.index) == true)
                 throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.DUPLICATE_OBJECT_INDEX, null);
             else if(objectData.variable == null || VariableCatalogue.Variables.Keys.Contains(objectData.variable.Name) == false || VariableCatalogue.Variables[objectData.variable.Name] != objectData.variable)
