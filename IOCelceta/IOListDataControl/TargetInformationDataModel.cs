@@ -17,18 +17,20 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
         {
         }
 
-        public override void UpdateDataModel()
+        public override void UpdateDataModel(bool clearDirtyFlag = true)
         {
             Name = _data_helper.TargetInformation.name;
             Description = _data_helper.TargetInformation.description;
-            Dirty = false;
+            if(clearDirtyFlag)
+                Dirty = false;
         }
 
-        public override void UpdateDataHelper()
+        public override void UpdateDataHelper(bool clearDirtyFlag = false)
         {
             _data_helper.TargetInformation.name = Name;
             _data_helper.TargetInformation.description = Description;
-            Dirty = false;
+            if(clearDirtyFlag)
+                Dirty = false;
         }
 
         public string Name

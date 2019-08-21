@@ -2,6 +2,7 @@
 using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDataControl;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -226,6 +227,11 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                     controllerInfo.EthernetModules.Select(dataModel => dataModel.ReferenceName),
                     objectsInfo.Objects.Select(dataModel => dataModel.Index),
                     __io_list_file_name);
+
+                targetInfo.Dirty = false;
+                controllerInfo.Dirty = false;
+                objectsInfo.Dirty = false;
+                pdoMappingsInfo.Dirty = false;
             }
             catch (IOListParseExcepetion exp)
             {
@@ -293,6 +299,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                         save.FileName);
                     __io_list_file_name = save.FileName;
                     Title = $"{__main_window_title} --- {__io_list_file_name}";
+                    targetInfo.Dirty = false;
+                    controllerInfo.Dirty = false;
+                    objectsInfo.Dirty = false;
+                    pdoMappingsInfo.Dirty = false;
                 }
                 catch (IOListParseExcepetion exp)
                 {
@@ -339,6 +349,22 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
         private void __save_io_list_file_can_executed(object sender, CanExecuteRoutedEventArgs e)
         {
             e.CanExecute = __tab_target_inforamtion.Content != null && __io_list_file_name != null;
+        }
+    }
+
+    internal class IsDirtyDocumentConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if ((bool)value)
+                return " *";
+            else
+                return "";
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
         }
     }
 

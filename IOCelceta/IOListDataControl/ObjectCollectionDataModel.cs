@@ -45,12 +45,13 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             ItemFilter = new ObjectItemFilter(null, null, null);
         }
 
-        public override void UpdateDataHelper()
+        public override void UpdateDataHelper(bool clearDirtyFlag = false)
         {
-            Dirty = false;
+            if(clearDirtyFlag == true)
+                Dirty = false;
         }
 
-        public override void UpdateDataModel()
+        public override void UpdateDataModel(bool clearDirtyFlag = true)
         {
             __objects.Clear();
             __object_dictionary.Clear();
@@ -60,7 +61,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
                 __objects.Add(temp);
                 __object_dictionary.Add(o.index, temp);
             }
-            Dirty = false;
+            if(clearDirtyFlag == true)
+                Dirty = false;
         }
 
         public void SwapDataModel(int firstPos, int secondPos)

@@ -37,7 +37,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             ControllerModuleDictionary = __controller_module_dictionary;
         }
 
-        public override void UpdateDataModel()
+        public override void UpdateDataModel(bool clearDirtyFlag = true)
         {
             MCServerIPAddress = _data_helper.MCServerIPAddress;
             MCServerPort = _data_helper.MCServerPort;
@@ -61,14 +61,16 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
                     __controller_module_dictionary.Add(temp.ReferenceName, temp);
                 }
             }
-            Dirty = false;
+            if(clearDirtyFlag == true)
+                Dirty = false;
         }
 
-        public override void UpdateDataHelper()
+        public override void UpdateDataHelper(bool clearDirtyFlag = false)
         {
             _data_helper.MCServerIPAddress = MCServerIPAddress;
             _data_helper.MCServerPort = MCServerPort;
-            Dirty = false;
+            if (clearDirtyFlag == true)
+                Dirty = false;
         }
 
         public string MCServerIPAddress

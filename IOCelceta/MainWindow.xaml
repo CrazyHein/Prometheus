@@ -58,11 +58,15 @@
             </MenuItem>
         </Menu>
         <TabControl Grid.Row="1" Margin="4">
+            <TabControl.Resources>
+                <local:IsDirtyDocumentConverter x:Key="DirtyConverter"/>
+            </TabControl.Resources>
             <TabItem Width="200" Name="__tab_target_inforamtion">
                 <TabItem.Header>
                     <StackPanel Orientation="Horizontal">
                         <Image Source="img/info.png" Height="32" Margin="2,2,8,2"/>
                         <TextBlock Text="Target Info" VerticalAlignment="Center"/>
+                        <TextBlock Text="{Binding  Path=Content.DataContext.Dirty, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type TabItem}}, Converter={StaticResource DirtyConverter}}" VerticalAlignment="Center" FontSize="20" Foreground="Red"/>
                     </StackPanel>
                 </TabItem.Header>
             </TabItem>
@@ -71,6 +75,7 @@
                     <StackPanel Orientation="Horizontal">
                         <Image Source="img/controller_configuration.png" Height="32" Margin="2,2,8,2"/>
                         <TextBlock Text="Controller Info" VerticalAlignment="Center"/>
+                        <TextBlock Text="{Binding  Path=Content.DataContext.Dirty, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type TabItem}}, Converter={StaticResource DirtyConverter}}" VerticalAlignment="Center" FontSize="20" Foreground="Red"/>
                     </StackPanel>
                 </TabItem.Header>
             </TabItem>
@@ -79,6 +84,7 @@
                     <StackPanel Orientation="Horizontal">
                         <Image Source="img/objects.png" Height="32" Margin="2,2,8,2"/>
                         <TextBlock Text="Object Collection" VerticalAlignment="Center"/>
+                        <TextBlock Text="{Binding  Path=Content.DataContext.Dirty, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type TabItem}}, Converter={StaticResource DirtyConverter}}" VerticalAlignment="Center" FontSize="20" Foreground="Red"/>
                     </StackPanel>
                 </TabItem.Header>
             </TabItem>
@@ -87,6 +93,7 @@
                     <StackPanel Orientation="Horizontal">
                         <Image Source="img/pdo.png" Height="32" Margin="2,2,8,2"/>
                         <TextBlock Text="PDO &amp; Interlock" VerticalAlignment="Center"/>
+                        <TextBlock Text="{Binding  Path=Content.DataContext.Dirty, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type TabItem}}, Converter={StaticResource DirtyConverter}}" VerticalAlignment="Center" FontSize="20" Foreground="Red"/>
                     </StackPanel>
                 </TabItem.Header>
             </TabItem>

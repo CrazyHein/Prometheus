@@ -20,7 +20,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             if (object.Equals(storage, value))
                 return;
             storage = value;
-            Dirty = true;
+            if(propertyName != "Dirty")
+                Dirty = true;
             OnPropertyChanged(propertyName);
         }
 
@@ -35,10 +36,15 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
         }
 
         protected IOListDataHelper _data_helper;
-        public abstract void UpdateDataModel();
-        public abstract void UpdateDataHelper();
+        public abstract void UpdateDataModel(bool clearDirtyFlag = true);
+        public abstract void UpdateDataHelper(bool clearDirtyFlag = false);
 
         public int FieldDataBindingErrors { get; set; }
-        public bool Dirty { get; protected set; }
+        private bool __dirty;
+        public bool Dirty
+        {
+            get { return __dirty; }
+            set { SetProperty(ref __dirty, value); }
+        }
     }
 }
