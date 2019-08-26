@@ -161,8 +161,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
                     ScrollViewer v = ((ScrollViewer)decorator.Child);
                     if (v.VerticalOffset > selectedIndex)
                         v.ScrollToVerticalOffset(selectedIndex);
-                    else if (v.VerticalOffset + v.ViewportHeight < selectedIndex)
-                        v.ScrollToVerticalOffset(selectedIndex - v.ViewportHeight);
+                    else if (v.VerticalOffset + v.ViewportHeight - 1 < selectedIndex)
+                        v.ScrollToVerticalOffset(selectedIndex - v.ViewportHeight + 1);
                     __area_views[area].SelectedIndex = selectedIndex;
                     //__area_views[area].ScrollIntoView(__area_views[area].SelectedItem);
                 }
@@ -196,11 +196,16 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
                 if(tag != null)
                 {
                     IO_LIST_PDO_AREA_T area = (IO_LIST_PDO_AREA_T)(tag);
-                    ListView view = __area_views[area];
-                    selectedIndex = view.SelectedIndex;
+                    selectedIndex = __area_views[area].SelectedIndex;
                     (DataContext as PDOCollectionDataModel).SwapPDOMapping(area, selectedIndex, selectedIndex - 1);
-                    view.SelectedIndex = selectedIndex - 1;
-                    view.ScrollIntoView(view.SelectedItem);
+                    Decorator decorator = (Decorator)VisualTreeHelper.GetChild(__area_views[area], 0);
+                    ScrollViewer v = ((ScrollViewer)decorator.Child);
+                    if (v.VerticalOffset > selectedIndex - 1)
+                        v.ScrollToVerticalOffset(selectedIndex - 1);
+                    else if (v.VerticalOffset + v.ViewportHeight < selectedIndex)
+                        v.ScrollToVerticalOffset(selectedIndex - v.ViewportHeight);
+                    __area_views[area].SelectedIndex = selectedIndex - 1;
+                    //view.ScrollIntoView(view.SelectedItem);
                 }
                 else
                 {
@@ -232,11 +237,16 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
                 if(tag != null)
                 {
                     IO_LIST_PDO_AREA_T area = (IO_LIST_PDO_AREA_T)((__tab_pdo_container.SelectedItem as TabItem).Tag);
-                    ListView view = __area_views[area];
-                    selectedIndex = view.SelectedIndex;
+                    selectedIndex = __area_views[area].SelectedIndex;
                     (DataContext as PDOCollectionDataModel).SwapPDOMapping(area, selectedIndex, selectedIndex + 1);
-                    view.SelectedIndex = selectedIndex + 1;
-                    view.ScrollIntoView(view.SelectedItem);
+                    Decorator decorator = (Decorator)VisualTreeHelper.GetChild(__area_views[area], 0);
+                    ScrollViewer v = ((ScrollViewer)decorator.Child);
+                    if (v.VerticalOffset > selectedIndex + 1)
+                        v.ScrollToVerticalOffset(selectedIndex + 1);
+                    else if (v.VerticalOffset + v.ViewportHeight - 1 < selectedIndex + 1)
+                        v.ScrollToVerticalOffset(selectedIndex - v.ViewportHeight + 2);
+                    __area_views[area].SelectedIndex = selectedIndex + 1;
+                    //view.ScrollIntoView(view.SelectedItem);
                 }
                 else
                 {
