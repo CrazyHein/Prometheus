@@ -22,9 +22,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
         {
             Title = "IO Celceta";
             Description = "A graphics editing tool for < AMEC IO List >.";
-            DataTypeCatalogue = "data_type_catalogue.xml";
-            ControllerModelCatalogue = "controller_model_catalogue.xml";
-            VariableCatalogue = "variable_catalogue.xml";
+            DataTypeCatalogue = "Metadata/data_type_catalogue.xml";
+            ControllerModelCatalogue = "Metadata/controller_model_catalogue.xml";
+            VariableCatalogue = "Metadata/variable_catalogue.xml";
 
             AssemblyVersion = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
             ProductVersion = Application.ProductVersion.ToString();
