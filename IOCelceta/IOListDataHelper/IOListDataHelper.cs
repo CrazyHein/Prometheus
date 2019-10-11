@@ -480,7 +480,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
             uint mask = 0;
             bool enabled = false;
             string unitName = null;
-            int upScale = 0, downScale = 0;
+            double upScale = 0, downScale = 0;
             try
             {
                 if (converterNode.NodeType == XmlNodeType.Element)
@@ -508,11 +508,11 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                                 mask |= 0x00000002;
                                 break;
                             case "UpScale":
-                                upScale = Convert.ToInt32(node.FirstChild.Value, 10);
+                                upScale = Convert.ToDouble(node.FirstChild.Value);
                                 mask |= 0x00000004;
                                 break;
                             case "DownScale":
-                                downScale = Convert.ToInt32(node.FirstChild.Value, 10);
+                                downScale = Convert.ToDouble(node.FirstChild.Value);
                                 mask |= 0x00000008;
                                 break;
                         }
@@ -2259,8 +2259,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
         {
             public bool enabled { get; private set; }
             public string unit_name { get; private set; }
-            public int up_scale { get; private set; }
-            public int down_scale { get; private set; }
+            public double up_scale { get; private set; }
+            public double down_scale { get; private set; }
 
             public override string ToString()
             {
@@ -2271,7 +2271,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                     return string.Format("[{0}, {1}] ({2})", down_scale, up_scale, unit_name);
             }
 
-            public VALUE_CONVERTER_T(bool enabled, string unitName, int up, int down)
+            public VALUE_CONVERTER_T(bool enabled, string unitName, double up, double down)
             {
                 this.enabled = enabled;
                 down_scale = down;
@@ -2374,30 +2374,32 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
             tx_pdo_diagnostic_area.objects.Clear();
             tx_pdo_diagnostic_area.offset_in_word = 0;
             tx_pdo_diagnostic_area.size_in_word = 0;
+            tx_pdo_diagnostic_area.actual_size_in_byte = 0;
 
             tx_pdo_bit_area.objects.Clear();
             tx_pdo_bit_area.offset_in_word = 0;
             tx_pdo_bit_area.size_in_word = 0;
+            tx_pdo_bit_area.actual_size_in_byte = 0;
 
             tx_pdo_block_area.objects.Clear();
             tx_pdo_block_area.offset_in_word = 0;
             tx_pdo_block_area.size_in_word = 0;
-
-            tx_pdo_diagnostic_area.objects.Clear();
-            tx_pdo_diagnostic_area.offset_in_word = 0;
-            tx_pdo_diagnostic_area.size_in_word = 0;
+            tx_pdo_block_area.actual_size_in_byte = 0;
 
             rx_pdo_control_area.objects.Clear();
             rx_pdo_control_area.offset_in_word = 0;
             rx_pdo_control_area.size_in_word = 0;
+            rx_pdo_control_area.actual_size_in_byte = 0;
 
             rx_pdo_bit_area.objects.Clear();
             rx_pdo_bit_area.offset_in_word = 0;
             rx_pdo_bit_area.size_in_word = 0;
+            rx_pdo_bit_area.actual_size_in_byte = 0;
 
             rx_pdo_block_area.objects.Clear();
             rx_pdo_block_area.offset_in_word = 0;
             rx_pdo_block_area.size_in_word = 0;
+            rx_pdo_block_area.actual_size_in_byte = 0;
         }
     }
 

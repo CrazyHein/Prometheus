@@ -1733,7 +1733,7 @@
 	</Variable>
   <Variable>
 		<ID>2012</ID>
-		<Name>Backside He Supply Pressure</Name>
+		<Name>Backside He Supply Pressure Reading</Name>
 		<DataType>FLOAT</DataType>
 		<Unit>Torr</Unit>
 		<Comment>Backside helium supply PT reading</Comment>

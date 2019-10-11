@@ -16,7 +16,7 @@
     <Deterministic>true</Deterministic>
     <TargetFrameworkProfile />
     <IsWebBootstrapper>false</IsWebBootstrapper>
-    <PublishUrl>\\192.168.10.152\EE_Center\Software\R2H\Publish\IOCelceta\</PublishUrl>
+    <PublishUrl>\\192.168.10.137\EE_Center\Software\R2H\Publish\IOCelceta\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Unc</InstallFrom>
     <UpdateEnabled>true</UpdateEnabled>

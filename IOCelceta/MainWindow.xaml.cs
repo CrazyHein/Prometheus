@@ -115,6 +115,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                 string message;
                 try
                 {
+                    __io_list_data_helper.SetDefault();
                     __io_list_data_helper.Load(open.FileName);    
                 }
                 catch (IOListParseExcepetion exp)

@@ -208,8 +208,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
 
         private bool __converter_enable;
         //private DataTypeDefinition __converter_data_type;
-        private int __converter_up_scale;
-        private int __converter_down_scale;
+        private double __converter_up_scale;
+        private double __converter_down_scale;
         private string __converter_unit_name;
 
         public uint Index
@@ -317,12 +317,12 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             set { SetProperty(ref __converter_data_type, value); }
         }
         */
-        public int ConverterUpScale
+        public double ConverterUpScale
         {
             get { return __converter_up_scale; }
             set { SetProperty(ref __converter_up_scale, value); }
         }
-        public int ConverterDownScale
+        public double ConverterDownScale
         {
             get { return __converter_down_scale; }
             set { SetProperty(ref __converter_down_scale, value); }
@@ -403,7 +403,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             if ((bool)values[0] == false)
                 return "N/A";
             else
-                return string.Format("[{0}, {1}] ({2})", (int)values[1], (int)values[2], (string)values[3]);
+                return string.Format("[{0}, {1}] ({2})", (double)values[1], (double)values[2], (string)values[3]);
         }
 
         public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
