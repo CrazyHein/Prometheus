@@ -1695,7 +1695,7 @@
 		<Unit>Torr</Unit>
 		<Comment>PM 1Torr pressure meter reading</Comment>
 	</Variable>
-  <Variable>
+  	<Variable>
 		<ID>2002</ID>
 		<Name>Foreline Preesure</Name>
 		<DataType>FLOAT</DataType>
@@ -1703,49 +1703,49 @@
 		<Comment>Foreline preesure reading</Comment>
 	</Variable>
 
-  <Variable>
+  	<Variable>
 		<ID>2008</ID>
 		<Name>ST1 ESC HV Total Current</Name>
 		<DataType>FLOAT</DataType>
 		<Unit>μA</Unit>
 		<Comment>Station1 E-Chuck HVM total current reading</Comment>
 	</Variable>
-  <Variable>
+  	<Variable>
 		<ID>2009</ID>
 		<Name>ST2 ESC HV Total Current</Name>
 		<DataType>FLOAT</DataType>
 		<Unit>μA</Unit>
 		<Comment>Station2 E-Chuck HVM total current reading</Comment>
 	</Variable>
-  <Variable>
+  	<Variable>
 		<ID>2010</ID>
 		<Name>ST1 ESC HV Monitoring</Name>
 		<DataType>FLOAT</DataType>
 		<Unit>Voltage</Unit>
 		<Comment>Station1 E-Chuck HVM Volt reading</Comment>
 	</Variable>
-  <Variable>
+  	<Variable>
 		<ID>2011</ID>
 		<Name>ST2 ESC HV Monitoring</Name>
 		<DataType>FLOAT</DataType>
 		<Unit>Voltage</Unit>
 		<Comment>Station2 E-Chuck HVM Volt reading</Comment>
 	</Variable>
-  <Variable>
+  	<Variable>
 		<ID>2012</ID>
 		<Name>Backside He Supply Pressure Reading</Name>
 		<DataType>FLOAT</DataType>
 		<Unit>Torr</Unit>
-		<Comment>Backside helium supply PT reading</Comment>
+		<Comment>Backside helium supply pressure reading</Comment>
 	</Variable>
-  <Variable>
+  	<Variable>
 		<ID>2014</ID>
 		<Name>ST1 ESC HV VDC Monitoring</Name>
 		<DataType>FLOAT</DataType>
 		<Unit>Voltage</Unit>
 		<Comment>Station1 E-Chuck HVM VDC reading</Comment>
 	</Variable>
-  <Variable>
+  	<Variable>
 		<ID>2015</ID>
 		<Name>ST2 ESC HV VDC Monitoring</Name>
 		<DataType>FLOAT</DataType>
@@ -1753,42 +1753,42 @@
 		<Comment>Station2 E-Chuck HVM VDC reading</Comment>
 	</Variable>
 
-  <Variable>
+  	<Variable>
 		<ID>2016</ID>
 		<Name>ST1 60Mhz VPP</Name>
 		<DataType>FLOAT</DataType>
 		<Unit>Voltage</Unit>
 		<Comment>Station1 HF 60Mhz Voltage Peak-Peak Detect value</Comment>
 	</Variable>
-  <Variable>
+  	<Variable>
 		<ID>2017</ID>
 		<Name>ST2 60Mhz VPP</Name>
 		<DataType>FLOAT</DataType>
 		<Unit>Voltage</Unit>
 		<Comment>Station2 HF 60Mhz Voltage Peak-Peak Detect value</Comment>
 	</Variable>
-  <Variable>
+  	<Variable>
 		<ID>2020</ID>
 		<Name>ST1 Soft Pin Pressure</Name>
 		<DataType>FLOAT</DataType>
 		<Unit>MPa</Unit>
 		<Comment>Station1 softpin pressure meter reading</Comment>
 	</Variable>
-  <Variable>
+  	<Variable>
 		<ID>2021</ID>
 		<Name>ST2 Soft Pin Pressure</Name>
 		<DataType>FLOAT</DataType>
 		<Unit>MPa</Unit>
 		<Comment>Station2 softpin pressure meter reading</Comment>
 	</Variable>
-  <Variable>
+  	<Variable>
 		<ID>2022</ID>
 		<Name>Onboard Gas1 Supply Pressure</Name>
 		<DataType>FLOAT</DataType>
 		<Unit>psi</Unit>
 		<Comment>Onboard gas1 supply pressure reading</Comment>
 	</Variable>
-  <Variable>
+  	<Variable>
 		<ID>2023</ID>
 		<Name>Onboard Gas2 Supply Pressure</Name>
 		<DataType>FLOAT</DataType>
@@ -1796,129 +1796,129 @@
 		<Comment>Onboard gas2 supply pressure reading</Comment>
 	</Variable>
 
-  <Variable>
+  	<Variable>
 		<ID>2024</ID>
 		<Name>GB PG01 Pressure</Name>
 		<DataType>FLOAT</DataType>
 		<Unit>psi</Unit>
-		<Comment>Channel1 gas supply pressure readig</Comment>
+		<Comment>Channel1 gas supply pressure reading</Comment>
 	</Variable>
-  <Variable>
+  	<Variable>
 		<ID>2025</ID>
 		<Name>GB PG02 Pressure</Name>
 		<DataType>FLOAT</DataType>
 		<Unit>psi</Unit>
-		<Comment>Channel2 gas supply pressure readig</Comment>
+		<Comment>Channel2 gas supply pressure reading</Comment>
 	</Variable>
-  <Variable>
+  	<Variable>
 		<ID>2026</ID>
 		<Name>GB PG03 Pressure</Name>
 		<DataType>FLOAT</DataType>
 		<Unit>psi</Unit>
-		<Comment>Channel3 gas supply pressure readig</Comment>
+		<Comment>Channel3 gas supply pressure reading</Comment>
 	</Variable>
-  <Variable>
+  	<Variable>
 		<ID>2027</ID>
 		<Name>GB PG04 Pressure</Name>
 		<DataType>FLOAT</DataType>
 		<Unit>psi</Unit>
-		<Comment>Channel4 gas supply pressure readig</Comment>
+		<Comment>Channel4 gas supply pressure reading</Comment>
 	</Variable>
-  <Variable>
+  	<Variable>
 		<ID>2028</ID>
 		<Name>GB PG05 Pressure</Name>
 		<DataType>FLOAT</DataType>
 		<Unit>psi</Unit>
-		<Comment>Channel5 gas supply pressure readig</Comment>
+		<Comment>Channel5 gas supply pressure reading</Comment>
 	</Variable>
-  <Variable>
+  	<Variable>
 		<ID>2029</ID>
 		<Name>GB PG06 Pressure</Name>
 		<DataType>FLOAT</DataType>
 		<Unit>psi</Unit>
-		<Comment>Channel6 gas supply pressure readig</Comment>
+		<Comment>Channel6 gas supply pressure reading</Comment>
 	</Variable>
-  <Variable>
+  	<Variable>
 		<ID>2030</ID>
 		<Name>GB PG07 Pressure</Name>
 		<DataType>FLOAT</DataType>
 		<Unit>psi</Unit>
-		<Comment>Channel7 gas supply pressure readig</Comment>
+		<Comment>Channel7 gas supply pressure reading</Comment>
 	</Variable>
-  <Variable>
+  	<Variable>
 		<ID>2031</ID>
 		<Name>GB PG08 Pressure</Name>
 		<DataType>FLOAT</DataType>
 		<Unit>psi</Unit>
-		<Comment>Channel8 gas supply pressure readig</Comment>
+		<Comment>Channel8 gas supply pressure reading</Comment>
 	</Variable>
 
-  <Variable>
+  	<Variable>
 		<ID>2032</ID>
 		<Name>GB PG09 Pressure</Name>
 		<DataType>FLOAT</DataType>
 		<Unit>psi</Unit>
-		<Comment>Channel9 gas supply pressure readig</Comment>
+		<Comment>Channel9 gas supply pressure reading</Comment>
 	</Variable>
-  <Variable>
+  	<Variable>
 		<ID>2033</ID>
 		<Name>GB PG10 Pressure</Name>
 		<DataType>FLOAT</DataType>
 		<Unit>psi</Unit>
-		<Comment>Channel10 gas supply pressure readig</Comment>
+		<Comment>Channel10 gas supply pressure reading</Comment>
 	</Variable>
-  <Variable>
+  	<Variable>
 		<ID>2034</ID>
 		<Name>GB PG11 Pressure</Name>
 		<DataType>FLOAT</DataType>
 		<Unit>psi</Unit>
-		<Comment>Channel11 gas supply pressure readig</Comment>
+		<Comment>Channel11 gas supply pressure reading</Comment>
 	</Variable>
-  <Variable>
+  	<Variable>
 		<ID>2035</ID>
 		<Name>GB PG12 Pressure</Name>
 		<DataType>FLOAT</DataType>
 		<Unit>psi</Unit>
-		<Comment>Channel12 gas supply pressure readig</Comment>
+		<Comment>Channel12 gas supply pressure reading</Comment>
 	</Variable>
-  <Variable>
+  	<Variable>
 		<ID>2036</ID>
 		<Name>GB PG13 Pressure</Name>
 		<DataType>FLOAT</DataType>
 		<Unit>psi</Unit>
-		<Comment>Channel13 gas supply pressure readig</Comment>
+		<Comment>Channel13 gas supply pressure reading</Comment>
 	</Variable>
-  <Variable>
+  	<Variable>
 		<ID>2037</ID>
 		<Name>GB PG14 Pressure</Name>
 		<DataType>FLOAT</DataType>
 		<Unit>psi</Unit>
-		<Comment>Channel14 gas supply pressure readig</Comment>
+		<Comment>Channel14 gas supply pressure reading</Comment>
 	</Variable>
-  <Variable>
+  	<Variable>
 		<ID>2038</ID>
 		<Name>GB PG15 Pressure</Name>
 		<DataType>FLOAT</DataType>
 		<Unit>psi</Unit>
-		<Comment>Channel15 gas supply pressure readig</Comment>
+		<Comment>Channel15 gas supply pressure reading</Comment>
 	</Variable>
-  <Variable>
+  	<Variable>
 		<ID>2039</ID>
 		<Name>GB PG16 Pressure</Name>
 		<DataType>FLOAT</DataType>
 		<Unit>psi</Unit>
-		<Comment>Channel16 gas supply pressure readig</Comment>
+		<Comment>Channel16 gas supply pressure reading</Comment>
 	</Variable>
 
 
-  <Variable>
+  	<Variable>
 		<ID>3000</ID>
 		<Name>ST1 ESC HV Setpoint</Name>
 		<DataType>FLOAT</DataType>
 		<Unit>Voltage</Unit>
 		<Comment>Station1 E-Chuck HVM setpoint</Comment>
 	</Variable>
-  <Variable>
+  	<Variable>
 		<ID>3001</ID>
 		<Name>ST2 ESC HV Setpoint</Name>
 		<DataType>FLOAT</DataType>
@@ -1926,14 +1926,14 @@
 		<Comment>Station2 E-Chuck HVM setpoint</Comment>
 	</Variable>
 
-  <Variable>
+  	<Variable>
 		<ID>3006</ID>
 		<Name>ST1 Soft Pin Pressure Setpoint</Name>
 		<DataType>FLOAT</DataType>
 		<Unit>Voltage</Unit>
 		<Comment>Station1 softpin pressure setpoint</Comment>
 	</Variable>
-  <Variable>
+  	<Variable>
 		<ID>3007</ID>
 		<Name>ST2 Soft Pin Pressure Setpoint</Name>
 		<DataType>FLOAT</DataType>
@@ -1941,56 +1941,56 @@
 		<Comment>Station2 softpin pressure setpoint</Comment>
 	</Variable>
 
-  <Variable>
+  	<Variable>
 		<ID>4000</ID>
 		<Name>ST1 ESC Inner Coolant Inlet Temp</Name>
 		<DataType>FLOAT</DataType>
 		<Unit>℃</Unit>
 		<Comment>Station1 E-Chuck inner zone coolant water inlet temperature</Comment>
 	</Variable>
-  <Variable>
+  	<Variable>
 		<ID>4001</ID>
 		<Name>ST2 ESC Inner Coolant Inlet Temp</Name>
 		<DataType>FLOAT</DataType>
 		<Unit>℃</Unit>
 		<Comment>Station2 E-Chuck inner zone coolant water inlet temperature</Comment>
 	</Variable>
-  <Variable>
+  	<Variable>
 		<ID>4002</ID>
 		<Name>ST1 ESC Inner Coolant Outlet Temp</Name>
 		<DataType>FLOAT</DataType>
 		<Unit>℃</Unit>
 		<Comment>Station1 E-Chuck inner zone coolant water outlet temperature</Comment>
 	</Variable>
-  <Variable>
+  	<Variable>
 		<ID>4003</ID>
 		<Name>ST2 ESC Inner Coolant Outlet Temp</Name>
 		<DataType>FLOAT</DataType>
 		<Unit>℃</Unit>
 		<Comment>Station2 E-Chuck inner zone coolant water outlet temperature</Comment>
 	</Variable>
-  <Variable>
+  	<Variable>
 		<ID>4004</ID>
 		<Name>ST1 ESC Outer Coolant Inlet Temp</Name>
 		<DataType>FLOAT</DataType>
 		<Unit>℃</Unit>
 		<Comment>Station1 E-Chuck outer zone coolant water inlet temperature</Comment>
 	</Variable>
-  <Variable>
+  	<Variable>
 		<ID>4005</ID>
 		<Name>ST2 ESC Outer Coolant Inlet Temp</Name>
 		<DataType>FLOAT</DataType>
 		<Unit>℃</Unit>
 		<Comment>Station2 E-Chuck outer zone coolant water inlet temperature</Comment>
 	</Variable>
-  <Variable>
+  	<Variable>
 		<ID>4006</ID>
 		<Name>ST1 ESC Outer Coolant Outlet Temp</Name>
 		<DataType>FLOAT</DataType>
 		<Unit>℃</Unit>
 		<Comment>Station1 E-Chuck outer zone coolant water outlet temperature</Comment>
 	</Variable>
-  <Variable>
+  	<Variable>
 		<ID>4007</ID>
 		<Name>ST2 ESC Outer Coolant Outlet Temp</Name>
 		<DataType>FLOAT</DataType>
@@ -1999,28 +1999,28 @@
 	</Variable>
 
   
-  <Variable>
+  	<Variable>
 		<ID>5000</ID>
 		<Name>ST1 Lid Heater Control Point Setpoint</Name>
 		<DataType>FLOAT</DataType>
 		<Unit>℃</Unit>
 		<Comment>Station1 lid heater control TC temperature setpoint</Comment>
 	</Variable>
-  <Variable>
+  	<Variable>
 		<ID>5001</ID>
 		<Name>ST1 Lid Heater Control Point Temp</Name>
 		<DataType>FLOAT</DataType>
 		<Unit>℃</Unit>
 		<Comment>Station1 lid heater control TC temperature reading</Comment>
 	</Variable>
-  <Variable>
+  	<Variable>
 		<ID>5002</ID>
 		<Name>ST1 Lid Heater Monitor Point Temp</Name>
 		<DataType>FLOAT</DataType>
 		<Unit>℃</Unit>
 		<Comment>Station1 lid heater monitor TC temperature reading</Comment>
 	</Variable>
-  <Variable>
+  	<Variable>
 		<ID>5003</ID>
 		<Name>ST1 Lid Heater PWR Output</Name>
 		<DataType>FLOAT</DataType>
@@ -2028,33 +2028,609 @@
 		<Comment>Station1 lid heater power output percent</Comment>
 	</Variable>
 
-  <Variable>
+  	<Variable>
 		<ID>5004</ID>
 		<Name>ST2 Lid Heater Control Point Setpoint</Name>
 		<DataType>FLOAT</DataType>
 		<Unit>℃</Unit>
 		<Comment>Station2 lid heater control TC temperature setpoint</Comment>
 	</Variable>
-  <Variable>
+  	<Variable>
 		<ID>5005</ID>
 		<Name>ST2 Lid Heater Control Point Temp</Name>
 		<DataType>FLOAT</DataType>
 		<Unit>℃</Unit>
 		<Comment>Station2 lid heater control TC temperature reading</Comment>
 	</Variable>
-  <Variable>
+  	<Variable>
 		<ID>5006</ID>
 		<Name>ST2 Lid Heater Monitor Point Temp</Name>
 		<DataType>FLOAT</DataType>
 		<Unit>℃</Unit>
 		<Comment>Station2 lid heater monitor TC temperature reading</Comment>
 	</Variable>
-  <Variable>
+  	<Variable>
 		<ID>5007</ID>
 		<Name>ST2 Lid Heater PWR Output</Name>
 		<DataType>FLOAT</DataType>
 		<Unit>%</Unit>
 		<Comment>Station2 lid heater power output percent</Comment>
+	</Variable>
+
+	<Variable>
+		<ID>6000</ID>
+		<Name>GasSpliter Flow Ratio Readback</Name>
+		<DataType>FLOAT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>GasSpliter flow ratio reading from gas split(1.0 - 20.0)</Comment>
+	</Variable>
+	<Variable>
+		<ID>6001</ID>
+		<Name>GasSpliter Flow Ratio Switch Readback</Name>
+		<DataType>BYTE</DataType>
+		<Unit>N/A</Unit>
+		<Comment>GasSpliter flow ratio switch reading from gas split(1-2)</Comment>
+	</Variable>
+	<Variable>
+		<ID>6002</ID>
+		<Name>MFC1 Flow Reading</Name>
+		<DataType>FLOAT</DataType>
+		<Unit>sccm</Unit>
+		<Comment>Channel1 gas flow reading</Comment>
+	</Variable>
+	<Variable>
+		<ID>6003</ID>
+		<Name>MFC2 Flow Reading</Name>
+		<DataType>FLOAT</DataType>
+		<Unit>sccm</Unit>
+		<Comment>Channel2 gas flow reading</Comment>
+	</Variable>
+	<Variable>
+		<ID>6004</ID>
+		<Name>MFC3 Flow Reading</Name>
+		<DataType>FLOAT</DataType>
+		<Unit>sccm</Unit>
+		<Comment>Channel3 gas flow reading</Comment>
+	</Variable>
+	<Variable>
+		<ID>6005</ID>
+		<Name>MFC4 Flow Reading</Name>
+		<DataType>FLOAT</DataType>
+		<Unit>sccm</Unit>
+		<Comment>Channel4 gas flow reading</Comment>
+	</Variable>
+	<Variable>
+		<ID>6006</ID>
+		<Name>MFC5 Flow Reading</Name>
+		<DataType>FLOAT</DataType>
+		<Unit>sccm</Unit>
+		<Comment>Channel5 gas flow reading</Comment>
+	</Variable>
+	<Variable>
+		<ID>6007</ID>
+		<Name>MFC6 Flow Reading</Name>
+		<DataType>FLOAT</DataType>
+		<Unit>sccm</Unit>
+		<Comment>Channel6 gas flow reading</Comment>
+	</Variable>
+	<Variable>
+		<ID>6008</ID>
+		<Name>MFC7 Flow Reading</Name>
+		<DataType>FLOAT</DataType>
+		<Unit>sccm</Unit>
+		<Comment>Channel7 gas flow reading</Comment>
+	</Variable>
+	<Variable>
+		<ID>6009</ID>
+		<Name>MFC8 Flow Reading</Name>
+		<DataType>FLOAT</DataType>
+		<Unit>sccm</Unit>
+		<Comment>Channel8 gas flow reading</Comment>
+	</Variable>
+	<Variable>
+		<ID>6010</ID>
+		<Name>MFC9 Flow Reading</Name>
+		<DataType>FLOAT</DataType>
+		<Unit>sccm</Unit>
+		<Comment>Channel9 gas flow reading</Comment>
+	</Variable>
+	<Variable>
+		<ID>6011</ID>
+		<Name>MFC10 Flow Reading</Name>
+		<DataType>FLOAT</DataType>
+		<Unit>sccm</Unit>
+		<Comment>Channel10 gas flow reading</Comment>
+	</Variable>
+	<Variable>
+		<ID>6012</ID>
+		<Name>MFC11 Flow Reading</Name>
+		<DataType>FLOAT</DataType>
+		<Unit>sccm</Unit>
+		<Comment>Channel11 gas flow reading</Comment>
+	</Variable>
+	<Variable>
+		<ID>6013</ID>
+		<Name>MFC12 Flow Reading</Name>
+		<DataType>FLOAT</DataType>
+		<Unit>sccm</Unit>
+		<Comment>Channel12 gas flow reading</Comment>
+	</Variable>
+	<Variable>
+		<ID>6014</ID>
+		<Name>MFC13 Flow Reading</Name>
+		<DataType>FLOAT</DataType>
+		<Unit>sccm</Unit>
+		<Comment>Channel13 gas flow reading</Comment>
+	</Variable>
+	<Variable>
+		<ID>6015</ID>
+		<Name>MFC14 Flow Reading</Name>
+		<DataType>FLOAT</DataType>
+		<Unit>sccm</Unit>
+		<Comment>Channel14 gas flow reading</Comment>
+	</Variable>
+	<Variable>
+		<ID>6016</ID>
+		<Name>MFC15 Flow Reading</Name>
+		<DataType>FLOAT</DataType>
+		<Unit>sccm</Unit>
+		<Comment>Channel15 gas flow reading</Comment>
+	</Variable>
+	<Variable>
+		<ID>6017</ID>
+		<Name>MFC16 Flow Reading</Name>
+		<DataType>FLOAT</DataType>
+		<Unit>sccm</Unit>
+		<Comment>Channel16 gas flow reading</Comment>
+	</Variable>
+	<Variable>
+		<ID>6018</ID>
+		<Name>MFC17 Flow Reading</Name>
+		<DataType>FLOAT</DataType>
+		<Unit>sccm</Unit>
+		<Comment>Channel17 gas flow reading</Comment>
+	</Variable>
+	<Variable>
+		<ID>6019</ID>
+		<Name>MFC18 Flow Reading</Name>
+		<DataType>FLOAT</DataType>
+		<Unit>sccm</Unit>
+		<Comment>Channel18 gas flow reading</Comment>
+	</Variable>
+	<Variable>
+		<ID>6020</ID>
+		<Name>MFC19 Flow Reading</Name>
+		<DataType>FLOAT</DataType>
+		<Unit>sccm</Unit>
+		<Comment>Channel19 gas flow reading</Comment>
+	</Variable>
+	<Variable>
+		<ID>6021</ID>
+		<Name>MFC20 Flow Reading</Name>
+		<DataType>FLOAT</DataType>
+		<Unit>sccm</Unit>
+		<Comment>Channel20 gas flow reading</Comment>
+	</Variable>
+	<Variable>
+		<ID>6022</ID>
+		<Name>MFC21 Flow Reading</Name>
+		<DataType>FLOAT</DataType>
+		<Unit>sccm</Unit>
+		<Comment>Channel21 gas flow reading</Comment>
+	</Variable>
+	<Variable>
+		<ID>6023</ID>
+		<Name>MFC22 Flow Reading</Name>
+		<DataType>FLOAT</DataType>
+		<Unit>sccm</Unit>
+		<Comment>Channel22 gas flow reading</Comment>
+	</Variable>
+	<Variable>
+		<ID>6024</ID>
+		<Name>MFC23 Flow Reading</Name>
+		<DataType>FLOAT</DataType>
+		<Unit>sccm</Unit>
+		<Comment>Channel23 gas flow reading</Comment>
+	</Variable>
+	<Variable>
+		<ID>6025</ID>
+		<Name>MFC24 Flow Reading</Name>
+		<DataType>FLOAT</DataType>
+		<Unit>sccm</Unit>
+		<Comment>Channel24 gas flow reading</Comment>
+	</Variable>
+	<Variable>
+		<ID>6026</ID>
+		<Name>ST1 Backside He Leak Rate Reading</Name>
+		<DataType>FLOAT</DataType>
+		<Unit>sccm</Unit>
+		<Comment>Station1 backside helium leakage rate reading</Comment>
+	</Variable>
+	<Variable>
+		<ID>6027</ID>
+		<Name>ST1 Backside He Pressure Reading</Name>
+		<DataType>FLOAT</DataType>
+		<Unit>Torr</Unit>
+		<Comment>Station1 backside helium pressure reading</Comment>
+	</Variable>
+	<Variable>
+		<ID>6028</ID>
+		<Name>ST2 Backside He Leak Rate Reading</Name>
+		<DataType>FLOAT</DataType>
+		<Unit>sccm</Unit>
+		<Comment>Station2 backside helium leakage rate reading</Comment>
+	</Variable>
+	<Variable>
+		<ID>6029</ID>
+		<Name>ST2 Backside He Pressure Reading</Name>
+		<DataType>FLOAT</DataType>
+		<Unit>Torr</Unit>
+		<Comment>Station2 backside helium pressure reading</Comment>
+	</Variable>
+
+	<!-- Onboard Gas Flow Reading-->
+	<Variable>
+		<ID>6030</ID>
+		<Name>ST1 Onboard Gas1 Flow Reading</Name>
+		<DataType>FLOAT</DataType>
+		<Unit>sccm</Unit>
+		<Comment>Station1 onboard gas1 flow reading</Comment>
+	</Variable>
+	<Variable>
+		<ID>6031</ID>
+		<Name>ST2 Onboard Gas1 Flow Reading</Name>
+		<DataType>FLOAT</DataType>
+		<Unit>sccm</Unit>
+		<Comment>Station2 onboard gas1 flow reading</Comment>
+	</Variable>
+		<Variable>
+		<ID>6032</ID>
+		<Name>ST1 Onboard Gas2 Flow Reading</Name>
+		<DataType>FLOAT</DataType>
+		<Unit>sccm</Unit>
+		<Comment>Station1 onboard gas2 flow reading</Comment>
+	</Variable>
+	<Variable>
+		<ID>6033</ID>
+		<Name>ST2 Onboard Gas2 Flow Reading</Name>
+		<DataType>FLOAT</DataType>
+		<Unit>sccm</Unit>
+		<Comment>Station2 onboard gas2 flow reading</Comment>
+	</Variable>
+
+	<Variable>
+		<ID>7000</ID>
+		<Name>GasSpliter Flow Ratio Setpoint</Name>
+		<DataType>FLOAT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>GasSpliter flow ratio setpoint to gas split(1.0 - 20.0)</Comment>
+	</Variable>
+	<Variable>
+		<ID>7001</ID>
+		<Name>GasSpliter Flow Ratio Swtich Setpoint</Name>
+		<DataType>BYTE</DataType>
+		<Unit>N/A</Unit>
+		<Comment>GasSpliter flow ratio switch setpoint to gas split(1 - 2)</Comment>
+	</Variable>
+	<Variable>
+		<ID>7002</ID>
+		<Name>MFC1 Flow Setpoint</Name>
+		<DataType>FLOAT</DataType>
+		<Unit>sccm</Unit>
+		<Comment>Channel1 gas flow setpoint</Comment>
+	</Variable>
+		<Variable>
+		<ID>7003</ID>
+		<Name>MFC2 Flow Setpoint</Name>
+		<DataType>FLOAT</DataType>
+		<Unit>sccm</Unit>
+		<Comment>Channel2 gas flow setpoint</Comment>
+	</Variable>
+	<Variable>
+		<ID>7004</ID>
+		<Name>MFC3 Flow Setpoint</Name>
+		<DataType>FLOAT</DataType>
+		<Unit>sccm</Unit>
+		<Comment>Channel3 gas flow setpoint</Comment>
+	</Variable>
+	<Variable>
+		<ID>7005</ID>
+		<Name>MFC4 Flow Setpoint</Name>
+		<DataType>FLOAT</DataType>
+		<Unit>sccm</Unit>
+		<Comment>Channel4 gas flow setpoint</Comment>
+	</Variable>
+	<Variable>
+		<ID>7006</ID>
+		<Name>MFC5 Flow Setpoint</Name>
+		<DataType>FLOAT</DataType>
+		<Unit>sccm</Unit>
+		<Comment>Channel5 gas flow setpoint</Comment>
+	</Variable>
+	<Variable>
+		<ID>7007</ID>
+		<Name>MFC6 Flow Setpoint</Name>
+		<DataType>FLOAT</DataType>
+		<Unit>sccm</Unit>
+		<Comment>Channel6 gas flow setpoint</Comment>
+	</Variable>
+	<Variable>
+		<ID>7008</ID>
+		<Name>MFC7 Flow Setpoint</Name>
+		<DataType>FLOAT</DataType>
+		<Unit>sccm</Unit>
+		<Comment>Channel7 gas flow setpoint</Comment>
+	</Variable>
+	<Variable>
+		<ID>7009</ID>
+		<Name>MFC8 Flow Setpoint</Name>
+		<DataType>FLOAT</DataType>
+		<Unit>sccm</Unit>
+		<Comment>Channel8 gas flow setpoint</Comment>
+	</Variable>
+	<Variable>
+		<ID>7010</ID>
+		<Name>MFC9 Flow Setpoint</Name>
+		<DataType>FLOAT</DataType>
+		<Unit>sccm</Unit>
+		<Comment>Channel9 gas flow setpoint</Comment>
+	</Variable>
+	<Variable>
+		<ID>7011</ID>
+		<Name>MFC10 Flow Setpoint</Name>
+		<DataType>FLOAT</DataType>
+		<Unit>sccm</Unit>
+		<Comment>Channel10 gas flow setpoint</Comment>
+	</Variable>
+	<Variable>
+		<ID>7012</ID>
+		<Name>MFC11 Flow Setpoint</Name>
+		<DataType>FLOAT</DataType>
+		<Unit>sccm</Unit>
+		<Comment>Channel11 gas flow setpoint</Comment>
+	</Variable>
+	<Variable>
+		<ID>7013</ID>
+		<Name>MFC12 Flow Setpoint</Name>
+		<DataType>FLOAT</DataType>
+		<Unit>sccm</Unit>
+		<Comment>Channel12 gas flow setpoint</Comment>
+	</Variable>
+	<Variable>
+		<ID>7014</ID>
+		<Name>MFC13 Flow Setpoint</Name>
+		<DataType>FLOAT</DataType>
+		<Unit>sccm</Unit>
+		<Comment>Channel13 gas flow setpoint</Comment>
+	</Variable>
+	<Variable>
+		<ID>7015</ID>
+		<Name>MFC14 Flow Setpoint</Name>
+		<DataType>FLOAT</DataType>
+		<Unit>sccm</Unit>
+		<Comment>Channel14 gas flow setpoint</Comment>
+	</Variable>
+	<Variable>
+		<ID>7016</ID>
+		<Name>MFC15 Flow Setpoint</Name>
+		<DataType>FLOAT</DataType>
+		<Unit>sccm</Unit>
+		<Comment>Channel15 gas flow setpoint</Comment>
+	</Variable>
+	<Variable>
+		<ID>7017</ID>
+		<Name>MFC16 Flow Setpoint</Name>
+		<DataType>FLOAT</DataType>
+		<Unit>sccm</Unit>
+		<Comment>Channel16 gas flow setpoint</Comment>
+	</Variable>
+	<Variable>
+		<ID>7018</ID>
+		<Name>MFC17 Flow Setpoint</Name>
+		<DataType>FLOAT</DataType>
+		<Unit>sccm</Unit>
+		<Comment>Channel17 gas flow setpoint</Comment>
+	</Variable>
+	<Variable>
+		<ID>7019</ID>
+		<Name>MFC18 Flow Setpoint</Name>
+		<DataType>FLOAT</DataType>
+		<Unit>sccm</Unit>
+		<Comment>Channel18 gas flow setpoint</Comment>
+	</Variable>
+	<Variable>
+		<ID>7020</ID>
+		<Name>MFC19 Flow Setpoint</Name>
+		<DataType>FLOAT</DataType>
+		<Unit>sccm</Unit>
+		<Comment>Channel19 gas flow setpoint</Comment>
+	</Variable>
+	<Variable>
+		<ID>7021</ID>
+		<Name>MFC20 Flow Setpoint</Name>
+		<DataType>FLOAT</DataType>
+		<Unit>sccm</Unit>
+		<Comment>Channel20 gas flow setpoint</Comment>
+	</Variable>
+	<Variable>
+		<ID>7022</ID>
+		<Name>MFC21 Flow Setpoint</Name>
+		<DataType>FLOAT</DataType>
+		<Unit>sccm</Unit>
+		<Comment>Channel21 gas flow setpoint</Comment>
+	</Variable>
+	<Variable>
+		<ID>7023</ID>
+		<Name>MFC22 Flow Setpoint</Name>
+		<DataType>FLOAT</DataType>
+		<Unit>sccm</Unit>
+		<Comment>Channel22 gas flow setpoint</Comment>
+	</Variable>
+	<Variable>
+		<ID>7024</ID>
+		<Name>MFC23 Flow Setpoint</Name>
+		<DataType>FLOAT</DataType>
+		<Unit>sccm</Unit>
+		<Comment>Channel23 gas flow setpoint</Comment>
+	</Variable>
+	<Variable>
+		<ID>7025</ID>
+		<Name>MFC24 Flow Setpoint</Name>
+		<DataType>FLOAT</DataType>
+		<Unit>sccm</Unit>
+		<Comment>Channel24 gas flow setpoint</Comment>
+	</Variable>
+
+	<Variable>
+		<ID>7026</ID>
+		<Name>ST1 Backside He Pressure Setpoint</Name>
+		<DataType>FLOAT</DataType>
+		<Unit>Torr</Unit>
+		<Comment>Station1 backside helium pressure setpoint</Comment>
+	</Variable>
+
+	<Variable>
+		<ID>7028</ID>
+		<Name>ST2 Backside He Pressure Setpoint</Name>
+		<DataType>FLOAT</DataType>
+		<Unit>Torr</Unit>
+		<Comment>Station2 backside helium pressure setpoint</Comment>
+	</Variable>
+
+	<!-- Onboard Gas Flow Setpoint-->
+	<Variable>
+		<ID>7030</ID>
+		<Name>ST1 Onboard Gas1 Flow Setpoint</Name>
+		<DataType>FLOAT</DataType>
+		<Unit>sccm</Unit>
+		<Comment>Station1 onboard gas1 flow setpoint</Comment>
+	</Variable>
+	<Variable>
+		<ID>7031</ID>
+		<Name>ST2 Onboard Gas1 Flow Setpoint</Name>
+		<DataType>FLOAT</DataType>
+		<Unit>sccm</Unit>
+		<Comment>Station2 onboard gas1 flow setpoint</Comment>
+	</Variable>
+	<Variable>
+		<ID>7032</ID>
+		<Name>ST1 Onboard Gas2 Flow Setpoint</Name>
+		<DataType>FLOAT</DataType>
+		<Unit>sccm</Unit>
+		<Comment>Station1 onboard gas2 flow setpoint</Comment>
+	</Variable>
+	<Variable>
+		<ID>7033</ID>
+		<Name>ST2 Onboard Gas2 Flow Setpoint</Name>
+		<DataType>FLOAT</DataType>
+		<Unit>sccm</Unit>
+		<Comment>Station2 onboard gas2 flow setpoint</Comment>
+	</Variable>
+
+	<!-- Movable Cathode -->
+	<Variable>
+		<ID>8000</ID>
+		<Name>ST1 MVC Current Position</Name>
+		<DataType>INT</DataType>
+		<Unit>0.1mm</Unit>
+		<Comment>Station1 movable cathode current position</Comment>
+	</Variable>
+	<Variable>
+		<ID>8001</ID>
+		<Name>ST2 MVC Current Position</Name>
+		<DataType>INT</DataType>
+		<Unit>0.1mm</Unit>
+		<Comment>Station2 movable cathode current position</Comment>
+	</Variable>
+
+	<Variable>
+		<ID>8002</ID>
+		<Name>ST1 MVC ACK</Name>
+		<DataType>UINT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Station1 movable cathode controller acknowledge code</Comment>
+	</Variable>
+	<Variable>
+		<ID>8003</ID>
+		<Name>ST2 MVC ACK</Name>
+		<DataType>UINT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Station2 movable cathode controller acknowledge code</Comment>
+	</Variable>
+
+	<Variable>
+		<ID>8004</ID>
+		<Name>ST1 MVC Driver Status</Name>
+		<DataType>UINT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Station1 movable cathode controller driver status</Comment>
+	</Variable>
+	<Variable>
+		<ID>8005</ID>
+		<Name>ST2 MVC Driver Status</Name>
+		<DataType>UINT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Station2 movable cathode controller driver status</Comment>
+	</Variable>
+
+	<Variable>
+		<ID>8006</ID>
+		<Name>ST1 MVC Error Code</Name>
+		<DataType>UINT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Station1 movable cathode controller error code</Comment>
+	</Variable>
+	<Variable>
+		<ID>8007</ID>
+		<Name>ST2 MVC Error Code</Name>
+		<DataType>UINT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Station2 movable cathode controller error code</Comment>
+	</Variable>
+
+	<Variable>
+		<ID>9000</ID>
+		<Name>ST1 MVC Velocity Setpoint</Name>
+		<DataType>INT</DataType>
+		<Unit>0.1mm/s</Unit>
+		<Comment>Station1 movable cathode motor velocity setting</Comment>
+	</Variable>
+	<Variable>
+		<ID>9001</ID>
+		<Name>ST2 MVC Velocity Setpoint</Name>
+		<DataType>INT</DataType>
+		<Unit>0.1mm/s</Unit>
+		<Comment>Station2 movable cathode motor velocity setting</Comment>
+	</Variable>
+
+	<Variable>
+		<ID>9002</ID>
+		<Name>ST1 MVC CMD</Name>
+		<DataType>UINT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Station1 movable cathode controller command</Comment>
+	</Variable>
+	<Variable>
+		<ID>9003</ID>
+		<Name>ST2 MVC CMD</Name>
+		<DataType>UINT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Station2 movable cathode controller command</Comment>
+	</Variable>
+
+	<Variable>
+		<ID>9004</ID>
+		<Name>ST1 MVC CMD Parameter</Name>
+		<DataType>UINT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Station1 movable cathode controller command parameter</Comment>
+	</Variable>
+	<Variable>
+		<ID>9005</ID>
+		<Name>ST2 MVC CMD Parameter</Name>
+		<DataType>UINT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Station2 movable cathode controller command parameter</Comment>
 	</Variable>
 
 </AMECVariables>

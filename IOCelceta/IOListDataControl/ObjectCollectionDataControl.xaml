@@ -137,6 +137,7 @@
         <ListView Name="__lsv_io_objects" Margin="4" SelectionMode="Single" ContextMenu="{StaticResource ContextMenu}" VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.IsVirtualizingWhenGrouping="True" VirtualizingPanel.VirtualizationMode="Recycling">
             <ListView.Resources>
                 <local:ObjectItemBindingString x:Key="BindingString"/>
+                <local:ObjectItemRangeString x:Key="RangeString"/>
                 <local:ObjectItemConverterString x:Key="ConverterString"/>
                 <Style TargetType="ListViewItem">
                     <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
@@ -189,6 +190,20 @@
                         </TextBlock.Text>
                     </TextBlock>
                 </DataTemplate>
+                <DataTemplate x:Key="RangeHeadTemplate">
+                    <TextBlock FontWeight="Bold" Text="Range"/>
+                </DataTemplate>
+                <DataTemplate x:Key="RangeContentTemplate">
+                    <TextBlock Margin="4" HorizontalAlignment="Left">
+                        <TextBlock.Text>
+                            <MultiBinding Converter="{StaticResource RangeString}">
+                                <Binding Path="RangeEnable"/>
+                                <Binding Path="RangeDownLimit"/>
+                                <Binding Path="RangeUpLimit"/>
+                            </MultiBinding>
+                        </TextBlock.Text>
+                    </TextBlock>
+                </DataTemplate>
                 <DataTemplate x:Key="ConverterHeadTemplate">
                     <TextBlock FontWeight="Bold" Text="Converter"/>
                 </DataTemplate>
@@ -197,10 +212,8 @@
                         <TextBlock.Text>
                             <MultiBinding Converter="{StaticResource ConverterString}">
                                 <Binding Path="ConverterEnable"/>
-                                <!--Binding Path="ConverterDataTypeSelection"-->
                                 <Binding Path="ConverterDownScale"/>
                                 <Binding Path="ConverterUpScale"/>
-                                <Binding Path="ConverterUnitName"/>
                             </MultiBinding>
                         </TextBlock.Text>
                     </TextBlock>
@@ -222,7 +235,8 @@
                     <GridViewColumn Width="100" HeaderTemplate="{StaticResource DataTypeHeadTemplate}" CellTemplate="{StaticResource DataTypeContentTemplate}"/>
                     <GridViewColumn Width="100" HeaderTemplate="{StaticResource UnitHeadTemplate}" CellTemplate="{StaticResource UnitContentTemplate}"/>
                     <GridViewColumn Width="200" HeaderTemplate="{StaticResource BindingHeadTemplate}" CellTemplate="{StaticResource BindingContentTemplate}"/>
-                    <GridViewColumn Width="200" HeaderTemplate="{StaticResource ConverterHeadTemplate}" CellTemplate="{StaticResource ConverterContentTemplate}"/>
+                    <GridViewColumn Width="120" HeaderTemplate="{StaticResource RangeHeadTemplate}" CellTemplate="{StaticResource RangeContentTemplate}"/>
+                    <GridViewColumn Width="120" HeaderTemplate="{StaticResource ConverterHeadTemplate}" CellTemplate="{StaticResource ConverterContentTemplate}"/>
                 </GridView>
             </ListView.View>
         </ListView>

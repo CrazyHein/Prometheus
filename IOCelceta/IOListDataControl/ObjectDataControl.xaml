@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDataControl"
         mc:Ignorable="d"
-        Title="Object Data Detail" Height="250" Width="650">
+        Title="Object Data Detail" Height="220" Width="850">
     <DockPanel Width="auto">
         <StackPanel Orientation="Horizontal" DockPanel.Dock="Bottom" HorizontalAlignment="Right">
             <Button Content="_OK" Margin="8" Width="120" Click="__on_ok"/>
@@ -32,9 +32,12 @@
                 <ColumnDefinition/>
                 <ColumnDefinition Width="2"/>
                 <ColumnDefinition/>
+                <ColumnDefinition Width="2"/>
+                <ColumnDefinition/>
             </Grid.ColumnDefinitions>
             <GridSplitter Grid.Column="1" Background="LightBlue" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="0,12,0,4"/>
             <GridSplitter Grid.Column="3" Background="LightBlue" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="0,12,0,4"/>
+            <GridSplitter Grid.Column="5" Background="LightBlue" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="0,12,0,4"/>
             <GroupBox Header="Basic Info" Margin="4">
                 <Grid>
                     <Grid.ColumnDefinitions>
@@ -81,10 +84,10 @@
                     <TextBox Grid.Column="1" Grid.Row="3"  IsEnabled="{Binding ElementName=__chk_binding_enable,Path=IsChecked}" Text="{Binding BindingChannelIndex, NotifyOnValidationError=True}"/>
                 </Grid>
             </GroupBox>
-            <GroupBox Header="Converter" Margin="4" Grid.Column="4">
+            <GroupBox Header="Range" Margin="4" Grid.Column="4">
                 <Grid>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="66"/>
+                        <ColumnDefinition Width="76"/>
                         <ColumnDefinition />
                     </Grid.ColumnDefinitions>
                     <Grid.RowDefinitions>
@@ -92,18 +95,35 @@
                         <RowDefinition Height="auto"/>
                         <RowDefinition Height="auto"/>
                         <RowDefinition Height="auto"/>
+                    </Grid.RowDefinitions>
+                    <CheckBox Content="Enable" Margin="4" Name="__chk_enable_range" IsChecked="{Binding RangeEnable}"/>
+                    <TextBlock Text="Dw Limit :" Grid.Row="1"/>
+                    <TextBlock Text="Up Limit : " Grid.Row="2"/>
+
+                    <TextBox Grid.Column="1" Grid.Row="1" IsEnabled="{Binding ElementName=__chk_enable_range,Path=IsChecked}" Text="{Binding RangeDownLimit, NotifyOnValidationError=True}"/>
+                    <TextBox Grid.Column="1" Grid.Row="2" IsEnabled="{Binding ElementName=__chk_enable_range,Path=IsChecked}" Text="{Binding RangeUpLimit, NotifyOnValidationError=True}"/>
+                </Grid>
+            </GroupBox>
+            <GroupBox Header="Converter" Margin="4" Grid.Column="6">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="76"/>
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="auto"/>
                         <RowDefinition Height="auto"/>
                     </Grid.RowDefinitions>
                     <CheckBox Content="Enable" Margin="4" Name="__chk_enable_converter" IsChecked="{Binding ConverterEnable}"/>
                     <!--TextBlock Text="Data Type : " Grid.Row="1"-->
-                    <TextBlock Text="Up Scale :" Grid.Row="2"/>
-                    <TextBlock Text="Dw Scale : " Grid.Row="3"/>
-                    <TextBlock Text="Unit : " Grid.Row="4"/>
+                    <TextBlock Text="Dw Scale :" Grid.Row="1"/>
+                    <TextBlock Text="Up Scale : " Grid.Row="2"/>
 
                     <!--ComboBox Grid.Column="1" Grid.Row="1" Name="__cmb_coverter_data_type_selection" SelectedItem="{Binding Path=ConverterDataTypeSelection}" Height="24" IsEnabled="{Binding ElementName=__chk_enable_converter,Path=IsChecked}"-->
+                    <TextBox Grid.Column="1" Grid.Row="1" IsEnabled="{Binding ElementName=__chk_enable_converter,Path=IsChecked}" Text="{Binding ConverterDownScale, NotifyOnValidationError=True}"/>
                     <TextBox Grid.Column="1" Grid.Row="2" IsEnabled="{Binding ElementName=__chk_enable_converter,Path=IsChecked}" Text="{Binding ConverterUpScale, NotifyOnValidationError=True}"/>
-                    <TextBox Grid.Column="1" Grid.Row="3" IsEnabled="{Binding ElementName=__chk_enable_converter,Path=IsChecked}" Text="{Binding ConverterDownScale, NotifyOnValidationError=True}"/>
-                    <TextBox Grid.Column="1" Grid.Row="4" IsEnabled="{Binding ElementName=__chk_enable_converter,Path=IsChecked}" Text="{Binding ConverterUnitName}"/>
                 </Grid>
             </GroupBox>
         </Grid>

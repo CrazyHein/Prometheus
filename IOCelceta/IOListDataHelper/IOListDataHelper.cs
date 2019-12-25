@@ -39,6 +39,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
         INVALID_OBJECT_VARIABLE                                 = 0x00000028,
         OBJECT_VARIABLE_DATA_TYPE_MISMATCH                      = 0x00000029,
         INVALID_OBJECT_INDEX                                    = 0x0000002A,
+        INVALID_OBJECT_RANGE                                    = 0x0000002B,
 
         INVALID_BIT_OBJECT_INDEX                                = 0x00000030,
         INVALID_BLOCK_OBJECT_INDEX                              = 0x00000031,
@@ -370,6 +371,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                         uint index = 0;
                         VariableDefinition variableDefinition = null;
                         IO_LIST_OBJECT_COLLECTION_T.MODULE_BINDING_T moduleBindingInfo = null;
+                        IO_LIST_OBJECT_COLLECTION_T.VALUE_RANGE_T valueRangeInfo = null;
                         IO_LIST_OBJECT_COLLECTION_T.VALUE_CONVERTER_T valueConverterInfo = null;
 
                         foreach (XmlNode node in objectNode)
@@ -393,6 +395,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                                     moduleBindingInfo = __load_object_binding_info(node);
                                     mask |= 0x00000008;
                                     break;
+                                case "Range":
+                                    valueRangeInfo = __load_object_range_info(node);
+                                    mask |= 0x00000020;
+                                    break;
                                 case "Converter":
                                     valueConverterInfo = __load_object_converter_info(node);
                                     mask |= 0x00000010;
@@ -403,7 +409,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                         if ((mask & 0x00000003) != 0x00000003)
                             throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.ELEMENT_MISSING, null);
 
-                        IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T objectDefinition = new IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T(index, variableDefinition, moduleBindingInfo, valueConverterInfo);
+                        IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T objectDefinition = new IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T(index, variableDefinition, moduleBindingInfo, valueRangeInfo, valueConverterInfo);
                         ObjectDataVerification(objectDefinition);
                         __object_collection.objects.Add(objectDefinition.index, objectDefinition);
                         __object_reference_counter_of_pdo.Add(objectDefinition.index, 0);
@@ -475,11 +481,54 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
             }
         }
 
+        private IO_LIST_OBJECT_COLLECTION_T.VALUE_RANGE_T __load_object_range_info(XmlNode converterNode)
+        {
+            uint mask = 0;
+            bool enabled = false;
+            double upLimit = 0, downLimit = 0;
+            try
+            {
+                if (converterNode.NodeType == XmlNodeType.Element)
+                {
+                    foreach (XmlNode node in converterNode.ChildNodes)
+                    {
+                        if (node.NodeType != XmlNodeType.Element)
+                            continue;
+
+                        switch (node.Name)
+                        {
+                            case "UpLimit":
+                                upLimit = Convert.ToDouble(node.FirstChild.Value);
+                                mask |= 0x00000004;
+                                break;
+                            case "DownLimit":
+                                downLimit = Convert.ToDouble(node.FirstChild.Value);
+                                mask |= 0x00000008;
+                                break;
+                        }
+                    }
+                    if (mask != 0x0C)
+                        throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.ELEMENT_MISSING, null);
+                    else
+                        enabled = true;
+                }
+
+                return new IO_LIST_OBJECT_COLLECTION_T.VALUE_RANGE_T(enabled, upLimit, downLimit);
+            }
+            catch (IOListParseExcepetion e)
+            {
+                throw e;
+            }
+            catch (Exception e)
+            {
+                throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.FILE_DATA_EXCEPTION, e);
+            }
+        }
+
         private IO_LIST_OBJECT_COLLECTION_T.VALUE_CONVERTER_T __load_object_converter_info(XmlNode converterNode)
         {
             uint mask = 0;
             bool enabled = false;
-            string unitName = null;
             double upScale = 0, downScale = 0;
             try
             {
@@ -503,10 +552,6 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                                     throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_OBJECT_DATA_TYPE, null);
                                 break;
                                 */
-                            case "Unit":
-                                unitName = node.FirstChild.Value;
-                                mask |= 0x00000002;
-                                break;
                             case "UpScale":
                                 upScale = Convert.ToDouble(node.FirstChild.Value);
                                 mask |= 0x00000004;
@@ -517,13 +562,13 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                                 break;
                         }
                     }
-                    if (mask != 0x0E)
+                    if (mask != 0x0C)
                         throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.ELEMENT_MISSING, null);
                     else
                         enabled = true;
                 }
 
-                return new IO_LIST_OBJECT_COLLECTION_T.VALUE_CONVERTER_T(enabled, unitName, upScale, downScale);
+                return new IO_LIST_OBJECT_COLLECTION_T.VALUE_CONVERTER_T(enabled, upScale, downScale);
             }
             catch (IOListParseExcepetion e)
             {
@@ -980,9 +1025,15 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                     throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_OBJECT_BINDING_MODULE_CHANNEL, null);
             }
 
+            if (objectData.range.enabled == true)
+            {
+                if (objectData.variable.DataType.BitSize == 1 || objectData.range.up_limit < objectData.range.down_limit)
+                    throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_OBJECT_RANGE, null);
+            }
+
             if (objectData.converter.enabled == true)
             {
-                if(objectData.variable.DataType.BitSize == 1 || objectData.converter.unit_name == null || objectData.converter.down_scale == objectData.converter.up_scale)
+                if(objectData.variable.DataType.BitSize == 1 || objectData.converter.down_scale == objectData.converter.up_scale)
                     throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_OBJECT_CONVERTER, null);
                 //else if (objectData.converter.data_type == null || DataTypeCatalogue.DataTypes.Values.Contains(objectData.converter.data_type) == false)
                     //throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_OBJECT_CONVERTER_DATA_TYPE, null);
@@ -1958,6 +2009,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                     if (objectData.binding.enabled == true)
                         objectNode.AppendChild(__create_object_binding_node(doc, objectData.binding));
 
+                    if(objectData.range.enabled == true)
+                        objectNode.AppendChild(__create_object_range_node(doc, objectData.range));
+
                     if (objectData.converter.enabled == true)
                         objectNode.AppendChild(__create_object_converter_node(doc, objectData.converter));
 
@@ -1980,6 +2034,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
 
                     if (__object_collection.objects[index].binding.enabled == true)
                         objectNode.AppendChild(__create_object_binding_node(doc, __object_collection.objects[index].binding));
+
+                    if (__object_collection.objects[index].range.enabled == true)
+                        objectNode.AppendChild(__create_object_range_node(doc, __object_collection.objects[index].range));
 
                     if (__object_collection.objects[index].converter.enabled == true)
                         objectNode.AppendChild(__create_object_converter_node(doc, __object_collection.objects[index].converter));
@@ -2005,18 +2062,28 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
             return binding;
         }
 
+        private XmlElement __create_object_range_node(XmlDocument doc, IO_LIST_OBJECT_COLLECTION_T.VALUE_RANGE_T rangeInfo)
+        {
+            XmlElement converter = doc.CreateElement("Range");
+
+            XmlElement sub;
+
+            sub = doc.CreateElement("UpLimit");
+            sub.AppendChild(doc.CreateTextNode(rangeInfo.up_limit.ToString()));
+            converter.AppendChild(sub);
+
+            sub = doc.CreateElement("DownLimit");
+            sub.AppendChild(doc.CreateTextNode(rangeInfo.down_limit.ToString()));
+            converter.AppendChild(sub);
+
+            return converter;
+        }
+
         private XmlElement __create_object_converter_node(XmlDocument doc, IO_LIST_OBJECT_COLLECTION_T.VALUE_CONVERTER_T converterInfo)
         {
             XmlElement converter = doc.CreateElement("Converter");
 
             XmlElement sub;
-            //XmlElement sub = doc.CreateElement("DataType");
-            //sub.AppendChild(doc.CreateTextNode(converterInfo.data_type.Name));
-            //converter.AppendChild(sub);
-
-            sub = doc.CreateElement("Unit");
-            sub.AppendChild(doc.CreateTextNode(converterInfo.unit_name));
-            converter.AppendChild(sub);
 
             sub = doc.CreateElement("UpScale");
             sub.AppendChild(doc.CreateTextNode(converterInfo.up_scale.ToString()));
@@ -2258,7 +2325,6 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
         public class VALUE_CONVERTER_T
         {
             public bool enabled { get; private set; }
-            public string unit_name { get; private set; }
             public double up_scale { get; private set; }
             public double down_scale { get; private set; }
 
@@ -2268,17 +2334,42 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                     return "N/A";
                 else
                     //return string.Format("{0} -- [{1}, {2}] ({3})", data_type.Name, down_scale, up_scale, unit_name);
-                    return string.Format("[{0}, {1}] ({2})", down_scale, up_scale, unit_name);
+                    return string.Format("S[{0}, {1}]", down_scale, up_scale);
             }
 
-            public VALUE_CONVERTER_T(bool enabled, string unitName, double up, double down)
+            public VALUE_CONVERTER_T(bool enabled, double upScale, double downScale)
             {
                 this.enabled = enabled;
-                down_scale = down;
-                up_scale = up;
-                unit_name = unitName;
+                down_scale = downScale;
+                up_scale = upScale;
             }
             public VALUE_CONVERTER_T()
+            {
+                enabled = false;
+            }
+        }
+
+        public class VALUE_RANGE_T
+        {
+            public bool enabled { get; private set; }
+            public double up_limit { get; private set; }
+            public double down_limit { get; private set; }
+
+            public override string ToString()
+            {
+                if (enabled == false)
+                    return "N/A";
+                else
+                    return string.Format("R[{0}, {1}]", down_limit, up_limit);
+            }
+
+            public VALUE_RANGE_T(bool enabled, double upLimit, double downLimit)
+            {
+                this.enabled = enabled;
+                down_limit = downLimit;
+                up_limit = upLimit;
+            }
+            public VALUE_RANGE_T()
             {
                 enabled = false;
             }
@@ -2291,9 +2382,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
             public VariableDefinition variable { get; private set; }
             //public DataTypeDefinition data_type;
             public MODULE_BINDING_T binding { get; private set; }
+            public VALUE_RANGE_T range { get; private set; }
             public VALUE_CONVERTER_T converter { get; private set; }
 
-            public OBJECT_DEFINITION_T(uint index, VariableDefinition variable, MODULE_BINDING_T binding, VALUE_CONVERTER_T converter)
+            public OBJECT_DEFINITION_T(uint index, VariableDefinition variable, MODULE_BINDING_T binding, VALUE_RANGE_T range, VALUE_CONVERTER_T converter)
             {
                 this.index = index;
                 this.variable = variable;
@@ -2301,6 +2393,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                     this.binding = binding;
                 else
                     this.binding = new MODULE_BINDING_T();
+                if (range != null)
+                    this.range = range;
+                else
+                    this.range = new VALUE_RANGE_T();
                 if (converter != null)
                     this.converter = converter;
                 else

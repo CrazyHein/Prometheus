@@ -92,7 +92,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
                 dataModel.Index,
                 dataModel.VariableSelection,
                 new IO_LIST_OBJECT_COLLECTION_T.MODULE_BINDING_T(dataModel.BindingEnable, dataModel.BindingModuleSelection, dataModel.BindingChannelName, dataModel.BindingChannelIndex),       
-                new IO_LIST_OBJECT_COLLECTION_T.VALUE_CONVERTER_T(dataModel.ConverterEnable, dataModel.ConverterUnitName, dataModel.ConverterUpScale, dataModel.ConverterDownScale)
+                new IO_LIST_OBJECT_COLLECTION_T.VALUE_RANGE_T(dataModel.RangeEnable, dataModel.RangeUpLimit, dataModel.RangeDownLimit),
+                new IO_LIST_OBJECT_COLLECTION_T.VALUE_CONVERTER_T(dataModel.ConverterEnable, dataModel.ConverterUpScale, dataModel.ConverterDownScale)
             );
             _data_helper.AddObjectData(objectItem);
             if(pos == -1)
@@ -110,7 +111,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
                 dataModel.Index,
                 dataModel.VariableSelection,
                 new IO_LIST_OBJECT_COLLECTION_T.MODULE_BINDING_T(dataModel.BindingEnable, dataModel.BindingModuleSelection, dataModel.BindingChannelName, dataModel.BindingChannelIndex),
-                new IO_LIST_OBJECT_COLLECTION_T.VALUE_CONVERTER_T(dataModel.ConverterEnable, dataModel.ConverterUnitName, dataModel.ConverterUpScale, dataModel.ConverterDownScale)
+                new IO_LIST_OBJECT_COLLECTION_T.VALUE_RANGE_T(dataModel.RangeEnable, dataModel.RangeUpLimit, dataModel.RangeDownLimit),
+                new IO_LIST_OBJECT_COLLECTION_T.VALUE_CONVERTER_T(dataModel.ConverterEnable, dataModel.ConverterUpScale, dataModel.ConverterDownScale)
             );
             _data_helper.ModifyObjectData(index, objectItem);
             var data = __object_dictionary[index];
@@ -187,11 +189,13 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             BindingChannelName = objectDefinition.binding.channel_name;
             BindingChannelIndex = objectDefinition.binding.channel_index;
 
+            RangeEnable = objectDefinition.range.enabled;
+            RangeUpLimit = objectDefinition.range.up_limit;
+            RangeDownLimit = objectDefinition.range.down_limit;
+
             ConverterEnable = objectDefinition.converter.enabled;
-            //ConverterDataTypeSelection = objectDefinition.converter.data_type;
             ConverterUpScale = objectDefinition.converter.up_scale;
             ConverterDownScale = objectDefinition.converter.down_scale;
-            ConverterUnitName = objectDefinition.converter.unit_name;
         }
 
         private uint __index;
@@ -206,11 +210,13 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
         private string __binding_channel_name;
         private int __binding_channel_index;
 
+        private bool __range_enable;
+        private double __range_up_limit;
+        private double __range_down_limit;
+
         private bool __converter_enable;
-        //private DataTypeDefinition __converter_data_type;
         private double __converter_up_scale;
         private double __converter_down_scale;
-        private string __converter_unit_name;
 
         public uint Index
         {
@@ -227,7 +233,6 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
                 if(__variable_selection != null)
                 {
                     VariableName = __variable_selection.Name;
-                    //VariableDataType = __variable_selection.DataType;
                 }
             }
         }
@@ -305,6 +310,33 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             }
         }
 
+        public bool RangeEnable
+        {
+            get { return __range_enable; }
+            set { SetProperty(ref __range_enable, value); }
+        }
+        public double RangeUpLimit
+        {
+            get { return __range_up_limit; }
+            set { SetProperty(ref __range_up_limit, value); }
+        }
+        public double RangeDownLimit
+        {
+            get { return __range_down_limit; }
+            set { SetProperty(ref __range_down_limit, value); }
+        }
+        public string Range
+        {
+            get
+            {
+                if (RangeEnable == false)
+                    return "N/A";
+                else
+                    //return string.Format("{0} -- [{1}, {2}] ({3})", ConverterDataTypeSelection.Name, ConverterDownScale, ConverterUpScale, ConverterUnitName);
+                    return string.Format("R[{0}, {1}]", RangeDownLimit, RangeUpLimit);
+            }
+        }
+
         public bool ConverterEnable
         {
             get { return __converter_enable; }
@@ -327,11 +359,6 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             get { return __converter_down_scale; }
             set { SetProperty(ref __converter_down_scale, value); }
         }
-        public string ConverterUnitName
-        {
-            get { return __converter_unit_name; }
-            set { SetProperty(ref __converter_unit_name, value); }
-        }
         public string Converter
         {
             get
@@ -340,7 +367,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
                     return "N/A";
                 else
                     //return string.Format("{0} -- [{1}, {2}] ({3})", ConverterDataTypeSelection.Name, ConverterDownScale, ConverterUpScale, ConverterUnitName);
-                    return string.Format("[{0}, {1}] ({2})", ConverterDownScale, ConverterUpScale, ConverterUnitName);
+                    return string.Format("S[{0}, {1}]", ConverterDownScale, ConverterUpScale);
             }
         }
 
@@ -403,7 +430,23 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             if ((bool)values[0] == false)
                 return "N/A";
             else
-                return string.Format("[{0}, {1}] ({2})", (double)values[1], (double)values[2], (string)values[3]);
+                return string.Format("S[{0}, {1}]", (double)values[1], (double)values[2]);
+        }
+
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    class ObjectItemRangeString : IMultiValueConverter
+    {
+        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
+        {
+            if ((bool)values[0] == false)
+                return "N/A";
+            else
+                return string.Format("R[{0}, {1}]", (double)values[1], (double)values[2]);
         }
 
         public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
