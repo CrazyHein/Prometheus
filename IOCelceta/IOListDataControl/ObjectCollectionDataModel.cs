@@ -211,8 +211,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
         private int __binding_channel_index;
 
         private bool __range_enable;
-        private double __range_up_limit;
-        private double __range_down_limit;
+        private string __range_up_limit;
+        private string __range_down_limit;
 
         private bool __converter_enable;
         private double __converter_up_scale;
@@ -315,12 +315,12 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             get { return __range_enable; }
             set { SetProperty(ref __range_enable, value); }
         }
-        public double RangeUpLimit
+        public string RangeUpLimit
         {
             get { return __range_up_limit; }
             set { SetProperty(ref __range_up_limit, value); }
         }
-        public double RangeDownLimit
+        public string RangeDownLimit
         {
             get { return __range_down_limit; }
             set { SetProperty(ref __range_down_limit, value); }
@@ -446,7 +446,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             if ((bool)values[0] == false)
                 return "N/A";
             else
-                return string.Format("R[{0}, {1}]", (double)values[1], (double)values[2]);
+                return string.Format("R[{0}, {1}]", values[1], values[2]);
         }
 
         public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)

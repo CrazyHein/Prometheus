@@ -13,6 +13,10 @@
 		<Name>DUINT</Name>
 		<BitSize>64</BitSize>
 	</DataType>
+  <DataType>
+    <Name>UDINT</Name>
+    <BitSize>64</BitSize>
+  </DataType>
 	<DataType>
 		<Name>INT</Name>
 		<BitSize>32</BitSize>

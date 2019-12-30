@@ -485,7 +485,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
         {
             uint mask = 0;
             bool enabled = false;
-            double upLimit = 0, downLimit = 0;
+            string upLimit = "0", downLimit = "0";
             try
             {
                 if (converterNode.NodeType == XmlNodeType.Element)
@@ -498,11 +498,11 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                         switch (node.Name)
                         {
                             case "UpLimit":
-                                upLimit = Convert.ToDouble(node.FirstChild.Value);
+                                upLimit = node.FirstChild.Value;
                                 mask |= 0x00000004;
                                 break;
                             case "DownLimit":
-                                downLimit = Convert.ToDouble(node.FirstChild.Value);
+                                downLimit = node.FirstChild.Value;
                                 mask |= 0x00000008;
                                 break;
                         }
@@ -1027,7 +1027,67 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
 
             if (objectData.range.enabled == true)
             {
-                if (objectData.variable.DataType.BitSize == 1 || objectData.range.up_limit < objectData.range.down_limit)
+                if (objectData.variable.DataType.BitSize != 1)
+                {
+                    try
+                    {
+                        switch (objectData.variable.DataType.Name)
+                        {
+                            case "INT":
+                                if (Convert.ToInt32(objectData.range.up_limit) < Convert.ToInt32(objectData.range.down_limit))
+                                    throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_OBJECT_RANGE, null);
+                                break;
+                            case "DINT":
+                                if (Convert.ToInt64(objectData.range.up_limit) < Convert.ToInt64(objectData.range.down_limit))
+                                    throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_OBJECT_RANGE, null);
+                                break;
+                            case "UINT":
+                                if (Convert.ToUInt32(objectData.range.up_limit) < Convert.ToUInt32(objectData.range.down_limit))
+                                    throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_OBJECT_RANGE, null);
+                                break;
+                            case "DUINT":
+                            case "UDINT":
+                                if (Convert.ToUInt64(objectData.range.up_limit) < Convert.ToUInt64(objectData.range.down_limit))
+                                    throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_OBJECT_RANGE, null);
+                                break;
+                            case "SHORT":
+                                if (Convert.ToInt16(objectData.range.up_limit) < Convert.ToInt16(objectData.range.down_limit))
+                                    throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_OBJECT_RANGE, null);
+                                break;
+                            case "USHORT":
+                                if (Convert.ToUInt16(objectData.range.up_limit) < Convert.ToUInt16(objectData.range.down_limit))
+                                    throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_OBJECT_RANGE, null);
+                                break;
+                            case "SBYTE":
+                                if (Convert.ToSByte(objectData.range.up_limit) < Convert.ToSByte(objectData.range.down_limit))
+                                    throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_OBJECT_RANGE, null);
+                                break;
+                            case "BYTE":
+                                if (Convert.ToByte(objectData.range.up_limit) < Convert.ToByte(objectData.range.down_limit))
+                                    throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_OBJECT_RANGE, null);
+                                break;
+                            case "FLOAT":
+                                if (Convert.ToSingle(objectData.range.up_limit) < Convert.ToSingle(objectData.range.down_limit))
+                                    throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_OBJECT_RANGE, null);
+                                break;
+                            case "DOUBLE":
+                                if (Convert.ToDouble(objectData.range.up_limit) < Convert.ToDouble(objectData.range.down_limit))
+                                    throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_OBJECT_RANGE, null);
+                                break;
+                            default:
+                                throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_OBJECT_RANGE, null);
+                        }
+                    }
+                    catch(IOListParseExcepetion)
+                    {
+                        throw;
+                    }
+                    catch
+                    {
+                        throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_OBJECT_RANGE, null);
+                    }
+                }
+                else
                     throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_OBJECT_RANGE, null);
             }
 
@@ -2352,8 +2412,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
         public class VALUE_RANGE_T
         {
             public bool enabled { get; private set; }
-            public double up_limit { get; private set; }
-            public double down_limit { get; private set; }
+            public string up_limit { get; private set; }
+            public string down_limit { get; private set; }
 
             public override string ToString()
             {
@@ -2363,7 +2423,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                     return string.Format("R[{0}, {1}]", down_limit, up_limit);
             }
 
-            public VALUE_RANGE_T(bool enabled, double upLimit, double downLimit)
+            public VALUE_RANGE_T(bool enabled, string upLimit, string downLimit)
             {
                 this.enabled = enabled;
                 down_limit = downLimit;
