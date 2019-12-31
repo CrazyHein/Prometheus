@@ -64,6 +64,9 @@
 			<RX>
 				<Bit>16</Bit>
 			</RX>
+			<TX>
+				<Bit>16</Bit>
+			</TX>
 		</ExtensionModel>
 		<ExtensionModel>
 			<ID>0x000A</ID>
@@ -71,6 +74,9 @@
 			<RX>
 				<Bit>16</Bit>
 			</RX>
+			<TX>
+				<Bit>16</Bit>
+			</TX>
 		</ExtensionModel>
 		<ExtensionModel>
 			<ID>0x000B</ID>
@@ -78,6 +84,9 @@
 			<RX>
 				<Bit>32</Bit>
 			</RX>
+			<TX>
+				<Bit>32</Bit>
+			</TX>
 		</ExtensionModel>
 		<ExtensionModel>
 			<ID>0x000C</ID>
@@ -85,6 +94,9 @@
 			<RX>
 				<Bit>32</Bit>
 			</RX>
+			<TX>
+				<Bit>32</Bit>
+			</TX>
 		</ExtensionModel>
 		<ExtensionModel>
 			<ID>0x000D</ID>
@@ -92,6 +104,9 @@
 			<RX>
 				<Bit>64</Bit>
 			</RX>
+			<TX>
+				<Bit>64</Bit>
+			</TX>
 		</ExtensionModel>
 		<ExtensionModel>
 			<ID>0x000E</ID>
@@ -99,6 +114,9 @@
 			<RX>
 				<Bit>16</Bit>
 			</RX>
+			<TX>
+				<Bit>16</Bit>
+			</TX>
 		</ExtensionModel>
 		<ExtensionModel>
 			<ID>0x000F</ID>
@@ -106,6 +124,9 @@
 			<RX>
 				<Bit>32</Bit>
 			</RX>
+			<TX>
+				<Bit>32</Bit>
+			</TX>
 		</ExtensionModel>
 		<ExtensionModel>
 			<ID>0x0010</ID>
@@ -113,6 +134,9 @@
 			<RX>
 				<Bit>32</Bit>
 			</RX>
+			<TX>
+				<Bit>32</Bit>
+			</TX>
 		</ExtensionModel>
 		<ExtensionModel>
 			<ID>0x0011</ID>
@@ -120,12 +144,15 @@
 			<RX>
 				<Bit>64</Bit>
 			</RX>
+			<TX>
+				<Bit>64</Bit>
+			</TX>
 		</ExtensionModel>
 		<ExtensionModel>
 			<ID>0x0012</ID>
 			<Name>RH42C4NT2P</Name>
 			<TX>
-				<Bit>32</Bit>
+				<Bit>64</Bit>
 			</TX>
 			<RX>
 				<Bit>32</Bit>

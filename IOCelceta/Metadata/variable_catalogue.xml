@@ -276,10 +276,10 @@
 	</Variable>
 	<Variable>
 		<ID>42</ID>
-		<Name>D-ESC HT Fan Fail</Name>
+		<Name>D-ESC HT Fan Failed</Name>
 		<DataType>BIT</DataType>
 		<Unit>N/A</Unit>
-		<Comment>Dynamic E-Chuck heater SCR box cooling fan fail signal</Comment>
+		<Comment>Dynamic E-Chuck heater SCR box cooling fan failed signal</Comment>
 	</Variable>
 	<Variable>
 		<ID>43</ID>
@@ -634,6 +634,1048 @@
 		<Comment>Station2 backside helium io communication status</Comment>
 	</Variable>
 
+	<!--                                                        Start of DO Feedback                                                        -->
+	<Variable>
+		<ID>600</ID>
+		<Name>[FB] Gas Inlet Center EV</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Process gas to center zone inlet valve</Comment>
+	</Variable>
+	<Variable>
+		<ID>601</ID>
+		<Name>[FB] 4Zone-1 EV</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Center and middle zone gas ratio adjust valve1</Comment>
+	</Variable>
+	<Variable>
+		<ID>602</ID>
+		<Name>[FB] 4Zone-2 EV</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Center and middle zone gas ratio adjust valve2</Comment>
+	</Variable>
+	<Variable>
+		<ID>603</ID>
+		<Name>[FB] Gas Inlet Edge EV</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Process gas to edge zone inlet valve</Comment>
+	</Variable>
+	<Variable>
+		<ID>604</ID>
+		<Name>[FB] Tub Pump N2 Purge EV</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Tubro pump nitrogen purge valve</Comment>
+	</Variable>
+	<Variable>
+		<ID>605</ID>
+		<Name>[FB] Tub Pump Foreline Fast Act EV</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Tubro pump foreline fast active valve</Comment>
+	</Variable>
+	<Variable>
+		<ID>606</ID>
+		<Name>[FB] Bypass Roughing EV</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Bypass Roughing EV valve</Comment>
+	</Variable>
+	<Variable>
+		<ID>607</ID>
+		<Name>[FB] Soft Pumping EV</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Soft pumping valve</Comment>
+	</Variable>
+	<Variable>
+		<ID>608</ID>
+		<Name>[FB] ST1 Isolation Ring Up EV</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Station1 isolation ring up valve</Comment>
+	</Variable>
+	<Variable>
+		<ID>609</ID>
+		<Name>[FB] ST1 Isolation Ring Down EV</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- ST1 Isolation Ring Down EV</Comment>
+	</Variable>
+	<Variable>
+		<ID>610</ID>
+		<Name>[FB] ST2 Isolation Ring Up EV</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Station2 isolation ring up valve</Comment>
+	</Variable>
+	<Variable>
+		<ID>611</ID>
+		<Name>[FB] ST2 Isolation Ring Down EV</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Station2 isolation ring down valve</Comment>
+	</Variable>
+	<Variable>
+		<ID>612</ID>
+		<Name>[FB] ST1 D-ESC PWR Enable</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Station1 dynamic E-chuck heater power enable</Comment>
+	</Variable>
+	<Variable>
+		<ID>613</ID>
+		<Name>[FB] ST2 D-ESC PWR Enable</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Station2 dynamic E-chuck heater power enable</Comment>
+	</Variable>
+	<Variable>
+		<ID>614</ID>
+		<Name>[FB] ST1 MVC Motor Energized</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Station1 move cathod control motor energized signal</Comment>
+	</Variable>
+	<Variable>
+		<ID>615</ID>
+		<Name>[FB] ST2 MVC Motor Energized</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Station2 move cathod control motor energized signal</Comment>
+	</Variable>
+	<Variable>
+		<ID>616</ID>
+		<Name>[FB] ST1 Lift Pin Up EV</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Station1 lift pin up valve</Comment>
+	</Variable>
+	<Variable>
+		<ID>617</ID>
+		<Name>[FB] ST1 Lift Pin Down EV</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Station1 lift pin down valve</Comment>
+	</Variable>
+	<Variable>
+		<ID>618</ID>
+		<Name>[FB] ST2 Lift Pin Up EV</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Station2 lift pin up valve</Comment>
+	</Variable>
+	<Variable>
+		<ID>619</ID>
+		<Name>[FB] ST2 Lift Pin Down EV</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Station2 lift pin down valve</Comment>
+	</Variable>
+	<Variable>
+		<ID>620</ID>
+		<Name>[FB] He Supply EV</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Helium supply valve</Comment>
+	</Variable>
+	<Variable>
+		<ID>621</ID>
+		<Name>[FB] ST1 He Inlet EV</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Station1 helium inlet valve</Comment>
+	</Variable>
+	<Variable>
+		<ID>622</ID>
+		<Name>[FB] ST2 He Inlet EV</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Station2 helium inlet valve</Comment>
+	</Variable>
+	<Variable>
+		<ID>623</ID>
+		<Name>[FB] ST1 He Exhaust EV</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Station1 helium exhaust valve</Comment>
+	</Variable>
+	<Variable>
+		<ID>624</ID>
+		<Name>[FB] ST2 He Exhaust EV</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Station2 helium exhaust valve</Comment>
+	</Variable>
+	<Variable>
+		<ID>625</ID>
+		<Name>[FB] Onboard Gas1 Supply EV</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Onboard gas1 supply valve</Comment>
+	</Variable>
+	<Variable>
+		<ID>626</ID>
+		<Name>[FB] ST1 Onboard Edge EV</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Station1 onboard gas edge zone valve</Comment>
+	</Variable>
+	<Variable>
+		<ID>627</ID>
+		<Name>[FB] ST1 Onboard Center EV</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Station1 onboard gas center zone valve</Comment>
+	</Variable>
+	<Variable>
+		<ID>628</ID>
+		<Name>[FB] ST1 Onboard Gas1 EV</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Station1 onboard gas1 control valve</Comment>
+	</Variable>
+	<Variable>
+		<ID>629</ID>
+		<Name>[FB] ST2 Onboard Gas1 EV</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Station2 onboard gas1 control valve</Comment>
+	</Variable>
+	<Variable>
+		<ID>630</ID>
+		<Name>[FB] Lid Heater PWR Enable</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Lid heater power enable signal</Comment>
+	</Variable>
+	<Variable>
+		<ID>631</ID>
+		<Name>[FB] Body Heater PWR Enable</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Chamber body heater power enable signal</Comment>
+	</Variable>
+	<Variable>
+		<ID>632</ID>
+		<Name>[FB] ST1 Soft Pin Up EV</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Station1 softpin up valve</Comment>
+	</Variable>
+	<Variable>
+		<ID>633</ID>
+		<Name>[FB] ST2 Soft Pin Up EV</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Station2 softpin up valve</Comment>
+	</Variable>
+	<Variable>
+		<ID>634</ID>
+		<Name>[FB] ST1 MIV EV</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Station1 monometer isolation valve</Comment>
+	</Variable>
+	<Variable>
+		<ID>635</ID>
+		<Name>[FB] ST2 MIV EV</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Station2 monometer isolation valve</Comment>
+	</Variable>
+	<Variable>
+		<ID>636</ID>
+		<Name>[FB] He Bleeding EV</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Helium bleeding valve</Comment>
+	</Variable>
+	<Variable>
+		<ID>637</ID>
+		<Name>[FB] Onboard MID EV</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Onboard gas middle zone valve</Comment>
+	</Variable>
+	<Variable>
+		<ID>638</ID>
+		<Name>[FB] ST2 Onboard Center EV</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Station2 onboard gas center zone valve</Comment>
+	</Variable>
+	<Variable>
+		<ID>639</ID>
+		<Name>[FB] ST2 Onboard X-Edge EV</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Station2 onboard gas X-edge zone valve</Comment>
+	</Variable>
+	<Variable>
+		<ID>640</ID>
+		<Name>[FB] Onboard Gas2 Supply EV</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Onboard gas2 supply valve</Comment>
+	</Variable>
+	<Variable>
+		<ID>641</ID>
+		<Name>[FB] ST1 Onboard X-Edge EV</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Station1 onboard gas X-edge zone valve</Comment>
+	</Variable>
+	<Variable>
+		<ID>642</ID>
+		<Name>[FB] ST2 Onboard Edge EV</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Station2 onboard gas edge zone valve</Comment>
+	</Variable>
+	<Variable>
+		<ID>643</ID>
+		<Name>[FB] ST1 Onboard Gas2 EV</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Station1 onboard gas2 control valve</Comment>
+	</Variable>
+	<Variable>
+		<ID>644</ID>
+		<Name>[FB] ST2 Onboard Gas2 EV</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Station2 onboard gas2 control valve</Comment>
+	</Variable>
+	<Variable>
+		<ID>645</ID>
+		<Name>[FB] X-Edge Enhance EV</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- X-Edge enhance valve</Comment>
+	</Variable>
+	<Variable>
+		<ID>646</ID>
+		<Name>[FB] ST1 D-ESC SCR Reset</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Station1 dynamic E-chuck SCR box error reset signal</Comment>
+	</Variable>
+	<Variable>
+		<ID>647</ID>
+		<Name>[FB] ST2 D-ESC SCR Reset</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Station2 dynamic E-chuck SCR box error reset signal</Comment>
+	</Variable>
+	<Variable>
+		<ID>648</ID>
+		<Name>[FB] ST1 HF RF INTLK Enable</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Station1 HF RF generator interlock enable signal</Comment>
+	</Variable>
+	<Variable>
+		<ID>649</ID>
+		<Name>[FB] ST2 HF RF INTLK Enable</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Station2 HF RF generator interlock enable signal</Comment>
+	</Variable>
+	<Variable>
+		<ID>650</ID>
+		<Name>[FB] ST1 LF RF INTLK Enable</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Station1 LF RF generator interlock enable signal</Comment>
+	</Variable>
+	<Variable>
+		<ID>651</ID>
+		<Name>[FB] ST2 LF RF INTLK Enable</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Station2 LF RF generator interlock enable signal</Comment>
+	</Variable>
+	<Variable>
+		<ID>652</ID>
+		<Name>[FB] Lid Heater 1&amp;2 Power Enable</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Station1&amp;2 lid heater power enable</Comment>
+	</Variable>
+	<Variable>
+		<ID>653</ID>
+		<Name>[FB] ST1 Fast Chiller Transfer</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Station1 fast chiller channel transfer signal</Comment>
+	</Variable>
+	<Variable>
+		<ID>654</ID>
+		<Name>[FB] ST1 Dechuck</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Station1 dechuck</Comment>
+	</Variable>
+	<Variable>
+		<ID>655</ID>
+		<Name>[FB] ST2 Dechuck</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Station2 dechuck</Comment>
+	</Variable>
+	<Variable>
+		<ID>656</ID>
+		<Name>[FB] GB Heater Enable</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Gasbox heater enable signal</Comment>
+	</Variable>
+	<Variable>
+		<ID>657</ID>
+		<Name>[FB] ST2 Fast Chiller Transfer</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Station2 fast chiller channel transfer signal</Comment>
+	</Variable>
+	<Variable>
+		<ID>658</ID>
+		<Name>[FB] ST1 ESC HV Power Enable</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Station1 E-Chuck HVM power enable</Comment>
+	</Variable>
+	<Variable>
+		<ID>659</ID>
+		<Name>[FB] ST2 ESC HV Power Enable</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Station2 E-Chuck HVM power enable</Comment>
+	</Variable>
+	<Variable>
+		<ID>660</ID>
+		<Name>[FB] ST1 SW GEN</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Station1 tranfer 2/13Mhz generator signal</Comment>
+	</Variable>
+	<Variable>
+		<ID>661</ID>
+		<Name>[FB] ST2 SW GEN</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Station2 tranfer 2/13Mhz generator signal</Comment>
+	</Variable>
+	<Variable>
+		<ID>662</ID>
+		<Name>[FB] ST1 ESC HV Reverse Polarity</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Station1 E-Chuck HVM reverse polarity</Comment>
+	</Variable>
+	<Variable>
+		<ID>663</ID>
+		<Name>[FB] ST2 ESC HV Reverse Polarity</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Station2 E-Chuck HVM reverse polarity</Comment>
+	</Variable>
+
+	<Variable>
+		<ID>664</ID>
+		<Name>[FB] UV-1</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Channel1 gas upstream valve</Comment>
+	</Variable>
+	<Variable>
+		<ID>665</ID>
+		<Name>[FB] PV-1</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Channel1 gas purge valve</Comment>
+	</Variable>
+	<Variable>
+		<ID>666</ID>
+		<Name>[FB] UV-2</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Channel2 gas upstream valve</Comment>
+	</Variable>
+	<Variable>
+		<ID>667</ID>
+		<Name>[FB] PV-2</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Channel2 gas purge valve</Comment>
+	</Variable>
+	<Variable>
+		<ID>668</ID>
+		<Name>[FB] UV-3</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Channel3 gas upstream valve</Comment>
+	</Variable>
+	<Variable>
+		<ID>669</ID>
+		<Name>[FB] PV-3</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Channel3 gas purge valve</Comment>
+	</Variable>
+	<Variable>
+		<ID>670</ID>
+		<Name>[FB] UV-4</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Channel4 gas upstream valve</Comment>
+	</Variable>
+	<Variable>
+		<ID>671</ID>
+		<Name>[FB] PV-4</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Channel4 gas purge valve</Comment>
+	</Variable>
+	<Variable>
+		<ID>672</ID>
+		<Name>[FB] UV-5</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Channel5 gas upstream valve</Comment>
+	</Variable>
+	<Variable>
+		<ID>673</ID>
+		<Name>[FB] PV-5</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Channel5 gas purge valve</Comment>
+	</Variable>
+	<Variable>
+		<ID>674</ID>
+		<Name>[FB] UV-6</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Channel6 gas upstream valve</Comment>
+	</Variable>
+	<Variable>
+		<ID>675</ID>
+		<Name>[FB] PV-6</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Channel6 gas purge valve</Comment>
+	</Variable>
+	<Variable>
+		<ID>676</ID>
+		<Name>[FB] UV-7</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Channel7 gas upstream valve</Comment>
+	</Variable>
+	<Variable>
+		<ID>677</ID>
+		<Name>[FB] PV-7</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Channel7 gas purge valve</Comment>
+	</Variable>
+	<Variable>
+		<ID>678</ID>
+		<Name>[FB] UV-8</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Channel8 gas upstream valve</Comment>
+	</Variable>
+	<Variable>
+		<ID>679</ID>
+		<Name>[FB] PV-8</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Channel8 gas purge valve</Comment>
+	</Variable>
+	<Variable>
+		<ID>680</ID>
+		<Name>[FB] UV-9</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Channel9 gas upstream valve</Comment>
+	</Variable>
+	<Variable>
+		<ID>681</ID>
+		<Name>[FB] PV-9</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Channel9 gas purge valve</Comment>
+	</Variable>
+	<Variable>
+		<ID>682</ID>
+		<Name>[FB] UV-10</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Channel10 gas upstream valve</Comment>
+	</Variable>
+	<Variable>
+		<ID>683</ID>
+		<Name>[FB] PV-10</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Channel10 gas purge valve</Comment>
+	</Variable>
+	<Variable>
+		<ID>684</ID>
+		<Name>[FB] UV-11</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Channel11 gas upstream valve</Comment>
+	</Variable>
+	<Variable>
+		<ID>685</ID>
+		<Name>[FB] PV-11</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Channel11 gas purge valve</Comment>
+	</Variable>
+	<Variable>
+		<ID>686</ID>
+		<Name>[FB] UV-12</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Channel12 gas upstream valve</Comment>
+	</Variable>
+	<Variable>
+		<ID>687</ID>
+		<Name>[FB] PV-12</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Channel12 gas purge valve</Comment>
+	</Variable>
+	<Variable>
+		<ID>688</ID>
+		<Name>[FB] UV-13</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Channel13 gas upstream valve</Comment>
+	</Variable>
+	<Variable>
+		<ID>689</ID>
+		<Name>[FB] PV-13</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Channel13 gas purge valve</Comment>
+	</Variable>
+	<Variable>
+		<ID>690</ID>
+		<Name>[FB] UV-14</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Channel14 gas upstream valve</Comment>
+	</Variable>
+	<Variable>
+		<ID>691</ID>
+		<Name>[FB] PV-14</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Channel14 gas purge valve</Comment>
+	</Variable>
+	<Variable>
+		<ID>692</ID>
+		<Name>[FB] UV-15</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Channel15 gas upstream valve</Comment>
+	</Variable>
+	<Variable>
+		<ID>693</ID>
+		<Name>[FB] PV-15</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Channel15 gas purge valve</Comment>
+	</Variable>
+	<Variable>
+		<ID>694</ID>
+		<Name>[FB] UV-16</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Channel16 gas upstream valve</Comment>
+	</Variable>
+	<Variable>
+		<ID>695</ID>
+		<Name>[FB] PV-16</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Channel16 gas purge valve</Comment>
+	</Variable>
+	<Variable>
+		<ID>696</ID>
+		<Name>[FB] DV-1</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Channel1 gas flow downstream valve</Comment>
+	</Variable>
+	<Variable>
+		<ID>697</ID>
+		<Name>[FB] DV-2</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Channel2 gas flow downstream valve</Comment>
+	</Variable>
+	<Variable>
+		<ID>698</ID>
+		<Name>[FB] DV-3</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Channel3 gas flow downstream valve</Comment>
+	</Variable>
+	<Variable>
+		<ID>699</ID>
+		<Name>[FB] DV-4</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Channel4 gas flow downstream valve</Comment>
+	</Variable>
+	<Variable>
+		<ID>700</ID>
+		<Name>[FB] DV-5</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Channel5 gas flow downstream valve</Comment>
+	</Variable>
+	<Variable>
+		<ID>701</ID>
+		<Name>[FB] DV-6</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Channel6 gas flow downstream valve</Comment>
+	</Variable>
+	<Variable>
+		<ID>702</ID>
+		<Name>[FB] DV-7</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Channel7 gas flow downstream valve</Comment>
+	</Variable>
+	<Variable>
+		<ID>703</ID>
+		<Name>[FB] DV-8</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Channel8 gas flow downstream valve</Comment>
+	</Variable>
+	<Variable>
+		<ID>704</ID>
+		<Name>[FB] DV-9</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Channel9 gas flow downstream valve</Comment>
+	</Variable>
+	<Variable>
+		<ID>705</ID>
+		<Name>[FB] DV-10</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Channel10 gas flow downstream valve</Comment>
+	</Variable>
+	<Variable>
+		<ID>706</ID>
+		<Name>[FB] DV-11</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Channel11 gas flow downstream valve</Comment>
+	</Variable>
+	<Variable>
+		<ID>707</ID>
+		<Name>[FB] DV-12</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Channel12 gas flow downstream valve</Comment>
+	</Variable>
+	<Variable>
+		<ID>708</ID>
+		<Name>[FB] DV-13</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Channel13 gas flow downstream valve</Comment>
+	</Variable>
+	<Variable>
+		<ID>709</ID>
+		<Name>[FB] DV-14</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Channel14 gas flow downstream valve</Comment>
+	</Variable>
+	<Variable>
+		<ID>710</ID>
+		<Name>[FB] DV-15</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Channel15 gas flow downstream valve</Comment>
+	</Variable>
+	<Variable>
+		<ID>711</ID>
+		<Name>[FB] DV-16</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Channel16 gas flow downstream valve</Comment>
+	</Variable>
+	<Variable>
+		<ID>712</ID>
+		<Name>[FB] V21</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- N2 purge MFC total valve</Comment>
+	</Variable>
+	<Variable>
+		<ID>713</ID>
+		<Name>[FB] V22</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- N2 purge gasline valve</Comment>
+	</Variable>
+	<Variable>
+		<ID>714</ID>
+		<Name>[FB] V23</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- ????</Comment>
+	</Variable>
+	<Variable>
+		<ID>715</ID>
+		<Name>[FB] V31</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- ????</Comment>
+	</Variable>
+	<Variable>
+		<ID>716</ID>
+		<Name>[FB] V32</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Final valve</Comment>
+	</Variable>
+	<Variable>
+		<ID>717</ID>
+		<Name>[FB] V33</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Tuning gas mix control valve</Comment>
+	</Variable>
+	<Variable>
+		<ID>718</ID>
+		<Name>[FB] V36</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- ????</Comment>
+	</Variable>
+	<Variable>
+		<ID>719</ID>
+		<Name>[FB] V37</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- ????</Comment>
+	</Variable>
+	<Variable>
+		<ID>720</ID>
+		<Name>[FB] V38</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- ????</Comment>
+	</Variable>
+	<Variable>
+		<ID>721</ID>
+		<Name>[FB] V39</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- ????</Comment>
+	</Variable>
+	<Variable>
+		<ID>722</ID>
+		<Name>[FB] UV-17</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Channel17 gas upstream valve</Comment>
+	</Variable>
+	<Variable>
+		<ID>723</ID>
+		<Name>[FB] PV-17</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Channel17 gas purge valve</Comment>
+	</Variable>
+	<Variable>
+		<ID>724</ID>
+		<Name>[FB] DV-17</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Channel17 gas flow downstream valve</Comment>
+	</Variable>
+	<Variable>
+		<ID>726</ID>
+		<Name>[FB] V34</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- ????</Comment>
+	</Variable>
+	<Variable>
+		<ID>727</ID>
+		<Name>[FB] V35</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- ????</Comment>
+	</Variable>
+
+	<Variable>
+		<ID>728</ID>
+		<Name>[FB] UV-18</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Channel18 gas upstream valve</Comment>
+	</Variable>
+	<Variable>
+		<ID>729</ID>
+		<Name>[FB] PV-18</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Channel18 gas purge valve</Comment>
+	</Variable>
+	<Variable>
+		<ID>730</ID>
+		<Name>[FB] UV-19</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Channel19 gas upstream valve</Comment>
+	</Variable>
+	<Variable>
+		<ID>731</ID>
+		<Name>[FB] PV-19</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Channel19 gas purge valve</Comment>
+	</Variable>
+	<Variable>
+		<ID>732</ID>
+		<Name>[FB] UV-20</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Channel20 gas upstream valve</Comment>
+	</Variable>
+	<Variable>
+		<ID>733</ID>
+		<Name>[FB] PV-20</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Channel20 gas purge valve</Comment>
+	</Variable>
+	<Variable>
+		<ID>734</ID>
+		<Name>[FB] UV-21</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Channel21 gas upstream valve</Comment>
+	</Variable>
+	<Variable>
+		<ID>735</ID>
+		<Name>[FB] PV-21</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Channel21 gas purge valve</Comment>
+	</Variable>
+	<Variable>
+		<ID>736</ID>
+		<Name>[FB] UV-22</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Channel22 gas upstream valve</Comment>
+	</Variable>
+	<Variable>
+		<ID>737</ID>
+		<Name>[FB] PV-22</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Channel22 gas purge valve</Comment>
+	</Variable>
+	<Variable>
+		<ID>738</ID>
+		<Name>[FB] UV-23</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Channel23 gas upstream valve</Comment>
+	</Variable>
+	<Variable>
+		<ID>739</ID>
+		<Name>[FB] PV-23</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Channel23 gas purge valve</Comment>
+	</Variable>
+	<Variable>
+		<ID>740</ID>
+		<Name>[FB] UV-24</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Channel24 gas upstream valve</Comment>
+	</Variable>
+	<Variable>
+		<ID>741</ID>
+		<Name>[FB] PV-24</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Channel24 gas purge valve</Comment>
+	</Variable>
+	<Variable>
+		<ID>742</ID>
+		<Name>[FB] DV-18</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Channel18 gas flow downstream valve</Comment>
+	</Variable>
+	<Variable>
+		<ID>743</ID>
+		<Name>[FB] DV-19</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Channel19 gas flow downstream valve</Comment>
+	</Variable>
+	<Variable>
+		<ID>744</ID>
+		<Name>[FB] DV-20</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Channel20 gas flow downstream valve</Comment>
+	</Variable>
+	<Variable>
+		<ID>745</ID>
+		<Name>[FB] DV-21</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Channel21 gas flow downstream valve</Comment>
+	</Variable>
+	<Variable>
+		<ID>746</ID>
+		<Name>[FB] DV-22</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Channel22 gas flow downstream valve</Comment>
+	</Variable>
+	<Variable>
+		<ID>747</ID>
+		<Name>[FB] DV-23</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Channel23 gas flow downstream valve</Comment>
+	</Variable>
+	<Variable>
+		<ID>748</ID>
+		<Name>[FB] DV-24</Name>
+		<DataType>BIT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Feedback -- Channel24 gas flow downstream valve</Comment>
+	</Variable>
+	<!--                                                        End of DO Feedback                                                        -->
+	
+
 
 	<Variable>
 		<ID>1999</ID>
@@ -644,7 +1686,7 @@
 	</Variable>
 	<Variable>
 		<ID>1000</ID>
-		<Name>Gas Intet Center EV</Name>
+		<Name>Gas Inlet Center EV</Name>
 		<DataType>BIT</DataType>
 		<Unit>N/A</Unit>
 		<Comment>Process gas to center zone inlet valve</Comment>
@@ -679,10 +1721,10 @@
 	</Variable>
 	<Variable>
 		<ID>1005</ID>
-		<Name>Tub Pump Foline Fast Act EV</Name>
+		<Name>Tub Pump Foreline Fast Act EV</Name>
 		<DataType>BIT</DataType>
 		<Unit>N/A</Unit>
-		<Comment>Tubro pump forline fast active valve</Comment>
+		<Comment>Tubro pump foreline fast active valve</Comment>
 	</Variable>
 	<Variable>
 		<ID>1006</ID>
@@ -840,14 +1882,14 @@
 	</Variable>
 	<Variable>
 		<ID>1028</ID>
-		<Name>ST1 OnBoard Gas1 EV</Name>
+		<Name>ST1 Onboard Gas1 EV</Name>
 		<DataType>BIT</DataType>
 		<Unit>N/A</Unit>
 		<Comment>Station1 onboard gas1 control valve</Comment>
 	</Variable>
 	<Variable>
 		<ID>1029</ID>
-		<Name>ST2 OnBoard Gas1 EV</Name>
+		<Name>ST2 Onboard Gas1 EV</Name>
 		<DataType>BIT</DataType>
 		<Unit>N/A</Unit>
 		<Comment>Station2 onboard gas1 control valve</Comment>
@@ -868,14 +1910,14 @@
 	</Variable>
 	<Variable>
 		<ID>1032</ID>
-		<Name>ST1 Soft Pin UP EV</Name>
+		<Name>ST1 Soft Pin Up EV</Name>
 		<DataType>BIT</DataType>
 		<Unit>N/A</Unit>
 		<Comment>Station1 softpin up valve</Comment>
 	</Variable>
 	<Variable>
 		<ID>1033</ID>
-		<Name>ST2 Soft Pin UP EV</Name>
+		<Name>ST2 Soft Pin Up EV</Name>
 		<DataType>BIT</DataType>
 		<Unit>N/A</Unit>
 		<Comment>Station2 softpin up valve</Comment>
@@ -945,14 +1987,14 @@
 	</Variable>
 	<Variable>
 		<ID>1043</ID>
-		<Name>ST1 OnBoard Gas2 EV</Name>
+		<Name>ST1 Onboard Gas2 EV</Name>
 		<DataType>BIT</DataType>
 		<Unit>N/A</Unit>
 		<Comment>Station1 onboard gas2 control valve</Comment>
 	</Variable>
 	<Variable>
 		<ID>1044</ID>
-		<Name>ST2 OnBoard Gas2 EV</Name>
+		<Name>ST2 Onboard Gas2 EV</Name>
 		<DataType>BIT</DataType>
 		<Unit>N/A</Unit>
 		<Comment>Station2 onboard gas2 control valve</Comment>
