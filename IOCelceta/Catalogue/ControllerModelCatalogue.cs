@@ -32,6 +32,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.Catalogue
     {
         public IReadOnlyDictionary<ushort, ControllerExtensionModel> ExtensionModels { get; private set; }
         public IReadOnlyDictionary<ushort, ControllerEthernetModel> EthernetModels { get; private set; }
+        public IReadOnlyList<string> ExtensionModelConfigruationFields { get; private set; }
+        public IReadOnlyList<string> EthernetModelConfigruationFields { get; private set; }
         public uint FileFormatVersion { get; private set; }
         private readonly uint __supported_file_format_version;
 
@@ -53,6 +55,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.Catalogue
         {
             ushort id = 0;
             string name = "";
+            int bitSize = 0;
             uint mask = 0;
             Dictionary<string, int> txVariables;
             Dictionary<string, int> rxVariables;
@@ -80,6 +83,12 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.Catalogue
                 XmlNode extensionModelsNode = xmlDoc.SelectSingleNode("/AMECControllerModels/ExtensionModels");
                 if (extensionModelsNode.NodeType == XmlNodeType.Element)
                 {
+                    var c = extensionModelsNode.Attributes["ConfigurationFields"];
+                    if (c != null)
+                        ExtensionModelConfigruationFields = new List<string>(c.Value.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries));
+                    else
+                        ExtensionModelConfigruationFields = new List<string>();
+
                     foreach (XmlNode extensionModelNode in extensionModelsNode.ChildNodes)
                     {
                         if (extensionModelNode.NodeType != XmlNodeType.Element || extensionModelNode.Name != "ExtensionModel")
@@ -102,6 +111,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.Catalogue
                                     name = node.FirstChild.Value;
                                     mask |= 0x00000002;
                                     break;
+                                case "BitSize":
+                                    bitSize = Convert.ToInt32(node.FirstChild.Value, 10);
+                                    mask |= 0x00000004;
+                                    break;
                                 case "TX":
                                     foreach (XmlNode x in node.ChildNodes)
                                     {
@@ -109,7 +122,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.Catalogue
                                             continue;
                                         txVariables.Add(x.Name, Convert.ToInt32(x.FirstChild.Value, 10));
                                     }
-                                    mask |= 0x00000004;
+                                    mask |= 0x00000008;
                                     break;
                                 case "RX":
                                     foreach (XmlNode x in node.ChildNodes)
@@ -118,13 +131,13 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.Catalogue
                                             continue;
                                         rxVariables.Add(x.Name, Convert.ToInt32(x.FirstChild.Value, 10));
                                     }
-                                    mask |= 0x00000008;
+                                    mask |= 0x00000010;
                                     break;
                             }
 
                         }
-                        if ((mask & 0x00000003) == 0x00000003)
-                            __extension_models.Add(id, new ControllerExtensionModel(id, name, txVariables, rxVariables));
+                        if ((mask & 0x00000007) == 0x00000007)
+                            __extension_models.Add(id, new ControllerExtensionModel(id, name, bitSize, txVariables, rxVariables));
                         else
                             throw new ModelCatalogueParseExcepetion(MODEL_CATALOGUE_FILE_ERROR_CODE_T.ELEMENT_MISSING, null);
                     }
@@ -148,6 +161,12 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.Catalogue
                 XmlNode extensionModelsNode = xmlDoc.SelectSingleNode("/AMECControllerModels/EthernetModels");
                 if (extensionModelsNode.NodeType == XmlNodeType.Element)
                 {
+                    var c = extensionModelsNode.Attributes["ConfigurationFields"];
+                    if (c != null)
+                        EthernetModelConfigruationFields = new List<string>(c.Value.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries));
+                    else
+                        EthernetModelConfigruationFields = new List<string>();
+
                     foreach (XmlNode extensionModelNode in extensionModelsNode.ChildNodes)
                     {
                         if (extensionModelNode.NodeType != XmlNodeType.Element || extensionModelNode.Name != "EthernetModel")
@@ -233,11 +252,13 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.Catalogue
     {
         public IReadOnlyDictionary<string, int> TxVariables { get; private set; }
         public IReadOnlyDictionary<string, int> RxVariables { get; private set; }
+        public int BitSize { get; private set; }
 
-        public ControllerExtensionModel(ushort id, string name, Dictionary<string, int> txVariables, Dictionary<string, int> rxVariables):base(id, name)
+        public ControllerExtensionModel(ushort id, string name, int bitSize, Dictionary<string, int> txVariables, Dictionary<string, int> rxVariables) :base(id, name)
         {
             TxVariables = txVariables;
             RxVariables = rxVariables;
+            BitSize = bitSize;
         }
     }
 
@@ -246,7 +267,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.Catalogue
         public IReadOnlyDictionary<string, int> TxVariables { get; private set; }
         public IReadOnlyDictionary<string, int> RxVariables { get; private set; }
 
-        public ControllerEthernetModel(ushort id, string name, Dictionary<string, int> txVariables, Dictionary<string, int> rxVariables):base(id, name)
+        public ControllerEthernetModel(ushort id, string name, Dictionary<string, int> txVariables, Dictionary<string, int> rxVariables) :base(id, name)
         {
             TxVariables = txVariables;
             RxVariables = rxVariables;

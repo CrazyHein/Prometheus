@@ -40,6 +40,13 @@
                         <TextBlock Text="{Binding Path=Name}" Margin="4" HorizontalAlignment="Left"/>
                     </DataTemplate>
 
+                    <DataTemplate x:Key="BitSizeHeadTemplate">
+                        <TextBlock FontWeight="Bold" Text="Bit Size"/>
+                    </DataTemplate>
+                    <DataTemplate x:Key="BitSizeContentTemplate">
+                        <TextBlock Text="{Binding Path=BitSize}" Margin="4" HorizontalAlignment="Left"/>
+                    </DataTemplate>
+
                     <DataTemplate x:Key="RxHeadTemplate">
                         <TextBlock FontWeight="Bold" Text="RX"/>
                     </DataTemplate>
@@ -60,6 +67,7 @@
                         <GridView>
                             <GridViewColumn Width="80" HeaderTemplate="{StaticResource IDHeadTemplate}" CellTemplate="{StaticResource IDContentTemplate}"/>
                             <GridViewColumn Width="200" HeaderTemplate="{StaticResource NameHeadTemplate}" CellTemplate="{StaticResource NameContentTemplate}"/>
+                            <GridViewColumn Width="80" HeaderTemplate="{StaticResource BitSizeHeadTemplate}" CellTemplate="{StaticResource BitSizeContentTemplate}"/>
                             <GridViewColumn Width="200" HeaderTemplate="{StaticResource RxHeadTemplate}" CellTemplate="{StaticResource RxContentTemplate}"/>
                             <GridViewColumn Width="200" HeaderTemplate="{StaticResource TxHeadTemplate}" CellTemplate="{StaticResource TxContentTemplate}"/>
                         </GridView>
