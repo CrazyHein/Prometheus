@@ -27,6 +27,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
         INVALID_CONTROLLER_MODEL                                = 0x00000013,
         INVALID_CONTROLLER_MODEL_ID                             = 0x00000014,
         INVALID_MC_SERVER_IPV4_ADDRESS                          = 0x00000015,
+        INVALID_MODULE_IPV4_ADDRESS                             = 0x00000016,
+        INVALID_MODULE_LOCAL_ADDRESS                            = 0x00000017,
+        MODULE_LOCAL_ADDRESS_OVERLAPPED                         = 0x00000018,                             
 
         INVALID_OBJECT_DATA_TYPE                                = 0x00000020,
         DUPLICATE_OBJECT_INDEX                                  = 0x00000021,
@@ -273,6 +276,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                         else
                         {
                             IO_LIST_CONTROLLER_INFORMATION_T.MODULE_T module = new IO_LIST_CONTROLLER_INFORMATION_T.MODULE_T(model, referenceName, localAddress);
+                            ModuleDataVerification(module);
                             __controller_information.modules.Add(module.reference_name, module);
                             __module_reference_counter.Add(module.reference_name, 0);
                         }
@@ -340,6 +344,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                         else
                         {
                             IO_LIST_CONTROLLER_INFORMATION_T.MODULE_T module = new IO_LIST_CONTROLLER_INFORMATION_T.MODULE_T(model, referenceName, ip, port);
+                            ModuleDataVerification(module);
                             __controller_information.modules.Add(module.reference_name, module);
                             __module_reference_counter.Add(module.reference_name, 0);
                         }
@@ -669,6 +674,43 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
             return false;
         }
 
+        private bool __controller_extension_modules_overlap_detector()
+        {
+            int counter = __controller_information.modules.Count;
+            Tuple<uint, uint>[] ranges = new Tuple<uint, uint>[counter];
+            int i = 0;
+            foreach(var module in __controller_information.modules)
+            {
+                if (module.Value.model is ControllerExtensionModel)
+                {
+                    ranges[i] = new Tuple<uint, uint>(module.Value.local_address, (module.Value.model as ControllerExtensionModel).BitSize);
+                    ++i;
+                }
+            }
+
+            counter = i;
+
+            for (i = 0; i < counter - 1; ++i)
+            {
+                for (int j = 0; j < counter - 1 - i; ++j)
+                {
+                    if (ranges[j].Item1 > ranges[j + 1].Item1)
+                    {
+                        Tuple<uint, uint> temp = ranges[j];
+                        ranges[j] = ranges[j + 1];
+                        ranges[j + 1] = temp;
+                    }
+                }
+            }
+            for (i = 0; i < counter - 1; ++i)
+            {
+                if (ranges[i].Item1 + ranges[i].Item2 > ranges[i + 1].Item1)
+                    return true;
+            }
+
+            return false;
+        }
+
         private void __load_interlock_logics(XmlNode interlocksNode)
         {
             try
@@ -966,6 +1008,11 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
 
             if (con0 == false && con1 == false)
                 throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_CONTROLLER_MODEL_ID, null);
+
+            if (Regex.IsMatch(moduleData.ip_address, @"^((2[0-4]\d|25[0-5]|[01]?\d\d?)\.){3}(2[0-4]\d|25[0-5]|[01]?\d\d?)$") == false)
+                throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_MODULE_IPV4_ADDRESS, null);
+            if(moduleData.local_address % 16 != 0)
+                throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_MODULE_LOCAL_ADDRESS, null);
         }
 
         public void ObjectDataVerification(IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T objectData, bool ignoreDuplicate = false)
@@ -1209,6 +1256,13 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                 {
                     __controller_pdo_collection.Clear();
                     throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.PDO_AREA_OVERLAPPED, null);
+                }
+
+                overlap = __controller_extension_modules_overlap_detector();
+                if (overlap == true)
+                {
+                    __controller_information.modules.Clear();
+                    throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.MODULE_LOCAL_ADDRESS_OVERLAPPED, null);
                 }
 
                 infoNode = xmlDoc.SelectSingleNode("/AMECIOList/Interlocks");
@@ -1867,6 +1921,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                 __controller_pdo_collection.rx_pdo_bit_area.size_in_word * 2 < __controller_pdo_collection.rx_pdo_bit_area.actual_size_in_byte ||
                 __controller_pdo_collection.rx_pdo_block_area.size_in_word * 2 < __controller_pdo_collection.rx_pdo_block_area.actual_size_in_byte)
                 throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.PDO_AREA_OUT_OF_RANGE, null);
+
+            overlap = __controller_extension_modules_overlap_detector();
+            if (overlap == true)
+                throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.MODULE_LOCAL_ADDRESS_OVERLAPPED, null);
 
             XmlDocument xmlDoc = new XmlDocument();
             try

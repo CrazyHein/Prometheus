@@ -5,7 +5,7 @@
 		<ExtensionModel>
 			<ID>0x0001</ID>
 			<Name>RX10</Name>
-			<BitSize>16</BitSize>
+			<BitSize>0x10</BitSize>
 			<TX>
 				<Bit>16</Bit>
 			</TX>
@@ -13,7 +13,7 @@
 		<ExtensionModel>
 			<ID>0x0002</ID>
 			<Name>RX40C7</Name>
-			<BitSize>16</BitSize>
+			<BitSize>0x10</BitSize>
 			<TX>
 				<Bit>16</Bit>
 			</TX>
@@ -21,7 +21,7 @@
 		<ExtensionModel>
 			<ID>0x0003</ID>
 			<Name>RX41C4</Name>
-			<BitSize>32</BitSize>
+			<BitSize>0x20</BitSize>
 			<TX>
 				<Bit>32</Bit>
 			</TX>
@@ -29,7 +29,7 @@
 		<ExtensionModel>
 			<ID>0x0004</ID>
 			<Name>RX42C4</Name>
-			<BitSize>64</BitSize>
+			<BitSize>0x40</BitSize>
 			<TX>
 				<Bit>64</Bit>
 			</TX>
@@ -37,7 +37,7 @@
 		<ExtensionModel>
 			<ID>0x0005</ID>
 			<Name>RX40PC6H</Name>
-			<BitSize>16</BitSize>
+			<BitSize>0x10</BitSize>
 			<TX>
 				<Bit>16</Bit>
 			</TX>
@@ -45,7 +45,7 @@
 		<ExtensionModel>
 			<ID>0x0006</ID>
 			<Name>RX40NC6H</Name>
-			<BitSize>16</BitSize>
+			<BitSize>0x10</BitSize>
 			<TX>
 				<Bit>16</Bit>
 			</TX>
@@ -53,7 +53,7 @@
 		<ExtensionModel>
 			<ID>0x0007</ID>
 			<Name>RX41C6HS</Name>
-			<BitSize>32</BitSize>
+			<BitSize>0x20</BitSize>
 			<TX>
 				<Bit>32</Bit>
 			</TX>
@@ -61,7 +61,7 @@
 		<ExtensionModel>
 			<ID>0x0008</ID>
 			<Name>RX61C6HS</Name>
-			<BitSize>32</BitSize>
+			<BitSize>0x20</BitSize>
 			<TX>
 				<Bit>32</Bit>
 			</TX>
@@ -69,7 +69,7 @@
 		<ExtensionModel>
 			<ID>0x0009</ID>
 			<Name>RY10R2</Name>
-			<BitSize>16</BitSize>
+			<BitSize>0x10</BitSize>
 			<RX>
 				<Bit>16</Bit>
 			</RX>
@@ -80,7 +80,7 @@
 		<ExtensionModel>
 			<ID>0x000A</ID>
 			<Name>RY40NT5P</Name>
-			<BitSize>16</BitSize>
+			<BitSize>0x10</BitSize>
 			<RX>
 				<Bit>16</Bit>
 			</RX>
@@ -91,7 +91,7 @@
 		<ExtensionModel>
 			<ID>0x000B</ID>
 			<Name>RY41NT2P</Name>
-			<BitSize>32</BitSize>
+			<BitSize>0x20</BitSize>
 			<RX>
 				<Bit>32</Bit>
 			</RX>
@@ -102,7 +102,7 @@
 		<ExtensionModel>
 			<ID>0x000C</ID>
 			<Name>RY41NT2H</Name>
-			<BitSize>32</BitSize>
+			<BitSize>0x20</BitSize>
 			<RX>
 				<Bit>32</Bit>
 			</RX>
@@ -113,7 +113,7 @@
 		<ExtensionModel>
 			<ID>0x000D</ID>
 			<Name>RY42NT2P</Name>
-			<BitSize>64</BitSize>
+			<BitSize>0x40</BitSize>
 			<RX>
 				<Bit>64</Bit>
 			</RX>
@@ -124,7 +124,7 @@
 		<ExtensionModel>
 			<ID>0x000E</ID>
 			<Name>RY40PT5P</Name>
-			<BitSize>16</BitSize>
+			<BitSize>0x10</BitSize>
 			<RX>
 				<Bit>16</Bit>
 			</RX>
@@ -135,7 +135,7 @@
 		<ExtensionModel>
 			<ID>0x000F</ID>
 			<Name>RY41PT1P</Name>
-			<BitSize>32</BitSize>
+			<BitSize>0x20</BitSize>
 			<RX>
 				<Bit>32</Bit>
 			</RX>
@@ -146,7 +146,7 @@
 		<ExtensionModel>
 			<ID>0x0010</ID>
 			<Name>RY41PT2H</Name>
-			<BitSize>32</BitSize>
+			<BitSize>0x20</BitSize>
 			<RX>
 				<Bit>32</Bit>
 			</RX>
@@ -157,7 +157,7 @@
 		<ExtensionModel>
 			<ID>0x0011</ID>
 			<Name>RY42PT1P</Name>
-			<BitSize>64</BitSize>
+			<BitSize>0x40</BitSize>
 			<RX>
 				<Bit>64</Bit>
 			</RX>
@@ -168,7 +168,7 @@
 		<ExtensionModel>
 			<ID>0x0012</ID>
 			<Name>RH42C4NT2P</Name>
-			<BitSize>32</BitSize>
+			<BitSize>0x20</BitSize>
 			<TX>
 				<Bit>64</Bit>
 			</TX>
@@ -179,7 +179,7 @@
 		<ExtensionModel>
 			<ID>0x0020</ID>
 			<Name>R60AD4</Name>
-			<BitSize>16</BitSize>
+			<BitSize>0x10</BitSize>
 			<TX>
 				<Channel>4</Channel>
 			</TX>
@@ -187,7 +187,7 @@
 		<ExtensionModel>
 			<ID>0x0021</ID>
 			<Name>R60ADV8</Name>
-			<BitSize>16</BitSize>
+			<BitSize>0x10</BitSize>
 			<TX>
 				<Channel>8</Channel>
 			</TX>
@@ -195,7 +195,7 @@
 		<ExtensionModel>
 			<ID>0x0022</ID>
 			<Name>R60ADI8</Name>
-			<BitSize>16</BitSize>
+			<BitSize>0x10</BitSize>
 			<TX>
 				<Channel>8</Channel>
 			</TX>
@@ -203,7 +203,7 @@
 		<ExtensionModel>
 			<ID>0x0030</ID>
 			<Name>R60DA4</Name>
-			<BitSize>16</BitSize>
+			<BitSize>0x10</BitSize>
 			<RX>
 				<Channel>4</Channel>
 			</RX>
@@ -211,7 +211,7 @@
 		<ExtensionModel>
 			<ID>0x0031</ID>
 			<Name>R60DAV8</Name>
-			<BitSize>16</BitSize>
+			<BitSize>0x10</BitSize>
 			<RX>
 				<Channel>8</Channel>
 			</RX>
@@ -219,7 +219,7 @@
 		<ExtensionModel>
 			<ID>0x0032</ID>
 			<Name>R60DAI8</Name>
-			<BitSize>16</BitSize>
+			<BitSize>0x10</BitSize>
 			<RX>
 				<Channel>8</Channel>
 			</RX>
@@ -227,7 +227,7 @@
 		<ExtensionModel>
 			<ID>0x0040</ID>
 			<Name>R60TD8_G</Name>
-			<BitSize>16</BitSize>
+			<BitSize>0x10</BitSize>
 			<TX>
 				<Channel>8</Channel>
 			</TX>
@@ -235,7 +235,7 @@
 		<ExtensionModel>
 			<ID>0x0041</ID>
 			<Name>R60RD8_G</Name>
-			<BitSize>16</BitSize>
+			<BitSize>0x10</BitSize>
 			<TX>
 				<Channel>8</Channel>
 			</TX>
@@ -243,7 +243,7 @@
 		<ExtensionModel>
 			<ID>0x0050</ID>
 			<Name>R60TCRT4</Name>
-			<BitSize>16</BitSize>
+			<BitSize>0x10</BitSize>
 			<TX>
 				<PV>4</PV>
 				<MVh>4</MVh>
@@ -259,7 +259,7 @@
 		<ExtensionModel>
 			<ID>0x0051</ID>
 			<Name>R60TCTRT2TT2</Name>
-			<BitSize>16</BitSize>
+			<BitSize>0x10</BitSize>
 			<TX>
 				<PV>4</PV>
 				<MVh>4</MVh>
@@ -275,7 +275,7 @@
 		<ExtensionModel>
 			<ID>0x0060</ID>
 			<Name>RJ71DN91_MASTER</Name>
-			<BitSize>32</BitSize>
+			<BitSize>0x20</BitSize>
 			<TX>
 				<Byte>512</Byte>
 				<NodeCFG>64</NodeCFG>
@@ -290,7 +290,7 @@
 		<ExtensionModel>
 			<ID>0x1001</ID>
 			<Name>R12CCPU_V_SMART_ECAT</Name>
-			<BitSize>16</BitSize>
+			<BitSize>0x10</BitSize>
 			<TX>
 				<Byte>17552</Byte>
 			</TX>

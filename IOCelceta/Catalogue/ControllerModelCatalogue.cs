@@ -55,7 +55,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.Catalogue
         {
             ushort id = 0;
             string name = "";
-            int bitSize = 0;
+            ushort bitSize = 0;
             uint mask = 0;
             Dictionary<string, int> txVariables;
             Dictionary<string, int> rxVariables;
@@ -112,7 +112,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.Catalogue
                                     mask |= 0x00000002;
                                     break;
                                 case "BitSize":
-                                    bitSize = Convert.ToInt32(node.FirstChild.Value, 10);
+                                    bitSize = Convert.ToUInt16(node.FirstChild.Value, 16);
                                     mask |= 0x00000004;
                                     break;
                                 case "TX":
@@ -252,9 +252,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.Catalogue
     {
         public IReadOnlyDictionary<string, int> TxVariables { get; private set; }
         public IReadOnlyDictionary<string, int> RxVariables { get; private set; }
-        public int BitSize { get; private set; }
+        public ushort BitSize { get; private set; }
 
-        public ControllerExtensionModel(ushort id, string name, int bitSize, Dictionary<string, int> txVariables, Dictionary<string, int> rxVariables) :base(id, name)
+        public ControllerExtensionModel(ushort id, string name, ushort bitSize, Dictionary<string, int> txVariables, Dictionary<string, int> rxVariables) :base(id, name)
         {
             TxVariables = txVariables;
             RxVariables = rxVariables;

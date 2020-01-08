@@ -5,6 +5,8 @@ VisualStudioVersion = 15.0.28307.705
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IOCelceta", "IOCelceta\IOCelceta.csproj", "{08F7D00B-39B0-4EC2-98E6-2EDB6F98664D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Eresia", "Eresia\Eresia.csproj", "{D857430E-8FF8-4044-8C11-7FB4B602D309}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{08F7D00B-39B0-4EC2-98E6-2EDB6F98664D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{08F7D00B-39B0-4EC2-98E6-2EDB6F98664D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{08F7D00B-39B0-4EC2-98E6-2EDB6F98664D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D857430E-8FF8-4044-8C11-7FB4B602D309}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D857430E-8FF8-4044-8C11-7FB4B602D309}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D857430E-8FF8-4044-8C11-7FB4B602D309}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D857430E-8FF8-4044-8C11-7FB4B602D309}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -364,7 +364,11 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
         {
             try
             {
-                return System.Convert.ToUInt16((string)value, 10);
+                ushort address = System.Convert.ToUInt16((string)value, 10);
+                if (address % 16 != 0)
+                    return new ArgumentException();
+                else
+                    return address;
             }
             catch
             {
@@ -372,7 +376,11 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             }
             try
             {
-                return System.Convert.ToUInt16((string)value, 16);
+                ushort address =  System.Convert.ToUInt16((string)value, 16);
+                if (address % 16 != 0)
+                    return new ArgumentException();
+                else
+                    return address;
             }
             catch
             {
