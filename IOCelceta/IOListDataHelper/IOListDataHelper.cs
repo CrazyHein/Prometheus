@@ -923,12 +923,15 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                 throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_OBJECT_REFERENCE_IN_INTERLOCK, null);
             foreach (var o in datas)
             {
+                InterlockLogicTargetObjectDataVerification(o);
+                /*
                 if ((o.index & 0x80000000) != 0 || o.index  >= 0x00002000)
                     throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_OBJECT_REFERENCE_IN_INTERLOCK, null);
                 else if (__object_collection.objects.Keys.Contains(o.index) == false)
                     throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_OBJECT_REFERENCE_IN_INTERLOCK, null);
                 else if(__object_collection.objects[o.index] != o)
                     throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_OBJECT_REFERENCE_IN_INTERLOCK, null);
+                    */
             }
         }
 
@@ -936,28 +939,24 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
         {
             if(data == null)
                 throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_OBJECT_REFERENCE_IN_INTERLOCK, null);
-            else if ((data.index & 0x80000000) != 0 || data.index >= 0x00002000)
-                throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_OBJECT_REFERENCE_IN_INTERLOCK, null);
-            else if (__object_collection.objects.Keys.Contains(data.index) == false)
-                throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_OBJECT_REFERENCE_IN_INTERLOCK, null);
-            else if (__object_collection.objects[data.index] != data)
+            else if(__controller_pdo_collection.rx_pdo_bit_area.objects.Contains(data) == false)
                 throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_OBJECT_REFERENCE_IN_INTERLOCK, null);
         }
 
         public void InterlockLogicTargetObjectDataVerification(uint objectIndex)
         {
-            if ((objectIndex & 0x80000000) != 0 || objectIndex >= 0x00002000)
+            if (__object_collection.objects.Keys.Contains(objectIndex) == false)
                 throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_OBJECT_REFERENCE_IN_INTERLOCK, null);
-            else if (__object_collection.objects.Keys.Contains(objectIndex) == false)
-                throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_OBJECT_REFERENCE_IN_INTERLOCK, null);
+            IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T data = __object_collection.objects[objectIndex];
+            InterlockLogicTargetObjectDataVerification(data);
         }
 
         public void InterlockLogicOperandDataVerification(uint objectIndex)
         {
-            uint id = objectIndex & 0x7FFFFFFF;
-            if (id >= 0x00002000)
+            if (__object_collection.objects.Keys.Contains(objectIndex) == false)
                 throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_OBJECT_REFERENCE_IN_INTERLOCK, null);
-            else if (__object_collection.objects.Keys.Contains(objectIndex) == false)
+            IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T data = __object_collection.objects[objectIndex];
+            if (__controller_pdo_collection.tx_pdo_bit_area.objects.Contains(data) == false && __controller_pdo_collection.rx_pdo_bit_area.objects.Contains(data) == false)
                 throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_OBJECT_REFERENCE_IN_INTERLOCK, null);
         }
 
