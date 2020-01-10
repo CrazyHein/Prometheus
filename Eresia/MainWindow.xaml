@@ -3,10 +3,71 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:Eresia"
+        xmlns:local="clr-namespace:AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Eresia"
         mc:Ignorable="d"
-        Title="Eresia" Height="450" Width="800">
+        Title="Eresia" Height="450" Width="800" WindowState="Maximized">
     <Grid>
-        
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition />
+        </Grid.RowDefinitions>
+        <Menu Grid.Row="0">
+            <MenuItem Header="_File" Margin="3">
+                <MenuItem Command="local:ConsoleControl.OpenTaskUserParametersFile">
+                    <MenuItem.Icon>
+                        <Image Source="img/edit_file.png"/>
+                    </MenuItem.Icon>
+
+                </MenuItem>
+                <MenuItem Command="local:ConsoleControl.NewTaskUserParametersFile">
+                    <MenuItem.Icon>
+                        <Image Source="img/new_file.png"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Command="local:ConsoleControl.SaveTaskUserParametersFile">
+                    <MenuItem.Icon>
+                        <Image Source="img/save.png"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Command="local:ConsoleControl.SaveTaskUserParametersFileAs">
+                    <MenuItem.Icon>
+                        <Image Source="img/save_as.png"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+            </MenuItem>
+            <MenuItem Header="_Tool" Margin="3">
+                <MenuItem Command="local:ConsoleControl.OpenAboutDialog">
+                    <MenuItem.Icon>
+                        <Image Source="img/about.png"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+            </MenuItem>
+        </Menu>
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto"/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <GroupBox Header="Host CPU" Grid.ColumnSpan="2" Margin="4" Padding="8">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="Address : "/>
+                    <TextBox Width="100" Margin="4,0,0,0" TextAlignment="Center"/>
+                </StackPanel>
+            </GroupBox>
+            <GroupBox Header="Extension Modules" Grid.Row="1" Margin="4" Padding="4">
+                <DockPanel LastChildFill="True">
+                    <StackPanel DockPanel.Dock="Bottom">
+                    </StackPanel>
+                    <ListBox>
+                    </ListBox>
+                </DockPanel>
+            </GroupBox>
+            <GroupBox Header="Ethernet Modules" Grid.Row="1" Grid.Column="1" Margin="4">
+            </GroupBox>
+        </Grid>
     </Grid>
 </Window>

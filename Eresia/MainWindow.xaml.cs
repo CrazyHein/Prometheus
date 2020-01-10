@@ -48,4 +48,43 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Eresia
             helper.Load("r2h_task_user_parameters.xml");
         }
     }
+
+    internal class ConsoleControl
+    {
+        public static RoutedUICommand OpenTaskUserParametersFile { get; private set; }
+        public static RoutedUICommand NewTaskUserParametersFile { get; private set; }
+        public static RoutedUICommand SaveTaskUserParametersFile { get; private set; }
+        public static RoutedUICommand OpenAboutDialog { get; private set; }
+
+        public static RoutedUICommand SaveTaskUserParametersFileAs { get; private set; }
+
+        static ConsoleControl()
+        {
+            InputGestureCollection gestureOpenTaskUserParametersFile = new InputGestureCollection
+            {
+                new KeyGesture(Key.O, ModifierKeys.Control, "Ctrl+O")
+            };
+            InputGestureCollection gestureNewTaskUserParametersFile = new InputGestureCollection
+            {
+                new KeyGesture(Key.N, ModifierKeys.Control, "Ctrl+N")
+            };
+            InputGestureCollection gestureSaveTaskUserParametersFile = new InputGestureCollection
+            {
+                new KeyGesture(Key.S, ModifierKeys.Control, "Ctrl+S")
+            };
+            InputGestureCollection gestureSaveTaskUserParametersFileAs = new InputGestureCollection
+            {
+                new KeyGesture(Key.S, ModifierKeys.Control|ModifierKeys.Shift, "Ctrl+Shift+S")
+            };
+            InputGestureCollection gestureOpenAboutDialog = new InputGestureCollection
+            {
+                new KeyGesture(Key.A, ModifierKeys.Control, "Ctrl+A")
+            };
+            OpenTaskUserParametersFile = new RoutedUICommand("Open", "OpenTaskUserParametersFile", typeof(ConsoleControl), gestureOpenTaskUserParametersFile);
+            NewTaskUserParametersFile = new RoutedUICommand("New", "NewTaskUserParametersFile", typeof(ConsoleControl), gestureNewTaskUserParametersFile);
+            SaveTaskUserParametersFileAs = new RoutedUICommand("Save As", "SaveTaskUserParametersFileAs", typeof(ConsoleControl), gestureSaveTaskUserParametersFileAs);
+            SaveTaskUserParametersFile = new RoutedUICommand("Save", "SaveTaskUserParametersFile", typeof(ConsoleControl), gestureSaveTaskUserParametersFile);
+            OpenAboutDialog = new RoutedUICommand("About", "OpenAboutDialog", typeof(ConsoleControl), gestureOpenAboutDialog);
+        }
+    }
 }
