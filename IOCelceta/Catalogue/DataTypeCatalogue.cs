@@ -47,6 +47,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.Catalogue
         {
             try
             {
+                __data_types.Clear();
                 if (dataTypesNode.NodeType == XmlNodeType.Element)
                 {
                     foreach (XmlNode dataTypeNode in dataTypesNode.ChildNodes)

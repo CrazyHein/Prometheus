@@ -23,6 +23,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Eresia
     public partial class MainWindow : Window
     {
         private ControllerModelCatalogue __controller_model_catalogue;
+        private TaskUserParametersDataModel __data_model;
         private string __controller_model_catalogue_exception = null;
         private string __task_user_parameters_file_name;
         private string __main_window_title;
@@ -46,6 +47,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Eresia
 
             TaskUserParametersHelper helper = new TaskUserParametersHelper(__controller_model_catalogue);
             helper.Load("r2h_task_user_parameters.xml");
+
+            __data_model = new TaskUserParametersDataModel(helper);
+            DataContext = __data_model;
+            __data_model.UpdateDataModel();
         }
     }
 

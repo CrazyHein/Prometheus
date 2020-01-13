@@ -103,39 +103,35 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Eresia
 
         public void ModuleDataVerification(CONTROLLER_EXTENSION_MODULE_T module)
         {
-            if (module.MODEL == null || __model_catalogue.ExtensionModels.Values.Contains(module.MODEL) == false)
+            if (module.MODEL == null || 
+                __model_catalogue.ExtensionModels.Contains(new KeyValuePair<ushort, ControllerExtensionModel>(module.MODEL.ID, module.MODEL)) == false)
                 throw new TaskUserParametersExcepetion(TASK_USER_PARAMETERS_ERROR_T.INVALID_EXTENSION_MODULE_MODEL, null);
             if(module.ADDRESS % 16 != 0)
                 throw new TaskUserParametersExcepetion(TASK_USER_PARAMETERS_ERROR_T.INVALID_EXTENSION_MODULE_ADDRESS, null);
+
             if (module.USER_CONFIGURATIONS != null)
             {
-                List<string> fields = new List<string>();
-                foreach (var c in module.USER_CONFIGURATIONS)
+                foreach (var k in module.USER_CONFIGURATIONS.Keys)
                 {
-                    if (fields.Contains(c.Item1) == true)
-                        throw new TaskUserParametersExcepetion(TASK_USER_PARAMETERS_ERROR_T.DUPLICATED_EXTENSION_MODULE_USERCONFIGURATION, null);
-                    if (__model_catalogue.ExtensionModelConfigruationFields.Contains(c.Item1) == false)
+                    if (__model_catalogue.ExtensionModelConfigruationFields.Contains(k) == false)
                         throw new TaskUserParametersExcepetion(TASK_USER_PARAMETERS_ERROR_T.INVALID_EXTENSION_MODULE_USERCONFIGURATION, null);
-                    fields.Add(c.Item1);
                 }
             }
         }
 
         public void ModuleDataVerification(CONTROLLER_ETHERNET_MODULE_T module)
         {
-            if (module.MODEL == null || __model_catalogue.EthernetModels.Values.Contains(module.MODEL) == false)
+            if (module.MODEL == null || 
+                __model_catalogue.EthernetModels.Contains(new KeyValuePair<ushort, ControllerEthernetModel>(module.MODEL.ID, module.MODEL)) == false)
                 throw new TaskUserParametersExcepetion(TASK_USER_PARAMETERS_ERROR_T.INVALID_ETHERNET_MODULE_MODEL, null);
 
             if (module.USER_CONFIGURATIONS != null)
             {
                 List<string> fields = new List<string>();
-                foreach (var c in module.USER_CONFIGURATIONS)
+                foreach (var k in module.USER_CONFIGURATIONS.Keys)
                 {
-                    if (fields.Contains(c.Item1) == true)
-                        throw new TaskUserParametersExcepetion(TASK_USER_PARAMETERS_ERROR_T.DUPLICATED_ETHERNET_MODULE_USERCONFIGURATION, null);
-                    if (__model_catalogue.EthernetModelConfigruationFields.Contains(c.Item1) == false)
+                    if (__model_catalogue.EthernetModelConfigruationFields.Contains(k) == false)
                         throw new TaskUserParametersExcepetion(TASK_USER_PARAMETERS_ERROR_T.INVALID_ETHERNET_MODULE_USERCONFIGURATION, null);
-                    fields.Add(c.Item1);
                 }
             }
 
@@ -148,6 +144,18 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Eresia
             get { return __host_cpu_address; }
             set { __host_cpu_address = value; }
         }
+
+        public IReadOnlyList<CONTROLLER_EXTENSION_MODULE_T> ControllerExtensionModules { get { return __controller_extension_modules; } }
+
+        public IReadOnlyList<CONTROLLER_ETHERNET_MODULE_T> ControllerEthernetModules { get { return __controller_ethernet_modules; } }
+
+        public IEnumerable<ControllerExtensionModel> AvailableExtensionModels { get { return __model_catalogue.ExtensionModels.Values; } }
+
+        public IEnumerable<ControllerEthernetModel> AvailableEthernetModels { get { return __model_catalogue.EthernetModels.Values; } }
+
+        public IReadOnlyCollection<string> AvailableExtensionUserConfigurationFields { get { return __model_catalogue.ExtensionModelConfigruationFields; } }
+
+        public IReadOnlyCollection<string> AvailableEthernetUserConfigurationFields { get { return __model_catalogue.EthernetModelConfigruationFields; } }
 
 
         private void __load_host_cpu_info(XmlNode cpuNode)
@@ -232,7 +240,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Eresia
             ControllerExtensionModel model = null;
             CONTROLLER_EXTENSION_MODULE_T module = null;
             uint mask = 0;
-            List<Tuple<string, string>> userConfigurations = new List<Tuple<string, string>>();
+            Dictionary<string, string> userConfigurations = new Dictionary<string, string>();
             try
             {
                 if (extensionNode.NodeType != XmlNodeType.Element)
@@ -262,7 +270,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Eresia
                             mask |= 0x00000008;
                             break;
                         default:
-                            userConfigurations.Add(new Tuple<string, string>(filed.Name, filed.FirstChild.Value));
+                            if (userConfigurations.Keys.Contains(filed.Name) == true)
+                                throw new TaskUserParametersExcepetion(TASK_USER_PARAMETERS_ERROR_T.DUPLICATED_EXTENSION_MODULE_USERCONFIGURATION, null);
+                            userConfigurations[filed.Name] = filed.FirstChild.Value;
                             break;
                     }
                 }
@@ -299,7 +309,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Eresia
             ControllerEthernetModel model = null;
             CONTROLLER_ETHERNET_MODULE_T module = null;
             uint mask = 0;
-            List<Tuple<string, string>> userConfigurations = new List<Tuple<string, string>>();
+            Dictionary<string, string> userConfigurations = new Dictionary<string, string>();
             try
             {
                 if (extensionNode.NodeType != XmlNodeType.Element)
@@ -331,7 +341,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Eresia
                             mask |= 0x00000008;
                             break;
                         default:
-                            userConfigurations.Add(new Tuple<string, string>(filed.Name, filed.FirstChild.Value));
+                            if (userConfigurations.Keys.Contains(filed.Name) == true)
+                                throw new TaskUserParametersExcepetion(TASK_USER_PARAMETERS_ERROR_T.DUPLICATED_ETHERNET_MODULE_USERCONFIGURATION, null);
+                            userConfigurations[filed.Name] = filed.FirstChild.Value;
                             break;
                     }
                 }
@@ -429,9 +441,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Eresia
     {
         public ControllerExtensionModel MODEL { get; private set; }
         public ushort ADDRESS { get; private set; }
-        public IReadOnlyList<Tuple<string, string>> USER_CONFIGURATIONS;
+        public IReadOnlyDictionary<string, string> USER_CONFIGURATIONS;
 
-        public CONTROLLER_EXTENSION_MODULE_T(ControllerExtensionModel model, ushort address, IReadOnlyList<Tuple<string, string>> userConfigurations)
+        public CONTROLLER_EXTENSION_MODULE_T(ControllerExtensionModel model, ushort address, Dictionary<string, string> userConfigurations)
         {
             MODEL = model;
             ADDRESS = address;
@@ -444,9 +456,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Eresia
         public ControllerEthernetModel MODEL { get; private set; }
         public string IP_ADDRESS { get; private set; }
         public uint PORT { get; private set; }
-        public IReadOnlyList<Tuple<string, string>> USER_CONFIGURATIONS;
+        public IReadOnlyDictionary<string, string> USER_CONFIGURATIONS;
 
-        public CONTROLLER_ETHERNET_MODULE_T(ControllerEthernetModel model, string ip, uint port, IReadOnlyList<Tuple<string, string>> userConfigurations)
+        public CONTROLLER_ETHERNET_MODULE_T(ControllerEthernetModel model, string ip, uint port, Dictionary<string, string> userConfigurations)
         {
             MODEL = model;
             IP_ADDRESS = ip;

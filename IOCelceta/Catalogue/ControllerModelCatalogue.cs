@@ -32,13 +32,15 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.Catalogue
     {
         public IReadOnlyDictionary<ushort, ControllerExtensionModel> ExtensionModels { get; private set; }
         public IReadOnlyDictionary<ushort, ControllerEthernetModel> EthernetModels { get; private set; }
-        public IReadOnlyList<string> ExtensionModelConfigruationFields { get; private set; }
-        public IReadOnlyList<string> EthernetModelConfigruationFields { get; private set; }
+        public IReadOnlyCollection<string> ExtensionModelConfigruationFields { get; private set; }
+        public IReadOnlyCollection<string> EthernetModelConfigruationFields { get; private set; }
         public uint FileFormatVersion { get; private set; }
         private readonly uint __supported_file_format_version;
 
         private Dictionary<ushort, ControllerExtensionModel> __extension_models = null;
         private Dictionary<ushort, ControllerEthernetModel> __ethernet_models = null;
+        private HashSet<string> __extension_model_configuration_fields = null;
+        private HashSet<string> __ethernet_model_configuration_fields = null;
 
         public ControllerModelCatalogue()
         {
@@ -46,9 +48,13 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.Catalogue
 
             __extension_models = new Dictionary<ushort, ControllerExtensionModel>();
             __ethernet_models = new Dictionary<ushort, ControllerEthernetModel>();
+            __extension_model_configuration_fields = new HashSet<string>();
+            __ethernet_model_configuration_fields = new HashSet<string>();
 
             ExtensionModels = __extension_models;
             EthernetModels = __ethernet_models;
+            ExtensionModelConfigruationFields = __extension_model_configuration_fields;
+            EthernetModelConfigruationFields = __ethernet_model_configuration_fields;
         }
 
         public void Load(string catalogueConfiguration)
@@ -81,13 +87,17 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.Catalogue
             try
             { 
                 XmlNode extensionModelsNode = xmlDoc.SelectSingleNode("/AMECControllerModels/ExtensionModels");
+                __extension_models.Clear();
+                __extension_model_configuration_fields.Clear();
+
                 if (extensionModelsNode.NodeType == XmlNodeType.Element)
                 {
                     var c = extensionModelsNode.Attributes["ConfigurationFields"];
                     if (c != null)
-                        ExtensionModelConfigruationFields = new List<string>(c.Value.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries));
-                    else
-                        ExtensionModelConfigruationFields = new List<string>();
+                    {
+                        foreach (var f in c.Value.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries))
+                            __extension_model_configuration_fields.Add(f);
+                    }
 
                     foreach (XmlNode extensionModelNode in extensionModelsNode.ChildNodes)
                     {
@@ -159,13 +169,17 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.Catalogue
             try
             {
                 XmlNode extensionModelsNode = xmlDoc.SelectSingleNode("/AMECControllerModels/EthernetModels");
+                __ethernet_models.Clear();
+                __ethernet_model_configuration_fields.Clear();
+
                 if (extensionModelsNode.NodeType == XmlNodeType.Element)
                 {
                     var c = extensionModelsNode.Attributes["ConfigurationFields"];
                     if (c != null)
-                        EthernetModelConfigruationFields = new List<string>(c.Value.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries));
-                    else
-                        EthernetModelConfigruationFields = new List<string>();
+                    {
+                        foreach (var f in c.Value.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries))
+                            __ethernet_model_configuration_fields.Add(f);
+                    }
 
                     foreach (XmlNode extensionModelNode in extensionModelsNode.ChildNodes)
                     {

@@ -56,6 +56,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="TaskUserParametersDataModel.cs" />
     <Compile Include="TaskUserParametersHelper\TaskUserParametersHelper.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -102,6 +103,31 @@
       <Name>IOCelceta</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Resource Include="img\CPU.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="img\about.png" />
+    <Resource Include="img\edit_file.png" />
+    <Resource Include="img\new_file.png" />
+    <Resource Include="img\save.png" />
+    <Resource Include="img\save_as.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="img\ethernet.png" />
+    <Resource Include="img\module.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="img\binary_code.png" />
+    <Resource Include="img\cloud_computing.png" />
+    <Resource Include="img\puzzle.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="img\add.png" />
+    <Resource Include="img\down.png" />
+    <Resource Include="img\left.png" />
+    <Resource Include="img\remove.png" />
+    <Resource Include="img\up.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
