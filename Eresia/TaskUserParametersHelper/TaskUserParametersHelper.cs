@@ -94,7 +94,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Eresia
             }
         }
 
-        private void SetDefault()
+        public void SetDefault()
         {
             HostCPUAddress = 0x3E00;
             __controller_extension_modules.Clear();

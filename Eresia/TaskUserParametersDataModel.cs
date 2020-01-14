@@ -34,7 +34,17 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Eresia
         public bool Dirty
         {
             get { return __dirty; }
-            set { SetProperty(ref __dirty, value); }
+            set
+            {
+                SetProperty(ref __dirty, value);
+                if(value == false)
+                {
+                    foreach (var m in ExtensionModules)
+                        m.Dirty = value;
+                    foreach (var m in EthernetModules)
+                        m.Dirty = value;
+                }
+            }
         }
 
 
@@ -45,10 +55,12 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Eresia
         public TaskUserParametersDataModel(TaskUserParametersHelper dataHelper)
         {
             __extension_modules = new ObservableCollection<ExtensionModuleDataModel>();
+            __ethernet_modules = new ObservableCollection<EthernetModuleDataModel>();
 
             _data_helper = dataHelper;
 
             ExtensionModules = __extension_modules;
+            EthernetModules = __ethernet_modules;
             AvailableExtensionModels = new List<ControllerExtensionModel>(dataHelper.AvailableExtensionModels);
             AvailableEthernetModels = new List<ControllerEthernetModel>(dataHelper.AvailableEthernetModels);
         }
@@ -87,10 +99,48 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Eresia
         
         public IReadOnlyList<ExtensionModuleDataModel> ExtensionModules { get; private set; }
         private ObservableCollection<ExtensionModuleDataModel> __extension_modules;
+
+        public IReadOnlyList<EthernetModuleDataModel> EthernetModules { get; private set; }
+        private ObservableCollection<EthernetModuleDataModel> __ethernet_modules;
+
+        public void AddExtensionModuleDataModel()
+        {
+            __extension_modules.Add(new ExtensionModuleDataModel(this,
+                new CONTROLLER_EXTENSION_MODULE_T(AvailableExtensionModels[0], 0x0000, null)));
+        }
+
+        public void InsertExtensionModuleDataModel(int pos)
+        {
+            __extension_modules.Insert(pos, new ExtensionModuleDataModel(this,
+                new CONTROLLER_EXTENSION_MODULE_T(AvailableExtensionModels[0], 0x0000, null)));
+        }
+
+        public void RemoveExtensionModuleDataModel(int pos)
+        {
+            __extension_modules.RemoveAt(pos);
+            Dirty = true;
+        }
+
+        public void SwapExtensionModuleDataModel(int firstPos, int secondPos)
+        {
+            if (firstPos < secondPos)
+            {
+                __extension_modules.Move(secondPos, firstPos);
+                __extension_modules.Move(firstPos + 1, secondPos);
+            }
+            else if (firstPos > secondPos)
+            {
+                __extension_modules.Move(firstPos, secondPos);
+                __extension_modules.Move(secondPos + 1, firstPos);
+            }
+            Dirty = true;
+        }
     }
 
-    class ExtensionModuleDataModel : INotifyPropertyChanged
+    class ModuleDataModel : INotifyPropertyChanged
     {
+        protected TaskUserParametersDataModel _host_data_model;
+
         public event PropertyChangedEventHandler PropertyChanged;
         virtual internal protected void OnPropertyChanged(string propertyName)
         {
@@ -101,10 +151,31 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Eresia
             if (object.Equals(storage, value))
                 return;
             storage = value;
+            if (propertyName != "Dirty")
+                Dirty = true;
             OnPropertyChanged(propertyName);
         }
+        private bool __dirty;
+        public bool Dirty
+        {
+            get { return __dirty; }
+            set
+            {
+                SetProperty(ref __dirty, value);
+                if (value == true)
+                    _host_data_model.Dirty = true;
+            }
+        }
 
-        public ExtensionModuleDataModel(TaskUserParametersDataModel host, CONTROLLER_EXTENSION_MODULE_T module)
+        public ModuleDataModel(TaskUserParametersDataModel host)
+        {
+            _host_data_model = host;
+        }
+    }
+
+    class ExtensionModuleDataModel : ModuleDataModel
+    {
+        public ExtensionModuleDataModel(TaskUserParametersDataModel host, CONTROLLER_EXTENSION_MODULE_T module) : base(host)
         {
             Address = module.ADDRESS;
             Model = module.MODEL;
@@ -115,15 +186,15 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Eresia
                 foreach (var f in host.DataHelper.AvailableExtensionUserConfigurationFields)
                 {
                     if(module.USER_CONFIGURATIONS.Keys.Contains(f))
-                        __user_configurations.Add(new ModuleUserConfiguration(f, module.USER_CONFIGURATIONS[f]));
+                        __user_configurations.Add(new ModuleUserConfiguration(this, f, module.USER_CONFIGURATIONS[f]));
                     else
-                        __user_configurations.Add(new ModuleUserConfiguration(f));
+                        __user_configurations.Add(new ModuleUserConfiguration(this, f));
                 }
             }
             else
             {
                 foreach (var f in host.DataHelper.AvailableExtensionUserConfigurationFields)
-                    __user_configurations.Add(new ModuleUserConfiguration(f));
+                    __user_configurations.Add(new ModuleUserConfiguration(this, f));
             }
         }
 
@@ -151,7 +222,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Eresia
         public ushort BitSize
         {
             get { return __bit_size; }
-            set { SetProperty(ref __bit_size, value); }
+            private set { SetProperty(ref __bit_size, value); }
         }
 
         private List<ModuleUserConfiguration> __user_configurations;
@@ -161,22 +232,44 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Eresia
         }
     }
 
+    class EthernetModuleDataModel : ModuleDataModel
+    {
+        public EthernetModuleDataModel(TaskUserParametersDataModel host, CONTROLLER_ETHERNET_MODULE_T module) : base(host)
+        {
+
+        }
+    }
+
     class ModuleUserConfiguration
     {
-        public ModuleUserConfiguration(string name, string value)
+        private string __name;
+        private string __value;
+        private ModuleDataModel __host_data_model;
+
+        public ModuleUserConfiguration(ModuleDataModel host, string name, string value)
         {
-            Name = name;
-            Value = value;
+            __host_data_model = host;
+            __name = name;
+            __value = value;
         }
 
-        public ModuleUserConfiguration(string name)
+        public ModuleUserConfiguration(ModuleDataModel host, string name)
         {
-            Name = name;
-            Value = "";
+            __host_data_model = host;
+            __name = name;
+            __value = "";
         }
 
-        public string Name { get; set; }
-        public string Value { get; set; }
+        public string Name
+        {
+            get { return __name; }
+            set { __name = value; __host_data_model.Dirty = true; }
+        }
+        public string Value
+        {
+            get { return __value; }
+            set { __value = value; __host_data_model.Dirty = true; }
+        }
     }
 
     class ModuleHexAddressToText : IValueConverter
@@ -215,4 +308,35 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Eresia
         }
     }
 
+    class ModuleDirtyStatusToWidth : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if ((bool)(value) == true)
+                return 3;
+            else
+                return 1;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    class ModuleDirtyStatusToTitle : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if ((bool)(value) == true)
+                return "DIRTY";
+            else
+                return "";
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
 }

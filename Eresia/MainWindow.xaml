@@ -5,10 +5,21 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Eresia"
         mc:Ignorable="d"
-        Title="Eresia" Height="450" Width="800" WindowState="Maximized">
+        Title="Eresia" Height="450" Width="800" WindowState="Maximized"
+        Closing="__on_main_window_closing" Loaded="__on_main_window_loaded">
+    <Window.CommandBindings>
+        <CommandBinding Command="local:ConsoleControl.OpenTaskUserParametersFile" Executed="__open_task_user_configuration_parameters_file_executed"/>
+        <CommandBinding Command="local:ConsoleControl.NewTaskUserParametersFile" Executed="__new_task_user_configuration_parameters_file_executed"/>
+        <CommandBinding Command="local:ConsoleControl.SaveTaskUserParametersFileAs" Executed="__save_task_user_configuration_parameters_file_as_executed" CanExecute="__save_task_user_configuration_parameters_file_as_can_executed"/>
+        <CommandBinding Command="local:ConsoleControl.SaveTaskUserParametersFile" Executed="__save_task_user_configuration_parameters_file_executed" CanExecute="__save_task_user_configuration_parameters_file_can_executed"/>
+        <CommandBinding Command="local:ConsoleControl.OpenAboutDialog" Executed="__open_about_dialog_executed"/>
+    </Window.CommandBindings>
     <Grid>
         <Grid.Resources>
             <local:ModuleHexAddressToText x:Key="HexToText"/>
+            <local:ModuleDirtyStatusToWidth x:Key="DirtyToWidth"/>
+            <local:ModuleDirtyStatusToTitle x:Key="DirtyToTitle"/>
+            <local:DataContextVisibility x:Key="ContextVisibility"/>
         </Grid.Resources>
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"/>
@@ -45,8 +56,13 @@
                     </MenuItem.Icon>
                 </MenuItem>
             </MenuItem>
+            <MenuItem Margin="3" IsEnabled="False">
+                <MenuItem.Header>
+                    <TextBlock Text="{Binding Dirty, Converter={StaticResource DirtyToTitle}}" Foreground="Red" FontWeight="Bold"/>
+                </MenuItem.Header>
+            </MenuItem>
         </Menu>
-        <Grid Grid.Row="1">
+        <Grid Grid.Row="1" Visibility="{Binding DataContext, RelativeSource={RelativeSource Mode=Self}, Converter={StaticResource ContextVisibility}}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition/>
                 <ColumnDefinition Width="8"/>
@@ -70,6 +86,13 @@
                 </StackPanel>
             </GroupBox>
             <GroupBox Grid.Row="1" Margin="4" Padding="4">
+                <GroupBox.CommandBindings>
+                    <CommandBinding Command="local:ConsoleControl.AddExtensionModule" Executed="__add_extension_module_executed" CanExecute="__add_extension_module_can_executed"/>
+                    <CommandBinding Command="local:ConsoleControl.InsertExtensionModule" Executed="__insert_extension_module_executed" CanExecute="__insert_extension_module_can_executed"/>
+                    <CommandBinding Command="local:ConsoleControl.RemoveExtensionModule" Executed="__remove_extension_module_executed" CanExecute="__remove_extension_module_can_executed"/>
+                    <CommandBinding Command="local:ConsoleControl.MoveUpExtensionModule" Executed="__move_up_extension_module_executed" CanExecute="__move_up_extension_module_can_executed"/>
+                    <CommandBinding Command="local:ConsoleControl.MoveDownExtensionModule" Executed="__move_down_extension_module_executed" CanExecute="__move_down_extension_module_can_executed"/>
+                </GroupBox.CommandBindings>
                 <GroupBox.Header>
                     <StackPanel Orientation="Horizontal">
                         <Image Source="img/binary_code.png" Height="30" Margin="0,0,8,0"/>
@@ -78,34 +101,34 @@
                 </GroupBox.Header>
                 <DockPanel LastChildFill="True">
                     <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Right">
-                        <Button Height="32" Width="120" Margin="4">
+                        <Button Height="32" Width="120" Margin="4" Command="local:ConsoleControl.AddExtensionModule">
                             <StackPanel Orientation="Horizontal">
                                 <Image Source="img/add.png" Margin="2,2,8,2"/>
                                 <TextBlock Text="Add" VerticalAlignment="Center"/>
                             </StackPanel>
                         </Button>
-                        <Button Height="32" Width="120" Margin="4">
+                        <Button Height="32" Width="120" Margin="4" Command="local:ConsoleControl.InsertExtensionModule">
+                            <StackPanel Orientation="Horizontal">
+                                <Image Source="img/left.png" Margin="2,2,8,2"/>
+                                <TextBlock Text="Insert" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+                        <Button Height="32" Width="120" Margin="4" Command="local:ConsoleControl.RemoveExtensionModule">
                             <StackPanel Orientation="Horizontal">
                                 <Image Source="img/remove.png" Margin="2,2,8,2"/>
                                 <TextBlock Text="Remove" VerticalAlignment="Center"/>
                             </StackPanel>
                         </Button>
-                        <Button Height="32" Width="120" Margin="4">
+                        <Button Height="32" Width="120" Margin="4" Command="local:ConsoleControl.MoveUpExtensionModule">
                             <StackPanel Orientation="Horizontal">
                                 <Image Source="img/up.png" Margin="2,2,8,2"/>
                                 <TextBlock Text="Move Up" VerticalAlignment="Center"/>
                             </StackPanel>
                         </Button>
-                        <Button Height="32" Width="120" Margin="4">
+                        <Button Height="32" Width="120" Margin="4" Command="local:ConsoleControl.MoveDownExtensionModule">
                             <StackPanel Orientation="Horizontal">
                                 <Image Source="img/down.png" Margin="2,2,8,2"/>
                                 <TextBlock Text="Move Down" VerticalAlignment="Center"/>
-                            </StackPanel>
-                        </Button>
-                        <Button Height="32" Width="120" Margin="4">
-                            <StackPanel Orientation="Horizontal">
-                                <Image Source="img/left.png" Margin="2,2,8,2"/>
-                                <TextBlock Text="Insert" VerticalAlignment="Center"/>
                             </StackPanel>
                         </Button>
                     </StackPanel>
@@ -123,7 +146,7 @@
                         <ListBox.ItemTemplate>
                             <DataTemplate>
                                 <Grid Margin="0" Background="White">
-                                    <Border Margin="4" BorderThickness="1" BorderBrush="SteelBlue" CornerRadius="4" Background="{Binding Path=Background, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ListBoxItem}}}">
+                                    <Border Margin="4" BorderThickness="{Binding Dirty, Converter={StaticResource DirtyToWidth}}" BorderBrush="SteelBlue" CornerRadius="4" Background="{Binding Path=Background, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ListBoxItem}}}">
                                         <Grid Margin="3">
                                             <Grid.Resources>
                                                 <Style TargetType="TextBlock">
@@ -152,7 +175,7 @@
                                             <TextBlock Text="Address : " Grid.Row="2"/>
 
                                             <ComboBox Grid.Column="1" ItemsSource="{Binding AvailableModels}" SelectedItem="{Binding Model}"/>
-                                            <TextBox Grid.Row="1" Grid.Column="1" IsReadOnly="True" Text="{Binding BitSize, Converter={StaticResource HexToText}}"/>
+                                            <TextBox Grid.Row="1" Grid.Column="1" IsReadOnly="True" Text="{Binding BitSize, Converter={StaticResource HexToText}, Mode=OneWay}"/>
                                             <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding Address, Converter={StaticResource HexToText}}"/>
                                             <Expander Grid.Row="3" Grid.ColumnSpan="2" Header="User Configurations" Padding="4">
                                                 <ListView ItemsSource="{Binding UserConfigurations}">
@@ -189,13 +212,15 @@
                     </ListBox>
                 </DockPanel>
             </GroupBox>
-            <GroupBox Grid.Row="1" Grid.Column="2" Margin="4">
+            <GroupBox Grid.Row="1" Grid.Column="2" Margin="4" Padding="4">
                 <GroupBox.Header>
                     <StackPanel Orientation="Horizontal">
                         <Image Source="img/cloud_computing.png" Height="30" Margin="0,0,8,0"/>
                         <TextBlock Text="Ethernet Modules" FontSize="15" VerticalAlignment="Center"/>
                     </StackPanel>
                 </GroupBox.Header>
+                <ListBox Name="__lsb_ethernet_modules" ItemsSource="{Binding EthernetModules}" HorizontalContentAlignment="Stretch" ScrollViewer.CanContentScroll="False">
+                </ListBox>
             </GroupBox>
         </Grid>
     </Grid>
