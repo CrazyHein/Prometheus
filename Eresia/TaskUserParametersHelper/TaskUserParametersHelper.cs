@@ -455,10 +455,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Eresia
     {
         public ControllerEthernetModel MODEL { get; private set; }
         public string IP_ADDRESS { get; private set; }
-        public uint PORT { get; private set; }
+        public ushort PORT { get; private set; }
         public IReadOnlyDictionary<string, string> USER_CONFIGURATIONS;
 
-        public CONTROLLER_ETHERNET_MODULE_T(ControllerEthernetModel model, string ip, uint port, Dictionary<string, string> userConfigurations)
+        public CONTROLLER_ETHERNET_MODULE_T(ControllerEthernetModel model, string ip, ushort port, Dictionary<string, string> userConfigurations)
         {
             MODEL = model;
             IP_ADDRESS = ip;

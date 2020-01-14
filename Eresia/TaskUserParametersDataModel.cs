@@ -7,6 +7,7 @@ using System.Globalization;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Data;
 
@@ -86,6 +87,12 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Eresia
                 ExtensionModuleDataModel temp = new ExtensionModuleDataModel(this, o);
                 __extension_modules.Add(temp);
             }
+            __ethernet_modules.Clear();
+            foreach (var o in _data_helper.ControllerEthernetModules)
+            {
+                EthernetModuleDataModel temp = new EthernetModuleDataModel(this, o);
+                __ethernet_modules.Add(temp);
+            }
             if (clearDirtyFlag == true)
                 Dirty = false;
         }
@@ -132,6 +139,39 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Eresia
             {
                 __extension_modules.Move(firstPos, secondPos);
                 __extension_modules.Move(secondPos + 1, firstPos);
+            }
+            Dirty = true;
+        }
+
+        public void AddEthernetModuleDataModel()
+        {
+            __ethernet_modules.Add(new EthernetModuleDataModel(this,
+                new CONTROLLER_ETHERNET_MODULE_T(AvailableEthernetModels[0], "192.168.0.1", 8366, null)));
+        }
+
+        public void InsertEthernetModuleDataModel(int pos)
+        {
+            __ethernet_modules.Insert(pos, new EthernetModuleDataModel(this,
+                new CONTROLLER_ETHERNET_MODULE_T(AvailableEthernetModels[0], "192.168.0.1", 8366, null)));
+        }
+
+        public void RemoveEthernetModuleDataModel(int pos)
+        {
+            __ethernet_modules.RemoveAt(pos);
+            Dirty = true;
+        }
+
+        public void SwapEthernetModuleDataModel(int firstPos, int secondPos)
+        {
+            if (firstPos < secondPos)
+            {
+                __ethernet_modules.Move(secondPos, firstPos);
+                __ethernet_modules.Move(firstPos + 1, secondPos);
+            }
+            else if (firstPos > secondPos)
+            {
+                __ethernet_modules.Move(firstPos, secondPos);
+                __ethernet_modules.Move(secondPos + 1, firstPos);
             }
             Dirty = true;
         }
@@ -236,7 +276,61 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Eresia
     {
         public EthernetModuleDataModel(TaskUserParametersDataModel host, CONTROLLER_ETHERNET_MODULE_T module) : base(host)
         {
+            IPAddress = module.IP_ADDRESS;
+            Port = module.PORT;
+            Model = module.MODEL;
+            AvailableModels = host.AvailableEthernetModels;
+            __user_configurations = new List<ModuleUserConfiguration>(host.DataHelper.AvailableEthernetUserConfigurationFields.Count);
+            if (module.USER_CONFIGURATIONS != null)
+            {
+                foreach (var f in host.DataHelper.AvailableEthernetUserConfigurationFields)
+                {
+                    if (module.USER_CONFIGURATIONS.Keys.Contains(f))
+                        __user_configurations.Add(new ModuleUserConfiguration(this, f, module.USER_CONFIGURATIONS[f]));
+                    else
+                        __user_configurations.Add(new ModuleUserConfiguration(this, f));
+                }
+            }
+            else
+            {
+                foreach (var f in host.DataHelper.AvailableEthernetUserConfigurationFields)
+                    __user_configurations.Add(new ModuleUserConfiguration(this, f));
+            }
+        }
 
+        public IReadOnlyList<ControllerEthernetModel> AvailableModels { get; private set; }
+
+        ControllerEthernetModel __model;
+        public ControllerEthernetModel Model
+        {
+            get { return __model; }
+            set { SetProperty(ref __model, value); }
+        }
+
+        private string __ip_address;
+        public string IPAddress
+        {
+            get { return __ip_address; }
+            set
+            {
+                if (Regex.IsMatch(value, @"^((2[0-4]\d|25[0-5]|[01]?\d\d?)\.){3}(2[0-4]\d|25[0-5]|[01]?\d\d?)$") == true)
+                    SetProperty(ref __ip_address, value);
+                else
+                    throw new ArgumentException();
+            }
+        }
+
+        private ushort __port;
+        public ushort Port
+        {
+            get { return __port; }
+            set { SetProperty(ref __port, value); }
+        }
+
+        private List<ModuleUserConfiguration> __user_configurations;
+        public IReadOnlyList<ModuleUserConfiguration> UserConfigurations
+        {
+            get { return __user_configurations; }
         }
     }
 

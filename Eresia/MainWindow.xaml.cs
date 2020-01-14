@@ -49,6 +49,14 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Eresia
             __task_user_configuration_parameters_helper = new TaskUserParametersHelper(__controller_model_catalogue);
         }
 
+        private void __on_data_binding_error(object sender, ValidationErrorEventArgs e)
+        {
+            if (e.Action == ValidationErrorEventAction.Added)
+                (DataContext as TaskUserParametersDataModel).FieldDataBindingErrors++;
+            else if (e.Action == ValidationErrorEventAction.Removed)
+                (DataContext as TaskUserParametersDataModel).FieldDataBindingErrors--;
+        }
+
         private void __open_task_user_configuration_parameters_file_executed(object sender, ExecutedRoutedEventArgs e)
         {
             if (__task_user_configuration_parameters_file_dirty() == true)
@@ -258,6 +266,136 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Eresia
             e.CanExecute = DataContext != null && __lsb_extension_modules.SelectedIndex + 1 < __lsb_extension_modules.Items.Count;
         }
 
+        private void __add_ethernet_module_executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            try
+            {
+                (DataContext as TaskUserParametersDataModel).AddEthernetModuleDataModel();
+                __lsb_ethernet_modules.SelectedIndex = __lsb_ethernet_modules.Items.Count - 1;
+                __lsb_ethernet_modules.ScrollIntoView(__lsb_ethernet_modules.SelectedItem);
+
+            }
+            catch (TaskUserParametersExcepetion exp)
+            {
+                string message;
+                if (exp.ErrorCode == TASK_USER_PARAMETERS_ERROR_T.FILE_DATA_EXCEPTION)
+                    message = string.Format("At least one unexpected error occurred while adding EthernetModule . \n{0}", exp.DataException.ToString());
+                else
+                    message = string.Format("At least one unexpected error occurred while adding EthernetModule . \n{0}", exp.ErrorCode.ToString());
+
+                MessageBox.Show(message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void __add_ethernet_module_can_executed(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = DataContext != null;
+        }
+
+        private void __insert_ethernet_module_executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            try
+            {
+                (DataContext as TaskUserParametersDataModel).InsertEthernetModuleDataModel(__lsb_ethernet_modules.SelectedIndex);
+                __lsb_ethernet_modules.SelectedIndex = __lsb_ethernet_modules.SelectedIndex - 1;
+                __lsb_ethernet_modules.ScrollIntoView(__lsb_ethernet_modules.SelectedItem);
+
+            }
+            catch (TaskUserParametersExcepetion exp)
+            {
+                string message;
+                if (exp.ErrorCode == TASK_USER_PARAMETERS_ERROR_T.FILE_DATA_EXCEPTION)
+                    message = string.Format("At least one unexpected error occurred while inserting EthernetModule . \n{0}", exp.DataException.ToString());
+                else
+                    message = string.Format("At least one unexpected error occurred while inserting EthernetModule . \n{0}", exp.ErrorCode.ToString());
+
+                MessageBox.Show(message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void __insert_ethernet_module_can_executed(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = DataContext != null && __lsb_ethernet_modules.SelectedItem != null;
+        }
+
+        private void __remove_ethernet_module_executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            try
+            {
+                if (MessageBox.Show("Are you sure ?", "Question", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+                    (DataContext as TaskUserParametersDataModel).RemoveEthernetModuleDataModel(__lsb_ethernet_modules.SelectedIndex);
+
+            }
+            catch (TaskUserParametersExcepetion exp)
+            {
+                string message;
+                if (exp.ErrorCode == TASK_USER_PARAMETERS_ERROR_T.FILE_DATA_EXCEPTION)
+                    message = string.Format("At least one unexpected error occurred while removing EthernetModule . \n{0}", exp.DataException.ToString());
+                else
+                    message = string.Format("At least one unexpected error occurred while removing EthernetModule . \n{0}", exp.ErrorCode.ToString());
+
+                MessageBox.Show(message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void __remove_ethernet_module_can_executed(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = DataContext != null && __lsb_ethernet_modules.SelectedItem != null;
+        }
+
+        private void __move_up_ethernet_module_executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            try
+            {
+                int selectedIndex = __lsb_ethernet_modules.SelectedIndex;
+                (DataContext as TaskUserParametersDataModel).SwapEthernetModuleDataModel(selectedIndex, selectedIndex - 1);
+                __lsb_ethernet_modules.SelectedIndex = selectedIndex - 1;
+                __lsb_ethernet_modules.ScrollIntoView(__lsb_ethernet_modules.SelectedItem);
+
+            }
+            catch (TaskUserParametersExcepetion exp)
+            {
+                string message;
+                if (exp.ErrorCode == TASK_USER_PARAMETERS_ERROR_T.FILE_DATA_EXCEPTION)
+                    message = string.Format("At least one unexpected error occurred while moving up EthernetModule . \n{0}", exp.DataException.ToString());
+                else
+                    message = string.Format("At least one unexpected error occurred while moving up EthernetModule . \n{0}", exp.ErrorCode.ToString());
+
+                MessageBox.Show(message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void __move_up_ethernet_module_can_executed(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = DataContext != null && __lsb_ethernet_modules.SelectedIndex >= 1;
+        }
+
+        private void __move_down_ethernet_module_executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            try
+            {
+                int selectedIndex = __lsb_ethernet_modules.SelectedIndex;
+                (DataContext as TaskUserParametersDataModel).SwapEthernetModuleDataModel(selectedIndex, selectedIndex + 1);
+                __lsb_ethernet_modules.SelectedIndex = selectedIndex + 1;
+                __lsb_ethernet_modules.ScrollIntoView(__lsb_ethernet_modules.SelectedItem);
+            }
+            catch (TaskUserParametersExcepetion exp)
+            {
+                string message;
+                if (exp.ErrorCode == TASK_USER_PARAMETERS_ERROR_T.FILE_DATA_EXCEPTION)
+                    message = string.Format("At least one unexpected error occurred while moving down EthernetModule . \n{0}", exp.DataException.ToString());
+                else
+                    message = string.Format("At least one unexpected error occurred while moving down EthernetModule . \n{0}", exp.ErrorCode.ToString());
+
+                MessageBox.Show(message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void __move_down_ethernet_module_can_executed(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = DataContext != null && __lsb_ethernet_modules.SelectedIndex + 1 < __lsb_ethernet_modules.Items.Count;
+        }
+
         private void __on_main_window_closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             if (__task_user_configuration_parameters_file_dirty() == true)
@@ -313,6 +451,12 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Eresia
         public static RoutedUICommand MoveUpExtensionModule { get; private set; }
         public static RoutedUICommand MoveDownExtensionModule { get; private set; }
 
+        public static RoutedUICommand AddEthernetModule { get; private set; }
+        public static RoutedUICommand InsertEthernetModule { get; private set; }
+        public static RoutedUICommand RemoveEthernetModule { get; private set; }
+        public static RoutedUICommand MoveUpEthernetModule { get; private set; }
+        public static RoutedUICommand MoveDownEthernetModule { get; private set; }
+
         static ConsoleControl()
         {
             InputGestureCollection gestureOpenTaskUserParametersFile = new InputGestureCollection
@@ -357,6 +501,27 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Eresia
                 new KeyGesture(Key.A, ModifierKeys.Control, "Ctrl+D")
             };
 
+            InputGestureCollection gestureAddEthernetModule = new InputGestureCollection
+            {
+                new KeyGesture(Key.A, ModifierKeys.Control|ModifierKeys.Shift, "Ctrl+Shift+P")
+            };
+            InputGestureCollection gestureInsertEthernetModule = new InputGestureCollection
+            {
+                new KeyGesture(Key.A, ModifierKeys.Control|ModifierKeys.Shift, "Ctrl+Shift+I")
+            };
+            InputGestureCollection gestureRemoveEthernetModule = new InputGestureCollection
+            {
+                new KeyGesture(Key.A, ModifierKeys.Control|ModifierKeys.Shift, "Ctrl+Shift+R")
+            };
+            InputGestureCollection gestureMoveUpEthernetModule = new InputGestureCollection
+            {
+                new KeyGesture(Key.A, ModifierKeys.Control|ModifierKeys.Shift, "Ctrl+Shift+U")
+            };
+            InputGestureCollection gestureMoveDownEthernetModule = new InputGestureCollection
+            {
+                new KeyGesture(Key.A, ModifierKeys.Control|ModifierKeys.Shift, "Ctrl+Shift+D")
+            };
+
 
             OpenTaskUserParametersFile = new RoutedUICommand("Open", "OpenTaskUserParametersFile", typeof(ConsoleControl), gestureOpenTaskUserParametersFile);
             NewTaskUserParametersFile = new RoutedUICommand("New", "NewTaskUserParametersFile", typeof(ConsoleControl), gestureNewTaskUserParametersFile);
@@ -364,11 +529,17 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Eresia
             SaveTaskUserParametersFile = new RoutedUICommand("Save", "SaveTaskUserParametersFile", typeof(ConsoleControl), gestureSaveTaskUserParametersFile);
             OpenAboutDialog = new RoutedUICommand("About", "OpenAboutDialog", typeof(ConsoleControl), gestureOpenAboutDialog);
 
-            AddExtensionModule = new RoutedUICommand("Add", "AddModule", typeof(ConsoleControl), gestureAddExtensionModule);
-            InsertExtensionModule = new RoutedUICommand("Insert", "InsertModule", typeof(ConsoleControl), gestureInsertExtensionModule);
-            RemoveExtensionModule = new RoutedUICommand("Remove", "RemoveModule", typeof(ConsoleControl), gestureRemoveExtensionModule);
-            MoveUpExtensionModule = new RoutedUICommand("Move Up", "MoveUpModule", typeof(ConsoleControl), gestureMoveUpExtensionModule);
-            MoveDownExtensionModule = new RoutedUICommand("Move Down", "MoveDownModule", typeof(ConsoleControl), gestureMoveDownExtensionModule);
+            AddExtensionModule = new RoutedUICommand("Add", "AddExtensionModule", typeof(ConsoleControl), gestureAddExtensionModule);
+            InsertExtensionModule = new RoutedUICommand("Insert", "InsertExtensionModule", typeof(ConsoleControl), gestureInsertExtensionModule);
+            RemoveExtensionModule = new RoutedUICommand("Remove", "RemoveExtensionModule", typeof(ConsoleControl), gestureRemoveExtensionModule);
+            MoveUpExtensionModule = new RoutedUICommand("Move Up", "MoveUpExtensionModule", typeof(ConsoleControl), gestureMoveUpExtensionModule);
+            MoveDownExtensionModule = new RoutedUICommand("Move Down", "MoveDownExtensionModule", typeof(ConsoleControl), gestureMoveDownExtensionModule);
+
+            AddEthernetModule = new RoutedUICommand("Add", "AddEthernetModule", typeof(ConsoleControl), gestureAddEthernetModule);
+            InsertEthernetModule = new RoutedUICommand("Insert", "InsertEthernetModule", typeof(ConsoleControl), gestureInsertEthernetModule);
+            RemoveEthernetModule = new RoutedUICommand("Remove", "RemoveEthernetModule", typeof(ConsoleControl), gestureRemoveEthernetModule);
+            MoveUpEthernetModule = new RoutedUICommand("Move Up", "MoveUpEthernetModule", typeof(ConsoleControl), gestureMoveUpEthernetModule);
+            MoveDownEthernetModule = new RoutedUICommand("Move Down", "MoveDownEthernetModule", typeof(ConsoleControl), gestureMoveDownEthernetModule);
         }
     }
 }
