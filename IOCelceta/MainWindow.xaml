@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta"
         mc:Ignorable="d"
-        Title="IO Celceta" Height="450" Width="1000" WindowState="Maximized" Closing="__on_main_window_closing" Loaded="__on_main_window_loaded">
+        Title="{Binding Source={x:Static local:Metadata.Title}}" Height="450" Width="1000" WindowState="Maximized" Closing="__on_main_window_closing" Loaded="__on_main_window_loaded">
     <Window.CommandBindings>
         <CommandBinding Command="local:ConsoleControl.OpenIOListFile" Executed="__open_io_list_file_executed"/>
         <CommandBinding Command="local:ConsoleControl.NewIOListFile" Executed="__new_io_list_file_executed"/>

@@ -74,6 +74,35 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Eresia
         public void UpdateDataHelper(bool clearDirtyFlag = false)
         {
             _data_helper.HostCPUAddress = HostCPUAddress;
+
+            List<CONTROLLER_EXTENSION_MODULE_T> extensionModules = new List<CONTROLLER_EXTENSION_MODULE_T>(__extension_modules.Count);
+            foreach(var dataModel in __extension_modules)
+            {
+                Dictionary<string, string> userConfiguration = new Dictionary<string, string>(_data_helper.AvailableExtensionUserConfigurationFields.Count);
+                foreach(var c in dataModel.UserConfigurations)
+                {
+                    string value = c.Value.Trim();
+                    if (value != "")
+                        userConfiguration[c.Name] = value;
+                }
+                extensionModules.Add(new CONTROLLER_EXTENSION_MODULE_T(dataModel.Model, dataModel.Address, userConfiguration));
+            }
+            _data_helper.ImportModules(extensionModules, true);
+
+            List<CONTROLLER_ETHERNET_MODULE_T> ethernetModules = new List<CONTROLLER_ETHERNET_MODULE_T>(__ethernet_modules.Count);
+            foreach (var dataModel in __ethernet_modules)
+            {
+                Dictionary<string, string> userConfiguration = new Dictionary<string, string>(_data_helper.AvailableEthernetUserConfigurationFields.Count);
+                foreach (var c in dataModel.UserConfigurations)
+                {
+                    string value = c.Value.Trim();
+                    if (value != "")
+                        userConfiguration[c.Name] = value;
+                }
+                ethernetModules.Add(new CONTROLLER_ETHERNET_MODULE_T(dataModel.Model, dataModel.IPAddress, dataModel.Port, userConfiguration));
+            }
+            _data_helper.ImportModules(ethernetModules, true);
+
             if (clearDirtyFlag == true)
                 Dirty = false;
         }

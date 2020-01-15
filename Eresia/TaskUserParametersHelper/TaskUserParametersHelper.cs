@@ -28,6 +28,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Eresia
         INVALID_ETHERNET_MODULE_MODEL_ID                    = 0x00000014,
         DUPLICATED_ETHERNET_MODULE_USERCONFIGURATION        = 0x00000015,
         DUPLICATED_ETHERNET_MODULE_IP_PORT                  = 0x00000016,
+
+        INVALID_HOST_CPU_ADDRESS                            = 0x00000020,             
     }
 
 
@@ -49,10 +51,12 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Eresia
         private ushort __host_cpu_address;
         private List<CONTROLLER_EXTENSION_MODULE_T> __controller_extension_modules;
         private List<CONTROLLER_ETHERNET_MODULE_T> __controller_ethernet_modules;
+        private HashSet<ushort> __controller_host_cpu_addresses;
 
         public TaskUserParametersHelper(ControllerModelCatalogue catalogue)
         {
             __model_catalogue = catalogue;
+            __controller_host_cpu_addresses = new HashSet<ushort>() { 0x3E00, 0x3E10, 0x3E20, 0x3E30 };
 
             HostCPUAddress = 0x3E00;
             __controller_extension_modules = new List<CONTROLLER_EXTENSION_MODULE_T>();
@@ -83,6 +87,58 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Eresia
                     __controller_extension_modules.Clear();
                     throw new TaskUserParametersExcepetion(TASK_USER_PARAMETERS_ERROR_T.EXTENSION_MODULE_ADDRESS_OVERLAPPED, null);
                 }
+            }
+            catch (TaskUserParametersExcepetion e)
+            {
+                throw e;
+            }
+            catch (Exception e)
+            {
+                throw new TaskUserParametersExcepetion(TASK_USER_PARAMETERS_ERROR_T.FILE_DATA_EXCEPTION, e);
+            }
+        }
+
+        public void ImportModules(IReadOnlyList<CONTROLLER_EXTENSION_MODULE_T> modules, bool clear)
+        {
+            foreach (var m in modules)
+                ModuleDataVerification(m);
+            if (__extension_modules_address_overlap_detector(modules) == true)
+                throw new TaskUserParametersExcepetion(TASK_USER_PARAMETERS_ERROR_T.EXTENSION_MODULE_ADDRESS_OVERLAPPED, null);
+
+            if (clear)
+                __controller_extension_modules.Clear();
+            foreach (var m in modules)
+                __controller_extension_modules.Add(m);
+        }
+
+        public void ImportModules(IReadOnlyList<CONTROLLER_ETHERNET_MODULE_T> modules, bool clear)
+        {
+            foreach (var m in modules)
+                ModuleDataVerification(m);
+
+            if (clear)
+                __controller_ethernet_modules.Clear();
+            foreach (var m in modules)
+                __controller_ethernet_modules.Add(m);
+        }
+
+
+        public void Save(string taskUserParameters)
+        {
+            XmlDocument xmlDoc = new XmlDocument();
+            try
+            {
+                XmlDeclaration decl = xmlDoc.CreateXmlDeclaration("1.0", "UTF-8", null);
+                xmlDoc.AppendChild(decl);
+
+                XmlElement root = xmlDoc.CreateElement("R2H_Task_UserParameters");
+                root.AppendChild(__create_host_cpu_information_node(xmlDoc));
+                root.AppendChild(__create_modules_node(xmlDoc, __controller_extension_modules));
+                root.AppendChild(__create_modules_node(xmlDoc, __controller_ethernet_modules));
+
+                xmlDoc.AppendChild(root);
+
+                xmlDoc.Save(taskUserParameters);
             }
             catch (TaskUserParametersExcepetion e)
             {
@@ -142,7 +198,12 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Eresia
         public ushort HostCPUAddress
         {
             get { return __host_cpu_address; }
-            set { __host_cpu_address = value; }
+            set
+            { 
+                if( __controller_host_cpu_addresses.Contains(value) == false)
+                    throw new TaskUserParametersExcepetion(TASK_USER_PARAMETERS_ERROR_T.INVALID_HOST_CPU_ADDRESS, null);
+                __host_cpu_address = value;
+            }
         }
 
         public IReadOnlyList<CONTROLLER_EXTENSION_MODULE_T> ControllerExtensionModules { get { return __controller_extension_modules; } }
@@ -435,13 +496,100 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Eresia
 
             return false;
         }
+
+        private XmlElement __create_host_cpu_information_node(XmlDocument doc)
+        {
+            XmlElement hostInfo = doc.CreateElement("HostCPU");
+
+            XmlElement sub = doc.CreateElement("Address");
+            sub.AppendChild(doc.CreateTextNode($"0x{HostCPUAddress:X4}"));
+            hostInfo.AppendChild(sub);
+
+            return hostInfo;
+        }
+
+        private XmlElement __create_module_node(XmlDocument doc, CONTROLLER_EXTENSION_MODULE_T module)
+        {
+            XmlElement moduleNode = doc.CreateElement("ExtensionModule");
+
+            XmlElement sub = doc.CreateElement("ID");
+            sub.AppendChild(doc.CreateTextNode($"0x{module.MODEL.ID:X4}"));
+            moduleNode.AppendChild(sub);
+
+            sub = doc.CreateElement("Name");
+            sub.AppendChild(doc.CreateTextNode(module.MODEL.Name));
+            moduleNode.AppendChild(sub);
+
+            sub = doc.CreateElement("Address");
+            sub.AppendChild(doc.CreateTextNode($"0x{module.ADDRESS:X4}"));
+            moduleNode.AppendChild(sub);
+
+            sub = doc.CreateElement("BitSize");
+            sub.AppendChild(doc.CreateTextNode($"0x{module.MODEL.BitSize:X4}"));
+            moduleNode.AppendChild(sub);
+
+            foreach(var c in module.USER_CONFIGURATIONS)
+            {
+                sub = doc.CreateElement(c.Key);
+                sub.AppendChild(doc.CreateTextNode(c.Value));
+                moduleNode.AppendChild(sub);
+            }
+
+            return moduleNode;
+        }
+
+        public XmlElement __create_modules_node(XmlDocument doc, IReadOnlyList<CONTROLLER_EXTENSION_MODULE_T> modules)
+        {
+            XmlElement modulesNode = doc.CreateElement("ExtensionModules");
+            foreach (var m in modules)
+                modulesNode.AppendChild(__create_module_node(doc, m));
+            return modulesNode;
+        }
+
+        private XmlElement __create_module_node(XmlDocument doc, CONTROLLER_ETHERNET_MODULE_T module)
+        {
+            XmlElement moduleNode = doc.CreateElement("EthernetModule");
+
+            XmlElement sub = doc.CreateElement("ID");
+            sub.AppendChild(doc.CreateTextNode($"0x{module.MODEL.ID:X4}"));
+            moduleNode.AppendChild(sub);
+
+            sub = doc.CreateElement("Name");
+            sub.AppendChild(doc.CreateTextNode(module.MODEL.Name));
+            moduleNode.AppendChild(sub);
+
+            sub = doc.CreateElement("IP");
+            sub.AppendChild(doc.CreateTextNode(module.IP_ADDRESS));
+            moduleNode.AppendChild(sub);
+
+            sub = doc.CreateElement("Port");
+            sub.AppendChild(doc.CreateTextNode(module.PORT.ToString()));
+            moduleNode.AppendChild(sub);
+
+            foreach (var c in module.USER_CONFIGURATIONS)
+            {
+                sub = doc.CreateElement(c.Key);
+                sub.AppendChild(doc.CreateTextNode(c.Value));
+                moduleNode.AppendChild(sub);
+            }
+
+            return moduleNode;
+        }
+
+        public XmlElement __create_modules_node(XmlDocument doc, IReadOnlyList<CONTROLLER_ETHERNET_MODULE_T> modules)
+        {
+            XmlElement modulesNode = doc.CreateElement("EthernetModules");
+            foreach (var m in modules)
+                modulesNode.AppendChild(__create_module_node(doc, m));
+            return modulesNode;
+        }
     }
 
     public class CONTROLLER_EXTENSION_MODULE_T
     {
         public ControllerExtensionModel MODEL { get; private set; }
         public ushort ADDRESS { get; private set; }
-        public IReadOnlyDictionary<string, string> USER_CONFIGURATIONS;
+        public IReadOnlyDictionary<string, string> USER_CONFIGURATIONS { get; private set; }
 
         public CONTROLLER_EXTENSION_MODULE_T(ControllerExtensionModel model, ushort address, Dictionary<string, string> userConfigurations)
         {
@@ -456,7 +604,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Eresia
         public ControllerEthernetModel MODEL { get; private set; }
         public string IP_ADDRESS { get; private set; }
         public ushort PORT { get; private set; }
-        public IReadOnlyDictionary<string, string> USER_CONFIGURATIONS;
+        public IReadOnlyDictionary<string, string> USER_CONFIGURATIONS { get; private set; }
 
         public CONTROLLER_ETHERNET_MODULE_T(ControllerEthernetModel model, string ip, ushort port, Dictionary<string, string> userConfigurations)
         {

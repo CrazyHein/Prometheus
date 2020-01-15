@@ -1,0 +1,49 @@
+﻿<Window x:Class="AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Eresia.About"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Eresia"
+        mc:Ignorable="d"
+        Title="About" Height="320" Width="820" ResizeMode="CanResize">
+    <DockPanel>
+        <Border DockPanel.Dock="Left" BorderBrush="Black" BorderThickness="1" VerticalAlignment="Center" Margin="8" Padding="8">
+            <Image Source="img/logo.png" Grid.RowSpan="2"   Height="128"/>
+        </Border>
+        <ScrollViewer>
+            <Grid Margin="8">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                <Grid.Resources>
+                    <Style TargetType="TextBlock">
+                        <Setter Property="FontSize" Value="18"/>
+                        <Setter Property="VerticalAlignment" Value="Center"/>
+                        <Setter Property ="Margin" Value="8,4,8,4"/>
+                        <Setter Property="TextWrapping" Value="Wrap"/>
+                        <Setter Property="FontWeight" Value="Light"/>
+                    </Style>
+                </Grid.Resources>
+                <TextBlock Grid.Column="0" Text="Title : "/>
+                <TextBlock Grid.Column="0" Grid.Row="1" Text="Description : "/>
+                <TextBlock Grid.Column="0" Grid.Row="2" Text="Model Catalogue : "/>
+                <TextBlock Grid.Column="0" Grid.Row="3" Text="Assembly Version : " />
+                <TextBlock Grid.Column="0" Grid.Row="4" Text="File Version : " />
+
+                <TextBlock Grid.Column="1" Grid.Row="0" Text="{Binding Source={x:Static local:Metadata.Title}}"/>
+                <TextBlock Grid.Column="1" Grid.Row="1" Text="{Binding Source={x:Static local:Metadata.Description}}"/>
+                <TextBlock Grid.Column="1" Grid.Row="2" Text="{Binding Source={x:Static local:Metadata.ControllerModelCatalogue}}"/>
+                <TextBlock Grid.Column="1" Grid.Row="3" Text="{Binding Source={x:Static local:Metadata.AssemblyVersion}}" />
+                <TextBlock Grid.Column="1" Grid.Row="4" Text="{Binding Source={x:Static local:Metadata.ProductVersion}}"/>
+            </Grid>
+        </ScrollViewer>
+    </DockPanel>
+</Window>

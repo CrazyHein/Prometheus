@@ -35,6 +35,9 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>title.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -57,8 +60,16 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="About.xaml.cs">
+      <DependentUpon>About.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Metadata.cs" />
     <Compile Include="TaskUserParametersDataModel.cs" />
     <Compile Include="TaskUserParametersHelper\TaskUserParametersHelper.cs" />
+    <Page Include="About.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -129,6 +140,15 @@
     <Resource Include="img\left.png" />
     <Resource Include="img\remove.png" />
     <Resource Include="img\up.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="img\logo.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <SplashScreen Include="img\splash.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="title.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

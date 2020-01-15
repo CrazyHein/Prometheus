@@ -73,8 +73,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Eresia
                 string message;
                 try
                 {
-                    __task_user_configuration_parameters_helper.SetDefault();
                     __task_user_configuration_parameters_helper.Load(open.FileName);
+
+                    DataContext = new TaskUserParametersDataModel(__task_user_configuration_parameters_helper);
+                    (DataContext as TaskUserParametersDataModel).UpdateDataModel();
                 }
                 catch (TaskUserParametersExcepetion exp)
                 {
@@ -90,9 +92,6 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Eresia
                     __task_user_parameters_file_name = open.FileName;
                     Title = $"{__main_window_title} --- {__task_user_parameters_file_name}";
                 }
-
-                DataContext = new TaskUserParametersDataModel(__task_user_configuration_parameters_helper);
-                (DataContext as TaskUserParametersDataModel).UpdateDataModel();
             }
         }
 
@@ -113,27 +112,80 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Eresia
 
         private void __save_task_user_configuration_parameters_file_executed(object sender, ExecutedRoutedEventArgs e)
         {
+            if ((DataContext as TaskUserParametersDataModel).FieldDataBindingErrors != 0)
+            {
+                MessageBox.Show("Invalid User Input ... ", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
 
+            string message;
+            try
+            {
+                (DataContext as TaskUserParametersDataModel).UpdateDataHelper();
+                __task_user_configuration_parameters_helper.Save(__task_user_parameters_file_name);
+                (DataContext as TaskUserParametersDataModel).Dirty = false;
+            }
+            catch (TaskUserParametersExcepetion exp)
+            {
+                if (exp.ErrorCode == TASK_USER_PARAMETERS_ERROR_T.FILE_DATA_EXCEPTION)
+                    message = string.Format("At least one unexpected error occurred while saving [Task User Configuration Parameters] file . \n{0}", exp.DataException.ToString());
+                else
+                    message = string.Format("At least one unexpected error occurred while saving [Task User Configuration Parameters] file . \n{0}", exp.ErrorCode.ToString());
+
+                MessageBox.Show(message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         private void __save_task_user_configuration_parameters_file_as_executed(object sender, ExecutedRoutedEventArgs e)
         {
+            if ((DataContext as TaskUserParametersDataModel).FieldDataBindingErrors != 0)
+            {
+                MessageBox.Show("Invalid User Input ... ", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
 
+            System.Windows.Forms.SaveFileDialog save = new System.Windows.Forms.SaveFileDialog();
+            save.Filter = "Extensible Markup Language(*.xml)|*.xml";
+            save.AddExtension = true;
+            save.DefaultExt = "xml";
+
+            if (save.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                string message;
+                try
+                {
+                    (DataContext as TaskUserParametersDataModel).UpdateDataHelper();
+                    __task_user_configuration_parameters_helper.Save(save.FileName);
+                    (DataContext as TaskUserParametersDataModel).Dirty = false;
+                    __task_user_parameters_file_name = save.FileName;
+                    Title = $"{__main_window_title} --- {__task_user_parameters_file_name}";
+                }
+                catch (TaskUserParametersExcepetion exp)
+                {
+                    if (exp.ErrorCode == TASK_USER_PARAMETERS_ERROR_T.FILE_DATA_EXCEPTION)
+                        message = string.Format("At least one unexpected error occurred while saving [Task User Configuration Parameters] file . \n{0}", exp.DataException.ToString());
+                    else
+                        message = string.Format("At least one unexpected error occurred while saving [Task User Configuration Parameters] file . \n{0}", exp.ErrorCode.ToString());
+
+                    MessageBox.Show(message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
         }
 
         private void __save_task_user_configuration_parameters_file_as_can_executed(object sender, CanExecuteRoutedEventArgs e)
         {
-
+            e.CanExecute = DataContext != null;
         }
 
         private void __save_task_user_configuration_parameters_file_can_executed(object sender, CanExecuteRoutedEventArgs e)
         {
-
+            e.CanExecute = __task_user_parameters_file_name != null && DataContext != null;
         }
 
         private void __open_about_dialog_executed(object sender, ExecutedRoutedEventArgs e)
         {
-
+            var about = new About();
+            about.ShowDialog();
         }
 
         private void __add_extension_module_executed(object sender, ExecutedRoutedEventArgs e)
