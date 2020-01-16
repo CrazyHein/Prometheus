@@ -53,6 +53,14 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Eresia
         private List<CONTROLLER_ETHERNET_MODULE_T> __controller_ethernet_modules;
         private HashSet<ushort> __controller_host_cpu_addresses;
 
+        public static Regex VALID_IPV4_ADDRESS { get; private set; }
+        public static Regex VALID_EXTENSION_MODULE_ADDRESS_FORMAT { get; private set; }
+        static TaskUserParametersHelper()
+        {
+            VALID_IPV4_ADDRESS = new Regex(@"^((2[0-4]\d|25[0-5]|[01]?\d\d?)\.){3}(2[0-4]\d|25[0-5]|[01]?\d\d?)$", RegexOptions.Compiled);
+            VALID_EXTENSION_MODULE_ADDRESS_FORMAT = new Regex(@"^0x[0-9A-F]{3}0$", RegexOptions.Compiled);
+        }
+
         public TaskUserParametersHelper(ControllerModelCatalogue catalogue)
         {
             __model_catalogue = catalogue;
@@ -191,7 +199,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Eresia
                 }
             }
 
-            if (Regex.IsMatch(module.IP_ADDRESS, @"^((2[0-4]\d|25[0-5]|[01]?\d\d?)\.){3}(2[0-4]\d|25[0-5]|[01]?\d\d?)$") != true)
+            if(VALID_IPV4_ADDRESS.IsMatch(module.IP_ADDRESS) != true)
                 throw new TaskUserParametersExcepetion(TASK_USER_PARAMETERS_ERROR_T.INVALID_ETHERNET_MODULE_IPV4_ADDRESS, null);
         }
 
@@ -392,8 +400,6 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Eresia
                             mask |= 0x00000002;
                             break;
                         case "IP":
-                            if (Regex.IsMatch(filed.FirstChild.Value, @"^((2[0-4]\d|25[0-5]|[01]?\d\d?)\.){3}(2[0-4]\d|25[0-5]|[01]?\d\d?)$") != true)
-                                throw new TaskUserParametersExcepetion(TASK_USER_PARAMETERS_ERROR_T.INVALID_ETHERNET_MODULE_IPV4_ADDRESS, null);
                             ip = filed.FirstChild.Value;
                             mask |= 0x00000004;
                             break;

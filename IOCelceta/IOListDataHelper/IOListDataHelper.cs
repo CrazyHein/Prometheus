@@ -121,6 +121,14 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
 
         public uint SupportedFileFormatVersion { get { return __supported_file_format_version; } }
 
+        public static Regex VALID_IPV4_ADDRESS { get; private set; }
+        public static Regex VALID_MODULE_LOCAL_ADDRESS { get; private set; }
+        static IOListDataHelper()
+        {
+            VALID_IPV4_ADDRESS = new Regex(@"^((2[0-4]\d|25[0-5]|[01]?\d\d?)\.){3}(2[0-4]\d|25[0-5]|[01]?\d\d?)$", RegexOptions.Compiled);
+            VALID_MODULE_LOCAL_ADDRESS = new Regex(@"^0x[0-9A-F]{3}0$", RegexOptions.Compiled);
+        }
+
         public IOListDataHelper(ControllerModelCatalogue controllerCatalogue, DataTypeCatalogue dataTypeCatalogue, VariableCatalogue variableCatalogue)
         {
             __supported_file_format_version = 1;
@@ -325,13 +333,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                                     mask |= 0x00000002;
                                     break;
                                 case "IP":
-                                    if (Regex.IsMatch(node.FirstChild.Value, @"^((2[0-4]\d|25[0-5]|[01]?\d\d?)\.){3}(2[0-4]\d|25[0-5]|[01]?\d\d?)$") == true)
-                                    {
-                                        ip = node.FirstChild.Value;
-                                        mask |= 0x00000004;
-                                    }
-                                    else
-                                        throw new ArgumentException("Invalid IPv4 Address String !");
+                                    ip = node.FirstChild.Value;
+                                    mask |= 0x00000004;
                                     break;
                                 case "Port":
                                     port = Convert.ToUInt16(node.FirstChild.Value, 10);
@@ -1008,7 +1011,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
             if (con0 == false && con1 == false)
                 throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_CONTROLLER_MODEL_ID, null);
 
-            if (Regex.IsMatch(moduleData.ip_address, @"^((2[0-4]\d|25[0-5]|[01]?\d\d?)\.){3}(2[0-4]\d|25[0-5]|[01]?\d\d?)$") == false)
+            if(VALID_IPV4_ADDRESS.IsMatch(moduleData.ip_address) == false)
                 throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_MODULE_IPV4_ADDRESS, null);
             if(moduleData.local_address % 16 != 0)
                 throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_MODULE_LOCAL_ADDRESS, null);
@@ -1351,7 +1354,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
             get { return __controller_information.mc_server_ip_address; }
             set
             {
-                if (Regex.IsMatch(value, @"^((2[0-4]\d|25[0-5]|[01]?\d\d?)\.){3}(2[0-4]\d|25[0-5]|[01]?\d\d?)$") == true)
+                if(VALID_IPV4_ADDRESS.IsMatch(value) == true)
                     __controller_information.mc_server_ip_address = value;
                 else
                     throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_MC_SERVER_IPV4_ADDRESS, null);

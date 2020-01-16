@@ -129,7 +129,12 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Eresia
         public ushort HostCPUAddress
         {
             get { return __host_cpu_address; }
-            set { SetProperty(ref __host_cpu_address, value); }
+            set
+            {
+                if (value % 16 != 0)
+                    throw new ArgumentException();
+                SetProperty(ref __host_cpu_address, value);
+            }
         }
         private ushort __host_cpu_address;
         
@@ -284,7 +289,12 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Eresia
         public ushort Address
         {
             get { return __address; }
-            set { SetProperty(ref __address, value); }
+            set
+            {
+                if (value % 16 != 0)
+                    throw new ArgumentException();
+                SetProperty(ref __address, value);
+            }
         }
 
         private ushort __bit_size;
@@ -342,7 +352,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Eresia
             get { return __ip_address; }
             set
             {
-                if (Regex.IsMatch(value, @"^((2[0-4]\d|25[0-5]|[01]?\d\d?)\.){3}(2[0-4]\d|25[0-5]|[01]?\d\d?)$") == true)
+                if(TaskUserParametersHelper.VALID_IPV4_ADDRESS.IsMatch(value) == true)
                     SetProperty(ref __ip_address, value);
                 else
                     throw new ArgumentException();
@@ -406,23 +416,11 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Eresia
         {
             try
             {
-                ushort address = System.Convert.ToUInt16((string)value, 10);
-                if (address % 16 != 0)
-                    return new ArgumentException();
+                string str = (string)value;
+                if (TaskUserParametersHelper.VALID_EXTENSION_MODULE_ADDRESS_FORMAT.IsMatch(str))
+                    return System.Convert.ToUInt16(str, 16);
                 else
-                    return address;
-            }
-            catch
-            {
-
-            }
-            try
-            {
-                ushort address = System.Convert.ToUInt16((string)value, 16);
-                if (address % 16 != 0)
                     return new ArgumentException();
-                else
-                    return address;
             }
             catch
             {

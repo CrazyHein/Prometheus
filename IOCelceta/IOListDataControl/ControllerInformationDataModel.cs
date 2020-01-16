@@ -78,7 +78,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             get { return __mc_server_ip_address; }
             set
             {
-                if (Regex.IsMatch(value, @"^((2[0-4]\d|25[0-5]|[01]?\d\d?)\.){3}(2[0-4]\d|25[0-5]|[01]?\d\d?)$") == true)
+                if(IOListDataHelper.VALID_IPV4_ADDRESS.IsMatch(value) == true)
                     SetProperty(ref __mc_server_ip_address, value);
                 else
                     throw new ArgumentException();
@@ -296,7 +296,12 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
         public ushort LocalAddress
         {
             get { return __local_address; }
-            set { SetProperty(ref __local_address, value); }
+            set
+            {
+                if (value % 16 != 0)
+                    throw new ArgumentException();
+                SetProperty(ref __local_address, value);
+            }
         }
 
         public override bool IsExtensionModule { get { return true; } }
@@ -326,7 +331,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             get { return __ip; }
             set
             {
-                if (Regex.IsMatch(value, @"^((2[0-4]\d|25[0-5]|[01]?\d\d?)\.){3}(2[0-4]\d|25[0-5]|[01]?\d\d?)$") == true)
+                if(IOListDataHelper.VALID_IPV4_ADDRESS.IsMatch(value) == true)
                     SetProperty(ref __ip, value);
                 else
                     throw new ArgumentException();
