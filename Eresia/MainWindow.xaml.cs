@@ -190,23 +190,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Eresia
 
         private void __add_extension_module_executed(object sender, ExecutedRoutedEventArgs e)
         {
-            try
-            {
-                (DataContext as TaskUserParametersDataModel).AddExtensionModuleDataModel();
-                __lsb_extension_modules.SelectedIndex = __lsb_extension_modules.Items.Count - 1;
-                __lsb_extension_modules.ScrollIntoView(__lsb_extension_modules.SelectedItem);
-
-            }
-            catch(TaskUserParametersExcepetion exp)
-            {
-                string message;
-                if (exp.ErrorCode == TASK_USER_PARAMETERS_ERROR_T.FILE_DATA_EXCEPTION)
-                    message = string.Format("At least one unexpected error occurred while adding ExtensionModule . \n{0}", exp.DataException.ToString());
-                else
-                    message = string.Format("At least one unexpected error occurred while adding ExtensionModule . \n{0}", exp.ErrorCode.ToString());
-
-                MessageBox.Show(message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
+            (DataContext as TaskUserParametersDataModel).AddExtensionModuleDataModel();
+            __lsb_extension_modules.SelectedIndex = __lsb_extension_modules.Items.Count - 1;
+            __lsb_extension_modules.ScrollIntoView(__lsb_extension_modules.SelectedItem);
         }
 
         private void __add_extension_module_can_executed(object sender, CanExecuteRoutedEventArgs e)
@@ -216,23 +202,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Eresia
 
         private void __insert_extension_module_executed(object sender, ExecutedRoutedEventArgs e)
         {
-            try
-            {
-                (DataContext as TaskUserParametersDataModel).InsertExtensionModuleDataModel(__lsb_extension_modules.SelectedIndex);
-                __lsb_extension_modules.SelectedIndex = __lsb_extension_modules.SelectedIndex - 1;
-                __lsb_extension_modules.ScrollIntoView(__lsb_extension_modules.SelectedItem);
-
-            }
-            catch (TaskUserParametersExcepetion exp)
-            {
-                string message;
-                if (exp.ErrorCode == TASK_USER_PARAMETERS_ERROR_T.FILE_DATA_EXCEPTION)
-                    message = string.Format("At least one unexpected error occurred while inserting ExtensionModule . \n{0}", exp.DataException.ToString());
-                else
-                    message = string.Format("At least one unexpected error occurred while inserting ExtensionModule . \n{0}", exp.ErrorCode.ToString());
-
-                MessageBox.Show(message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
+            (DataContext as TaskUserParametersDataModel).InsertExtensionModuleDataModel(__lsb_extension_modules.SelectedIndex);
+            __lsb_extension_modules.SelectedIndex = __lsb_extension_modules.SelectedIndex - 1;
+            __lsb_extension_modules.ScrollIntoView(__lsb_extension_modules.SelectedItem);
         }
 
         private void __insert_extension_module_can_executed(object sender, CanExecuteRoutedEventArgs e)
@@ -242,22 +214,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Eresia
 
         private void __remove_extension_module_executed(object sender, ExecutedRoutedEventArgs e)
         {
-            try
-            {
-                if (MessageBox.Show("Are you sure ?", "Question", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes) 
-                    (DataContext as TaskUserParametersDataModel).RemoveExtensionModuleDataModel(__lsb_extension_modules.SelectedIndex);
+            if (MessageBox.Show("Are you sure ?", "Question", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes) 
+                (DataContext as TaskUserParametersDataModel).RemoveExtensionModuleDataModel(__lsb_extension_modules.SelectedIndex);
 
-            }
-            catch (TaskUserParametersExcepetion exp)
-            {
-                string message;
-                if (exp.ErrorCode == TASK_USER_PARAMETERS_ERROR_T.FILE_DATA_EXCEPTION)
-                    message = string.Format("At least one unexpected error occurred while removing ExtensionModule . \n{0}", exp.DataException.ToString());
-                else
-                    message = string.Format("At least one unexpected error occurred while removing ExtensionModule . \n{0}", exp.ErrorCode.ToString());
-
-                MessageBox.Show(message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
         }
 
         private void __remove_extension_module_can_executed(object sender, CanExecuteRoutedEventArgs e)
@@ -267,76 +226,35 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Eresia
 
         private void __move_up_extension_module_executed(object sender, ExecutedRoutedEventArgs e)
         {
-            try
-            {
-                int selectedIndex = __lsb_extension_modules.SelectedIndex;
-                (DataContext as TaskUserParametersDataModel).SwapExtensionModuleDataModel(selectedIndex, selectedIndex - 1);
-                __lsb_extension_modules.SelectedIndex = selectedIndex - 1;
-                __lsb_extension_modules.ScrollIntoView(__lsb_extension_modules.SelectedItem);
-
-            }
-            catch (TaskUserParametersExcepetion exp)
-            {
-                string message;
-                if (exp.ErrorCode == TASK_USER_PARAMETERS_ERROR_T.FILE_DATA_EXCEPTION)
-                    message = string.Format("At least one unexpected error occurred while moving up ExtensionModule . \n{0}", exp.DataException.ToString());
-                else
-                    message = string.Format("At least one unexpected error occurred while moving up ExtensionModule . \n{0}", exp.ErrorCode.ToString());
-
-                MessageBox.Show(message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
+            int selectedIndex = __lsb_extension_modules.SelectedIndex;
+            (DataContext as TaskUserParametersDataModel).SwapExtensionModuleDataModel(selectedIndex, selectedIndex - 1);
+            __lsb_extension_modules.SelectedIndex = selectedIndex - 1;
+            __lsb_extension_modules.ScrollIntoView(__lsb_extension_modules.SelectedItem);
         }
 
         private void __move_up_extension_module_can_executed(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = DataContext != null && __lsb_extension_modules.SelectedIndex >= 1;
+            e.CanExecute = DataContext != null && __lsb_extension_modules.SelectedItem != null && __lsb_extension_modules.SelectedIndex >= 1;
         }
 
         private void __move_down_extension_module_executed(object sender, ExecutedRoutedEventArgs e)
         {
-            try
-            {
-                int selectedIndex = __lsb_extension_modules.SelectedIndex;
-                (DataContext as TaskUserParametersDataModel).SwapExtensionModuleDataModel(selectedIndex, selectedIndex + 1);
-                __lsb_extension_modules.SelectedIndex = selectedIndex + 1;
-                __lsb_extension_modules.ScrollIntoView(__lsb_extension_modules.SelectedItem);
-            }
-            catch (TaskUserParametersExcepetion exp)
-            {
-                string message;
-                if (exp.ErrorCode == TASK_USER_PARAMETERS_ERROR_T.FILE_DATA_EXCEPTION)
-                    message = string.Format("At least one unexpected error occurred while moving down ExtensionModule . \n{0}", exp.DataException.ToString());
-                else
-                    message = string.Format("At least one unexpected error occurred while moving down ExtensionModule . \n{0}", exp.ErrorCode.ToString());
-
-                MessageBox.Show(message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
+            int selectedIndex = __lsb_extension_modules.SelectedIndex;
+            (DataContext as TaskUserParametersDataModel).SwapExtensionModuleDataModel(selectedIndex, selectedIndex + 1);
+            __lsb_extension_modules.SelectedIndex = selectedIndex + 1;
+            __lsb_extension_modules.ScrollIntoView(__lsb_extension_modules.SelectedItem);
         }
 
         private void __move_down_extension_module_can_executed(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = DataContext != null && __lsb_extension_modules.SelectedIndex + 1 < __lsb_extension_modules.Items.Count;
+            e.CanExecute = DataContext != null && __lsb_extension_modules.SelectedItem != null && __lsb_extension_modules.SelectedIndex + 1 < __lsb_extension_modules.Items.Count;
         }
 
         private void __add_ethernet_module_executed(object sender, ExecutedRoutedEventArgs e)
         {
-            try
-            {
-                (DataContext as TaskUserParametersDataModel).AddEthernetModuleDataModel();
-                __lsb_ethernet_modules.SelectedIndex = __lsb_ethernet_modules.Items.Count - 1;
-                __lsb_ethernet_modules.ScrollIntoView(__lsb_ethernet_modules.SelectedItem);
-
-            }
-            catch (TaskUserParametersExcepetion exp)
-            {
-                string message;
-                if (exp.ErrorCode == TASK_USER_PARAMETERS_ERROR_T.FILE_DATA_EXCEPTION)
-                    message = string.Format("At least one unexpected error occurred while adding EthernetModule . \n{0}", exp.DataException.ToString());
-                else
-                    message = string.Format("At least one unexpected error occurred while adding EthernetModule . \n{0}", exp.ErrorCode.ToString());
-
-                MessageBox.Show(message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
+            (DataContext as TaskUserParametersDataModel).AddEthernetModuleDataModel();
+            __lsb_ethernet_modules.SelectedIndex = __lsb_ethernet_modules.Items.Count - 1;
+            __lsb_ethernet_modules.ScrollIntoView(__lsb_ethernet_modules.SelectedItem);
         }
 
         private void __add_ethernet_module_can_executed(object sender, CanExecuteRoutedEventArgs e)
@@ -346,23 +264,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Eresia
 
         private void __insert_ethernet_module_executed(object sender, ExecutedRoutedEventArgs e)
         {
-            try
-            {
-                (DataContext as TaskUserParametersDataModel).InsertEthernetModuleDataModel(__lsb_ethernet_modules.SelectedIndex);
-                __lsb_ethernet_modules.SelectedIndex = __lsb_ethernet_modules.SelectedIndex - 1;
-                __lsb_ethernet_modules.ScrollIntoView(__lsb_ethernet_modules.SelectedItem);
-
-            }
-            catch (TaskUserParametersExcepetion exp)
-            {
-                string message;
-                if (exp.ErrorCode == TASK_USER_PARAMETERS_ERROR_T.FILE_DATA_EXCEPTION)
-                    message = string.Format("At least one unexpected error occurred while inserting EthernetModule . \n{0}", exp.DataException.ToString());
-                else
-                    message = string.Format("At least one unexpected error occurred while inserting EthernetModule . \n{0}", exp.ErrorCode.ToString());
-
-                MessageBox.Show(message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
+            (DataContext as TaskUserParametersDataModel).InsertEthernetModuleDataModel(__lsb_ethernet_modules.SelectedIndex);
+            __lsb_ethernet_modules.SelectedIndex = __lsb_ethernet_modules.SelectedIndex - 1;
+            __lsb_ethernet_modules.ScrollIntoView(__lsb_ethernet_modules.SelectedItem);
         }
 
         private void __insert_ethernet_module_can_executed(object sender, CanExecuteRoutedEventArgs e)
@@ -372,22 +276,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Eresia
 
         private void __remove_ethernet_module_executed(object sender, ExecutedRoutedEventArgs e)
         {
-            try
-            {
-                if (MessageBox.Show("Are you sure ?", "Question", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
-                    (DataContext as TaskUserParametersDataModel).RemoveEthernetModuleDataModel(__lsb_ethernet_modules.SelectedIndex);
-
-            }
-            catch (TaskUserParametersExcepetion exp)
-            {
-                string message;
-                if (exp.ErrorCode == TASK_USER_PARAMETERS_ERROR_T.FILE_DATA_EXCEPTION)
-                    message = string.Format("At least one unexpected error occurred while removing EthernetModule . \n{0}", exp.DataException.ToString());
-                else
-                    message = string.Format("At least one unexpected error occurred while removing EthernetModule . \n{0}", exp.ErrorCode.ToString());
-
-                MessageBox.Show(message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
+            if (MessageBox.Show("Are you sure ?", "Question", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+                (DataContext as TaskUserParametersDataModel).RemoveEthernetModuleDataModel(__lsb_ethernet_modules.SelectedIndex);
         }
 
         private void __remove_ethernet_module_can_executed(object sender, CanExecuteRoutedEventArgs e)
@@ -397,55 +287,28 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Eresia
 
         private void __move_up_ethernet_module_executed(object sender, ExecutedRoutedEventArgs e)
         {
-            try
-            {
-                int selectedIndex = __lsb_ethernet_modules.SelectedIndex;
-                (DataContext as TaskUserParametersDataModel).SwapEthernetModuleDataModel(selectedIndex, selectedIndex - 1);
-                __lsb_ethernet_modules.SelectedIndex = selectedIndex - 1;
-                __lsb_ethernet_modules.ScrollIntoView(__lsb_ethernet_modules.SelectedItem);
-
-            }
-            catch (TaskUserParametersExcepetion exp)
-            {
-                string message;
-                if (exp.ErrorCode == TASK_USER_PARAMETERS_ERROR_T.FILE_DATA_EXCEPTION)
-                    message = string.Format("At least one unexpected error occurred while moving up EthernetModule . \n{0}", exp.DataException.ToString());
-                else
-                    message = string.Format("At least one unexpected error occurred while moving up EthernetModule . \n{0}", exp.ErrorCode.ToString());
-
-                MessageBox.Show(message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
+            int selectedIndex = __lsb_ethernet_modules.SelectedIndex;
+            (DataContext as TaskUserParametersDataModel).SwapEthernetModuleDataModel(selectedIndex, selectedIndex - 1);
+            __lsb_ethernet_modules.SelectedIndex = selectedIndex - 1;
+            __lsb_ethernet_modules.ScrollIntoView(__lsb_ethernet_modules.SelectedItem);
         }
 
         private void __move_up_ethernet_module_can_executed(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = DataContext != null && __lsb_ethernet_modules.SelectedIndex >= 1;
+            e.CanExecute = DataContext != null && __lsb_ethernet_modules.SelectedItem != null && __lsb_ethernet_modules.SelectedIndex >= 1;
         }
 
         private void __move_down_ethernet_module_executed(object sender, ExecutedRoutedEventArgs e)
         {
-            try
-            {
-                int selectedIndex = __lsb_ethernet_modules.SelectedIndex;
-                (DataContext as TaskUserParametersDataModel).SwapEthernetModuleDataModel(selectedIndex, selectedIndex + 1);
-                __lsb_ethernet_modules.SelectedIndex = selectedIndex + 1;
-                __lsb_ethernet_modules.ScrollIntoView(__lsb_ethernet_modules.SelectedItem);
-            }
-            catch (TaskUserParametersExcepetion exp)
-            {
-                string message;
-                if (exp.ErrorCode == TASK_USER_PARAMETERS_ERROR_T.FILE_DATA_EXCEPTION)
-                    message = string.Format("At least one unexpected error occurred while moving down EthernetModule . \n{0}", exp.DataException.ToString());
-                else
-                    message = string.Format("At least one unexpected error occurred while moving down EthernetModule . \n{0}", exp.ErrorCode.ToString());
-
-                MessageBox.Show(message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
+            int selectedIndex = __lsb_ethernet_modules.SelectedIndex;
+            (DataContext as TaskUserParametersDataModel).SwapEthernetModuleDataModel(selectedIndex, selectedIndex + 1);
+            __lsb_ethernet_modules.SelectedIndex = selectedIndex + 1;
+            __lsb_ethernet_modules.ScrollIntoView(__lsb_ethernet_modules.SelectedItem);    
         }
 
         private void __move_down_ethernet_module_can_executed(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = DataContext != null && __lsb_ethernet_modules.SelectedIndex + 1 < __lsb_ethernet_modules.Items.Count;
+            e.CanExecute = DataContext != null && __lsb_ethernet_modules.SelectedItem != null && __lsb_ethernet_modules.SelectedIndex + 1 < __lsb_ethernet_modules.Items.Count;
         }
 
         private void __on_main_window_closing(object sender, System.ComponentModel.CancelEventArgs e)
