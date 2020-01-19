@@ -397,44 +397,44 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Eresia
 
             InputGestureCollection gestureAddExtensionModule = new InputGestureCollection
             {
-                new KeyGesture(Key.A, ModifierKeys.Control, "Ctrl+P")
+                new KeyGesture(Key.P, ModifierKeys.Control, "Ctrl+P")
             };
             InputGestureCollection gestureInsertExtensionModule = new InputGestureCollection
             {
-                new KeyGesture(Key.A, ModifierKeys.Control, "Ctrl+I")
+                new KeyGesture(Key.I, ModifierKeys.Control, "Ctrl+I")
             };
             InputGestureCollection gestureRemoveExtensionModule = new InputGestureCollection
             {
-                new KeyGesture(Key.A, ModifierKeys.Control, "Ctrl+R")
+                new KeyGesture(Key.R, ModifierKeys.Control, "Ctrl+R")
             };
             InputGestureCollection gestureMoveUpExtensionModule = new InputGestureCollection
             {
-                new KeyGesture(Key.A, ModifierKeys.Control, "Ctrl+U")
+                new KeyGesture(Key.U, ModifierKeys.Control, "Ctrl+U")
             };
             InputGestureCollection gestureMoveDownExtensionModule = new InputGestureCollection
             {
-                new KeyGesture(Key.A, ModifierKeys.Control, "Ctrl+D")
+                new KeyGesture(Key.D, ModifierKeys.Control, "Ctrl+D")
             };
 
             InputGestureCollection gestureAddEthernetModule = new InputGestureCollection
             {
-                new KeyGesture(Key.A, ModifierKeys.Control|ModifierKeys.Shift, "Ctrl+Shift+P")
+                new KeyGesture(Key.P, ModifierKeys.Control|ModifierKeys.Shift, "Ctrl+Shift+P")
             };
             InputGestureCollection gestureInsertEthernetModule = new InputGestureCollection
             {
-                new KeyGesture(Key.A, ModifierKeys.Control|ModifierKeys.Shift, "Ctrl+Shift+I")
+                new KeyGesture(Key.I, ModifierKeys.Control|ModifierKeys.Shift, "Ctrl+Shift+I")
             };
             InputGestureCollection gestureRemoveEthernetModule = new InputGestureCollection
             {
-                new KeyGesture(Key.A, ModifierKeys.Control|ModifierKeys.Shift, "Ctrl+Shift+R")
+                new KeyGesture(Key.R, ModifierKeys.Control|ModifierKeys.Shift, "Ctrl+Shift+R")
             };
             InputGestureCollection gestureMoveUpEthernetModule = new InputGestureCollection
             {
-                new KeyGesture(Key.A, ModifierKeys.Control|ModifierKeys.Shift, "Ctrl+Shift+U")
+                new KeyGesture(Key.U, ModifierKeys.Control|ModifierKeys.Shift, "Ctrl+Shift+U")
             };
             InputGestureCollection gestureMoveDownEthernetModule = new InputGestureCollection
             {
-                new KeyGesture(Key.A, ModifierKeys.Control|ModifierKeys.Shift, "Ctrl+Shift+D")
+                new KeyGesture(Key.D, ModifierKeys.Control|ModifierKeys.Shift, "Ctrl+Shift+D")
             };
 
 

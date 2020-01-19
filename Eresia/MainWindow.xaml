@@ -13,6 +13,16 @@
         <CommandBinding Command="local:ConsoleControl.SaveTaskUserParametersFileAs" Executed="__save_task_user_configuration_parameters_file_as_executed" CanExecute="__save_task_user_configuration_parameters_file_as_can_executed"/>
         <CommandBinding Command="local:ConsoleControl.SaveTaskUserParametersFile" Executed="__save_task_user_configuration_parameters_file_executed" CanExecute="__save_task_user_configuration_parameters_file_can_executed"/>
         <CommandBinding Command="local:ConsoleControl.OpenAboutDialog" Executed="__open_about_dialog_executed"/>
+        <CommandBinding Command="local:ConsoleControl.AddExtensionModule" Executed="__add_extension_module_executed" CanExecute="__add_extension_module_can_executed"/>
+        <CommandBinding Command="local:ConsoleControl.InsertExtensionModule" Executed="__insert_extension_module_executed" CanExecute="__insert_extension_module_can_executed"/>
+        <CommandBinding Command="local:ConsoleControl.RemoveExtensionModule" Executed="__remove_extension_module_executed" CanExecute="__remove_extension_module_can_executed"/>
+        <CommandBinding Command="local:ConsoleControl.MoveUpExtensionModule" Executed="__move_up_extension_module_executed" CanExecute="__move_up_extension_module_can_executed"/>
+        <CommandBinding Command="local:ConsoleControl.MoveDownExtensionModule" Executed="__move_down_extension_module_executed" CanExecute="__move_down_extension_module_can_executed"/>
+        <CommandBinding Command="local:ConsoleControl.AddEthernetModule" Executed="__add_ethernet_module_executed" CanExecute="__add_ethernet_module_can_executed"/>
+        <CommandBinding Command="local:ConsoleControl.InsertEthernetModule" Executed="__insert_ethernet_module_executed" CanExecute="__insert_ethernet_module_can_executed"/>
+        <CommandBinding Command="local:ConsoleControl.RemoveEthernetModule" Executed="__remove_ethernet_module_executed" CanExecute="__remove_ethernet_module_can_executed"/>
+        <CommandBinding Command="local:ConsoleControl.MoveUpEthernetModule" Executed="__move_up_ethernet_module_executed" CanExecute="__move_up_ethernet_module_can_executed"/>
+        <CommandBinding Command="local:ConsoleControl.MoveDownEthernetModule" Executed="__move_down_ethernet_module_executed" CanExecute="__move_down_ethernet_module_can_executed"/>
     </Window.CommandBindings>
     <Grid>
         <Grid.Resources>
@@ -85,13 +95,6 @@
                 </StackPanel>
             </GroupBox>
             <GroupBox Grid.Row="1" Margin="4" Padding="4">
-                <GroupBox.CommandBindings>
-                    <CommandBinding Command="local:ConsoleControl.AddExtensionModule" Executed="__add_extension_module_executed" CanExecute="__add_extension_module_can_executed"/>
-                    <CommandBinding Command="local:ConsoleControl.InsertExtensionModule" Executed="__insert_extension_module_executed" CanExecute="__insert_extension_module_can_executed"/>
-                    <CommandBinding Command="local:ConsoleControl.RemoveExtensionModule" Executed="__remove_extension_module_executed" CanExecute="__remove_extension_module_can_executed"/>
-                    <CommandBinding Command="local:ConsoleControl.MoveUpExtensionModule" Executed="__move_up_extension_module_executed" CanExecute="__move_up_extension_module_can_executed"/>
-                    <CommandBinding Command="local:ConsoleControl.MoveDownExtensionModule" Executed="__move_down_extension_module_executed" CanExecute="__move_down_extension_module_can_executed"/>
-                </GroupBox.CommandBindings>
                 <GroupBox.Header>
                     <StackPanel Orientation="Horizontal">
                         <Image Source="img/binary_code.png" Height="30" Margin="0,0,8,0"/>
@@ -236,13 +239,6 @@
                 </DockPanel>
             </GroupBox>
             <GroupBox Grid.Row="1" Grid.Column="2" Margin="4" Padding="4">
-                <GroupBox.CommandBindings>
-                    <CommandBinding Command="local:ConsoleControl.AddEthernetModule" Executed="__add_ethernet_module_executed" CanExecute="__add_ethernet_module_can_executed"/>
-                    <CommandBinding Command="local:ConsoleControl.InsertEthernetModule" Executed="__insert_ethernet_module_executed" CanExecute="__insert_ethernet_module_can_executed"/>
-                    <CommandBinding Command="local:ConsoleControl.RemoveEthernetModule" Executed="__remove_ethernet_module_executed" CanExecute="__remove_ethernet_module_can_executed"/>
-                    <CommandBinding Command="local:ConsoleControl.MoveUpEthernetModule" Executed="__move_up_ethernet_module_executed" CanExecute="__move_up_ethernet_module_can_executed"/>
-                    <CommandBinding Command="local:ConsoleControl.MoveDownEthernetModule" Executed="__move_down_ethernet_module_executed" CanExecute="__move_down_ethernet_module_can_executed"/>
-                </GroupBox.CommandBindings>
                 <GroupBox.Header>
                     <StackPanel Orientation="Horizontal">
                         <Image Source="img/cloud_computing.png" Height="30" Margin="0,0,8,0"/>
