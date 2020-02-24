@@ -73,10 +73,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Eresia
                 string message;
                 try
                 {
+                    __task_user_configuration_parameters_helper.SetDefault();
                     __task_user_configuration_parameters_helper.Load(open.FileName);
-
-                    DataContext = new TaskUserParametersDataModel(__task_user_configuration_parameters_helper);
-                    (DataContext as TaskUserParametersDataModel).UpdateDataModel();
+                    
                 }
                 catch (TaskUserParametersExcepetion exp)
                 {
@@ -92,6 +91,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Eresia
                     __task_user_parameters_file_name = open.FileName;
                     Title = $"{__main_window_title} --- {__task_user_parameters_file_name}";
                 }
+
+                DataContext = new TaskUserParametersDataModel(__task_user_configuration_parameters_helper);
+                (DataContext as TaskUserParametersDataModel).UpdateDataModel();
             }
         }
 
