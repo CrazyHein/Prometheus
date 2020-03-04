@@ -34,6 +34,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
         private string __variable_catalogue_exception = null;
         private string __io_list_file_name;
         private string __main_window_title;
+        private byte[] __io_list_file_md5_hash = null;
 
         public MainWindow()
         {
@@ -116,10 +117,12 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                 try
                 {
                     __io_list_data_helper.SetDefault();
-                    byte[] code = __io_list_data_helper.Load(open.FileName);    
+                    __io_list_file_md5_hash = __io_list_data_helper.Load(open.FileName);    
                 }
                 catch (IOListParseExcepetion exp)
                 {
+                    __io_list_file_md5_hash = null;
+
                     if (exp.ErrorCode == IO_LIST_FILE_ERROR_T.FILE_DATA_EXCEPTION)
                         message = string.Format("At least one unexpected error occurred while reading [IO List] file . \n{0}", exp.DataException.ToString());
                     else
@@ -224,6 +227,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
             string message;
             try
             {
+                __io_list_file_md5_hash = 
                 __io_list_data_helper.Save(controllerInfo.ExtensionModules.Select(dataModel => dataModel.ReferenceName),
                     controllerInfo.EthernetModules.Select(dataModel => dataModel.ReferenceName),
                     objectsInfo.Objects.Select(dataModel => dataModel.Index),
@@ -236,6 +240,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
             }
             catch (IOListParseExcepetion exp)
             {
+                __io_list_file_md5_hash = null;
+
                 if (exp.ErrorCode == IO_LIST_FILE_ERROR_T.FILE_DATA_EXCEPTION)
                     message = string.Format("At least one unexpected error occurred while reading [IO List] file . \n{0}", exp.DataException.ToString());
                 else
@@ -293,7 +299,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
 
                 string message;
                 try
-                {  
+                {
+                    __io_list_file_md5_hash = 
                     __io_list_data_helper.Save(controllerInfo.ExtensionModules.Select(dataModel => dataModel.ReferenceName),
                         controllerInfo.EthernetModules.Select(dataModel => dataModel.ReferenceName),
                         objectsInfo.Objects.Select(dataModel => dataModel.Index), 
@@ -307,6 +314,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                 }
                 catch (IOListParseExcepetion exp)
                 {
+                    __io_list_file_md5_hash = null;
+
                     if (exp.ErrorCode == IO_LIST_FILE_ERROR_T.FILE_DATA_EXCEPTION)
                         message = string.Format("At least one unexpected error occurred while reading [IO List] file . \n{0}", exp.DataException.ToString());
                     else
@@ -351,6 +360,20 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
         {
             e.CanExecute = __tab_target_inforamtion.Content != null && __io_list_file_name != null;
         }
+
+        private void __show_io_list_hash_code_can_executed(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = !__io_list_file_dirty() && __io_list_file_md5_hash != null ; 
+        }
+
+        private void __show_io_list_hash_code_executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            MessageBox.Show($"MD5 : {__io_list_file_md5_hash[0]:X2}{__io_list_file_md5_hash[1]:X2} - {__io_list_file_md5_hash[2]:X2}{__io_list_file_md5_hash[3]:X2} - " +
+                $"{__io_list_file_md5_hash[4]:X2}{__io_list_file_md5_hash[5]:X2} - {__io_list_file_md5_hash[6]:X2}{__io_list_file_md5_hash[7]:X2} - " +
+                $"{__io_list_file_md5_hash[8]:X2}{__io_list_file_md5_hash[9]:X2} - {__io_list_file_md5_hash[10]:X2}{__io_list_file_md5_hash[11]:X2} - " +
+                $"{__io_list_file_md5_hash[12]:X2}{__io_list_file_md5_hash[13]:X2} - {__io_list_file_md5_hash[14]:X2}{__io_list_file_md5_hash[15]:X2}",
+                "Information", MessageBoxButton.OK, MessageBoxImage.Information);
+        }
     }
 
     internal class IsDirtyDocumentConverter : IValueConverter
@@ -380,6 +403,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
 
         public static RoutedUICommand SaveIOListFileAs { get; private set; }
 
+        public static RoutedUICommand ShowIOListFileHashCode { get; private set; }
+
         static ConsoleControl()
         {
             InputGestureCollection gestureOpenIOListFile = new InputGestureCollection
@@ -406,12 +431,17 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
             {
                 new KeyGesture(Key.C, ModifierKeys.Control, "Ctrl+C")
             };
+            InputGestureCollection gestureShowIOListFileHashCode = new InputGestureCollection
+            {
+                new KeyGesture(Key.H, ModifierKeys.Control, "Ctrl+H")
+            };
             OpenIOListFile = new RoutedUICommand("Open", "OpenIOListFile", typeof(ConsoleControl), gestureOpenIOListFile);
             NewIOListFile = new RoutedUICommand("New", "NewIOListFile", typeof(ConsoleControl), gestureNewIOListFile);
             SaveIOListFileAs = new RoutedUICommand("Save As", "SaveIOListFileAs", typeof(ConsoleControl), gestureSaveIOListFileAs);
             SaveIOListFile = new RoutedUICommand("Save", "SaveIOListFile", typeof(ConsoleControl), gestureSaveIOListFile);
             OpenAboutDialog = new RoutedUICommand("About", "OpenAboutDialog", typeof(ConsoleControl), gestureOpenAboutDialog);
             OpenCatalogueDialog = new RoutedUICommand("Catalogue", "OpenCatalogueDialog", typeof(ConsoleControl), gestureOpenCatalogueDialog);
+            ShowIOListFileHashCode = new RoutedUICommand("Hash", "ShowIOListFileHashCode", typeof(ConsoleControl), gestureShowIOListFileHashCode);
         }
 
     }

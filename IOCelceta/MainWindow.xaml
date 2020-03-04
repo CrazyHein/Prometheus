@@ -13,6 +13,7 @@
         <CommandBinding Command="local:ConsoleControl.SaveIOListFile" Executed="__save_io_list_file_executed" CanExecute="__save_io_list_file_can_executed"/>
         <CommandBinding Command="local:ConsoleControl.OpenAboutDialog" Executed="__open_about_dialog_executed"/>
         <CommandBinding Command="local:ConsoleControl.OpenCatalogueDialog" Executed="__open_catalogue_dialog_executed"/>
+        <CommandBinding Command="local:ConsoleControl.ShowIOListFileHashCode" Executed="__show_io_list_hash_code_executed" CanExecute="__show_io_list_hash_code_can_executed"/>
     </Window.CommandBindings>
     <Grid>
         <Grid.RowDefinitions>
@@ -48,6 +49,11 @@
                 <MenuItem Command="local:ConsoleControl.OpenCatalogueDialog">
                     <MenuItem.Icon>
                         <Image Source="img/catalogue.png"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Command="local:ConsoleControl.ShowIOListFileHashCode">
+                    <MenuItem.Icon>
+                        <Image Source="img/hash0.png"/>
                     </MenuItem.Icon>
                 </MenuItem>
                 <MenuItem Command="local:ConsoleControl.OpenAboutDialog">
