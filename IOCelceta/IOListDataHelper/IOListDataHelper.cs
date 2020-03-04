@@ -6,6 +6,8 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Xml;
+using System.Security.Cryptography;
+using System.IO;
 
 namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
 {
@@ -91,6 +93,12 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
     {
         OPERAND                 = 0x01,
         EXPRESSION              = 0x02
+    }
+
+    public enum IO_LIST_HASH_CODE : byte
+    {
+        MD5,
+        SH256,
     }
 
     public class IOListParseExcepetion : Exception
@@ -1205,7 +1213,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
             __object_data_area_verification(area, objectData);
         }
 
-        public void Load(string ioList)
+        public byte[] Load(string ioList, IO_LIST_HASH_CODE code = IO_LIST_HASH_CODE.MD5)
         {
             XmlDocument xmlDoc = new XmlDocument();
 
@@ -1269,6 +1277,17 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
 
                 infoNode = xmlDoc.SelectSingleNode("/AMECIOList/Interlocks");
                 __load_interlock_logics(infoNode);
+
+                if (code == IO_LIST_HASH_CODE.MD5)
+                {
+                    using (MD5 hash = MD5.Create())
+                    using (FileStream stream = File.Open(ioList, FileMode.Open))
+                    {
+                        return hash.ComputeHash(stream);
+                    }
+                }
+                else
+                    return new byte[0];
             }
             catch (IOListParseExcepetion e)
             {
@@ -1904,7 +1923,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
         }
 
 
-        public void Save(IEnumerable<string> extensionModules, IEnumerable<string> ethernetModules, IEnumerable<uint> objects, string fileName)
+        public byte[] Save(IEnumerable<string> extensionModules, IEnumerable<string> ethernetModules, IEnumerable<uint> objects, string fileName, IO_LIST_HASH_CODE code = IO_LIST_HASH_CODE.MD5)
         {
             bool overlap = __overlap_detector(new Tuple<uint, uint>[] {
                     new Tuple<uint, uint>(__controller_pdo_collection.tx_pdo_diagnostic_area.offset_in_word, __controller_pdo_collection.tx_pdo_diagnostic_area.size_in_word),
@@ -1946,6 +1965,17 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
 
                 xmlDoc.AppendChild(root);
                 xmlDoc.Save(fileName);
+
+                if (code == IO_LIST_HASH_CODE.MD5)
+                {
+                    using (MD5 hash = MD5.Create())
+                    using (FileStream stream = File.Open(fileName, FileMode.Open))
+                    {
+                        return hash.ComputeHash(stream);
+                    }
+                }
+                else
+                    return new byte[0];
             }
             catch (IOListParseExcepetion e)
             {
