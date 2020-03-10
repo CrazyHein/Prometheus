@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Security.Cryptography;
+using System.IO;
 
 namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
 {
@@ -18,6 +20,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
         public static string AssemblyVersion { get; private set; }
         public static string ProductVersion { get; private set; }
 
+        public static byte[] VariableCatalogueMD5 { get; private set; }
+        public static byte[] DataTypeCatalogueMD5 { get; private set; }
+        public static byte[] ControllerModelCatalogueMD5 { get; private set; }
+
         static Metadata()
         {
             Title = "IO Celceta";
@@ -28,6 +34,22 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
 
             AssemblyVersion = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
             ProductVersion = Application.ProductVersion.ToString();
+
+            using (MD5 hash = MD5.Create())
+            {
+                using (FileStream stream = File.Open(DataTypeCatalogue, FileMode.Open))
+                {
+                    DataTypeCatalogueMD5 = hash.ComputeHash(stream);
+                }
+                using (FileStream stream = File.Open(ControllerModelCatalogue, FileMode.Open))
+                {
+                    ControllerModelCatalogueMD5 = hash.ComputeHash(stream);
+                }
+                using (FileStream stream = File.Open(VariableCatalogue, FileMode.Open))
+                {
+                    VariableCatalogueMD5 = hash.ComputeHash(stream);
+                }
+            }
         }
 
         public Metadata(IOListDataHelper dataHelp)

@@ -28,6 +28,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Eresia
         private string __controller_model_catalogue_exception = null;
         private string __task_user_parameters_file_name;
         private string __main_window_title;
+        private byte[] __task_user_parameters_file_md5_hash = null;
 
         public MainWindow()
         {
@@ -74,11 +75,12 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Eresia
                 try
                 {
                     __task_user_configuration_parameters_helper.SetDefault();
-                    __task_user_configuration_parameters_helper.Load(open.FileName);
-                    
+                    __task_user_parameters_file_md5_hash = __task_user_configuration_parameters_helper.Load(open.FileName);        
                 }
                 catch (TaskUserParametersExcepetion exp)
                 {
+                    __task_user_parameters_file_md5_hash = null;
+
                     if (exp.ErrorCode == TASK_USER_PARAMETERS_ERROR_T.FILE_DATA_EXCEPTION)
                         message = string.Format("At least one unexpected error occurred while reading [Task User Configuration Parameters] file . \n{0}", exp.DataException.ToString());
                     else
@@ -124,11 +126,13 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Eresia
             try
             {
                 (DataContext as TaskUserParametersDataModel).UpdateDataHelper();
+                __task_user_parameters_file_md5_hash = 
                 __task_user_configuration_parameters_helper.Save(__task_user_parameters_file_name);
                 (DataContext as TaskUserParametersDataModel).Dirty = false;
             }
             catch (TaskUserParametersExcepetion exp)
             {
+                __task_user_parameters_file_md5_hash = null;
                 if (exp.ErrorCode == TASK_USER_PARAMETERS_ERROR_T.FILE_DATA_EXCEPTION)
                     message = string.Format("At least one unexpected error occurred while saving [Task User Configuration Parameters] file . \n{0}", exp.DataException.ToString());
                 else
@@ -157,6 +161,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Eresia
                 try
                 {
                     (DataContext as TaskUserParametersDataModel).UpdateDataHelper();
+                    __task_user_parameters_file_md5_hash = 
                     __task_user_configuration_parameters_helper.Save(save.FileName);
                     (DataContext as TaskUserParametersDataModel).Dirty = false;
                     __task_user_parameters_file_name = save.FileName;
@@ -164,6 +169,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Eresia
                 }
                 catch (TaskUserParametersExcepetion exp)
                 {
+                    __task_user_parameters_file_md5_hash = null;
                     if (exp.ErrorCode == TASK_USER_PARAMETERS_ERROR_T.FILE_DATA_EXCEPTION)
                         message = string.Format("At least one unexpected error occurred while saving [Task User Configuration Parameters] file . \n{0}", exp.DataException.ToString());
                     else
@@ -174,6 +180,15 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Eresia
             }
         }
 
+        private void __show_task_user_configuration_parameters_file_hash_code_executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            MessageBox.Show($"MD5 : {__task_user_parameters_file_md5_hash[0]:X2}{__task_user_parameters_file_md5_hash[1]:X2} - {__task_user_parameters_file_md5_hash[2]:X2}{__task_user_parameters_file_md5_hash[3]:X2} - " +
+                $"{__task_user_parameters_file_md5_hash[4]:X2}{__task_user_parameters_file_md5_hash[5]:X2} - {__task_user_parameters_file_md5_hash[6]:X2}{__task_user_parameters_file_md5_hash[7]:X2} - " +
+                $"{__task_user_parameters_file_md5_hash[8]:X2}{__task_user_parameters_file_md5_hash[9]:X2} - {__task_user_parameters_file_md5_hash[10]:X2}{__task_user_parameters_file_md5_hash[11]:X2} - " +
+                $"{__task_user_parameters_file_md5_hash[12]:X2}{__task_user_parameters_file_md5_hash[13]:X2} - {__task_user_parameters_file_md5_hash[14]:X2}{__task_user_parameters_file_md5_hash[15]:X2}",
+                "Information", MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+
         private void __save_task_user_configuration_parameters_file_as_can_executed(object sender, CanExecuteRoutedEventArgs e)
         {
             e.CanExecute = DataContext != null;
@@ -182,6 +197,11 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Eresia
         private void __save_task_user_configuration_parameters_file_can_executed(object sender, CanExecuteRoutedEventArgs e)
         {
             e.CanExecute = __task_user_parameters_file_name != null && DataContext != null;
+        }
+
+        private void __show_task_user_configuration_parameters_file_hash_code_can_executed(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = !__task_user_configuration_parameters_file_dirty() && __task_user_parameters_file_md5_hash != null;
         }
 
         private void __open_about_dialog_executed(object sender, ExecutedRoutedEventArgs e)
@@ -362,6 +382,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Eresia
 
         public static RoutedUICommand SaveTaskUserParametersFileAs { get; private set; }
 
+        public static RoutedUICommand ShowTaskUserParametersFileHashCode { get; private set; }
+
         public static RoutedUICommand AddExtensionModule { get; private set; }
         public static RoutedUICommand InsertExtensionModule { get; private set; }
         public static RoutedUICommand RemoveExtensionModule { get; private set; }
@@ -391,6 +413,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Eresia
             InputGestureCollection gestureSaveTaskUserParametersFileAs = new InputGestureCollection
             {
                 new KeyGesture(Key.S, ModifierKeys.Control|ModifierKeys.Shift, "Ctrl+Shift+S")
+            };
+            InputGestureCollection gestureShowTaskUserParametersFileHashCode = new InputGestureCollection
+            {
+                new KeyGesture(Key.H, ModifierKeys.Control, "Ctrl+H")
             };
             InputGestureCollection gestureOpenAboutDialog = new InputGestureCollection
             {
@@ -444,6 +470,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Eresia
             NewTaskUserParametersFile = new RoutedUICommand("New", "NewTaskUserParametersFile", typeof(ConsoleControl), gestureNewTaskUserParametersFile);
             SaveTaskUserParametersFileAs = new RoutedUICommand("Save As", "SaveTaskUserParametersFileAs", typeof(ConsoleControl), gestureSaveTaskUserParametersFileAs);
             SaveTaskUserParametersFile = new RoutedUICommand("Save", "SaveTaskUserParametersFile", typeof(ConsoleControl), gestureSaveTaskUserParametersFile);
+            ShowTaskUserParametersFileHashCode = new RoutedUICommand("Hash", "ShowTaskUserParametersFileHashCode", typeof(ConsoleControl), gestureShowTaskUserParametersFileHashCode);
             OpenAboutDialog = new RoutedUICommand("About", "OpenAboutDialog", typeof(ConsoleControl), gestureOpenAboutDialog);
 
             AddExtensionModule = new RoutedUICommand("Add", "AddExtensionModule", typeof(ConsoleControl), gestureAddExtensionModule);

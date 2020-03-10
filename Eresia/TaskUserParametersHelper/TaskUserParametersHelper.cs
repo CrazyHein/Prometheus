@@ -5,6 +5,8 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Xml;
+using System.Security.Cryptography;
+using System.IO;
 using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.Catalogue;
 
 namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Eresia
@@ -72,7 +74,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Eresia
         }
 
 
-        public void Load(string taskUserParameters)
+        public byte[] Load(string taskUserParameters)
         {
             XmlDocument xmlDoc = new XmlDocument();
             SetDefault();
@@ -94,6 +96,14 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Eresia
                 {
                     __controller_extension_modules.Clear();
                     throw new TaskUserParametersExcepetion(TASK_USER_PARAMETERS_ERROR_T.EXTENSION_MODULE_ADDRESS_OVERLAPPED, null);
+                }
+
+                using (MD5 hash = MD5.Create())
+                {
+                    using (FileStream stream = File.Open(taskUserParameters, FileMode.Open))
+                    {
+                        return hash.ComputeHash(stream);
+                    }
                 }
             }
             catch (TaskUserParametersExcepetion e)
@@ -131,7 +141,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Eresia
         }
 
 
-        public void Save(string taskUserParameters)
+        public byte[] Save(string taskUserParameters)
         {
             XmlDocument xmlDoc = new XmlDocument();
             try
@@ -147,6 +157,14 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Eresia
                 xmlDoc.AppendChild(root);
 
                 xmlDoc.Save(taskUserParameters);
+
+                using (MD5 hash = MD5.Create())
+                {
+                    using (FileStream stream = File.Open(taskUserParameters, FileMode.Open))
+                    {
+                        return hash.ComputeHash(stream);
+                    }
+                }
             }
             catch (TaskUserParametersExcepetion e)
             {

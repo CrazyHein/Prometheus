@@ -12,6 +12,7 @@
         <CommandBinding Command="local:ConsoleControl.NewTaskUserParametersFile" Executed="__new_task_user_configuration_parameters_file_executed"/>
         <CommandBinding Command="local:ConsoleControl.SaveTaskUserParametersFileAs" Executed="__save_task_user_configuration_parameters_file_as_executed" CanExecute="__save_task_user_configuration_parameters_file_as_can_executed"/>
         <CommandBinding Command="local:ConsoleControl.SaveTaskUserParametersFile" Executed="__save_task_user_configuration_parameters_file_executed" CanExecute="__save_task_user_configuration_parameters_file_can_executed"/>
+        <CommandBinding Command="local:ConsoleControl.ShowTaskUserParametersFileHashCode" Executed="__show_task_user_configuration_parameters_file_hash_code_executed" CanExecute="__show_task_user_configuration_parameters_file_hash_code_can_executed"/>
         <CommandBinding Command="local:ConsoleControl.OpenAboutDialog" Executed="__open_about_dialog_executed"/>
         <CommandBinding Command="local:ConsoleControl.AddExtensionModule" Executed="__add_extension_module_executed" CanExecute="__add_extension_module_can_executed"/>
         <CommandBinding Command="local:ConsoleControl.InsertExtensionModule" Executed="__insert_extension_module_executed" CanExecute="__insert_extension_module_can_executed"/>
@@ -59,6 +60,11 @@
                 </MenuItem>
             </MenuItem>
             <MenuItem Header="_Tool" Margin="3">
+                <MenuItem Command="local:ConsoleControl.ShowTaskUserParametersFileHashCode">
+                    <MenuItem.Icon>
+                        <Image Source="img/hash.png"/>
+                    </MenuItem.Icon>
+                </MenuItem>
                 <MenuItem Command="local:ConsoleControl.OpenAboutDialog">
                     <MenuItem.Icon>
                         <Image Source="img/about.png"/>

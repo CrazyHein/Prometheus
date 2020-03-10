@@ -4,8 +4,12 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta"
+        xmlns:datacontrol="clr-namespace:AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDataControl"
         mc:Ignorable="d"
         Title="About" Height="320" Width="820" ResizeMode="CanResize">
+    <Window.Resources>
+        <datacontrol:MD5HashToText x:Key="MD5"/>
+    </Window.Resources>
     <DockPanel>
         <Border DockPanel.Dock="Left" BorderBrush="Black" BorderThickness="1" VerticalAlignment="Center" Margin="8" Padding="8">
             <Image Source="img/logo.png" Grid.RowSpan="2"   Height="128"/>
@@ -17,6 +21,9 @@
                     <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
                     <RowDefinition/>
                     <RowDefinition/>
                     <RowDefinition/>
@@ -38,20 +45,26 @@
                 <TextBlock Grid.Column="0" Text="Title : "/>
                 <TextBlock Grid.Column="0" Grid.Row="1" Text="Description : "/>
                 <TextBlock Grid.Column="0" Grid.Row="2" Text="DataType Catalogue : "/>
-                <TextBlock Grid.Column="0" Grid.Row="3" Text="Model Catalogue : "/>
-                <TextBlock Grid.Column="0" Grid.Row="4" Text="Variable Catalogue : "/>
-                <TextBlock Grid.Column="0" Grid.Row="5" Text="DataHelper Version : "/>
-                <TextBlock Grid.Column="0" Grid.Row="6" Text="Assembly Version : " />
-                <TextBlock Grid.Column="0" Grid.Row="7" Text="File Version : " />
+                <TextBlock Grid.Column="0" Grid.Row="3" Text="DataType Catalogue (MD5) : "/>
+                <TextBlock Grid.Column="0" Grid.Row="4" Text="Model Catalogue : "/>
+                <TextBlock Grid.Column="0" Grid.Row="5" Text="Model Catalogue (MD5) : "/>
+                <TextBlock Grid.Column="0" Grid.Row="6" Text="Variable Catalogue : "/>
+                <TextBlock Grid.Column="0" Grid.Row="7" Text="Variable Catalogue (MD5) : "/>
+                <TextBlock Grid.Column="0" Grid.Row="8" Text="DataHelper Version : "/>
+                <TextBlock Grid.Column="0" Grid.Row="9" Text="Assembly Version : " />
+                <TextBlock Grid.Column="0" Grid.Row="10" Text="File Version : " />
 
                 <TextBlock Grid.Column="1" Grid.Row="0" Text="{Binding Title}"/>
                 <TextBlock Grid.Column="1" Grid.Row="1" Text="{Binding Description}"/>
                 <TextBlock Grid.Column="1" Grid.Row="2" Text="{Binding DataTypeCatalogue}"/>
-                <TextBlock Grid.Column="1" Grid.Row="3" Text="{Binding ControllerModelCatalogue}"/>
-                <TextBlock Grid.Column="1" Grid.Row="4" Text="{Binding VariableCatalogue}"/>
-                <TextBlock Grid.Column="1" Grid.Row="5" Text="{Binding DataHelperSupportedFileFormatVersion}"/>
-                <TextBlock Grid.Column="1" Grid.Row="6" Text="{Binding AssemblyVersion}" />
-                <TextBlock Grid.Column="1" Grid.Row="7" Text="{Binding ProductVersion}"/>
+                <TextBlock Grid.Column="1" Grid.Row="3" Text="{Binding DataTypeCatalogueMD5, Converter={StaticResource MD5}}"/>
+                <TextBlock Grid.Column="1" Grid.Row="4" Text="{Binding ControllerModelCatalogue}"/>
+                <TextBlock Grid.Column="1" Grid.Row="5" Text="{Binding ControllerModelCatalogueMD5, Converter={StaticResource MD5}}"/>
+                <TextBlock Grid.Column="1" Grid.Row="6" Text="{Binding VariableCatalogue}"/>
+                <TextBlock Grid.Column="1" Grid.Row="7" Text="{Binding VariableCatalogueMD5, Converter={StaticResource MD5}}"/>
+                <TextBlock Grid.Column="1" Grid.Row="8" Text="{Binding DataHelperSupportedFileFormatVersion}"/>
+                <TextBlock Grid.Column="1" Grid.Row="9" Text="{Binding AssemblyVersion}" />
+                <TextBlock Grid.Column="1" Grid.Row="10" Text="{Binding ProductVersion}"/>
             </Grid>
         </ScrollViewer>
     </DockPanel>
