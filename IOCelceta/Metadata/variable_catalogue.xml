@@ -3572,29 +3572,29 @@
 	<!-- Movable Cathode -->
 	<Variable>
 		<ID>8000</ID>
-		<Name>ST1 MVC Current Position</Name>
+		<Name>ST1 MVC Motor Current Position</Name>
 		<DataType>INT</DataType>
 		<Unit>0.1mm</Unit>
-		<Comment>Station1 movable cathode current position</Comment>
+		<Comment>Station1 movable cathode motor current position</Comment>
 	</Variable>
 	<Variable>
 		<ID>8001</ID>
-		<Name>ST2 MVC Current Position</Name>
+		<Name>ST2 MVC Motor Current Position</Name>
 		<DataType>INT</DataType>
 		<Unit>0.1mm</Unit>
-		<Comment>Station2 movable cathode current position</Comment>
+		<Comment>Station2 movable cathode motor current position</Comment>
 	</Variable>
 
 	<Variable>
 		<ID>8002</ID>
-		<Name>ST1 MVC ACK</Name>
+		<Name>ST1 MVC Controller ACK</Name>
 		<DataType>UINT</DataType>
 		<Unit>N/A</Unit>
 		<Comment>Station1 movable cathode controller acknowledge code</Comment>
 	</Variable>
 	<Variable>
 		<ID>8003</ID>
-		<Name>ST2 MVC ACK</Name>
+		<Name>ST2 MVC Controller ACK</Name>
 		<DataType>UINT</DataType>
 		<Unit>N/A</Unit>
 		<Comment>Station2 movable cathode controller acknowledge code</Comment>
@@ -3617,14 +3617,14 @@
 
 	<Variable>
 		<ID>8006</ID>
-		<Name>ST1 MVC Error Code</Name>
+		<Name>ST1 MVC Controller Error Code</Name>
 		<DataType>UINT</DataType>
 		<Unit>N/A</Unit>
 		<Comment>Station1 movable cathode controller error code</Comment>
 	</Variable>
 	<Variable>
 		<ID>8007</ID>
-		<Name>ST2 MVC Error Code</Name>
+		<Name>ST2 MVC Controller Error Code</Name>
 		<DataType>UINT</DataType>
 		<Unit>N/A</Unit>
 		<Comment>Station2 movable cathode controller error code</Comment>
@@ -3632,14 +3632,14 @@
 
 	<Variable>
 		<ID>9000</ID>
-		<Name>ST1 MVC Velocity Setpoint</Name>
+		<Name>ST1 MVC Motor Velocity Setpoint</Name>
 		<DataType>INT</DataType>
 		<Unit>0.1mm/s</Unit>
 		<Comment>Station1 movable cathode motor velocity setting</Comment>
 	</Variable>
 	<Variable>
 		<ID>9001</ID>
-		<Name>ST2 MVC Velocity Setpoint</Name>
+		<Name>ST2 MVC Motor Velocity Setpoint</Name>
 		<DataType>INT</DataType>
 		<Unit>0.1mm/s</Unit>
 		<Comment>Station2 movable cathode motor velocity setting</Comment>
@@ -3647,14 +3647,14 @@
 
 	<Variable>
 		<ID>9002</ID>
-		<Name>ST1 MVC CMD</Name>
+		<Name>ST1 MVC Controller CMD</Name>
 		<DataType>UINT</DataType>
 		<Unit>N/A</Unit>
 		<Comment>Station1 movable cathode controller command</Comment>
 	</Variable>
 	<Variable>
 		<ID>9003</ID>
-		<Name>ST2 MVC CMD</Name>
+		<Name>ST2 MVC Controller CMD</Name>
 		<DataType>UINT</DataType>
 		<Unit>N/A</Unit>
 		<Comment>Station2 movable cathode controller command</Comment>
@@ -3662,17 +3662,146 @@
 
 	<Variable>
 		<ID>9004</ID>
-		<Name>ST1 MVC CMD Parameter</Name>
+		<Name>ST1 MVC Controller CMD Parameter</Name>
 		<DataType>UINT</DataType>
 		<Unit>N/A</Unit>
 		<Comment>Station1 movable cathode controller command parameter</Comment>
 	</Variable>
 	<Variable>
 		<ID>9005</ID>
-		<Name>ST2 MVC CMD Parameter</Name>
+		<Name>ST2 MVC Controller CMD Parameter</Name>
 		<DataType>UINT</DataType>
 		<Unit>N/A</Unit>
 		<Comment>Station2 movable cathode controller command parameter</Comment>
 	</Variable>
 
+	<Variable>
+		<ID>100000</ID>
+		<Name>Variable Catalogue File MD5 Hash</Name>
+		<DataType>FINGERPRINT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Variable catalogue file MD5 hash</Comment>
+	</Variable>
+	<Variable>
+		<ID>100001</ID>
+		<Name>IO List File MD5 Hash</Name>
+		<DataType>FINGERPRINT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>IO list file MD5 hash</Comment>
+	</Variable>
+	<Variable>
+		<ID>100002</ID>
+		<Name>Task User Parameters File MD5 Hash</Name>
+		<DataType>FINGERPRINT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Task user parameters file MD5 hash</Comment>
+	</Variable>
+	<Variable>
+		<ID>100003</ID>
+		<Name>Tx Handshake Byte for Device</Name>
+		<DataType>BYTE</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Tx Handshake byte for device</Comment>
+	</Variable>
+	<Variable>
+		<ID>100004</ID>
+		<Name>Rx Handshake Byte for Device</Name>
+		<DataType>BYTE</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Rx Handshake byte for device</Comment>
+	</Variable>
+	<Variable>
+		<ID>100005</ID>
+		<Name>Controller Heartbeat Counter</Name>
+		<DataType>UINT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Controller heartbeat counter</Comment>
+	</Variable>
+	<Variable>
+		<ID>101003</ID>
+		<Name>Tx Handshake Byte for Host</Name>
+		<DataType>BYTE</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Tx Handshake byte for host</Comment>
+	</Variable>	
+	<Variable>
+		<ID>101004</ID>
+		<Name>Rx Handshake Byte for Host</Name>
+		<DataType>BYTE</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Rx Handshake byte for host</Comment>
+	</Variable>
+	<Variable>
+		<ID>101005</ID>
+		<Name>Host Heartbeat Counter</Name>
+		<DataType>UINT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Host heartbeat counter</Comment>
+	</Variable>
+
+	<!-- ECAT Master Info & PDO -->
+	<Variable>
+		<ID>200000</ID>
+		<Name>Movable Cathode Motor ECAT CiA402 Default TxPDO 00</Name>
+		<DataType>ECAT_CIA402_DEFAULT_TX</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Movable cathode motor default status interface (ECAT CiA402) station 1 rod 1</Comment>
+	</Variable>
+	<Variable>
+		<ID>200001</ID>
+		<Name>Movable Cathode Motor ECAT CiA402 Default TxPDO 01</Name>
+		<DataType>ECAT_CIA402_DEFAULT_TX</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Movable cathode motor default status interface (ECAT CiA402) station 1 rod 2</Comment>
+	</Variable>
+	<Variable>
+		<ID>200002</ID>
+		<Name>Movable Cathode Motor ECAT CiA402 Default TxPDO 10</Name>
+		<DataType>ECAT_CIA402_DEFAULT_TX</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Movable cathode motor default status interface (ECAT CiA402) station 2 rod 1</Comment>
+	</Variable>
+	<Variable>
+		<ID>200003</ID>
+		<Name>Movable Cathode Motor ECAT CiA402 Default TxPDO 11</Name>
+		<DataType>ECAT_CIA402_DEFAULT_TX</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Movable cathode motor default status interface (ECAT CiA402) station 2 rod 2</Comment>
+	</Variable>
+	<Variable>
+		<ID>200500</ID>
+		<Name>SMART_ECAT Communication Status</Name>
+		<DataType>USHORT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>SMART_ECAT communication status word(0: Not Start; 1: Communicating; 2: Disconnection)</Comment>
+	</Variable>
+
+	<Variable>
+		<ID>201000</ID>
+		<Name>Movable Cathode Motor ECAT CiA402 Default RxPDO 00</Name>
+		<DataType>ECAT_CIA402_DEFAULT_RX</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Movable cathode motor default control interface (ECAT CiA402) station 1 rod 1</Comment>
+	</Variable>
+	<Variable>
+		<ID>201001</ID>
+		<Name>Movable Cathode Motor ECAT CiA402 Default RxPDO 01</Name>
+		<DataType>ECAT_CIA402_DEFAULT_RX</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Movable cathode motor default control interface (ECAT CiA402) station 1 rod 2</Comment>
+	</Variable>
+	<Variable>
+		<ID>201002</ID>
+		<Name>Movable Cathode Motor ECAT CiA402 Default RxPDO 10</Name>
+		<DataType>ECAT_CIA402_DEFAULT_RX</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Movable cathode motor default control interface (ECAT CiA402) station 2 rod 1</Comment>
+	</Variable>
+	<Variable>
+		<ID>201003</ID>
+		<Name>Movable Cathode Motor ECAT CiA402 Default RxPDO 11</Name>
+		<DataType>ECAT_CIA402_DEFAULT_RX</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Movable cathode motor default control interface (ECAT CiA402) station 2 rod 2</Comment>
+	</Variable>
 </AMECVariables>

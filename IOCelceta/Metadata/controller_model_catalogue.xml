@@ -292,6 +292,12 @@
 			<Name>R12CCPU_V_SMART_ECAT</Name>
 			<BitSize>0x10</BitSize>
 			<TX>
+				<NetSLV>1</NetSLV>
+				<NetCFG>1</NetCFG>
+				<NetIOCOM>1</NetIOCOM>
+				<NetLP>1</NetLP>
+				<NetMLP>1</NetMLP>
+				<NetEVT>1</NetEVT>
 				<Byte>17552</Byte>
 			</TX>
 			<RX>
@@ -305,6 +311,8 @@
 			<Name>PC104_SERIAL_PORT_SERVER</Name>
 			<TX>
 				<Byte>2048</Byte>
+				<NodeCFG>32</NodeCFG>
+				<NodeIOCOM>32</NodeIOCOM>
 			</TX>
 			<RX>
 				<Byte>2048</Byte>
