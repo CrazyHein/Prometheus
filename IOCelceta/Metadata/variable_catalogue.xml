@@ -3698,17 +3698,17 @@
 	</Variable>
 	<Variable>
 		<ID>100003</ID>
-		<Name>Tx Handshake Byte for Device</Name>
-		<DataType>BYTE</DataType>
+		<Name>Tx Handshake Word for Controller</Name>
+		<DataType>USHORT</DataType>
 		<Unit>N/A</Unit>
-		<Comment>Tx Handshake byte for device</Comment>
+		<Comment>Tx Handshake Word for controller</Comment>
 	</Variable>
 	<Variable>
 		<ID>100004</ID>
-		<Name>Rx Handshake Byte for Device</Name>
-		<DataType>BYTE</DataType>
+		<Name>Rx Handshake Word for Controler</Name>
+		<DataType>USHORT</DataType>
 		<Unit>N/A</Unit>
-		<Comment>Rx Handshake byte for device</Comment>
+		<Comment>Rx Handshake word for controller</Comment>
 	</Variable>
 	<Variable>
 		<ID>100005</ID>
@@ -3719,17 +3719,17 @@
 	</Variable>
 	<Variable>
 		<ID>101003</ID>
-		<Name>Tx Handshake Byte for Host</Name>
-		<DataType>BYTE</DataType>
+		<Name>Tx Handshake Word for Host</Name>
+		<DataType>USHORT</DataType>
 		<Unit>N/A</Unit>
-		<Comment>Tx Handshake byte for host</Comment>
+		<Comment>Tx Handshake word for host</Comment>
 	</Variable>	
 	<Variable>
 		<ID>101004</ID>
-		<Name>Rx Handshake Byte for Host</Name>
-		<DataType>BYTE</DataType>
+		<Name>Rx Handshake Word for Host</Name>
+		<DataType>USHORT</DataType>
 		<Unit>N/A</Unit>
-		<Comment>Rx Handshake byte for host</Comment>
+		<Comment>Rx Handshake word for host</Comment>
 	</Variable>
 	<Variable>
 		<ID>101005</ID>
