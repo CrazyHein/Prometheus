@@ -3705,7 +3705,7 @@
 	</Variable>
 	<Variable>
 		<ID>100004</ID>
-		<Name>Rx Handshake Word for Controler</Name>
+		<Name>Rx Handshake Word for Controller</Name>
 		<DataType>USHORT</DataType>
 		<Unit>N/A</Unit>
 		<Comment>Rx Handshake word for controller</Comment>
