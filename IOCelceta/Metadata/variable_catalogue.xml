@@ -418,7 +418,7 @@
 
 	<Variable>
 		<ID>500</ID>
-		<Name>GasSpliter IO COM</Name>
+		<Name>Gas Spliter IO COM</Name>
 		<DataType>BIT</DataType>
 		<Unit>N/A</Unit>
 		<Comment>Gas spliter io communication status</Comment>
@@ -3101,17 +3101,17 @@
 
 	<Variable>
 		<ID>6000</ID>
-		<Name>GasSpliter Flow Ratio Readback</Name>
+		<Name>Gas Spliter Flow Ratio Readback</Name>
 		<DataType>FLOAT</DataType>
 		<Unit>N/A</Unit>
-		<Comment>GasSpliter flow ratio reading from gas split(1.0 - 20.0)</Comment>
+		<Comment>Gas spliter flow ratio reading from gas split(1.0 - 20.0)</Comment>
 	</Variable>
 	<Variable>
 		<ID>6001</ID>
-		<Name>GasSpliter Flow Ratio Switch Readback</Name>
+		<Name>Gas Spliter Flow Ratio Switch Readback</Name>
 		<DataType>BYTE</DataType>
 		<Unit>N/A</Unit>
-		<Comment>GasSpliter flow ratio switch reading from gas split(1-2)</Comment>
+		<Comment>Gas spliter flow ratio switch reading from gas split(1-2)</Comment>
 	</Variable>
 	<Variable>
 		<ID>6002</ID>
@@ -3342,17 +3342,17 @@
 
 	<Variable>
 		<ID>7000</ID>
-		<Name>GasSpliter Flow Ratio Setpoint</Name>
+		<Name>Gas Spliter Flow Ratio Setpoint</Name>
 		<DataType>FLOAT</DataType>
 		<Unit>N/A</Unit>
-		<Comment>GasSpliter flow ratio setpoint to gas split(1.0 - 20.0)</Comment>
+		<Comment>Gas spliter flow ratio setpoint to gas split(1.0 - 20.0)</Comment>
 	</Variable>
 	<Variable>
 		<ID>7001</ID>
-		<Name>GasSpliter Flow Ratio Swtich Setpoint</Name>
+		<Name>Gas Spliter Flow Ratio Swtich Setpoint</Name>
 		<DataType>BYTE</DataType>
 		<Unit>N/A</Unit>
-		<Comment>GasSpliter flow ratio switch setpoint to gas split(1 - 2)</Comment>
+		<Comment>Gas spliter flow ratio switch setpoint to gas split(1 - 2)</Comment>
 	</Variable>
 	<Variable>
 		<ID>7002</ID>
@@ -3631,6 +3631,14 @@
 	</Variable>
 
 	<Variable>
+		<ID>8010</ID>
+		<Name>Classic Gas Spliter Flow Ratio Readback</Name>
+		<DataType>FLOAT</DataType>
+		<Unit>%</Unit>
+		<Comment>Gas spliter flow ratio reading from gas split(0.0 - 100.0)</Comment>
+	</Variable>
+
+	<Variable>
 		<ID>9000</ID>
 		<Name>ST1 MVC Motor Velocity Setpoint</Name>
 		<DataType>INT</DataType>
@@ -3673,6 +3681,14 @@
 		<DataType>UINT</DataType>
 		<Unit>N/A</Unit>
 		<Comment>Station2 movable cathode controller command parameter</Comment>
+	</Variable>
+
+	<Variable>
+		<ID>9010</ID>
+		<Name>Classic Gas Spliter Flow Ratio Setpoint</Name>
+		<DataType>FLOAT</DataType>
+		<Unit>%</Unit>
+		<Comment>Gas spliter flow ratio setpoint to gas split(0.0 - 100.0)</Comment>
 	</Variable>
 
 	<Variable>
@@ -3803,5 +3819,22 @@
 		<DataType>ECAT_CIA402_DEFAULT_RX</DataType>
 		<Unit>N/A</Unit>
 		<Comment>Movable cathode motor default control interface (ECAT CiA402) station 2 rod 2</Comment>
+	</Variable>
+
+	<!-- DeviceNet Info & PDO -->
+	<Variable>
+		<ID>200010</ID>
+		<Name>DeviceNet Gas Spliter Default TxPDO</Name>
+		<DataType>DEVICENET_FRC_DEFAULT_TX</DataType>
+		<Unit>N/A</Unit>
+		<Comment>DeviceNet gas spliter default status interface</Comment>
+	</Variable>
+
+	<Variable>
+		<ID>201010</ID>
+		<Name>DeviceNet Gas Spliter Default RxPDO</Name>
+		<DataType>DEVICENET_FRC_DEFAULT_RX</DataType>
+		<Unit>N/A</Unit>
+		<Comment>DeviceNet gas spliter default control interface</Comment>
 	</Variable>
 </AMECVariables>
