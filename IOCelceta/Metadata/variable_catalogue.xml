@@ -3755,6 +3755,64 @@
 		<Comment>Host heartbeat counter</Comment>
 	</Variable>
 
+	<Variable>
+		<ID>100010</ID>
+		<Name>Recipe Engine Control Response</Name>
+		<DataType>UINT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Recipe engine control response</Comment>
+	</Variable>
+	<Variable>
+		<ID>100011</ID>
+		<Name>Recipe Engine Control Result</Name>
+		<DataType>INT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Recipe engine control result</Comment>
+	</Variable>
+	<Variable>
+		<ID>100012</ID>
+		<Name>Recipe Engine Millisecond Counter</Name>
+		<DataType>UINT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Recipe engine millisecond counter</Comment>
+	</Variable>
+	<Variable>
+		<ID>100013</ID>
+		<Name>Recipe Engine Step Counter</Name>
+		<DataType>UINT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Recipe engine step counter</Comment>
+	</Variable>
+	<Variable>
+		<ID>100014</ID>
+		<Name>Recipe Engine State</Name>
+		<DataType>UINT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Recipe engine state</Comment>
+	</Variable>
+		<Variable>
+		<ID>100015</ID>
+		<Name>Recipe Engine User Return Code</Name>
+		<DataType>INT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Recipe engine user return code</Comment>
+	</Variable>
+
+	<Variable>
+		<ID>101010</ID>
+		<Name>Recipe Engine Control Request</Name>
+		<DataType>UINT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Recipe engine control request</Comment>
+	</Variable>
+	<Variable>
+		<ID>101011</ID>
+		<Name>Recipe Engine Initial Step</Name>
+		<DataType>UINT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Recipe engine initial step</Comment>
+	</Variable>
+
 	<!-- ECAT Master Info & PDO -->
 	<Variable>
 		<ID>200000</ID>
