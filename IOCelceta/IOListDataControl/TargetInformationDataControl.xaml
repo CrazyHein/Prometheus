@@ -9,7 +9,7 @@
     <Grid Margin="4" Validation.Error="__on_data_binding_error">
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"/>
-            <RowDefinition Height="auto"/>
+            <RowDefinition Height="1*"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="auto"/>
@@ -18,7 +18,7 @@
         <TextBlock Text="Name : " VerticalAlignment="Center" FontSize="16" FontWeight="Bold" Margin="4"/>
         <TextBox Grid.Column="1" HorizontalAlignment="Stretch" Margin="4" Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}"/>
 
-        <TextBlock Text="Description : " VerticalAlignment="Center" FontSize="16" FontWeight="Bold" Grid.Row="1" Margin="4"/>
-        <TextBox Grid.Column="1" Grid.Row="1" HorizontalAlignment="Stretch" Margin="4" Text="{Binding Description, UpdateSourceTrigger=PropertyChanged}"/>
+        <TextBlock Text="Description : " VerticalAlignment="Top" FontSize="16" FontWeight="Bold" Grid.Row="1" Margin="4"/>
+        <TextBox Grid.Column="1" Grid.Row="1" HorizontalAlignment="Stretch" Margin="4" AcceptsReturn="True" Text="{Binding Description, UpdateSourceTrigger=PropertyChanged}"/>
     </Grid>
 </UserControl>

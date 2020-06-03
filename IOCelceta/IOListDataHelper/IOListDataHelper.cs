@@ -1091,10 +1091,15 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                         switch (objectData.variable.DataType.Name)
                         {
                             case "INT":
+                            case "FIXEDPOINT3201":
+                            case "FIXEDPOINT3202":
                                 if (Convert.ToInt32(objectData.range.up_limit) < Convert.ToInt32(objectData.range.down_limit))
                                     throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_OBJECT_RANGE, null);
                                 break;
                             case "DINT":
+                            case "FIXEDPOINT6401":
+                            case "FIXEDPOINT6402":
+                            case "FIXEDPOINT6404":
                                 if (Convert.ToInt64(objectData.range.up_limit) < Convert.ToInt64(objectData.range.down_limit))
                                     throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_OBJECT_RANGE, null);
                                 break;

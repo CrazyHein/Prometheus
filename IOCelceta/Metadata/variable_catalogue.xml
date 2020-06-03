@@ -2724,13 +2724,35 @@
 	</Variable>
 
 	<Variable>
+		<ID>2999</ID>
+		<Name>Dummy Float AI</Name>
+		<DataType>FLOAT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Dummy analog input signal of type float</Comment>
+	</Variable>
+	<Variable>
+		<ID>2998</ID>
+		<Name>Dummy Double AI</Name>
+		<DataType>DOUBLE</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Dummy analog input signal of type double</Comment>
+	</Variable>
+	<Variable>
+		<ID>2997</ID>
+		<Name>Dummy Byte AI</Name>
+		<DataType>BYTE</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Dummy analog input signal of type byte</Comment>
+	</Variable>
+
+	<Variable>
 		<ID>2000</ID>
 		<Name>PM Pressure</Name>
 		<DataType>FLOAT</DataType>
 		<Unit>Torr</Unit>
 		<Comment>PM 10Torr pressure meter reading</Comment>
 	</Variable>
-  <Variable>
+  	<Variable>
 		<ID>2001</ID>
 		<Name>PM Process</Name>
 		<DataType>FLOAT</DataType>
@@ -2953,6 +2975,144 @@
 	</Variable>
 
 
+	<!-- Variables compatible with excel based io list -->
+	<Variable>
+		<ID>2100</ID>
+		<Name>PM Pressure (Obsolete)</Name>
+		<DataType>INT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>PM 10Torr pressure meter reading (Obsolete)</Comment>
+	</Variable>
+  	<Variable>
+		<ID>2101</ID>
+		<Name>PM Process (Obsolete)</Name>
+		<DataType>INT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>PM 1Torr pressure meter reading (Obsolete)</Comment>
+	</Variable>
+  	<Variable>
+		<ID>2102</ID>
+		<Name>Foreline Preesure (Obsolete)</Name>
+		<DataType>INT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Foreline preesure reading (Obsolete)</Comment>
+	</Variable>
+
+  	<Variable>
+		<ID>2108</ID>
+		<Name>ST1 ESC HV Total Current (Obsolete)</Name>
+		<DataType>INT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Station1 E-Chuck HVM total current reading (Obsolete)</Comment>
+	</Variable>
+  	<Variable>
+		<ID>2109</ID>
+		<Name>ST2 ESC HV Total Current (Obsolete)</Name>
+		<DataType>INT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Station2 E-Chuck HVM total current reading (Obsolete)</Comment>
+	</Variable>
+  	<Variable>
+		<ID>2110</ID>
+		<Name>ST1 ESC HV Monitoring (Obsolete)</Name>
+		<DataType>INT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Station1 E-Chuck HVM Volt reading (Obsolete)</Comment>
+	</Variable>
+  	<Variable>
+		<ID>2111</ID>
+		<Name>ST2 ESC HV Monitoring (Obsolete)</Name>
+		<DataType>INT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Station2 E-Chuck HVM Volt reading (Obsolete)</Comment>
+	</Variable>
+  	<Variable>
+		<ID>2112</ID>
+		<Name>Backside He Supply Pressure Reading (Obsolete)</Name>
+		<DataType>INT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Backside helium supply pressure reading (Obsolete)</Comment>
+	</Variable>
+  	<Variable>
+		<ID>2114</ID>
+		<Name>ST1 ESC HV VDC Monitoring (Obsolete)</Name>
+		<DataType>INT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Station1 E-Chuck HVM VDC reading (Obsolete)</Comment>
+	</Variable>
+  	<Variable>
+		<ID>2115</ID>
+		<Name>ST2 ESC HV VDC Monitoring (Obsolete)</Name>
+		<DataType>INT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Station2 E-Chuck HVM VDC reading (Obsolete)</Comment>
+	</Variable>
+
+  	<Variable>
+		<ID>2116</ID>
+		<Name>ST1 60Mhz VPP (Obsolete)</Name>
+		<DataType>INT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Station1 HF 60Mhz Voltage Peak-Peak Detect value (Obsolete)</Comment>
+	</Variable>
+  	<Variable>
+		<ID>2117</ID>
+		<Name>ST2 60Mhz VPP (Obsolete)</Name>
+		<DataType>INT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Station2 HF 60Mhz Voltage Peak-Peak Detect value (Obsolete)</Comment>
+	</Variable>
+  	<Variable>
+		<ID>2120</ID>
+		<Name>ST1 Soft Pin Pressure (Obsolete)</Name>
+		<DataType>INT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Station1 softpin pressure meter reading (Obsolete)</Comment>
+	</Variable>
+  	<Variable>
+		<ID>2121</ID>
+		<Name>ST2 Soft Pin Pressure (Obsolete)</Name>
+		<DataType>INT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Station2 softpin pressure meter reading (Obsolete)</Comment>
+	</Variable>
+  	<Variable>
+		<ID>2122</ID>
+		<Name>Onboard Gas1 Supply Pressure (Obsolete)</Name>
+		<DataType>INT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Onboard gas1 supply pressure reading (Obsolete)</Comment>
+	</Variable>
+  	<Variable>
+		<ID>2123</ID>
+		<Name>Onboard Gas2 Supply Pressure (Obsolete)</Name>
+		<DataType>INT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Onboard gas2 supply pressure reading (Obsolete)</Comment>
+	</Variable>
+
+
+	<Variable>
+		<ID>3999</ID>
+		<Name>Dummy Float AO</Name>
+		<DataType>FLOAT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Dummy analog output signal of type float</Comment>
+	</Variable>
+	<Variable>
+		<ID>3998</ID>
+		<Name>Dummy Double AO</Name>
+		<DataType>DOUBLE</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Dummy analog output signal of type double</Comment>
+	</Variable>
+	<Variable>
+		<ID>3997</ID>
+		<Name>Dummy Byte AO</Name>
+		<DataType>BYTE</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Dummy analog output signal of type byte</Comment>
+	</Variable>
   	<Variable>
 		<ID>3000</ID>
 		<Name>ST1 ESC HV Setpoint</Name>
@@ -2981,6 +3141,37 @@
 		<DataType>FLOAT</DataType>
 		<Unit>Voltage</Unit>
 		<Comment>Station2 softpin pressure setpoint</Comment>
+	</Variable>
+
+	<!-- Variables compatible with excel based io list -->
+	<Variable>
+		<ID>3100</ID>
+		<Name>ST1 ESC HV Setpoint (Obsolete)</Name>
+		<DataType>INT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Station1 E-Chuck HVM setpoint (Obsolete)</Comment>
+	</Variable>
+  	<Variable>
+		<ID>3101</ID>
+		<Name>ST2 ESC HV Setpoint (Obsolete)</Name>
+		<DataType>INT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Station2 E-Chuck HVM setpoint (Obsolete)</Comment>
+	</Variable>
+
+  	<Variable>
+		<ID>3106</ID>
+		<Name>ST1 Soft Pin Pressure Setpoint (Obsolete)</Name>
+		<DataType>INT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Station1 softpin pressure setpoint (Obsolete)</Comment>
+	</Variable>
+  	<Variable>
+		<ID>3107</ID>
+		<Name>ST2 Soft Pin Pressure Setpoint (Obsolete)</Name>
+		<DataType>INT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Station2 softpin pressure setpoint (Obsolete)</Comment>
 	</Variable>
 
   	<Variable>
@@ -3040,7 +3231,64 @@
 		<Comment>Station2 E-Chuck outer zone coolant water outlet temperature</Comment>
 	</Variable>
 
-  
+  	<!-- Variables compatible with excel based io list -->
+	<Variable>
+		<ID>4100</ID>
+		<Name>ST1 ESC Inner Coolant Inlet Temp (Obsolete)</Name>
+		<DataType>FIXEDPOINT3201</DataType>
+		<Unit>℃</Unit>
+		<Comment>Station1 E-Chuck inner zone coolant water inlet temperature (Obsolete)</Comment>
+	</Variable>
+  	<Variable>
+		<ID>4101</ID>
+		<Name>ST2 ESC Inner Coolant Inlet Temp (Obsolete)</Name>
+		<DataType>FIXEDPOINT3201</DataType>
+		<Unit>℃</Unit>
+		<Comment>Station2 E-Chuck inner zone coolant water inlet temperature (Obsolete)</Comment>
+	</Variable>
+  	<Variable>
+		<ID>4102</ID>
+		<Name>ST1 ESC Inner Coolant Outlet Temp (Obsolete)</Name>
+		<DataType>FIXEDPOINT3201</DataType>
+		<Unit>℃</Unit>
+		<Comment>Station1 E-Chuck inner zone coolant water outlet temperature (Obsolete)</Comment>
+	</Variable>
+  	<Variable>
+		<ID>4103</ID>
+		<Name>ST2 ESC Inner Coolant Outlet Temp (Obsolete)</Name>
+		<DataType>FIXEDPOINT3201</DataType>
+		<Unit>℃</Unit>
+		<Comment>Station2 E-Chuck inner zone coolant water outlet temperature (Obsolete)</Comment>
+	</Variable>
+  	<Variable>
+		<ID>4104</ID>
+		<Name>ST1 ESC Outer Coolant Inlet Temp (Obsolete)</Name>
+		<DataType>FIXEDPOINT3201</DataType>
+		<Unit>℃</Unit>
+		<Comment>Station1 E-Chuck outer zone coolant water inlet temperature (Obsolete)</Comment>
+	</Variable>
+  	<Variable>
+		<ID>4105</ID>
+		<Name>ST2 ESC Outer Coolant Inlet Temp (Obsolete)</Name>
+		<DataType>FIXEDPOINT3201</DataType>
+		<Unit>℃</Unit>
+		<Comment>Station2 E-Chuck outer zone coolant water inlet temperature (Obsolete)</Comment>
+	</Variable>
+  	<Variable>
+		<ID>4106</ID>
+		<Name>ST1 ESC Outer Coolant Outlet Temp (Obsolete)</Name>
+		<DataType>FIXEDPOINT3201</DataType>
+		<Unit>℃</Unit>
+		<Comment>Station1 E-Chuck outer zone coolant water outlet temperature (Obsolete)</Comment>
+	</Variable>
+  	<Variable>
+		<ID>4107</ID>
+		<Name>ST2 ESC Outer Coolant Outlet Temp (Obsolete)</Name>
+		<DataType>FIXEDPOINT3201</DataType>
+		<Unit>℃</Unit>
+		<Comment>Station2 E-Chuck outer zone coolant water outlet temperature (Obsolete)</Comment>
+	</Variable>
+
   	<Variable>
 		<ID>5000</ID>
 		<Name>ST1 Lid Heater Control Point Setpoint</Name>
@@ -3097,6 +3345,65 @@
 		<DataType>FLOAT</DataType>
 		<Unit>%</Unit>
 		<Comment>Station2 lid heater power output percent</Comment>
+	</Variable>
+
+	<!-- Variables compatible with excel based io list -->
+  	<Variable>
+		<ID>5100</ID>
+		<Name>ST1 Lid Heater Control Point Setpoint (Obsolete)</Name>
+		<DataType>FIXEDPOINT3201</DataType>
+		<Unit>℃</Unit>
+		<Comment>Station1 lid heater control TC temperature setpoint (Obsolete)</Comment>
+	</Variable>
+  	<Variable>
+		<ID>5101</ID>
+		<Name>ST1 Lid Heater Control Point Temp (Obsolete)</Name>
+		<DataType>FIXEDPOINT3201</DataType>
+		<Unit>℃</Unit>
+		<Comment>Station1 lid heater control TC temperature reading (Obsolete)</Comment>
+	</Variable>
+  	<Variable>
+		<ID>5102</ID>
+		<Name>ST1 Lid Heater Monitor Point Temp (Obsolete)</Name>
+		<DataType>FIXEDPOINT3201</DataType>
+		<Unit>℃</Unit>
+		<Comment>Station1 lid heater monitor TC temperature reading (Obsolete)</Comment>
+	</Variable>
+  	<Variable>
+		<ID>5103</ID>
+		<Name>ST1 Lid Heater PWR Output (Obsolete)</Name>
+		<DataType>FIXEDPOINT3201</DataType>
+		<Unit>%</Unit>
+		<Comment>Station1 lid heater power output percent (Obsolete)</Comment>
+	</Variable>
+
+  	<Variable>
+		<ID>5104</ID>
+		<Name>ST2 Lid Heater Control Point Setpoint (Obsolete)</Name>
+		<DataType>FIXEDPOINT3201</DataType>
+		<Unit>℃</Unit>
+		<Comment>Station2 lid heater control TC temperature setpoint (Obsolete)</Comment>
+	</Variable>
+  	<Variable>
+		<ID>5105</ID>
+		<Name>ST2 Lid Heater Control Point Temp (Obsolete)</Name>
+		<DataType>FIXEDPOINT3201</DataType>
+		<Unit>℃</Unit>
+		<Comment>Station2 lid heater control TC temperature reading (Obsolete)</Comment>
+	</Variable>
+  	<Variable>
+		<ID>5106</ID>
+		<Name>ST2 Lid Heater Monitor Point Temp (Obsolete)</Name>
+		<DataType>FIXEDPOINT3201</DataType>
+		<Unit>℃</Unit>
+		<Comment>Station2 lid heater monitor TC temperature reading (Obsolete)</Comment>
+	</Variable>
+  	<Variable>
+		<ID>5107</ID>
+		<Name>ST2 Lid Heater PWR Output (Obsolete)</Name>
+		<DataType>FIXEDPOINT3201</DataType>
+		<Unit>%</Unit>
+		<Comment>Station2 lid heater power output percent (Obsolete)</Comment>
 	</Variable>
 
 	<Variable>
