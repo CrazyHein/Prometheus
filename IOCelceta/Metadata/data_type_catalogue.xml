@@ -4,405 +4,449 @@
 	<DataType>
 		<Name>BIT</Name>
 		<BitSize>1</BitSize>
+		<Alignment>1</Alignment>
 	</DataType>
 	<DataType>
 		<Name>DINT</Name>
 		<BitSize>64</BitSize>
+		<Alignment>8</Alignment>
 	</DataType>
 	<DataType>
 		<Name>DUINT</Name>
 		<BitSize>64</BitSize>
+		<Alignment>8</Alignment>
 	</DataType>
-  <DataType>
-    <Name>UDINT</Name>
-    <BitSize>64</BitSize>
-  </DataType>
+	<DataType>
+		<Name>UDINT</Name>
+		<BitSize>64</BitSize>
+		<Alignment>8</Alignment>
+	</DataType>
 	<DataType>
 		<Name>INT</Name>
 		<BitSize>32</BitSize>
+		<Alignment>4</Alignment>
 	</DataType>
 	<DataType>
 		<Name>UINT</Name>
 		<BitSize>32</BitSize>
+		<Alignment>4</Alignment>
 	</DataType>
 	<DataType>
 		<Name>SHORT</Name>
 		<BitSize>16</BitSize>
+		<Alignment>2</Alignment>
 	</DataType>
 	<DataType>
 		<Name>USHORT</Name>
 		<BitSize>16</BitSize>
+		<Alignment>2</Alignment>
 	</DataType>
 	<DataType>
 		<Name>SBYTE</Name>
 		<BitSize>8</BitSize>
+		<Alignment>1</Alignment>
 	</DataType>
 	<DataType>
 		<Name>BYTE</Name>
 		<BitSize>8</BitSize>
+		<Alignment>1</Alignment>
 	</DataType>
 	<DataType>
 		<Name>FLOAT</Name>
 		<BitSize>32</BitSize>
+		<Alignment>4</Alignment>
 	</DataType>
 	<DataType>
 		<Name>DOUBLE</Name>
 		<BitSize>64</BitSize>
+		<Alignment>8</Alignment>
 	</DataType>
 	<DataType>
 		<Name>FIXEDPOINT3201</Name>
 		<BitSize>32</BitSize>
+		<Alignment>4</Alignment>
 	</DataType>
 	<DataType>
 		<Name>FIXEDPOINT3202</Name>
 		<BitSize>32</BitSize>
+		<Alignment>4</Alignment>
 	</DataType>
 	<DataType>
 		<Name>FIXEDPOINT6401</Name>
 		<BitSize>64</BitSize>
+		<Alignment>8</Alignment>
 	</DataType>
 	<DataType>
 		<Name>FIXEDPOINT6402</Name>
 		<BitSize>64</BitSize>
+		<Alignment>8</Alignment>
 	</DataType>
 	<DataType>
 		<Name>FIXEDPOINT6404</Name>
 		<BitSize>64</BitSize>
+		<Alignment>8</Alignment>
 	</DataType>
 	<DataType>
 		<Name>FINGERPRINT</Name>
 		<BitSize>128</BitSize>
-		<SubItem>
-			<Name>BYTE</Name>
-			<ByteOffset>0</ByteOffset>
-			<Comment>Byte0</Comment>
-		</SubItem>
-		<SubItem>
-			<Name>BYTE</Name>
-			<ByteOffset>1</ByteOffset>
-			<Comment>Byte1</Comment>
-		</SubItem>
-		<SubItem>
-			<Name>BYTE</Name>
-			<ByteOffset>2</ByteOffset>
-			<Comment>Byte2</Comment>
-		</SubItem>
-		<SubItem>
-			<Name>BYTE</Name>
-			<ByteOffset>3</ByteOffset>
-			<Comment>Byte3</Comment>
-		</SubItem>
-		<SubItem>
-			<Name>BYTE</Name>
-			<ByteOffset>4</ByteOffset>
-			<Comment>Byte4</Comment>
-		</SubItem>
-		<SubItem>
-			<Name>BYTE</Name>
-			<ByteOffset>5</ByteOffset>
-			<Comment>Byte5</Comment>
-		</SubItem>
-		<SubItem>
-			<Name>BYTE</Name>
-			<ByteOffset>6</ByteOffset>
-			<Comment>Byte6</Comment>
-		</SubItem>
-		<SubItem>
-			<Name>BYTE</Name>
-			<ByteOffset>7</ByteOffset>
-			<Comment>Byte7</Comment>
-		</SubItem>
-		<SubItem>
-			<Name>BYTE</Name>
-			<ByteOffset>8</ByteOffset>
-			<Comment>Byte8</Comment>
-		</SubItem>
-		<SubItem>
-			<Name>BYTE</Name>
-			<ByteOffset>9</ByteOffset>
-			<Comment>Byte9</Comment>
-		</SubItem>
-		<SubItem>
-			<Name>BYTE</Name>
-			<ByteOffset>10</ByteOffset>
-			<Comment>Byte10</Comment>
-		</SubItem>
-		<SubItem>
-			<Name>BYTE</Name>
-			<ByteOffset>11</ByteOffset>
-			<Comment>Byte11</Comment>
-		</SubItem>
-		<SubItem>
-			<Name>BYTE</Name>
-			<ByteOffset>12</ByteOffset>
-			<Comment>Byte12</Comment>
-		</SubItem>
-		<SubItem>
-			<Name>BYTE</Name>
-			<ByteOffset>13</ByteOffset>
-			<Comment>Byte13</Comment>
-		</SubItem>
-		<SubItem>
-			<Name>BYTE</Name>
-			<ByteOffset>14</ByteOffset>
-			<Comment>Byte14</Comment>
-		</SubItem>
-		<SubItem>
-			<Name>BYTE</Name>
-			<ByteOffset>15</ByteOffset>
-			<Comment>Byte15</Comment>
-		</SubItem>
+		<Alignment>1</Alignment>
+		<SubItems>
+			<SubItem>
+				<Name>BYTE</Name>
+				<ByteOffset>0</ByteOffset>
+				<Comment>Byte0</Comment>
+			</SubItem>
+			<SubItem>
+				<Name>BYTE</Name>
+				<ByteOffset>1</ByteOffset>
+				<Comment>Byte1</Comment>
+			</SubItem>
+			<SubItem>
+				<Name>BYTE</Name>
+				<ByteOffset>2</ByteOffset>
+				<Comment>Byte2</Comment>
+			</SubItem>
+			<SubItem>
+				<Name>BYTE</Name>
+				<ByteOffset>3</ByteOffset>
+				<Comment>Byte3</Comment>
+			</SubItem>
+			<SubItem>
+				<Name>BYTE</Name>
+				<ByteOffset>4</ByteOffset>
+				<Comment>Byte4</Comment>
+			</SubItem>
+			<SubItem>
+				<Name>BYTE</Name>
+				<ByteOffset>5</ByteOffset>
+				<Comment>Byte5</Comment>
+			</SubItem>
+			<SubItem>
+				<Name>BYTE</Name>
+				<ByteOffset>6</ByteOffset>
+				<Comment>Byte6</Comment>
+			</SubItem>
+			<SubItem>
+				<Name>BYTE</Name>
+				<ByteOffset>7</ByteOffset>
+				<Comment>Byte7</Comment>
+			</SubItem>
+			<SubItem>
+				<Name>BYTE</Name>
+				<ByteOffset>8</ByteOffset>
+				<Comment>Byte8</Comment>
+			</SubItem>
+			<SubItem>
+				<Name>BYTE</Name>
+				<ByteOffset>9</ByteOffset>
+				<Comment>Byte9</Comment>
+			</SubItem>
+			<SubItem>
+				<Name>BYTE</Name>
+				<ByteOffset>10</ByteOffset>
+				<Comment>Byte10</Comment>
+			</SubItem>
+			<SubItem>
+				<Name>BYTE</Name>
+				<ByteOffset>11</ByteOffset>
+				<Comment>Byte11</Comment>
+			</SubItem>
+			<SubItem>
+				<Name>BYTE</Name>
+				<ByteOffset>12</ByteOffset>
+				<Comment>Byte12</Comment>
+			</SubItem>
+			<SubItem>
+				<Name>BYTE</Name>
+				<ByteOffset>13</ByteOffset>
+				<Comment>Byte13</Comment>
+			</SubItem>
+			<SubItem>
+				<Name>BYTE</Name>
+				<ByteOffset>14</ByteOffset>
+				<Comment>Byte14</Comment>
+			</SubItem>
+			<SubItem>
+				<Name>BYTE</Name>
+				<ByteOffset>15</ByteOffset>
+				<Comment>Byte15</Comment>
+			</SubItem>
+		</SubItems>
 	</DataType>
 	<DataType>
 		<Name>DEVICENET_MFC_DEFAULT_TX</Name>
 		<BitSize>48</BitSize>
-		<SubItem>
-			<Name>BYTE</Name>
-			<ByteOffset>0</ByteOffset>
-			<Comment>ExceptionStatus</Comment>
-		</SubItem>
-		<SubItem>
-			<Name>FLOAT</Name>
-			<ByteOffset>1</ByteOffset>
-			<Comment>Flow(sccm)</Comment>
-		</SubItem>
-		<SubItem>
-			<Name>BYTE</Name>
-			<ByteOffset>5</ByteOffset>
-			<Comment>Dummy</Comment>
-		</SubItem>
+		<Alignment>4</Alignment>
+		<SubItems>
+			<SubItem>
+				<Name>BYTE</Name>
+				<ByteOffset>0</ByteOffset>
+				<Comment>ExceptionStatus</Comment>
+			</SubItem>
+			<SubItem>
+				<Name>FLOAT</Name>
+				<ByteOffset>1</ByteOffset>
+				<Comment>Flow(sccm)</Comment>
+			</SubItem>
+			<SubItem>
+				<Name>BYTE</Name>
+				<ByteOffset>5</ByteOffset>
+				<Comment>Dummy</Comment>
+			</SubItem>
+		</SubItems>
 	</DataType>
 	<DataType>
 		<Name>DEVICENET_MFC_DEFAULT_RX</Name>
 		<BitSize>32</BitSize>
-		<SubItem>
-			<Name>FLOAT</Name>
-			<ByteOffset>0</ByteOffset>
-			<Comment>FlowSetpoint(sccm)</Comment>
-		</SubItem>
+		<Alignment>4</Alignment>
+		<SubItems>
+			<SubItem>
+				<Name>FLOAT</Name>
+				<ByteOffset>0</ByteOffset>
+				<Comment>FlowSetpoint(sccm)</Comment>
+			</SubItem>
+		</SubItems>
 	</DataType>
 	<DataType>
 		<Name>DEVICENET_PC_DEFAULT_TX</Name>
 		<BitSize>80</BitSize>
-		<SubItem>
-			<Name>BYTE</Name>
-			<ByteOffset>0</ByteOffset>
-			<Comment>ExceptionStatus</Comment>
-		</SubItem>
-		<SubItem>
-			<Name>FLOAT</Name>
-			<ByteOffset>1</ByteOffset>
-			<Comment>Pressure(torr)</Comment>
-		</SubItem>
-		<SubItem>
-			<Name>FLOAT</Name>
-			<ByteOffset>5</ByteOffset>
-			<Comment>Flow(sccm)</Comment>
-		</SubItem>
-		<SubItem>
-			<Name>BYTE</Name>
-			<ByteOffset>9</ByteOffset>
-			<Comment>Dummy</Comment>
-		</SubItem>
+		<Alignment>4</Alignment>
+		<SubItems>
+			<SubItem>
+				<Name>BYTE</Name>
+				<ByteOffset>0</ByteOffset>
+				<Comment>ExceptionStatus</Comment>
+			</SubItem>
+			<SubItem>
+				<Name>FLOAT</Name>
+				<ByteOffset>1</ByteOffset>
+				<Comment>Pressure(torr)</Comment>
+			</SubItem>
+			<SubItem>
+				<Name>FLOAT</Name>
+				<ByteOffset>5</ByteOffset>
+				<Comment>Flow(sccm)</Comment>
+			</SubItem>
+			<SubItem>
+				<Name>BYTE</Name>
+				<ByteOffset>9</ByteOffset>
+				<Comment>Dummy</Comment>
+			</SubItem>
+		</SubItems>
 	</DataType>
 	<DataType>
 		<Name>DEVICENET_PC_DEFAULT_RX</Name>
 		<BitSize>48</BitSize>
-		<SubItem>
-			<Name>FLOAT</Name>
-			<ByteOffset>0</ByteOffset>
-			<Comment>PressureSetpoint(torr)</Comment>
-		</SubItem>
-		<SubItem>
-			<Name>USHORT</Name>
-			<ByteOffset>4</ByteOffset>
-			<Comment>Instance</Comment>
-		</SubItem>
+		<Alignment>4</Alignment>
+		<SubItems>
+			<SubItem>
+				<Name>FLOAT</Name>
+				<ByteOffset>0</ByteOffset>
+				<Comment>PressureSetpoint(torr)</Comment>
+			</SubItem>
+			<SubItem>
+				<Name>USHORT</Name>
+				<ByteOffset>4</ByteOffset>
+				<Comment>Instance</Comment>
+			</SubItem>
+		</SubItems>
 	</DataType>
 	<DataType>
 		<Name>DEVICENET_FRC_DEFAULT_RX</Name>
 		<BitSize>48</BitSize>
-		<SubItem>
-			<Name>BYTE</Name>
-			<ByteOffset>0</ByteOffset>
-			<Comment>RatioSwitch(1-2)</Comment>
-		</SubItem>
-		<SubItem>
-			<Name>FLOAT</Name>
-			<ByteOffset>1</ByteOffset>
-			<Comment>RatioSetpoint(1-20)</Comment>
-		</SubItem>
-		<SubItem>
-			<Name>BYTE</Name>
-			<ByteOffset>5</ByteOffset>
-			<Comment>Dummy</Comment>
-		</SubItem>
+		<Alignment>4</Alignment>
+		<SubItems>
+			<SubItem>
+				<Name>BYTE</Name>
+				<ByteOffset>0</ByteOffset>
+				<Comment>RatioSwitch(1-2)</Comment>
+			</SubItem>
+			<SubItem>
+				<Name>FLOAT</Name>
+				<ByteOffset>1</ByteOffset>
+				<Comment>RatioSetpoint(1-20)</Comment>
+			</SubItem>
+			<SubItem>
+				<Name>BYTE</Name>
+				<ByteOffset>5</ByteOffset>
+				<Comment>Dummy</Comment>
+			</SubItem>
+		</SubItems>
 	</DataType>
 	<DataType>
 		<Name>DEVICENET_FRC_DEFAULT_TX</Name>
 		<BitSize>48</BitSize>
-		<SubItem>
-			<Name>BYTE</Name>
-			<ByteOffset>0</ByteOffset>
-			<Comment>ExceptionStatus</Comment>
-		</SubItem>
-		<SubItem>
-			<Name>BYTE</Name>
-			<ByteOffset>1</ByteOffset>
-			<Comment>RatioSwitchReadback(1-2)</Comment>
-		</SubItem>
-		<SubItem>
-			<Name>FLOAT</Name>
-			<ByteOffset>2</ByteOffset>
-			<Comment>RatioReadback(1-20)</Comment>
-		</SubItem>
+		<Alignment>4</Alignment>
+		<SubItems>
+			<SubItem>
+				<Name>BYTE</Name>
+				<ByteOffset>0</ByteOffset>
+				<Comment>ExceptionStatus</Comment>
+			</SubItem>
+			<SubItem>
+				<Name>BYTE</Name>
+				<ByteOffset>1</ByteOffset>
+				<Comment>RatioSwitchReadback(1-2)</Comment>
+			</SubItem>
+			<SubItem>
+				<Name>FLOAT</Name>
+				<ByteOffset>2</ByteOffset>
+				<Comment>RatioReadback(1-20)</Comment>
+			</SubItem>
+		</SubItems>
 	</DataType>
 	<DataType>
 		<Name>ECAT_CIA402_DEFAULT_TX</Name>
 		<BitSize>336</BitSize>
-		<SubItem>
-			<Name>BYTE</Name>
-			<ByteOffset>0</ByteOffset>
-			<Comment>ModeOfOperation</Comment>
-		</SubItem>
-		<SubItem>
-			<Name>USHORT</Name>
-			<ByteOffset>1</ByteOffset>
-			<Comment>StatusWord</Comment>
-		</SubItem>
-		<SubItem>
-			<Name>USHORT</Name>
-			<ByteOffset>3</ByteOffset>
-			<Comment>StatusDO_1</Comment>
-		</SubItem>
-		<SubItem>
-			<Name>USHORT</Name>
-			<ByteOffset>5</ByteOffset>
-			<Comment>StatusDO_2</Comment>
-		</SubItem>
-		<SubItem>
-			<Name>USHORT</Name>
-			<ByteOffset>7</ByteOffset>
-			<Comment>StatusDO_3</Comment>
-		</SubItem>
-		<SubItem>
-			<Name>INT</Name>
-			<ByteOffset>9</ByteOffset>
-			<Comment>PositionValue</Comment>
-		</SubItem>
-		<SubItem>
-			<Name>INT</Name>
-			<ByteOffset>13</ByteOffset>
-			<Comment>VelocityValue</Comment>
-		</SubItem>
-		<SubItem>
-			<Name>INT</Name>
-			<ByteOffset>17</ByteOffset>
-			<Comment>FollowingErrorValue</Comment>
-		</SubItem>
-		<SubItem>
-			<Name>SHORT</Name>
-			<ByteOffset>21</ByteOffset>
-			<Comment>TorqueValue</Comment>
-		</SubItem>
-		<SubItem>
-			<Name>USHORT</Name>
-			<ByteOffset>23</ByteOffset>
-			<Comment>TouchProbeStatus</Comment>
-		</SubItem>PosValue
-		<SubItem>
-			<Name>INT</Name>
-			<ByteOffset>25</ByteOffset>
-			<Comment>TouchProbePosition1PosValue</Comment>
-		</SubItem>
-		<SubItem>
-			<Name>INT</Name>
-			<ByteOffset>29</ByteOffset>
-			<Comment>TouchProbePosition1NegValue</Comment>
-		</SubItem>
-		<SubItem>
-			<Name>INT</Name>
-			<ByteOffset>33</ByteOffset>
-			<Comment>TouchProbePosition2PosValue</Comment>
-		</SubItem>
-		<SubItem>
-			<Name>INT</Name>
-			<ByteOffset>37</ByteOffset>
-			<Comment>TouchProbePosition2NegValue</Comment>
-		</SubItem>
-		<SubItem>
-			<Name>BYTE</Name>
-			<ByteOffset>41</ByteOffset>
-			<Comment>Dummy</Comment>
-		</SubItem>
+		<Alignment>4</Alignment>
+		<SubItems>
+			<SubItem>
+				<Name>BYTE</Name>
+				<ByteOffset>0</ByteOffset>
+				<Comment>ModeOfOperation</Comment>
+			</SubItem>
+			<SubItem>
+				<Name>USHORT</Name>
+				<ByteOffset>1</ByteOffset>
+				<Comment>StatusWord</Comment>
+			</SubItem>
+			<SubItem>
+				<Name>USHORT</Name>
+				<ByteOffset>3</ByteOffset>
+				<Comment>StatusDO_1</Comment>
+			</SubItem>
+			<SubItem>
+				<Name>USHORT</Name>
+				<ByteOffset>5</ByteOffset>
+				<Comment>StatusDO_2</Comment>
+			</SubItem>
+			<SubItem>
+				<Name>USHORT</Name>
+				<ByteOffset>7</ByteOffset>
+				<Comment>StatusDO_3</Comment>
+			</SubItem>
+			<SubItem>
+				<Name>INT</Name>
+				<ByteOffset>9</ByteOffset>
+				<Comment>PositionValue</Comment>
+			</SubItem>
+			<SubItem>
+				<Name>INT</Name>
+				<ByteOffset>13</ByteOffset>
+				<Comment>VelocityValue</Comment>
+			</SubItem>
+			<SubItem>
+				<Name>INT</Name>
+				<ByteOffset>17</ByteOffset>
+				<Comment>FollowingErrorValue</Comment>
+			</SubItem>
+			<SubItem>
+				<Name>SHORT</Name>
+				<ByteOffset>21</ByteOffset>
+				<Comment>TorqueValue</Comment>
+			</SubItem>
+			<SubItem>
+				<Name>USHORT</Name>
+				<ByteOffset>23</ByteOffset>
+				<Comment>TouchProbeStatus</Comment>
+			</SubItem>PosValue
+			<SubItem>
+				<Name>INT</Name>
+				<ByteOffset>25</ByteOffset>
+				<Comment>TouchProbePosition1PosValue</Comment>
+			</SubItem>
+			<SubItem>
+				<Name>INT</Name>
+				<ByteOffset>29</ByteOffset>
+				<Comment>TouchProbePosition1NegValue</Comment>
+			</SubItem>
+			<SubItem>
+				<Name>INT</Name>
+				<ByteOffset>33</ByteOffset>
+				<Comment>TouchProbePosition2PosValue</Comment>
+			</SubItem>
+			<SubItem>
+				<Name>INT</Name>
+				<ByteOffset>37</ByteOffset>
+				<Comment>TouchProbePosition2NegValue</Comment>
+			</SubItem>
+			<SubItem>
+				<Name>BYTE</Name>
+				<ByteOffset>41</ByteOffset>
+				<Comment>Dummy</Comment>
+			</SubItem>
+		</SubItems>
 	</DataType>
 	<DataType>
 		<Name>ECAT_CIA402_DEFAULT_RX</Name>
 		<BitSize>240</BitSize>
-		<SubItem>
-			<Name>BYTE</Name>
-			<ByteOffset>0</ByteOffset>
-			<Comment>ModeOfOperation</Comment>
-		</SubItem>
-		<SubItem>
-			<Name>USHORT</Name>
-			<ByteOffset>1</ByteOffset>
-			<Comment>ControlWord</Comment>
-		</SubItem>
-		<SubItem>
-			<Name>USHORT</Name>
-			<ByteOffset>3</ByteOffset>
-			<Comment>ControlDI_1</Comment>
-		</SubItem>
-		<SubItem>
-			<Name>USHORT</Name>
-			<ByteOffset>5</ByteOffset>
-			<Comment>ControlDI_2</Comment>
-		</SubItem>
-		<SubItem>
-			<Name>USHORT</Name>
-			<ByteOffset>7</ByteOffset>
-			<Comment>ControlDI_3</Comment>
-		</SubItem>
-		<SubItem>
-			<Name>INT</Name>
-			<ByteOffset>9</ByteOffset>
-			<Comment>TargetPosition</Comment>
-		</SubItem>
-		<SubItem>
-			<Name>INT</Name>
-			<ByteOffset>13</ByteOffset>
-			<Comment>TargetVelocity</Comment>
-		</SubItem>
-		<SubItem>
-			<Name>UINT</Name>
-			<ByteOffset>17</ByteOffset>
-			<Comment>TargetVelocityLimitValue</Comment>
-		</SubItem>
-		<SubItem>
-			<Name>SHORT</Name>
-			<ByteOffset>21</ByteOffset>
-			<Comment>TargetTorque</Comment>
-		</SubItem>
-		<SubItem>
-			<Name>USHORT</Name>
-			<ByteOffset>23</ByteOffset>
-			<Comment>PositiveTorqueLimitValue</Comment>
-		</SubItem>
-		<SubItem>
-			<Name>USHORT</Name>
-			<ByteOffset>25</ByteOffset>
-			<Comment>NegativeTorqueLimitValue</Comment>
-		</SubItem>
-		<SubItem>
-			<Name>USHORT</Name>
-			<ByteOffset>27</ByteOffset>
-			<Comment>TouchProbeFunction</Comment>
-		</SubItem>
-		<SubItem>
-			<Name>BYTE</Name>
-			<ByteOffset>29</ByteOffset>
-			<Comment>Dummy</Comment>
-		</SubItem>
+		<Alignment>4</Alignment>
+		<SubItems>
+			<SubItem>
+				<Name>BYTE</Name>
+				<ByteOffset>0</ByteOffset>
+				<Comment>ModeOfOperation</Comment>
+			</SubItem>
+			<SubItem>
+				<Name>USHORT</Name>
+				<ByteOffset>1</ByteOffset>
+				<Comment>ControlWord</Comment>
+			</SubItem>
+			<SubItem>
+				<Name>USHORT</Name>
+				<ByteOffset>3</ByteOffset>
+				<Comment>ControlDI_1</Comment>
+			</SubItem>
+			<SubItem>
+				<Name>USHORT</Name>
+				<ByteOffset>5</ByteOffset>
+				<Comment>ControlDI_2</Comment>
+			</SubItem>
+			<SubItem>
+				<Name>USHORT</Name>
+				<ByteOffset>7</ByteOffset>
+				<Comment>ControlDI_3</Comment>
+			</SubItem>
+			<SubItem>
+				<Name>INT</Name>
+				<ByteOffset>9</ByteOffset>
+				<Comment>TargetPosition</Comment>
+			</SubItem>
+			<SubItem>
+				<Name>INT</Name>
+				<ByteOffset>13</ByteOffset>
+				<Comment>TargetVelocity</Comment>
+			</SubItem>
+			<SubItem>
+				<Name>UINT</Name>
+				<ByteOffset>17</ByteOffset>
+				<Comment>TargetVelocityLimitValue</Comment>
+			</SubItem>
+			<SubItem>
+				<Name>SHORT</Name>
+				<ByteOffset>21</ByteOffset>
+				<Comment>TargetTorque</Comment>
+			</SubItem>
+			<SubItem>
+				<Name>USHORT</Name>
+				<ByteOffset>23</ByteOffset>
+				<Comment>PositiveTorqueLimitValue</Comment>
+			</SubItem>
+			<SubItem>
+				<Name>USHORT</Name>
+				<ByteOffset>25</ByteOffset>
+				<Comment>NegativeTorqueLimitValue</Comment>
+			</SubItem>
+			<SubItem>
+				<Name>USHORT</Name>
+				<ByteOffset>27</ByteOffset>
+				<Comment>TouchProbeFunction</Comment>
+			</SubItem>
+			<SubItem>
+				<Name>BYTE</Name>
+				<ByteOffset>29</ByteOffset>
+				<Comment>Dummy</Comment>
+			</SubItem>
+		</SubItems>
 	</DataType>	
 </AMECDataTypes>

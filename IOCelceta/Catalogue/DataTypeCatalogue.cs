@@ -100,43 +100,35 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.Catalogue
 
         private void __search_data_type(XmlNode dataTypeNode, Dictionary<string, DataTypeDefinition> dictionary)
         {
-            uint bitSize = 0, subItemsByteSize = 0;
-            string name = "";
-            uint mask = 0;
+            uint bitSize = 0, subItemsByteSize = 0, alignment = 0;
+            string name;
             List<DataTypeDefinition> subItems = null;
+            XmlNode subItemsNode;
             try
             {
-                foreach (XmlNode node in dataTypeNode.ChildNodes)
-                {
-                    if (node.NodeType != XmlNodeType.Element)
-                        continue;
+                name = dataTypeNode.SelectSingleNode("Name").FirstChild.Value;
+                bitSize = uint.Parse(dataTypeNode.SelectSingleNode("BitSize").FirstChild.Value);
+                alignment = uint.Parse(dataTypeNode.SelectSingleNode("Alignment").FirstChild.Value);
 
-                    switch (node.Name)
+                subItemsNode = dataTypeNode["SubItems"];
+                if (subItemsNode != null)
+                {
+                    foreach (XmlNode node in subItemsNode.ChildNodes)
                     {
-                        case "Name":
-                            name = node.FirstChild.Value;
-                            mask |= 0x00000001;
-                            break;
-                        case "BitSize":
-                            bitSize = uint.Parse(node.FirstChild.Value);
-                            mask |= 0x00000002;
-                            break;
-                        case "SubItem":
-                            if (subItems == null)
-                                subItems = new List<DataTypeDefinition>();
-                            __search_sub_items( node, dictionary, subItems, out subItemsByteSize);
-                            break;
+                        if (node.NodeType != XmlNodeType.Element)
+                            continue;
+
+                        if (node.Name == "SubItem")
+                        {
+                            if (subItems == null) subItems = new List<DataTypeDefinition>();
+                            __search_sub_items(node, dictionary, subItems, out subItemsByteSize);
+                        }
                     }
                 }
-                if ((mask & 0x00000003) == 0x00000003)
-                {
-                    if ((subItems != null && bitSize % 8 == 0 && bitSize / 8 == subItemsByteSize) || (subItems == null))
-                        dictionary.Add(name, new DataTypeDefinition(name, bitSize, 0, "N/A", subItems));
-                    else
-                        throw new DataTypeCatalogueParseExcepetion(DATA_TYPE_CATALOGUE_FILE_ERROR_CODE_T.ILLEGAL_DATA_TYPE_DEFINITION, null);
-                }
+                if ((subItems != null && bitSize % 8 == 0 && bitSize / 8 == subItemsByteSize) || (subItems == null))
+                    dictionary.Add(name, new DataTypeDefinition(name, bitSize, alignment, 0, "N/A", subItems));
                 else
-                    throw new DataTypeCatalogueParseExcepetion(DATA_TYPE_CATALOGUE_FILE_ERROR_CODE_T.ELEMENT_MISSING, null);
+                    throw new DataTypeCatalogueParseExcepetion(DATA_TYPE_CATALOGUE_FILE_ERROR_CODE_T.ILLEGAL_DATA_TYPE_DEFINITION, null);
             }
             catch(DataTypeCatalogueParseExcepetion e)
             {
@@ -152,43 +144,20 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.Catalogue
             List<DataTypeDefinition> subItemList, out uint byteSize)
         {
             uint byteOffset = 0;
-            string comment = "", name = "";
-            uint mask = 0;
+            string comment, name;
 
             byteSize = 0;
             try
             {
-                foreach (XmlNode node in subItemNode.ChildNodes)
-                {
-                    if (node.NodeType != XmlNodeType.Element)
-                        continue;
+                name = subItemNode.SelectSingleNode("Name").FirstChild.Value;
+                byteOffset = uint.Parse(subItemNode.SelectSingleNode("ByteOffset").FirstChild.Value);
+                comment = subItemNode.SelectSingleNode("Comment").FirstChild.Value;
 
-                    switch (node.Name)
-                    {
-                        case "Name":
-                            name = node.FirstChild.Value;
-                            mask |= 0x00000001;
-                            break;
-                        case "Comment":
-                            comment = node.FirstChild.Value;
-                            mask |= 0x00000002;
-                            break;
-                        case "ByteOffset":
-                            byteOffset = uint.Parse(node.FirstChild.Value);
-                            mask |= 0x00000004;
-                            break;
-                    }
-                }
-                if ((mask & 0x00000007) == 0x00000007)
-                {
-                    subItemList.Add(new DataTypeDefinition(name, dataTypeDictionary[name].BitSize, byteOffset, comment, null));
-                    if(dataTypeDictionary[name].BitSize % 8 == 0)
-                        byteSize += dataTypeDictionary[name].BitSize / 8 + byteOffset;
-                    else
-                        byteSize += dataTypeDictionary[name].BitSize / 8 + byteOffset + 1;
-                }
+                subItemList.Add(new DataTypeDefinition(name, dataTypeDictionary[name].BitSize, 1, byteOffset, comment, null));
+                if (dataTypeDictionary[name].BitSize % 8 == 0)
+                    byteSize += dataTypeDictionary[name].BitSize / 8 + byteOffset;
                 else
-                    throw new DataTypeCatalogueParseExcepetion(DATA_TYPE_CATALOGUE_FILE_ERROR_CODE_T.ELEMENT_MISSING, null);
+                    byteSize += dataTypeDictionary[name].BitSize / 8 + byteOffset + 1;
             }
             catch (DataTypeCatalogueParseExcepetion e)
             {
@@ -205,15 +174,17 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.Catalogue
     {
         public string Name { get; private set; }
         public uint BitSize { get; private set; }
+        public uint Alignment { get; private set; }
         public uint ByteOffset { get; private set; }
         public string Comment { get; private set; }
 
         public IReadOnlyList<DataTypeDefinition> SubItems { get; private set; }
 
-        public DataTypeDefinition(string name, uint bitSize, uint byteOffset, string comment, List<DataTypeDefinition> subItems)
+        public DataTypeDefinition(string name, uint bitSize, uint alignment, uint byteOffset, string comment, List<DataTypeDefinition> subItems)
         {
             Name = name;
             BitSize = bitSize;
+            Alignment = alignment;
             ByteOffset = byteOffset;
             Comment = comment;
             if (subItems != null)

@@ -87,41 +87,15 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.Catalogue
                         string name = null;
                         DataTypeDefinition dataType = null;
                         string unit = null, comment = null;
-                        uint mask = 0;
-                        foreach (XmlNode node in variableNode.ChildNodes)
-                        {
-                            switch (node.Name)
-                            {
-                                case "ID":
-                                    id = uint.Parse(node.FirstChild.Value);
-                                    mask |= 0x00000001;
-                                    break;
-                                case "Name":
-                                    name = node.FirstChild.Value;
-                                    mask |= 0x00000002;
-                                    break;
-                                case "DataType":
-                                    if (__data_type_catalogue.DataTypes.Keys.Contains(node.FirstChild.Value))
-                                    {
-                                        dataType = __data_type_catalogue.DataTypes[node.FirstChild.Value];
-                                        mask |= 0x00000004;
-                                    }
-                                    else
-                                        throw new VariableCatalogueParseExcepetion(VARIABLE_CATALOGUE_FILE_ERROR_CODE_T.INVALID_VARIABLE_DATA_TYPE, null);
-                                    break;
-                                case "Unit":
-                                    unit = node.FirstChild.Value;
-                                    mask |= 0x00000008;
-                                    break;
-                                case "Comment":
-                                    comment = node.FirstChild.Value;
-                                    break;
-                            }
-                        }
-                        if ((mask & 0x0000000F) == 0x0000000F)
-                            __variables.Add(name, new VariableDefinition(id, name, dataType, unit, comment));
-                        else
-                            throw new VariableCatalogueParseExcepetion(VARIABLE_CATALOGUE_FILE_ERROR_CODE_T.ELEMENT_MISSING, null);
+
+                        id = uint.Parse(variableNode.SelectSingleNode("ID").FirstChild.Value);
+                        name = variableNode.SelectSingleNode("Name").FirstChild.Value;
+                        if (__data_type_catalogue.DataTypes.TryGetValue(variableNode.SelectSingleNode("DataType").FirstChild.Value, out dataType) == false)
+                            throw new VariableCatalogueParseExcepetion(VARIABLE_CATALOGUE_FILE_ERROR_CODE_T.INVALID_VARIABLE_DATA_TYPE, null);
+                        unit = variableNode.SelectSingleNode("Unit").FirstChild.Value;
+                        comment = variableNode.SelectSingleNode("Comment").FirstChild.Value;
+
+                        __variables.Add(name, new VariableDefinition(id, name, dataType, unit, comment));
                     }
                 }
             }

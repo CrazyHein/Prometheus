@@ -103,53 +103,34 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.Catalogue
                     {
                         if (extensionModelNode.NodeType != XmlNodeType.Element || extensionModelNode.Name != "ExtensionModel")
                             continue;
-                        mask = 0;
                         txVariables = new Dictionary<string, int>();
                         rxVariables = new Dictionary<string, int>();
-                        foreach (XmlNode node in extensionModelNode.ChildNodes)
+                        
+                        id = Convert.ToUInt16(extensionModelNode.SelectSingleNode("ID").FirstChild.Value, 16);
+                        name = extensionModelNode.SelectSingleNode("Name").FirstChild.Value;
+                        bitSize = Convert.ToUInt16(extensionModelNode.SelectSingleNode("BitSize").FirstChild.Value, 16);
+                        XmlNode x = extensionModelNode["TX"];
+                        if (x != null)
                         {
-                            if (node.NodeType != XmlNodeType.Element)
-                                continue;
-
-                            switch (node.Name)
+                            foreach (XmlNode tx in x.ChildNodes)
                             {
-                                case "ID":
-                                    id = Convert.ToUInt16(node.FirstChild.Value, 16);
-                                    mask |= 0x00000001;
-                                    break;
-                                case "Name":
-                                    name = node.FirstChild.Value;
-                                    mask |= 0x00000002;
-                                    break;
-                                case "BitSize":
-                                    bitSize = Convert.ToUInt16(node.FirstChild.Value, 16);
-                                    mask |= 0x00000004;
-                                    break;
-                                case "TX":
-                                    foreach (XmlNode x in node.ChildNodes)
-                                    {
-                                        if (x.NodeType != XmlNodeType.Element)
-                                            continue;
-                                        txVariables.Add(x.Name, Convert.ToInt32(x.FirstChild.Value, 10));
-                                    }
-                                    mask |= 0x00000008;
-                                    break;
-                                case "RX":
-                                    foreach (XmlNode x in node.ChildNodes)
-                                    {
-                                        if (x.NodeType != XmlNodeType.Element)
-                                            continue;
-                                        rxVariables.Add(x.Name, Convert.ToInt32(x.FirstChild.Value, 10));
-                                    }
-                                    mask |= 0x00000010;
-                                    break;
+                                if (tx.NodeType != XmlNodeType.Element)
+                                    continue;
+                                txVariables.Add(tx.Name, Convert.ToInt32(tx.FirstChild.Value, 10));
                             }
-
                         }
-                        if ((mask & 0x00000007) == 0x00000007)
-                            __extension_models.Add(id, new ControllerExtensionModel(id, name, bitSize, txVariables, rxVariables));
-                        else
-                            throw new ModelCatalogueParseExcepetion(MODEL_CATALOGUE_FILE_ERROR_CODE_T.ELEMENT_MISSING, null);
+                        x = extensionModelNode["RX"];
+                        if (x != null)
+                        {
+                            foreach (XmlNode rx in x.ChildNodes)
+                            {
+                                if (rx.NodeType != XmlNodeType.Element)
+                                    continue;
+                                rxVariables.Add(rx.Name, Convert.ToInt32(rx.FirstChild.Value, 10));
+                            }
+                        }
+                            
+                        __extension_models.Add(id, new ControllerExtensionModel(id, name, bitSize, txVariables, rxVariables));
                     }
                 }
             }
@@ -188,46 +169,32 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.Catalogue
                         mask = 0;
                         txVariables = new Dictionary<string, int>();
                         rxVariables = new Dictionary<string, int>();
-                        foreach (XmlNode node in extensionModelNode.ChildNodes)
+
+                        id = Convert.ToUInt16(extensionModelNode.SelectSingleNode("ID").FirstChild.Value, 16);
+                        name = extensionModelNode.SelectSingleNode("Name").FirstChild.Value;
+                        XmlNode x = extensionModelNode["TX"];
+                        if (x != null)
                         {
-                            if (node.NodeType != XmlNodeType.Element)
-                                continue;
-
-                            switch (node.Name)
+                            foreach (XmlNode tx in x.ChildNodes)
                             {
-                                case "ID":
-                                    id = Convert.ToUInt16(node.FirstChild.Value, 16);
-                                    mask |= 0x00000001;
-                                    break;
-                                case "Name":
-                                    name = node.FirstChild.Value;
-                                    mask |= 0x00000002;
-                                    break;
-                                case "TX":
-                                    foreach (XmlNode x in node.ChildNodes)
-                                    {
-                                        if (x.NodeType != XmlNodeType.Element)
-                                            continue;
-                                        txVariables.Add(x.Name, Convert.ToInt32(x.FirstChild.Value, 10));
-                                    }
-                                    mask |= 0x00000004;
-                                    break;
-                                case "RX":
-                                    foreach (XmlNode x in node.ChildNodes)
-                                    {
-                                        if (x.NodeType != XmlNodeType.Element)
-                                            continue;
-                                        rxVariables.Add(x.Name, Convert.ToInt32(x.FirstChild.Value, 10));
-                                    }
-                                    mask |= 0x00000008;
-                                    break;
+                                if (tx.NodeType != XmlNodeType.Element)
+                                    continue;
+                                txVariables.Add(tx.Name, Convert.ToInt32(tx.FirstChild.Value, 10));
                             }
-
                         }
-                        if ((mask & 0x00000003) == 0x00000003)
-                            __ethernet_models.Add(id, new ControllerEthernetModel(id, name, txVariables, rxVariables));
-                        else
-                            throw new ModelCatalogueParseExcepetion(MODEL_CATALOGUE_FILE_ERROR_CODE_T.ELEMENT_MISSING, null);
+                        x = extensionModelNode["RX"];
+                        if (x != null)
+                        {
+                            foreach (XmlNode rx in x.ChildNodes)
+                            {
+                                if (rx.NodeType != XmlNodeType.Element)
+                                    continue;
+                                rxVariables.Add(rx.Name, Convert.ToInt32(rx.FirstChild.Value, 10));
+                            }
+                        }
+                       
+                        __ethernet_models.Add(id, new ControllerEthernetModel(id, name, txVariables, rxVariables));
+
                     }
                 }
             }

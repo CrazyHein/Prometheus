@@ -113,6 +113,13 @@
                         <TextBlock Text="{Binding Path=BitSize}" Margin="4" HorizontalAlignment="Left"/>
                     </DataTemplate>
 
+                    <DataTemplate x:Key="AlignmentHeadTemplate">
+                        <TextBlock FontWeight="Bold" Text="Alignment"/>
+                    </DataTemplate>
+                    <DataTemplate x:Key="AlignmentContentTemplate">
+                        <TextBlock Text="{Binding Path=Alignment}" Margin="4" HorizontalAlignment="Left"/>
+                    </DataTemplate>
+
                     <DataTemplate x:Key="ByteOffsetHeadTemplate">
                         <TextBlock FontWeight="Bold" Text="ByteOffset"/>
                     </DataTemplate>
@@ -138,6 +145,7 @@
                     <GridView>
                         <GridViewColumn Width="160" HeaderTemplate="{StaticResource NameHeadTemplate}" CellTemplate="{StaticResource NameContentTemplate}"/>
                         <GridViewColumn Width="100" HeaderTemplate="{StaticResource BitSizeHeadTemplate}" CellTemplate="{StaticResource BitSizeContentTemplate}"/>
+                        <GridViewColumn Width="100" HeaderTemplate="{StaticResource AlignmentHeadTemplate}" CellTemplate="{StaticResource AlignmentContentTemplate}"/>
                         <GridViewColumn Width="100" HeaderTemplate="{StaticResource ByteOffsetHeadTemplate}" CellTemplate="{StaticResource ByteOffsetContentTemplate}"/>
                         <GridViewColumn Width="200" HeaderTemplate="{StaticResource CommentHeadTemplate}" CellTemplate="{StaticResource CommentContentTemplate}"/>
                         <GridViewColumn Width="80" HeaderTemplate="{StaticResource SubItemsHeadTemplate}" CellTemplate="{StaticResource SubItemsContentTemplate}"/>
