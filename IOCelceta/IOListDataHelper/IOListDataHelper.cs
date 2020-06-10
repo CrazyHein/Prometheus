@@ -174,30 +174,12 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
 
         private void __load_target_info(XmlNode basicNode)
         {
-            uint mask = 0;
             try
             {
                 if (basicNode.NodeType == XmlNodeType.Element)
                 {
-                    foreach (XmlNode node in basicNode.ChildNodes)
-                    {
-
-                        if (node.NodeType != XmlNodeType.Element)
-                            continue;
-                        switch (node.Name)
-                        {
-                            case "Name":
-                                TargetInformation.name = node.FirstChild.Value;
-                                mask |= 0x00000001;
-                                break;
-                            case "Description":
-                                TargetInformation.description = node.FirstChild.Value;
-                                mask |= 0x00000002;
-                                break;
-                        }
-                    }
-                    if (mask != 3)
-                        throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.ELEMENT_MISSING, null);
+                    TargetInformation.name = basicNode.SelectSingleNode("Name").FirstChild.Value;
+                    TargetInformation.description = basicNode.SelectSingleNode("Description").FirstChild.Value;
                 }
                 else
                     throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.ELEMENT_MISSING, null);
@@ -214,29 +196,12 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
 
         private void __load_mc_server_info(XmlNode mcServerInfoNode)
         {
-            uint mask = 0;
             try
             {
                 if (mcServerInfoNode.NodeType == XmlNodeType.Element)
                 {
-                    foreach (XmlNode node in mcServerInfoNode.ChildNodes)
-                    {
-                        if (node.NodeType != XmlNodeType.Element)
-                            continue;
-                        switch (node.Name)
-                        {
-                            case "IP":
-                                MCServerIPAddress = node.FirstChild.Value;
-                                mask |= 0x00000001;
-                                break;
-                            case "Port":
-                                MCServerPort = Convert.ToUInt16(node.FirstChild.Value, 10);
-                                mask |= 0x00000002;
-                                break;
-                        }
-                    }
-                    if (mask != 3)
-                        throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.ELEMENT_MISSING, null);
+                    MCServerIPAddress = mcServerInfoNode.SelectSingleNode("IP").FirstChild.Value;
+                    MCServerPort = Convert.ToUInt16(mcServerInfoNode.SelectSingleNode("Port").FirstChild.Value, 10);
                 }
                 else
                     throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.ELEMENT_MISSING, null);
@@ -253,8 +218,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
 
         private void __load_controller_extension_modules(XmlNode extensionModulesNode)
         {
-            uint mask = 0;
-            ControllerModel model = null;
+            ControllerExtensionModel model = null;
             string referenceName = null;
             ushort localAddress = 0;
             try
@@ -265,37 +229,18 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                     {
                         if (extensionModule.NodeType != XmlNodeType.Element || extensionModule.Name != "ExtensionModule")
                             continue;
-                        
-                        foreach (XmlNode node in extensionModule)
-                        {
-                            switch (node.Name)
-                            {
-                                case "ID":
-                                    ushort id = Convert.ToUInt16(node.FirstChild.Value, 16);
-                                    if (ControllerCatalogue.ExtensionModels.Keys.Contains(id) == false)
-                                        throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_CONTROLLER_EXTENSION_MODEL, null);
-                                    model = ControllerCatalogue.ExtensionModels[id];
-                                    mask |= 0x00000001;
-                                    break;
-                                case "Name":
-                                    referenceName = node.FirstChild.Value;
-                                    mask |= 0x00000002;
-                                    break;
-                                case "Address":
-                                    localAddress = Convert.ToUInt16(node.FirstChild.Value, 16);
-                                    mask |= 0x00000004;
-                                    break;
-                            }
-                        }
-                        if (mask != 7)
-                            throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.ELEMENT_MISSING, null);
-                        else
-                        {
-                            IO_LIST_CONTROLLER_INFORMATION_T.MODULE_T module = new IO_LIST_CONTROLLER_INFORMATION_T.MODULE_T(model, referenceName, localAddress);
-                            ModuleDataVerification(module);
-                            __controller_information.modules.Add(module.reference_name, module);
-                            __module_reference_counter.Add(module.reference_name, 0);
-                        }
+
+                        ushort id = Convert.ToUInt16(extensionModule.SelectSingleNode("ID").FirstChild.Value, 16);
+                        if(ControllerCatalogue.ExtensionModels.TryGetValue(id, out model) == false)
+                            throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_CONTROLLER_EXTENSION_MODEL, null);
+
+                        referenceName = extensionModule.SelectSingleNode("Name").FirstChild.Value;
+                        localAddress = Convert.ToUInt16(extensionModule.SelectSingleNode("Address").FirstChild.Value, 16);
+
+                        IO_LIST_CONTROLLER_INFORMATION_T.MODULE_T module = new IO_LIST_CONTROLLER_INFORMATION_T.MODULE_T(model, referenceName, localAddress);
+                        ModuleDataVerification(module);
+                        __controller_information.modules.Add(module.reference_name, module);
+                        __module_reference_counter.Add(module.reference_name, 0);
                     }
                 }
             }
@@ -311,8 +256,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
 
         private void __load_controller_ethernet_modules(XmlNode ethernetModulesNode)
         {
-            uint mask = 0;
-            ControllerModel model = null;
+            ControllerEthernetModel model = null;
             string referenceName = null;
             string ip = null;
             ushort port = 0;
@@ -324,41 +268,19 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                     {
                         if (extensionModule.NodeType != XmlNodeType.Element || extensionModule.Name != "EthernetModule")
                             continue;
-                        
-                        foreach (XmlNode node in extensionModule)
-                        {
-                            switch (node.Name)
-                            {
-                                case "ID":
-                                    ushort id = Convert.ToUInt16(node.FirstChild.Value, 16);
-                                    if (ControllerCatalogue.EthernetModels.Keys.Contains(id) == false)
-                                        throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_CONTROLLER_EXTENSION_MODEL, null);
-                                    model = ControllerCatalogue.EthernetModels[id];
-                                    mask |= 0x00000001;
-                                    break;
-                                case "Name":
-                                    referenceName = node.FirstChild.Value;
-                                    mask |= 0x00000002;
-                                    break;
-                                case "IP":
-                                    ip = node.FirstChild.Value;
-                                    mask |= 0x00000004;
-                                    break;
-                                case "Port":
-                                    port = Convert.ToUInt16(node.FirstChild.Value, 10);
-                                    mask |= 0x00000008;
-                                    break;
-                            }
-                        }
-                        if (mask != 15)
-                            throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.ELEMENT_MISSING, null);
-                        else
-                        {
-                            IO_LIST_CONTROLLER_INFORMATION_T.MODULE_T module = new IO_LIST_CONTROLLER_INFORMATION_T.MODULE_T(model, referenceName, ip, port);
-                            ModuleDataVerification(module);
-                            __controller_information.modules.Add(module.reference_name, module);
-                            __module_reference_counter.Add(module.reference_name, 0);
-                        }
+
+                        ushort id = Convert.ToUInt16(extensionModule.SelectSingleNode("ID").FirstChild.Value, 16);
+                        if (ControllerCatalogue.EthernetModels.TryGetValue(id, out model) == false)
+                            throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_CONTROLLER_EXTENSION_MODEL, null);
+
+                        referenceName = extensionModule.SelectSingleNode("Name").FirstChild.Value;
+                        ip = extensionModule.SelectSingleNode("IP").FirstChild.Value;
+                        port = Convert.ToUInt16(extensionModule.SelectSingleNode("Port").FirstChild.Value, 10);
+
+                        IO_LIST_CONTROLLER_INFORMATION_T.MODULE_T module = new IO_LIST_CONTROLLER_INFORMATION_T.MODULE_T(model, referenceName, ip, port);
+                        ModuleDataVerification(module);
+                        __controller_information.modules.Add(module.reference_name, module);
+                        __module_reference_counter.Add(module.reference_name, 0);
                     }
                 }
             }
@@ -383,47 +305,25 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                         if (objectNode.NodeType != XmlNodeType.Element || objectNode.Name != "Object")
                             continue;
 
-                        uint mask = 0;
                         uint index = 0;
                         VariableDefinition variableDefinition = null;
                         IO_LIST_OBJECT_COLLECTION_T.MODULE_BINDING_T moduleBindingInfo = null;
                         IO_LIST_OBJECT_COLLECTION_T.VALUE_RANGE_T valueRangeInfo = null;
                         IO_LIST_OBJECT_COLLECTION_T.VALUE_CONVERTER_T valueConverterInfo = null;
 
-                        foreach (XmlNode node in objectNode)
-                        {
-                            switch (node.Name)
-                            {
-                                case "Index":
-                                    index = Convert.ToUInt32(node.FirstChild.Value, 16);
-                                    mask |= 0x00000001;
-                                    break;
-                                case "Name":
-                                    if (VariableCatalogue.Variables.Keys.Contains(node.FirstChild.Value))
-                                    {
-                                        variableDefinition = VariableCatalogue.Variables[node.FirstChild.Value];
-                                        mask |= 0x00000002;
-                                    }
-                                    else
-                                        throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_OBJECT_VARIABLE, null);
-                                    break;
-                                case "Binding":
-                                    moduleBindingInfo = __load_object_binding_info(node);
-                                    mask |= 0x00000008;
-                                    break;
-                                case "Range":
-                                    valueRangeInfo = __load_object_range_info(node);
-                                    mask |= 0x00000020;
-                                    break;
-                                case "Converter":
-                                    valueConverterInfo = __load_object_converter_info(node);
-                                    mask |= 0x00000010;
-                                    break;
-                            }
-                        }
-                        
-                        if ((mask & 0x00000003) != 0x00000003)
-                            throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.ELEMENT_MISSING, null);
+                        index = Convert.ToUInt32(objectNode.SelectSingleNode("Index").FirstChild.Value, 16);
+                        if (VariableCatalogue.Variables.TryGetValue(objectNode.SelectSingleNode("Name").FirstChild.Value, out variableDefinition) == false)
+                            throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_OBJECT_VARIABLE, null);
+
+                        XmlNode opt = objectNode["Binding"];
+                        if(opt != null) moduleBindingInfo = __load_object_binding_info(opt);
+
+                        opt = objectNode["Range"];
+                        if (opt != null) valueRangeInfo = __load_object_range_info(opt);
+
+                        opt = objectNode["Converter"];
+                        if (opt != null) valueConverterInfo = __load_object_converter_info(opt);
+
 
                         IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T objectDefinition = new IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T(index, variableDefinition, moduleBindingInfo, valueRangeInfo, valueConverterInfo);
                         ObjectDataVerification(objectDefinition);
@@ -448,42 +348,42 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
 
         private IO_LIST_OBJECT_COLLECTION_T.MODULE_BINDING_T __load_object_binding_info(XmlNode bindingNode)
         {
-            uint mask = 0;
             bool enabled = false;
             IO_LIST_CONTROLLER_INFORMATION_T.MODULE_T module = null;
             string channelName = null;
             int channelIndex = 0;
             try
             {
-                if (bindingNode.NodeType == XmlNodeType.Element)
+                foreach (XmlNode node in bindingNode.ChildNodes)
                 {
-                    foreach (XmlNode node in bindingNode.ChildNodes)
+                    if (node.NodeType != XmlNodeType.Element)
+                        continue;
+                    if (module != null && channelName != null)
+                        break;
+
+                    switch (node.Name)
                     {
-                        if (node.NodeType != XmlNodeType.Element)
-                            continue;
-                        switch (node.Name)
-                        {
-                            case "Module":
-                                if(__controller_information.modules.Keys.Contains(node.FirstChild.Value) == false)
-                                    throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_OBJECT_BINDING_MODULE_REFERENCE, null);
-                                module = __controller_information.modules[node.FirstChild.Value];
-                                mask |= 0x00000001;
+                        case "Module":
+                            if (module != null)
                                 break;
-                            default:
-                                if (node.NodeType == XmlNodeType.Element)
-                                {
-                                    channelName = node.Name;
-                                    channelIndex = Convert.ToInt32(node.FirstChild.Value, 10);
-                                    mask |= 0x00000002;
-                                }
+                            if (__controller_information.modules.TryGetValue(node.FirstChild.Value, out module) == false)
+                                throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_OBJECT_BINDING_MODULE_REFERENCE, null);
+                            break;
+                        default:
+                            if (channelName != null)
                                 break;
-                        }
+                            if (node.NodeType == XmlNodeType.Element)
+                            {
+                                channelName = node.Name;
+                                channelIndex = Convert.ToInt32(node.FirstChild.Value, 10);
+                            }
+                            break;
                     }
-                    if (mask != 3)
-                        throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.ELEMENT_MISSING, null);
-                    else
-                        enabled = true;
                 }
+                if (module == null || channelName == null)
+                    throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.ELEMENT_MISSING, null);
+                else
+                    enabled = true;
 
                 return new IO_LIST_OBJECT_COLLECTION_T.MODULE_BINDING_T(enabled, module, channelName, channelIndex);
             }
@@ -499,35 +399,14 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
 
         private IO_LIST_OBJECT_COLLECTION_T.VALUE_RANGE_T __load_object_range_info(XmlNode converterNode)
         {
-            uint mask = 0;
             bool enabled = false;
             string upLimit = "0", downLimit = "0";
             try
             {
-                if (converterNode.NodeType == XmlNodeType.Element)
-                {
-                    foreach (XmlNode node in converterNode.ChildNodes)
-                    {
-                        if (node.NodeType != XmlNodeType.Element)
-                            continue;
-
-                        switch (node.Name)
-                        {
-                            case "UpLimit":
-                                upLimit = node.FirstChild.Value;
-                                mask |= 0x00000004;
-                                break;
-                            case "DownLimit":
-                                downLimit = node.FirstChild.Value;
-                                mask |= 0x00000008;
-                                break;
-                        }
-                    }
-                    if (mask != 0x0C)
-                        throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.ELEMENT_MISSING, null);
-                    else
-                        enabled = true;
-                }
+                upLimit = converterNode.SelectSingleNode("UpLimit").FirstChild.Value;
+                downLimit = converterNode.SelectSingleNode("DownLimit").FirstChild.Value;
+                    
+                enabled = true;
 
                 return new IO_LIST_OBJECT_COLLECTION_T.VALUE_RANGE_T(enabled, upLimit, downLimit);
             }
@@ -543,46 +422,13 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
 
         private IO_LIST_OBJECT_COLLECTION_T.VALUE_CONVERTER_T __load_object_converter_info(XmlNode converterNode)
         {
-            uint mask = 0;
             bool enabled = false;
             double upScale = 0, downScale = 0;
             try
             {
-                if (converterNode.NodeType == XmlNodeType.Element)
-                {
-                    foreach (XmlNode node in converterNode.ChildNodes)
-                    {
-                        if (node.NodeType != XmlNodeType.Element)
-                            continue;
-
-                        switch (node.Name)
-                        {
-                            /*
-                            case "DataType":
-                                if (DataTypeCatalogue.DataTypes.Keys.Contains(node.FirstChild.Value))
-                                {
-                                    converterData.data_type = DataTypeCatalogue.DataTypes[node.FirstChild.Value];
-                                    mask |= 0x00000001;
-                                }
-                                else
-                                    throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_OBJECT_DATA_TYPE, null);
-                                break;
-                                */
-                            case "UpScale":
-                                upScale = Convert.ToDouble(node.FirstChild.Value);
-                                mask |= 0x00000004;
-                                break;
-                            case "DownScale":
-                                downScale = Convert.ToDouble(node.FirstChild.Value);
-                                mask |= 0x00000008;
-                                break;
-                        }
-                    }
-                    if (mask != 0x0C)
-                        throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.ELEMENT_MISSING, null);
-                    else
-                        enabled = true;
-                }
+                upScale = Convert.ToDouble(converterNode.SelectSingleNode("UpScale").FirstChild.Value);
+                downScale = Convert.ToDouble(converterNode.SelectSingleNode("DownScale").FirstChild.Value);
+                enabled = true;
 
                 return new IO_LIST_OBJECT_COLLECTION_T.VALUE_CONVERTER_T(enabled, upScale, downScale);
             }
@@ -616,10 +462,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                         {
                             uint id = Convert.ToUInt32(index.FirstChild.Value, 16);
                             IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T objectData = null;
-                            if (__object_collection.objects.Keys.Contains(id))
-                                objectData = __object_collection.objects[id];
-                            else
+                            if(__object_collection.objects.TryGetValue(id, out objectData) == false)
                                 throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_OBJECT_REFERENCE_IN_PDO, null);
+
                             PdoObjectDataVerification(area, objectData, false);
 
                             if (area == IO_LIST_PDO_AREA_T.RX_BIT || area == IO_LIST_PDO_AREA_T.TX_BIT)
@@ -736,30 +581,12 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                         string name = null;
                         List<IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T> objectDatas = null;
                         IO_LIST_INTERLOCK_LOGIC_COLLECTION_T.LOGIC_EXPRESSION_T statement = null;
-                        uint mask = 0;
-                        foreach (XmlNode node in interlock.ChildNodes)
-                        {
-                            if (node.NodeType != XmlNodeType.Element)
-                                continue;
-                            switch (node.Name)
-                            {
-                                case "Name":
-                                    name = node.FirstChild.Value;
-                                    mask |= 0x00000001;
-                                    break;
-                                case "Target":
-                                    objectDatas = __load_interlock_logic_target(node);
-                                    mask |= 0x00000002;
-                                    break;
-                                case "Statement":
-                                    statement = __load_interlock_logic_statement(node.FirstChild, null) as IO_LIST_INTERLOCK_LOGIC_COLLECTION_T.LOGIC_EXPRESSION_T;
-                                    if(statement != null)
-                                        mask |= 0x00000004;
-                                    break;
-                            }
-                        }
 
-                        if(mask != 0x00000007)
+                        name = interlock.SelectSingleNode("Name").FirstChild.Value;
+                        objectDatas = __load_interlock_logic_target(interlock.SelectSingleNode("Target"));
+                        statement = __load_interlock_logic_statement(interlock.SelectSingleNode("Statement").FirstChild, null) as IO_LIST_INTERLOCK_LOGIC_COLLECTION_T.LOGIC_EXPRESSION_T;
+
+                        if(statement == null)
                             throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.ELEMENT_MISSING, null);
 
                         __controller_interlock_collection.logic_definitions.Add(
@@ -818,7 +645,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                     IO_LIST_INTERLOCK_LOGIC_COLLECTION_T.LOGIC_EXPRESSION_T expression = null;
                     if (rootExpression != null)
                     {
-                        if (rootExpression.layer == IO_LIST_INTERLOCK_LOGIC_COLLECTION_T.MAX_LAYER_OF_NESTED_LOGIC - 1)
+                        if (rootExpression.layer == IO_LIST_INTERLOCK_LOGIC_COLLECTION_T.MAX_LAYER_OF_NESTED_LOGIC)
                             throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INTERLOCK_LOGIC_STATEMENT_LAYER_OUT_OF_RANGE, null);
                     }
                     switch (rootNode.Name)
@@ -956,17 +783,19 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
 
         public void InterlockLogicTargetObjectDataVerification(uint objectIndex)
         {
-            if (__object_collection.objects.Keys.Contains(objectIndex) == false)
+            IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T data;
+            if (__object_collection.objects.TryGetValue(objectIndex, out data) == false)
                 throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_OBJECT_REFERENCE_IN_INTERLOCK, null);
-            IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T data = __object_collection.objects[objectIndex];
+
             InterlockLogicTargetObjectDataVerification(data);
         }
 
         public void InterlockLogicOperandDataVerification(uint objectIndex)
         {
-            if (__object_collection.objects.Keys.Contains(objectIndex) == false)
+            IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T data;
+            if(__object_collection.objects.TryGetValue(objectIndex, out data) == false)
                 throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_OBJECT_REFERENCE_IN_INTERLOCK, null);
-            IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T data = __object_collection.objects[objectIndex];
+
             if (__controller_pdo_collection.tx_pdo_bit_area.objects.Contains(data) == false && __controller_pdo_collection.rx_pdo_bit_area.objects.Contains(data) == false)
                 throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_OBJECT_REFERENCE_IN_INTERLOCK, null);
         }
@@ -975,7 +804,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
         {
             if (element == null)
                 throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_INTERLOCK_LOGIC_EXPRESSION, null);
-            else if(element.layer > IO_LIST_INTERLOCK_LOGIC_COLLECTION_T.MAX_LAYER_OF_NESTED_LOGIC - 1)
+            else if(element.layer > IO_LIST_INTERLOCK_LOGIC_COLLECTION_T.MAX_LAYER_OF_NESTED_LOGIC)
                 throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INTERLOCK_LOGIC_STATEMENT_LAYER_OUT_OF_RANGE, null);
             else if (element.type == IO_LIST_INTERLOCK_LOGIC_ELEMENT_TYPE.OPERAND)
             {
@@ -1195,9 +1024,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
 
         public IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T PdoObjectReferenceVerification(IO_LIST_PDO_AREA_T area, uint objectIndex)
         {
-            if (__object_collection.objects.Keys.Contains(objectIndex))
+            IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T objectData;
+            if (__object_collection.objects.TryGetValue(objectIndex, out objectData) == true)
             {
-                IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T objectData = __object_collection.objects[objectIndex];
                 __object_data_area_verification(area, objectData);
                 return objectData;
             }
@@ -2732,7 +2561,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
 
             private LOGIC_ELEMEMT_T __search_logic_element(List<Tuple<string, int>> statements, ref int start, LOGIC_EXPRESSION_T root, IReadOnlyDictionary<uint, IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T> objectDictionary)
             {
-                if (root != null && root.layer == MAX_LAYER_OF_NESTED_LOGIC - 1)
+                if (root != null && root.layer == MAX_LAYER_OF_NESTED_LOGIC)
                     throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INTERLOCK_LOGIC_STATEMENT_LAYER_OUT_OF_RANGE, null);
                
                 LOGIC_EXPRESSION_T expression = null;

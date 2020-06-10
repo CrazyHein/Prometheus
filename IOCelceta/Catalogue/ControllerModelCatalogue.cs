@@ -62,7 +62,6 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.Catalogue
             ushort id = 0;
             string name = "";
             ushort bitSize = 0;
-            uint mask = 0;
             Dictionary<string, int> txVariables;
             Dictionary<string, int> rxVariables;
             XmlDocument xmlDoc = new XmlDocument();
@@ -166,7 +165,6 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.Catalogue
                     {
                         if (extensionModelNode.NodeType != XmlNodeType.Element || extensionModelNode.Name != "EthernetModel")
                             continue;
-                        mask = 0;
                         txVariables = new Dictionary<string, int>();
                         rxVariables = new Dictionary<string, int>();
 
