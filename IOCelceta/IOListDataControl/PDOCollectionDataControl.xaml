@@ -180,11 +180,28 @@
                     <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
                 </Style>
 
+                <DataTemplate x:Key="BitOffsetHeadTemplate">
+                    <TextBlock FontWeight="Bold" Text="Bit"/>
+                </DataTemplate>
+                <DataTemplate x:Key="BitOffsetContentTemplate">
+                    <TextBlock Text="{Binding Path=OffsetInBit}" Margin="4" HorizontalAlignment="Left"/>
+                </DataTemplate>
+
+                <DataTemplate x:Key="ByteOffsetHeadTemplate">
+                    <TextBlock FontWeight="Bold" Text="Byte"/>
+                </DataTemplate>
+                <DataTemplate x:Key="ByteOffsetContentTemplate">
+                    <TextBlock Text="{Binding Path=OffsetInByte}" Margin="4" HorizontalAlignment="Left"/>
+                </DataTemplate>
+
                 <DataTemplate x:Key="IndexHeadTemplate">
                     <TextBlock FontWeight="Bold" Text="Index"/>
                 </DataTemplate>
                 <DataTemplate x:Key="IndexContentTemplate">
                     <TextBlock Text="{Binding Path=Index, StringFormat=0x{0:X8}}" Margin="4" HorizontalAlignment="Left"/>
+                </DataTemplate>
+                <DataTemplate x:Key="ObjectIndexContentTemplate">
+                    <TextBlock Text="{Binding Path=ObjectReference.Index, StringFormat=0x{0:X8}}" Margin="4" HorizontalAlignment="Left"/>
                 </DataTemplate>
 
                 <DataTemplate x:Key="VariableNameHeadTemplate">
@@ -197,6 +214,13 @@
                         </TextBlock.ToolTip>
                     </TextBlock>
                 </DataTemplate>
+                <DataTemplate x:Key="ObjectVariableNameContentTemplate">
+                    <TextBlock Text="{Binding Path=ObjectReference.VariableName}" Margin="4" HorizontalAlignment="Left">
+                        <TextBlock.ToolTip>
+                            <TextBlock Text="{Binding Path=ObjectReference.VariableComment}"/>
+                        </TextBlock.ToolTip>
+                    </TextBlock>
+                </DataTemplate>
 
                 <DataTemplate x:Key="DataTypeHeadTemplate">
                     <TextBlock FontWeight="Bold" Text="Data Type"/>
@@ -204,12 +228,18 @@
                 <DataTemplate x:Key="DataTypeContentTemplate">
                     <TextBlock Text="{Binding Path=VariableDataType}" Margin="4" HorizontalAlignment="Left"/>
                 </DataTemplate>
+                <DataTemplate x:Key="ObjectDataTypeContentTemplate">
+                    <TextBlock Text="{Binding Path=ObjectReference.VariableDataType}" Margin="4" HorizontalAlignment="Left"/>
+                </DataTemplate>
 
                 <DataTemplate x:Key="UnitHeadTemplate">
                     <TextBlock FontWeight="Bold" Text="Unit"/>
                 </DataTemplate>
                 <DataTemplate x:Key="UnitContentTemplate">
                     <TextBlock Text="{Binding Path=VariableUnit}" Margin="4" HorizontalAlignment="Left"/>
+                </DataTemplate>
+                <DataTemplate x:Key="ObjectUnitContentTemplate">
+                    <TextBlock Text="{Binding Path=ObjectReference.VariableUnit}" Margin="4" HorizontalAlignment="Left"/>
                 </DataTemplate>
 
                 <DataTemplate x:Key="BindingHeadTemplate">
@@ -227,6 +257,19 @@
                         </TextBlock.Text>
                     </TextBlock>
                 </DataTemplate>
+                <DataTemplate x:Key="ObjectBindingContentTemplate">
+                    <TextBlock Margin="4" HorizontalAlignment="Left">
+                        <TextBlock.Text>
+                            <MultiBinding Converter="{StaticResource BindingString}">
+                                <Binding Path="ObjectReference.BindingEnable"/>
+                                <Binding Path="ObjectReference.BindingModuleSelection"/>
+                                <Binding Path="ObjectReference.BindingChannelName"/>
+                                <Binding Path="ObjectReference.BindingChannelIndex"/>
+                            </MultiBinding>
+                        </TextBlock.Text>
+                    </TextBlock>
+                </DataTemplate>
+                
                 <DataTemplate x:Key="RangeHeadTemplate">
                     <TextBlock FontWeight="Bold" Text="Range"/>
                 </DataTemplate>
@@ -241,6 +284,18 @@
                         </TextBlock.Text>
                     </TextBlock>
                 </DataTemplate>
+                <DataTemplate x:Key="ObjectRangeContentTemplate">
+                    <TextBlock Margin="4" HorizontalAlignment="Left">
+                        <TextBlock.Text>
+                            <MultiBinding Converter="{StaticResource RangeString}">
+                                <Binding Path="ObjectReference.RangeEnable"/>
+                                <Binding Path="ObjectReference.RangeDownLimit"/>
+                                <Binding Path="ObjectReference.RangeUpLimit"/>
+                            </MultiBinding>
+                        </TextBlock.Text>
+                    </TextBlock>
+                </DataTemplate>
+                
                 <DataTemplate x:Key="ConverterHeadTemplate">
                     <TextBlock FontWeight="Bold" Text="Converter"/>
                 </DataTemplate>
@@ -251,6 +306,17 @@
                                 <Binding Path="ConverterEnable"/>
                                 <Binding Path="ConverterDownScale"/>
                                 <Binding Path="ConverterUpScale"/>
+                            </MultiBinding>
+                        </TextBlock.Text>
+                    </TextBlock>
+                </DataTemplate>
+                <DataTemplate x:Key="ObjectConverterContentTemplate">
+                    <TextBlock Margin="4" HorizontalAlignment="Left">
+                        <TextBlock.Text>
+                            <MultiBinding Converter="{StaticResource ConverterString}">
+                                <Binding Path="ObjectReference.ConverterEnable"/>
+                                <Binding Path="ObjectReference.ConverterDownScale"/>
+                                <Binding Path="ObjectReference.ConverterUpScale"/>
                             </MultiBinding>
                         </TextBlock.Text>
                     </TextBlock>
@@ -300,13 +366,15 @@
                             <ListView Name="__lsv_tx_diagnostic_area" ItemsSource="{Binding TxDiagnosticArea}" SelectionMode="Single" ContextMenu="{StaticResource PDOContextMenu}">
                                 <ListView.View>
                                     <GridView>
-                                        <GridViewColumn Width="100" HeaderTemplate="{StaticResource IndexHeadTemplate}" CellTemplate="{StaticResource IndexContentTemplate}"/>
-                                        <GridViewColumn Width="200" HeaderTemplate="{StaticResource VariableNameHeadTemplate}" CellTemplate="{StaticResource VariableNameContentTemplate}"/>
-                                        <GridViewColumn Width="100" HeaderTemplate="{StaticResource DataTypeHeadTemplate}" CellTemplate="{StaticResource DataTypeContentTemplate}"/>
-                                        <GridViewColumn Width="100" HeaderTemplate="{StaticResource UnitHeadTemplate}" CellTemplate="{StaticResource UnitContentTemplate}"/>
-                                        <GridViewColumn Width="200" HeaderTemplate="{StaticResource BindingHeadTemplate}" CellTemplate="{StaticResource BindingContentTemplate}"/>
-                                        <GridViewColumn Width="120" HeaderTemplate="{StaticResource RangeHeadTemplate}" CellTemplate="{StaticResource RangeContentTemplate}"/>
-                                        <GridViewColumn Width="120" HeaderTemplate="{StaticResource ConverterHeadTemplate}" CellTemplate="{StaticResource ConverterContentTemplate}"/>
+                                        <GridViewColumn Width="80" HeaderTemplate="{StaticResource BitOffsetHeadTemplate}" CellTemplate="{StaticResource BitOffsetContentTemplate}"/>
+                                        <GridViewColumn Width="80" HeaderTemplate="{StaticResource ByteOffsetHeadTemplate}" CellTemplate="{StaticResource ByteOffsetContentTemplate}"/>
+                                        <GridViewColumn Width="100" HeaderTemplate="{StaticResource IndexHeadTemplate}" CellTemplate="{StaticResource ObjectIndexContentTemplate}"/>
+                                        <GridViewColumn Width="200" HeaderTemplate="{StaticResource VariableNameHeadTemplate}" CellTemplate="{StaticResource ObjectVariableNameContentTemplate}"/>
+                                        <GridViewColumn Width="100" HeaderTemplate="{StaticResource DataTypeHeadTemplate}" CellTemplate="{StaticResource ObjectDataTypeContentTemplate}"/>
+                                        <GridViewColumn Width="100" HeaderTemplate="{StaticResource UnitHeadTemplate}" CellTemplate="{StaticResource ObjectUnitContentTemplate}"/>
+                                        <GridViewColumn Width="200" HeaderTemplate="{StaticResource BindingHeadTemplate}" CellTemplate="{StaticResource ObjectBindingContentTemplate}"/>
+                                        <GridViewColumn Width="120" HeaderTemplate="{StaticResource RangeHeadTemplate}" CellTemplate="{StaticResource ObjectRangeContentTemplate}"/>
+                                        <GridViewColumn Width="120" HeaderTemplate="{StaticResource ConverterHeadTemplate}" CellTemplate="{StaticResource ObjectConverterContentTemplate}"/>
                                     </GridView>
                                 </ListView.View>
                             </ListView>
@@ -332,16 +400,18 @@
                             </StackPanel>
                         </GroupBox>
                         <GroupBox Header="PDO Mapping" Padding="6">
-                            <ListView Name="__lsv_tx_bit_area" ItemsSource="{Binding TxBitArea}" SelectionMode="Single"  ContextMenu="{StaticResource PDOContextMenu}" VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.VirtualizationMode="Recycling">
+                            <ListView Name="__lsv_tx_bit_area" ItemsSource="{Binding TxBitArea}" SelectionMode="Extended"  ContextMenu="{StaticResource PDOContextMenu}" VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.VirtualizationMode="Recycling">
                                 <ListView.View>
                                     <GridView>
-                                        <GridViewColumn Width="100" HeaderTemplate="{StaticResource IndexHeadTemplate}" CellTemplate="{StaticResource IndexContentTemplate}"/>
-                                        <GridViewColumn Width="200" HeaderTemplate="{StaticResource VariableNameHeadTemplate}" CellTemplate="{StaticResource VariableNameContentTemplate}"/>
-                                        <GridViewColumn Width="100" HeaderTemplate="{StaticResource DataTypeHeadTemplate}" CellTemplate="{StaticResource DataTypeContentTemplate}"/>
-                                        <GridViewColumn Width="100" HeaderTemplate="{StaticResource UnitHeadTemplate}" CellTemplate="{StaticResource UnitContentTemplate}"/>
-                                        <GridViewColumn Width="200" HeaderTemplate="{StaticResource BindingHeadTemplate}" CellTemplate="{StaticResource BindingContentTemplate}"/>
-                                        <GridViewColumn Width="120" HeaderTemplate="{StaticResource RangeHeadTemplate}" CellTemplate="{StaticResource RangeContentTemplate}"/>
-                                        <GridViewColumn Width="120" HeaderTemplate="{StaticResource ConverterHeadTemplate}" CellTemplate="{StaticResource ConverterContentTemplate}"/>
+                                        <GridViewColumn Width="80" HeaderTemplate="{StaticResource BitOffsetHeadTemplate}" CellTemplate="{StaticResource BitOffsetContentTemplate}"/>
+                                        <GridViewColumn Width="80" HeaderTemplate="{StaticResource ByteOffsetHeadTemplate}" CellTemplate="{StaticResource ByteOffsetContentTemplate}"/>
+                                        <GridViewColumn Width="100" HeaderTemplate="{StaticResource IndexHeadTemplate}" CellTemplate="{StaticResource ObjectIndexContentTemplate}"/>
+                                        <GridViewColumn Width="200" HeaderTemplate="{StaticResource VariableNameHeadTemplate}" CellTemplate="{StaticResource ObjectVariableNameContentTemplate}"/>
+                                        <GridViewColumn Width="100" HeaderTemplate="{StaticResource DataTypeHeadTemplate}" CellTemplate="{StaticResource ObjectDataTypeContentTemplate}"/>
+                                        <GridViewColumn Width="100" HeaderTemplate="{StaticResource UnitHeadTemplate}" CellTemplate="{StaticResource ObjectUnitContentTemplate}"/>
+                                        <GridViewColumn Width="200" HeaderTemplate="{StaticResource BindingHeadTemplate}" CellTemplate="{StaticResource ObjectBindingContentTemplate}"/>
+                                        <GridViewColumn Width="120" HeaderTemplate="{StaticResource RangeHeadTemplate}" CellTemplate="{StaticResource ObjectRangeContentTemplate}"/>
+                                        <GridViewColumn Width="120" HeaderTemplate="{StaticResource ConverterHeadTemplate}" CellTemplate="{StaticResource ObjectConverterContentTemplate}"/>
                                     </GridView>
                                 </ListView.View>
                             </ListView>
@@ -370,13 +440,15 @@
                             <ListView Name="__lsv_tx_block_area" ItemsSource="{Binding TxBlockArea}" SelectionMode="Single"  ContextMenu="{StaticResource PDOContextMenu}" VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.VirtualizationMode="Recycling">
                                 <ListView.View>
                                     <GridView>
-                                        <GridViewColumn Width="100" HeaderTemplate="{StaticResource IndexHeadTemplate}" CellTemplate="{StaticResource IndexContentTemplate}"/>
-                                        <GridViewColumn Width="200" HeaderTemplate="{StaticResource VariableNameHeadTemplate}" CellTemplate="{StaticResource VariableNameContentTemplate}"/>
-                                        <GridViewColumn Width="100" HeaderTemplate="{StaticResource DataTypeHeadTemplate}" CellTemplate="{StaticResource DataTypeContentTemplate}"/>
-                                        <GridViewColumn Width="100" HeaderTemplate="{StaticResource UnitHeadTemplate}" CellTemplate="{StaticResource UnitContentTemplate}"/>
-                                        <GridViewColumn Width="200" HeaderTemplate="{StaticResource BindingHeadTemplate}" CellTemplate="{StaticResource BindingContentTemplate}"/>
-                                        <GridViewColumn Width="120" HeaderTemplate="{StaticResource RangeHeadTemplate}" CellTemplate="{StaticResource RangeContentTemplate}"/>
-                                        <GridViewColumn Width="120" HeaderTemplate="{StaticResource ConverterHeadTemplate}" CellTemplate="{StaticResource ConverterContentTemplate}"/>
+                                        <GridViewColumn Width="80" HeaderTemplate="{StaticResource BitOffsetHeadTemplate}" CellTemplate="{StaticResource BitOffsetContentTemplate}"/>
+                                        <GridViewColumn Width="80" HeaderTemplate="{StaticResource ByteOffsetHeadTemplate}" CellTemplate="{StaticResource ByteOffsetContentTemplate}"/>
+                                        <GridViewColumn Width="100" HeaderTemplate="{StaticResource IndexHeadTemplate}" CellTemplate="{StaticResource ObjectIndexContentTemplate}"/>
+                                        <GridViewColumn Width="200" HeaderTemplate="{StaticResource VariableNameHeadTemplate}" CellTemplate="{StaticResource ObjectVariableNameContentTemplate}"/>
+                                        <GridViewColumn Width="100" HeaderTemplate="{StaticResource DataTypeHeadTemplate}" CellTemplate="{StaticResource ObjectDataTypeContentTemplate}"/>
+                                        <GridViewColumn Width="100" HeaderTemplate="{StaticResource UnitHeadTemplate}" CellTemplate="{StaticResource ObjectUnitContentTemplate}"/>
+                                        <GridViewColumn Width="200" HeaderTemplate="{StaticResource BindingHeadTemplate}" CellTemplate="{StaticResource ObjectBindingContentTemplate}"/>
+                                        <GridViewColumn Width="120" HeaderTemplate="{StaticResource RangeHeadTemplate}" CellTemplate="{StaticResource ObjectRangeContentTemplate}"/>
+                                        <GridViewColumn Width="120" HeaderTemplate="{StaticResource ConverterHeadTemplate}" CellTemplate="{StaticResource ObjectConverterContentTemplate}"/>
                                     </GridView>
                                 </ListView.View>
                             </ListView>
@@ -405,13 +477,15 @@
                             <ListView Name="__lsv_rx_control_area" ItemsSource="{Binding RxControlArea}" SelectionMode="Single"  ContextMenu="{StaticResource PDOContextMenu}">
                                 <ListView.View>
                                     <GridView>
-                                        <GridViewColumn Width="100" HeaderTemplate="{StaticResource IndexHeadTemplate}" CellTemplate="{StaticResource IndexContentTemplate}"/>
-                                        <GridViewColumn Width="200" HeaderTemplate="{StaticResource VariableNameHeadTemplate}" CellTemplate="{StaticResource VariableNameContentTemplate}"/>
-                                        <GridViewColumn Width="100" HeaderTemplate="{StaticResource DataTypeHeadTemplate}" CellTemplate="{StaticResource DataTypeContentTemplate}"/>
-                                        <GridViewColumn Width="100" HeaderTemplate="{StaticResource UnitHeadTemplate}" CellTemplate="{StaticResource UnitContentTemplate}"/>
-                                        <GridViewColumn Width="200" HeaderTemplate="{StaticResource BindingHeadTemplate}" CellTemplate="{StaticResource BindingContentTemplate}"/>
-                                        <GridViewColumn Width="120" HeaderTemplate="{StaticResource RangeHeadTemplate}" CellTemplate="{StaticResource RangeContentTemplate}"/>
-                                        <GridViewColumn Width="120" HeaderTemplate="{StaticResource ConverterHeadTemplate}" CellTemplate="{StaticResource ConverterContentTemplate}"/>
+                                        <GridViewColumn Width="80" HeaderTemplate="{StaticResource BitOffsetHeadTemplate}" CellTemplate="{StaticResource BitOffsetContentTemplate}"/>
+                                        <GridViewColumn Width="80" HeaderTemplate="{StaticResource ByteOffsetHeadTemplate}" CellTemplate="{StaticResource ByteOffsetContentTemplate}"/>
+                                        <GridViewColumn Width="100" HeaderTemplate="{StaticResource IndexHeadTemplate}" CellTemplate="{StaticResource ObjectIndexContentTemplate}"/>
+                                        <GridViewColumn Width="200" HeaderTemplate="{StaticResource VariableNameHeadTemplate}" CellTemplate="{StaticResource ObjectVariableNameContentTemplate}"/>
+                                        <GridViewColumn Width="100" HeaderTemplate="{StaticResource DataTypeHeadTemplate}" CellTemplate="{StaticResource ObjectDataTypeContentTemplate}"/>
+                                        <GridViewColumn Width="100" HeaderTemplate="{StaticResource UnitHeadTemplate}" CellTemplate="{StaticResource ObjectUnitContentTemplate}"/>
+                                        <GridViewColumn Width="200" HeaderTemplate="{StaticResource BindingHeadTemplate}" CellTemplate="{StaticResource ObjectBindingContentTemplate}"/>
+                                        <GridViewColumn Width="120" HeaderTemplate="{StaticResource RangeHeadTemplate}" CellTemplate="{StaticResource ObjectRangeContentTemplate}"/>
+                                        <GridViewColumn Width="120" HeaderTemplate="{StaticResource ConverterHeadTemplate}" CellTemplate="{StaticResource ObjectConverterContentTemplate}"/>
                                     </GridView>
                                 </ListView.View>
                             </ListView>
@@ -440,13 +514,15 @@
                             <ListView Name="__lsv_rx_bit_area" ItemsSource="{Binding RxBitArea}" SelectionMode="Single"  ContextMenu="{StaticResource PDOContextMenu}" VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.VirtualizationMode="Recycling">
                                 <ListView.View>
                                     <GridView>
-                                        <GridViewColumn Width="100" HeaderTemplate="{StaticResource IndexHeadTemplate}" CellTemplate="{StaticResource IndexContentTemplate}"/>
-                                        <GridViewColumn Width="200" HeaderTemplate="{StaticResource VariableNameHeadTemplate}" CellTemplate="{StaticResource VariableNameContentTemplate}"/>
-                                        <GridViewColumn Width="100" HeaderTemplate="{StaticResource DataTypeHeadTemplate}" CellTemplate="{StaticResource DataTypeContentTemplate}"/>
-                                        <GridViewColumn Width="100" HeaderTemplate="{StaticResource UnitHeadTemplate}" CellTemplate="{StaticResource UnitContentTemplate}"/>
-                                        <GridViewColumn Width="200" HeaderTemplate="{StaticResource BindingHeadTemplate}" CellTemplate="{StaticResource BindingContentTemplate}"/>
-                                        <GridViewColumn Width="120" HeaderTemplate="{StaticResource RangeHeadTemplate}" CellTemplate="{StaticResource RangeContentTemplate}"/>
-                                        <GridViewColumn Width="120" HeaderTemplate="{StaticResource ConverterHeadTemplate}" CellTemplate="{StaticResource ConverterContentTemplate}"/>
+                                        <GridViewColumn Width="80" HeaderTemplate="{StaticResource BitOffsetHeadTemplate}" CellTemplate="{StaticResource BitOffsetContentTemplate}"/>
+                                        <GridViewColumn Width="80" HeaderTemplate="{StaticResource ByteOffsetHeadTemplate}" CellTemplate="{StaticResource ByteOffsetContentTemplate}"/>
+                                        <GridViewColumn Width="100" HeaderTemplate="{StaticResource IndexHeadTemplate}" CellTemplate="{StaticResource ObjectIndexContentTemplate}"/>
+                                        <GridViewColumn Width="200" HeaderTemplate="{StaticResource VariableNameHeadTemplate}" CellTemplate="{StaticResource ObjectVariableNameContentTemplate}"/>
+                                        <GridViewColumn Width="100" HeaderTemplate="{StaticResource DataTypeHeadTemplate}" CellTemplate="{StaticResource ObjectDataTypeContentTemplate}"/>
+                                        <GridViewColumn Width="100" HeaderTemplate="{StaticResource UnitHeadTemplate}" CellTemplate="{StaticResource ObjectUnitContentTemplate}"/>
+                                        <GridViewColumn Width="200" HeaderTemplate="{StaticResource BindingHeadTemplate}" CellTemplate="{StaticResource ObjectBindingContentTemplate}"/>
+                                        <GridViewColumn Width="120" HeaderTemplate="{StaticResource RangeHeadTemplate}" CellTemplate="{StaticResource ObjectRangeContentTemplate}"/>
+                                        <GridViewColumn Width="120" HeaderTemplate="{StaticResource ConverterHeadTemplate}" CellTemplate="{StaticResource ObjectConverterContentTemplate}"/>
                                     </GridView>
                                 </ListView.View>
                             </ListView>
@@ -475,13 +551,15 @@
                             <ListView Name="__lsv_rx_block_area" ItemsSource="{Binding RxBlockArea}" SelectionMode="Single"  ContextMenu="{StaticResource PDOContextMenu}" VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.VirtualizationMode="Recycling">
                                 <ListView.View>
                                     <GridView>
-                                        <GridViewColumn Width="100" HeaderTemplate="{StaticResource IndexHeadTemplate}" CellTemplate="{StaticResource IndexContentTemplate}"/>
-                                        <GridViewColumn Width="200" HeaderTemplate="{StaticResource VariableNameHeadTemplate}" CellTemplate="{StaticResource VariableNameContentTemplate}"/>
-                                        <GridViewColumn Width="100" HeaderTemplate="{StaticResource DataTypeHeadTemplate}" CellTemplate="{StaticResource DataTypeContentTemplate}"/>
-                                        <GridViewColumn Width="100" HeaderTemplate="{StaticResource UnitHeadTemplate}" CellTemplate="{StaticResource UnitContentTemplate}"/>
-                                        <GridViewColumn Width="200" HeaderTemplate="{StaticResource BindingHeadTemplate}" CellTemplate="{StaticResource BindingContentTemplate}"/>
-                                        <GridViewColumn Width="120" HeaderTemplate="{StaticResource RangeHeadTemplate}" CellTemplate="{StaticResource RangeContentTemplate}"/>
-                                        <GridViewColumn Width="120" HeaderTemplate="{StaticResource ConverterHeadTemplate}" CellTemplate="{StaticResource ConverterContentTemplate}"/>
+                                        <GridViewColumn Width="80" HeaderTemplate="{StaticResource BitOffsetHeadTemplate}" CellTemplate="{StaticResource BitOffsetContentTemplate}"/>
+                                        <GridViewColumn Width="80" HeaderTemplate="{StaticResource ByteOffsetHeadTemplate}" CellTemplate="{StaticResource ByteOffsetContentTemplate}"/>
+                                        <GridViewColumn Width="100" HeaderTemplate="{StaticResource IndexHeadTemplate}" CellTemplate="{StaticResource ObjectIndexContentTemplate}"/>
+                                        <GridViewColumn Width="200" HeaderTemplate="{StaticResource VariableNameHeadTemplate}" CellTemplate="{StaticResource ObjectVariableNameContentTemplate}"/>
+                                        <GridViewColumn Width="100" HeaderTemplate="{StaticResource DataTypeHeadTemplate}" CellTemplate="{StaticResource ObjectDataTypeContentTemplate}"/>
+                                        <GridViewColumn Width="100" HeaderTemplate="{StaticResource UnitHeadTemplate}" CellTemplate="{StaticResource ObjectUnitContentTemplate}"/>
+                                        <GridViewColumn Width="200" HeaderTemplate="{StaticResource BindingHeadTemplate}" CellTemplate="{StaticResource ObjectBindingContentTemplate}"/>
+                                        <GridViewColumn Width="120" HeaderTemplate="{StaticResource RangeHeadTemplate}" CellTemplate="{StaticResource ObjectRangeContentTemplate}"/>
+                                        <GridViewColumn Width="120" HeaderTemplate="{StaticResource ConverterHeadTemplate}" CellTemplate="{StaticResource ObjectConverterContentTemplate}"/>
                                     </GridView>
                                 </ListView.View>
                             </ListView>

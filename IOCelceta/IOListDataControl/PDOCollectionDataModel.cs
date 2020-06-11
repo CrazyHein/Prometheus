@@ -11,26 +11,67 @@ using System.Xml;
 
 namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDataControl
 {
+    public class ProcessObjectItemDataModel : INotifyPropertyChanged
+    {
+        private uint __offset_in_bit;
+        private uint __offset_in_byte;
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        virtual internal protected void OnPropertyChanged(string propertyName)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+        protected void SetProperty<T>(ref T storage, T value, [CallerMemberName] String propertyName = null)
+        {
+            if (object.Equals(storage, value))
+                return;
+            storage = value;
+            OnPropertyChanged(propertyName);
+        }
+
+        public uint OffsetInBit
+        {
+            get { return __offset_in_bit; }
+            set { SetProperty(ref __offset_in_bit, value); OffsetInByte = value / 8; }
+        }
+
+        public uint OffsetInByte
+        {
+            get { return __offset_in_byte; }
+            protected set { SetProperty(ref __offset_in_byte, value); }
+        }
+
+        public ObjectItemDataModel ObjectReference { get; }
+
+        public ProcessObjectItemDataModel(uint offsetInBit, ObjectItemDataModel objectReference)
+        {
+            __offset_in_bit = offsetInBit;
+            __offset_in_byte = __offset_in_bit / 8;
+            ObjectReference = objectReference;
+        }
+    }
+
+
     public class PDOCollectionDataModel : IOListDataModel
     {
-        public IReadOnlyList<ObjectItemDataModel> TxDiagnosticArea { get { return __tx_diagnostic_area; } }
-        public IReadOnlyList<ObjectItemDataModel> TxBitArea { get { return __tx_bit_area; } }
-        public IReadOnlyList<ObjectItemDataModel> TxBlockArea { get { return __tx_block_area; } }
-        public IReadOnlyList<ObjectItemDataModel> RxControlArea { get { return __rx_control_area; } }
-        public IReadOnlyList<ObjectItemDataModel> RxBitArea { get { return __rx_bit_area; } }
-        public IReadOnlyList<ObjectItemDataModel> RxBlockArea { get { return __rx_block_area; } }
+        public IReadOnlyList<ProcessObjectItemDataModel> TxDiagnosticArea { get { return __tx_diagnostic_area; } }
+        public IReadOnlyList<ProcessObjectItemDataModel> TxBitArea { get { return __tx_bit_area; } }
+        public IReadOnlyList<ProcessObjectItemDataModel> TxBlockArea { get { return __tx_block_area; } }
+        public IReadOnlyList<ProcessObjectItemDataModel> RxControlArea { get { return __rx_control_area; } }
+        public IReadOnlyList<ProcessObjectItemDataModel> RxBitArea { get { return __rx_bit_area; } }
+        public IReadOnlyList<ProcessObjectItemDataModel> RxBlockArea { get { return __rx_block_area; } }
         public IReadOnlyList<ObjectItemDataModel> AvailableObjects { get { return __object_collection_data_model.Objects; }}
         public ObjectItemFilter AvailableObjectItemFilter { get; private set; }
         public string FilterDataTypeName { get; set; }
         public string FilterVariableName { get; set; }
         public string FilterModuleName { get; set; }
 
-        private ObservableCollection<ObjectItemDataModel> __tx_diagnostic_area;
-        private ObservableCollection<ObjectItemDataModel> __tx_bit_area;
-        private ObservableCollection<ObjectItemDataModel> __tx_block_area;
-        private ObservableCollection<ObjectItemDataModel> __rx_control_area;
-        private ObservableCollection<ObjectItemDataModel> __rx_bit_area;
-        private ObservableCollection<ObjectItemDataModel> __rx_block_area;
+        private ObservableCollection<ProcessObjectItemDataModel> __tx_diagnostic_area;
+        private ObservableCollection<ProcessObjectItemDataModel> __tx_bit_area;
+        private ObservableCollection<ProcessObjectItemDataModel> __tx_block_area;
+        private ObservableCollection<ProcessObjectItemDataModel> __rx_control_area;
+        private ObservableCollection<ProcessObjectItemDataModel> __rx_bit_area;
+        private ObservableCollection<ProcessObjectItemDataModel> __rx_block_area;
         private uint __tx_diag_offset_in_word, __tx_diag_size_in_word, __tx_diag_actual_size_in_byte;
         private uint __tx_bit_offset_in_word, __tx_bit_size_in_word, __tx_bit_actual_size_in_byte;
         private uint __tx_block_offset_in_word, __tx_block_size_in_word, __tx_block_actual_size_in_byte;
@@ -38,7 +79,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
         private uint __rx_bit_offset_in_word, __rx_bit_size_in_word, __rx_bit_actual_size_in_byte;
         private uint __rx_block_offset_in_word, __rx_block_size_in_word, __rx_block_actual_size_in_byte;
 
-        private Dictionary<IO_LIST_PDO_AREA_T, ObservableCollection<ObjectItemDataModel>> __collection_areas;
+        private Dictionary<IO_LIST_PDO_AREA_T, ObservableCollection<ProcessObjectItemDataModel>> __collection_areas;
 
         private ObservableCollection<IntlklogicDefinition> __intlk_logic_area;
         public IReadOnlyList<IntlklogicDefinition> IntlkLogicArea { get { return __intlk_logic_area; } }
@@ -49,14 +90,14 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
 
         public PDOCollectionDataModel(IOListDataHelper helper, ObjectCollectionDataModel objectCollectionDataModel) : base(helper)
         {
-            __tx_diagnostic_area = new ObservableCollection<ObjectItemDataModel>();
-            __tx_bit_area = new ObservableCollection<ObjectItemDataModel>();
-            __tx_block_area = new ObservableCollection<ObjectItemDataModel>();
-            __rx_control_area = new ObservableCollection<ObjectItemDataModel>();
-            __rx_bit_area = new ObservableCollection<ObjectItemDataModel>();
-            __rx_block_area = new ObservableCollection<ObjectItemDataModel>();
+            __tx_diagnostic_area = new ObservableCollection<ProcessObjectItemDataModel>();
+            __tx_bit_area = new ObservableCollection<ProcessObjectItemDataModel>();
+            __tx_block_area = new ObservableCollection<ProcessObjectItemDataModel>();
+            __rx_control_area = new ObservableCollection<ProcessObjectItemDataModel>();
+            __rx_bit_area = new ObservableCollection<ProcessObjectItemDataModel>();
+            __rx_block_area = new ObservableCollection<ProcessObjectItemDataModel>();
 
-            __collection_areas = new Dictionary<IO_LIST_PDO_AREA_T, ObservableCollection<ObjectItemDataModel>>(6);
+            __collection_areas = new Dictionary<IO_LIST_PDO_AREA_T, ObservableCollection<ProcessObjectItemDataModel>>(6);
             __collection_areas.Add(IO_LIST_PDO_AREA_T.TX_DIAGNOSTIC, __tx_diagnostic_area);
             __collection_areas.Add(IO_LIST_PDO_AREA_T.TX_BIT, __tx_bit_area);
             __collection_areas.Add(IO_LIST_PDO_AREA_T.TX_BLOCK, __tx_block_area);
@@ -170,6 +211,37 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             private set { SetProperty(ref __rx_block_actual_size_in_byte, value); }
         }
 
+        public void __update_area_pdo_offset(IO_LIST_PDO_AREA_T area, int start)
+        {
+            switch (area)
+            {
+                case IO_LIST_PDO_AREA_T.TX_DIAGNOSTIC:
+                    for(int i = start; i < _data_helper.TxDiagnosticArea.Count; ++i)
+                        __collection_areas[area][i].OffsetInBit = _data_helper.TxDiagnosticArea[i].offset_in_bit;
+                    break;
+                case IO_LIST_PDO_AREA_T.TX_BIT:
+                    for (int i = start; i < _data_helper.TxBitArea.Count; ++i)
+                        __collection_areas[area][i].OffsetInBit = _data_helper.TxBitArea[i].offset_in_bit;
+                    break;
+                case IO_LIST_PDO_AREA_T.TX_BLOCK:
+                    for (int i = start; i < _data_helper.TxBlockArea.Count; ++i)
+                        __collection_areas[area][i].OffsetInBit = _data_helper.TxBlockArea[i].offset_in_bit;
+                    break;
+                case IO_LIST_PDO_AREA_T.RX_CONTROL:
+                    for (int i = start; i < _data_helper.RxControlArea.Count; ++i)
+                        __collection_areas[area][i].OffsetInBit = _data_helper.RxControlArea[i].offset_in_bit;
+                    break;
+                case IO_LIST_PDO_AREA_T.RX_BIT:
+                    for (int i = start; i < _data_helper.RxBitArea.Count; ++i)
+                        __collection_areas[area][i].OffsetInBit = _data_helper.RxBitArea[i].offset_in_bit;
+                    break;
+                case IO_LIST_PDO_AREA_T.RX_BLOCK:
+                    for (int i = start; i < _data_helper.RxBlockArea.Count; ++i)
+                        __collection_areas[area][i].OffsetInBit = _data_helper.RxBlockArea[i].offset_in_bit;
+                    break;
+            }
+        }
+
         public void __updata_area_actual_size(IO_LIST_PDO_AREA_T area)
         {
             switch (area)
@@ -272,7 +344,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             __tx_diagnostic_area.Clear();
             foreach (var o in _data_helper.TxDiagnosticArea)
             {
-                __tx_diagnostic_area.Add(__object_collection_data_model.ObjectDictionary[o.index]);
+                __tx_diagnostic_area.Add(new ProcessObjectItemDataModel(o.offset_in_bit, __object_collection_data_model.ObjectDictionary[o.object_reference.index]));
             }
 
             TxBitAreaOffsetInWord = _data_helper.TxBitAreaOffset;
@@ -282,7 +354,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             foreach (var o in _data_helper.TxBitArea)
             {
                 //ObjectItemDataModel model = new ObjectItemDataModel(o);
-                __tx_bit_area.Add(__object_collection_data_model.ObjectDictionary[o.index]);
+                __tx_bit_area.Add(new ProcessObjectItemDataModel(o.offset_in_bit, __object_collection_data_model.ObjectDictionary[o.object_reference.index]));
             }
 
             TxBlockAreaOffsetInWord = _data_helper.TxBlockAreaOffset;
@@ -292,7 +364,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             foreach (var o in _data_helper.TxBlockArea)
             {
                 //ObjectItemDataModel model = new ObjectItemDataModel(o);
-                __tx_block_area.Add(__object_collection_data_model.ObjectDictionary[o.index]);
+                __tx_block_area.Add(new ProcessObjectItemDataModel(o.offset_in_bit, __object_collection_data_model.ObjectDictionary[o.object_reference.index]));
             }
 
             RxControlAreaOffsetInWord = _data_helper.RxControlAreaOffset;
@@ -302,7 +374,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             foreach (var o in _data_helper.RxControlArea)
             {
                 //ObjectItemDataModel model = new ObjectItemDataModel(o);
-                __rx_control_area.Add(__object_collection_data_model.ObjectDictionary[o.index]);
+                __rx_control_area.Add(new ProcessObjectItemDataModel(o.offset_in_bit, __object_collection_data_model.ObjectDictionary[o.object_reference.index]));
             }
 
             RxBitAreaOffsetInWord = _data_helper.RxBitAreaOffset;
@@ -312,7 +384,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             foreach (var o in _data_helper.RxBitArea)
             {
                 //ObjectItemDataModel model = new ObjectItemDataModel(o);
-                __rx_bit_area.Add(__object_collection_data_model.ObjectDictionary[o.index]);
+                __rx_bit_area.Add(new ProcessObjectItemDataModel(o.offset_in_bit, __object_collection_data_model.ObjectDictionary[o.object_reference.index]));
             }
 
             RxBlockAreaOffsetInWord = _data_helper.RxBlockAreaOffset;
@@ -322,7 +394,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             foreach (var o in _data_helper.RxBlockArea)
             {
                 //ObjectItemDataModel model = new ObjectItemDataModel(o);
-                __rx_block_area.Add(__object_collection_data_model.ObjectDictionary[o.index]);
+                __rx_block_area.Add(new ProcessObjectItemDataModel(o.offset_in_bit, __object_collection_data_model.ObjectDictionary[o.object_reference.index]));
             }
 
             foreach (var def in _data_helper.InterlockDefinitions)
@@ -345,6 +417,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
                 __collection_areas[area].Move(firstPos, secondPos);
                 __collection_areas[area].Move(secondPos + 1, firstPos);
             }
+            __updata_area_actual_size(area);
+            __update_area_pdo_offset(area, Math.Min(firstPos, secondPos));
             Dirty = true;
         }
 
@@ -353,7 +427,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             __updata_area_size(area);
             _data_helper.InsertPDOMapping(pos, area, objectIndex);
             __updata_area_actual_size(area);
-            __collection_areas[area].Insert(pos, __object_collection_data_model.ObjectDictionary[objectIndex]);
+            __collection_areas[area].Insert(pos, new ProcessObjectItemDataModel(0, __object_collection_data_model.ObjectDictionary[objectIndex]));
+            __update_area_pdo_offset(area, pos);
             Dirty = true;
         }
 
@@ -363,7 +438,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T objectData = _data_helper.IOObjectDictionary[objectDataModel.Index];
             _data_helper.InsertPDOMapping(pos, area, objectData, false);
             __updata_area_actual_size(area);
-            __collection_areas[area].Insert(pos, objectDataModel);
+            __collection_areas[area].Insert(pos, new ProcessObjectItemDataModel(0, objectDataModel));
+            __update_area_pdo_offset(area, pos);
             Dirty = true;
         }
 
@@ -373,6 +449,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             _data_helper.RemovePDOMapping(pos, area);
             __updata_area_actual_size(area);
             __collection_areas[area].RemoveAt(pos);
+            __update_area_pdo_offset(area, pos);
             Dirty = true;
         }
 
@@ -381,7 +458,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             __updata_area_size(area);
             _data_helper.AppendPDOMapping(area, objectIndex);
             __updata_area_actual_size(area);
-            __collection_areas[area].Add(__object_collection_data_model.ObjectDictionary[objectIndex]);
+            __collection_areas[area].Add(new ProcessObjectItemDataModel(0, __object_collection_data_model.ObjectDictionary[objectIndex]));
+            __update_area_pdo_offset(area, __collection_areas[area].Count - 1);
             Dirty = true;
         }
 
@@ -391,7 +469,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T objectData = _data_helper.IOObjectDictionary[objectDataModel.Index];
             _data_helper.AppendPDOMapping(area, objectData, false);
             __updata_area_actual_size(area);
-            __collection_areas[area].Add(objectDataModel);
+            __collection_areas[area].Add(new ProcessObjectItemDataModel(0, objectDataModel));
+            __update_area_pdo_offset(area, __collection_areas[area].Count - 1);
             Dirty = true;
         }
 
@@ -401,7 +480,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             _data_helper.ReplacePDOMapping(area, pos, objectIndex);
             __updata_area_actual_size(area);
             __collection_areas[area].RemoveAt(pos);
-            __collection_areas[area].Insert(pos, __object_collection_data_model.ObjectDictionary[objectIndex]);
+            __collection_areas[area].Insert(pos, new ProcessObjectItemDataModel(0, __object_collection_data_model.ObjectDictionary[objectIndex]));
+            __update_area_pdo_offset(area, pos);
             //__collection_areas[area][pos] = __object_collection_data_model.ObjectDictionary[objectIndex];
             Dirty = true;
         }
@@ -413,7 +493,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             _data_helper.ReplacePDOMapping(area, pos, objectData, false);
             __updata_area_actual_size(area);
             __collection_areas[area].RemoveAt(pos);
-            __collection_areas[area].Insert(pos, objectDataModel);
+            __collection_areas[area].Insert(pos, new ProcessObjectItemDataModel(0, objectDataModel));
+            __update_area_pdo_offset(area, pos);
             //__collection_areas[area][pos] = objectDataModel;
             Dirty = true;
         }
@@ -421,7 +502,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
         public void GroupPDOMappingByBindingModule(IO_LIST_PDO_AREA_T area)
         {
             _data_helper.GroupPDOMappingByBindingModule(area);
-            IReadOnlyList<IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T> objectList = null;
+            IReadOnlyList<IO_LIST_CONTROLLER_PDO_COLLECTION_T.OBJECT_T> objectList = null;
 
             switch (area)
             {
@@ -446,7 +527,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             }
             __collection_areas[area].Clear();
             foreach (var o in objectList)
-                __collection_areas[area].Add(__object_collection_data_model.ObjectDictionary[o.index]);
+                __collection_areas[area].Add(new ProcessObjectItemDataModel(o.offset_in_bit, __object_collection_data_model.ObjectDictionary[o.object_reference.index]));
             Dirty = true;
         }
 
