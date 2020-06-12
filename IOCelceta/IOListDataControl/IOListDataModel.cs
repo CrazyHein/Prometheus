@@ -38,8 +38,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
         }
 
         protected IOListDataHelper _data_helper;
-        public abstract void UpdateDataModel(bool clearDirtyFlag = true);
-        public abstract void UpdateDataHelper(bool clearDirtyFlag = false);
+        public abstract void InitializeDataModel(bool clearDirtyFlag = true);
+        public abstract void FinalizeDataHelper(bool clearDirtyFlag = false);
 
         public int FieldDataBindingErrors { get; set; }
         private bool __dirty;

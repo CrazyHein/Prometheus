@@ -277,14 +277,34 @@
 			<Name>RJ71DN91_MASTER</Name>
 			<BitSize>0x20</BitSize>
 			<TX>
+				<Raw>512</Raw>
 				<Byte>512</Byte>
+				<SByte>512</SByte>
+				<Short>511</Short>
+				<UShort>511</UShort>
+				<Int>509</Int>
+				<UInt>509</UInt>
+				<FP3201>509</FP3201>
+				<FP3202>509</FP3202>
+				<Float>509</Float>
+				<Double>505</Double>
 				<NodeCFG>64</NodeCFG>
 				<NodeDIAG>64</NodeDIAG>
 				<NodeIOCOM>64</NodeIOCOM>
 				<NodeIOERR>64</NodeIOERR>
 			</TX>
 			<RX>
+				<Raw>512</Raw>
 				<Byte>512</Byte>
+				<SByte>512</SByte>
+				<Short>511</Short>
+				<UShort>511</UShort>
+				<Int>509</Int>
+				<UInt>509</UInt>
+				<FP3201>509</FP3201>
+				<FP3202>509</FP3202>
+				<Float>509</Float>
+				<Double>505</Double>
 			</RX>
 		</ExtensionModel>
 		<ExtensionModel>
@@ -298,10 +318,10 @@
 				<NetLP>1</NetLP>
 				<NetMLP>1</NetMLP>
 				<NetEVT>1</NetEVT>
-				<Byte>17552</Byte>
+				<Raw>17552</Raw>
 			</TX>
 			<RX>
-				<Byte>23696</Byte>
+				<Raw>23696</Raw>
 			</RX>
 		</ExtensionModel>
 	</ExtensionModels>
@@ -310,12 +330,12 @@
 			<ID>0x2001</ID>
 			<Name>PC104_SERIAL_PORT_SERVER</Name>
 			<TX>
-				<Byte>2048</Byte>
+				<Raw>2048</Raw>
 				<NodeCFG>32</NodeCFG>
 				<NodeIOCOM>32</NodeIOCOM>
 			</TX>
 			<RX>
-				<Byte>2048</Byte>
+				<Raw>2048</Raw>
 			</RX>
 		</EthernetModel>
 	</EthernetModels>

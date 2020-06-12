@@ -328,7 +328,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             return new IntlklogicDefinition(definition.name, objectDataModels, expressionDataModel);
         }
 
-        public override void UpdateDataHelper(bool clearDirtyFlag = false)
+        public override void FinalizeDataHelper(bool clearDirtyFlag = false)
         {
             foreach (var area in Enum.GetValues(typeof(IO_LIST_PDO_AREA_T)))
                 __updata_area_size((IO_LIST_PDO_AREA_T)area);
@@ -336,7 +336,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
                 Dirty = false;
         }
 
-        public override void UpdateDataModel(bool clearDirtyFlag = true)
+        public override void InitializeDataModel(bool clearDirtyFlag = true)
         {
             TxDiagnosticAreaOffsetInWord = _data_helper.TxDiagnosticAreaOffset;
             TxDiagnosticAreaSizeInWord = _data_helper.TxDiagnosticAreaSize;

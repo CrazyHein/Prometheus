@@ -17,7 +17,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
         {
         }
 
-        public override void UpdateDataModel(bool clearDirtyFlag = true)
+        public override void InitializeDataModel(bool clearDirtyFlag = true)
         {
             Name = _data_helper.TargetInformation.name;
             Description = _data_helper.TargetInformation.description;
@@ -25,7 +25,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
                 Dirty = false;
         }
 
-        public override void UpdateDataHelper(bool clearDirtyFlag = false)
+        public override void FinalizeDataHelper(bool clearDirtyFlag = false)
         {
             _data_helper.TargetInformation.name = Name;
             _data_helper.TargetInformation.description = Description;

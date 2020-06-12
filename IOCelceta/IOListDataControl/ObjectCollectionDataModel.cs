@@ -45,13 +45,13 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             ItemFilter = new ObjectItemFilter(null, null, null);
         }
 
-        public override void UpdateDataHelper(bool clearDirtyFlag = false)
+        public override void FinalizeDataHelper(bool clearDirtyFlag = false)
         {
             if(clearDirtyFlag == true)
                 Dirty = false;
         }
 
-        public override void UpdateDataModel(bool clearDirtyFlag = true)
+        public override void InitializeDataModel(bool clearDirtyFlag = true)
         {
             __objects.Clear();
             __object_dictionary.Clear();

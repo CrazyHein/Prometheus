@@ -147,10 +147,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                 //InterlockCollectionDataModel interlockCollectionDataModel = new InterlockCollectionDataModel(__io_list_data_helper, objectCollectionDataModel);
                 //__tab_interlock_collection.Content = new InterlockCollectionDataControl(interlockCollectionDataModel);
 
-                ((__tab_target_inforamtion.Content as TargetInformationDataControl).DataContext as TargetInformationDataModel).UpdateDataModel();
-                ((__tab_controller_inforamtion.Content as ControllerInformationDataControl).DataContext as ControllerInformationDataModel).UpdateDataModel();
-                ((__tab_object_collection.Content as ObjectCollectionDataControl).DataContext as ObjectCollectionDataModel).UpdateDataModel();
-                ((__tab_pdo_intlk_collection.Content as PDOCollectionDataControl).DataContext as PDOCollectionDataModel).UpdateDataModel();
+                ((__tab_target_inforamtion.Content as TargetInformationDataControl).DataContext as TargetInformationDataModel).InitializeDataModel();
+                ((__tab_controller_inforamtion.Content as ControllerInformationDataControl).DataContext as ControllerInformationDataModel).InitializeDataModel();
+                ((__tab_object_collection.Content as ObjectCollectionDataControl).DataContext as ObjectCollectionDataModel).InitializeDataModel();
+                ((__tab_pdo_intlk_collection.Content as PDOCollectionDataControl).DataContext as PDOCollectionDataModel).InitializeDataModel();
                 //((__tab_interlock_collection.Content as InterlockCollectionDataControl).DataContext as InterlockCollectionDataModel).UpdateDataModel();
             }
         }
@@ -178,10 +178,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
             //InterlockCollectionDataModel interlockCollectionDataModel = new InterlockCollectionDataModel(__io_list_data_helper, objectCollectionDataModel);
             //__tab_interlock_collection.Content = new InterlockCollectionDataControl(interlockCollectionDataModel);
 
-            ((__tab_target_inforamtion.Content as TargetInformationDataControl).DataContext as TargetInformationDataModel).UpdateDataModel();
-            ((__tab_controller_inforamtion.Content as ControllerInformationDataControl).DataContext as ControllerInformationDataModel).UpdateDataModel();
-            ((__tab_object_collection.Content as ObjectCollectionDataControl).DataContext as ObjectCollectionDataModel).UpdateDataModel();
-            ((__tab_pdo_intlk_collection.Content as PDOCollectionDataControl).DataContext as PDOCollectionDataModel).UpdateDataModel();
+            ((__tab_target_inforamtion.Content as TargetInformationDataControl).DataContext as TargetInformationDataModel).InitializeDataModel();
+            ((__tab_controller_inforamtion.Content as ControllerInformationDataControl).DataContext as ControllerInformationDataModel).InitializeDataModel();
+            ((__tab_object_collection.Content as ObjectCollectionDataControl).DataContext as ObjectCollectionDataModel).InitializeDataModel();
+            ((__tab_pdo_intlk_collection.Content as PDOCollectionDataControl).DataContext as PDOCollectionDataModel).InitializeDataModel();
             //((__tab_interlock_collection.Content as InterlockCollectionDataControl).DataContext as InterlockCollectionDataModel).UpdateDataModel();
         }
 
@@ -219,10 +219,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                 return;
             }
 
-            targetInfo.UpdateDataHelper();
-            controllerInfo.UpdateDataHelper();
-            objectsInfo.UpdateDataHelper();
-            pdoMappingsInfo.UpdateDataHelper();
+            targetInfo.FinalizeDataHelper();
+            controllerInfo.FinalizeDataHelper();
+            objectsInfo.FinalizeDataHelper();
+            pdoMappingsInfo.FinalizeDataHelper();
 
             string message;
             try
@@ -292,10 +292,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
 
             if (save.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
-                targetInfo.UpdateDataHelper();
-                controllerInfo.UpdateDataHelper();
-                objectsInfo.UpdateDataHelper();
-                pdoMappingsInfo.UpdateDataHelper();
+                targetInfo.FinalizeDataHelper();
+                controllerInfo.FinalizeDataHelper();
+                objectsInfo.FinalizeDataHelper();
+                pdoMappingsInfo.FinalizeDataHelper();
 
                 string message;
                 try
