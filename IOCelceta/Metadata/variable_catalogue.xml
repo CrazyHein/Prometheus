@@ -3844,6 +3844,34 @@
 		<Unit>Torr</Unit>
 		<Comment>Station2 backside helium pressure reading (Obsolete)</Comment>
 	</Variable>
+	<Variable>
+		<ID>6130</ID>
+		<Name>Analog ST1 Backside He Leak Rate Reading (Obsolete)</Name>
+		<DataType>INT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Station1 backside helium leakage rate reading (0 - 16000) (Obsolete)</Comment>
+	</Variable>
+	<Variable>
+		<ID>6131</ID>
+		<Name>Analog ST1 Backside He Pressure Reading (Obsolete)</Name>
+		<DataType>INT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Station1 backside helium pressure reading (0 - 16000) (Obsolete)</Comment>
+	</Variable>
+	<Variable>
+		<ID>6132</ID>
+		<Name>Analog ST2 Backside He Leak Rate Reading (Obsolete)</Name>
+		<DataType>INT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Station2 backside helium leakage rate reading (0 - 16000) (Obsolete)</Comment>
+	</Variable>
+	<Variable>
+		<ID>6133</ID>
+		<Name>Analog ST2 Backside He Pressure Reading (Obsolete)</Name>
+		<DataType>INT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Station2 backside helium pressure reading (0 - 16000) (Obsolete)</Comment>
+	</Variable>
 
 	<!-- Onboard Gas Flow Reading-->
 	<Variable>
@@ -4318,6 +4346,22 @@
 		<Comment>Station2 backside helium pressure setpoint (Obsolete)</Comment>
 	</Variable>
 
+	<Variable>
+		<ID>7127</ID>
+		<Name>Analog ST1 Backside He Pressure Setpoint (Obsolete)</Name>
+		<DataType>INT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Station1 backside helium pressure setpoint (0 - 16000) (Obsolete)</Comment>
+	</Variable>
+
+	<Variable>
+		<ID>7129</ID>
+		<Name>Analog ST2 Backside He Pressure Setpoint (Obsolete)</Name>
+		<DataType>INT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Station2 backside helium pressure setpoint (0 - 16000) (Obsolete)</Comment>
+	</Variable>
+
 	<!-- Onboard Gas Flow Setpoint-->
 	<Variable>
 		<ID>7130</ID>
@@ -4418,10 +4462,10 @@
 	</Variable>
 	<Variable>
 		<ID>8011</ID>
-		<Name>Classic Gas Spliter Flow Ratio Readback (Obsolete)</Name>
-		<DataType>FIXEDPOINT3201</DataType>
-		<Unit>%</Unit>
-		<Comment>Gas spliter flow ratio reading from gas split(0.0 - 100.0) (Obsolete)</Comment>
+		<Name>Analog Classic Gas Spliter Flow Ratio Readback (Obsolete)</Name>
+		<DataType>INT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Gas spliter flow ratio reading from gas split (0 - 16000) (Obsolete)</Comment>
 	</Variable>
 
 	<Variable>
@@ -4478,10 +4522,10 @@
 	</Variable>
 	<Variable>
 		<ID>9011</ID>
-		<Name>Classic Gas Spliter Flow Ratio Setpoint (Obsolete)</Name>
-		<DataType>FIXEDPOINT3201</DataType>
-		<Unit>%</Unit>
-		<Comment>Gas spliter flow ratio setpoint to gas split(0.0 - 100.0) (Obsolete)</Comment>
+		<Name>Analog Classic Gas Spliter Flow Ratio Setpoint (Obsolete)</Name>
+		<DataType>INT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Gas spliter flow ratio setpoint to gas split (0 - 16000) (Obsolete)</Comment>
 	</Variable>
 
 	<Variable>
@@ -4680,6 +4724,20 @@
 		<Unit>N/A</Unit>
 		<Comment>DeviceNet gas spliter default status interface</Comment>
 	</Variable>
+	<Variable>
+		<ID>200011</ID>
+		<Name>DeviceNet Backside He Default TxPDO 0</Name>
+		<DataType>DEVICENET_UPC_DEFAULT_TX</DataType>
+		<Unit>N/A</Unit>
+		<Comment>DeviceNet backside he default TxPDO 0</Comment>
+	</Variable>
+	<Variable>
+		<ID>200012</ID>
+		<Name>DeviceNet Backside He Default TxPDO 1</Name>
+		<DataType>DEVICENET_UPC_DEFAULT_TX</DataType>
+		<Unit>N/A</Unit>
+		<Comment>DeviceNet backside he default TxPDO 1</Comment>
+	</Variable>
 
 	<Variable>
 		<ID>201010</ID>
@@ -4687,5 +4745,19 @@
 		<DataType>DEVICENET_FRC_DEFAULT_RX</DataType>
 		<Unit>N/A</Unit>
 		<Comment>DeviceNet gas spliter default control interface</Comment>
+	</Variable>
+	<Variable>
+		<ID>201011</ID>
+		<Name>DeviceNet Backside He Default RxPDO 0</Name>
+		<DataType>DEVICENET_UPC_DEFAULT_RX</DataType>
+		<Unit>N/A</Unit>
+		<Comment>DeviceNet backside he default RxPDO 0</Comment>
+	</Variable>
+	<Variable>
+		<ID>201012</ID>
+		<Name>DeviceNet Backside He Default RxPDO 1</Name>
+		<DataType>DEVICENET_UPC_DEFAULT_RX</DataType>
+		<Unit>N/A</Unit>
+		<Comment>DeviceNet backside he default RxPDO 1</Comment>
 	</Variable>
 </AMECVariables>

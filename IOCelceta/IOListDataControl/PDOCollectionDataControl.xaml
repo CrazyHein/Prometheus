@@ -352,7 +352,7 @@
                         </StackPanel>
                     </TabItem.Header>
                     <DockPanel Margin="4">
-                        <GroupBox DockPanel.Dock="Top" Header="Rx Diagnostic Area" Margin="0,0,0,8" Padding="6">
+                        <GroupBox DockPanel.Dock="Top" Header="Tx Diagnostic Area" Margin="0,0,0,8" Padding="6">
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock Text="Offset In Word : " Margin="0,0,6,0" FontWeight="Bold"/>
                                 <TextBox Width="100" Margin="0,0,6,0" Text="{Binding TxDiagnosticAreaOffsetInWord, ValidatesOnExceptions=True, NotifyOnValidationError=True, UpdateSourceTrigger=PropertyChanged}"/>

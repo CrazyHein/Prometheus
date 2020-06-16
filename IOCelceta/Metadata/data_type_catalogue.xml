@@ -208,7 +208,7 @@
 		</SubItems>
 	</DataType>
 	<DataType>
-		<Name>DEVICENET_PC_DEFAULT_TX</Name>
+		<Name>DEVICENET_UPC_DEFAULT_TX</Name>
 		<BitSize>80</BitSize>
 		<Alignment>4</Alignment>
 		<SubItems>
@@ -235,7 +235,7 @@
 		</SubItems>
 	</DataType>
 	<DataType>
-		<Name>DEVICENET_PC_DEFAULT_RX</Name>
+		<Name>DEVICENET_UPC_DEFAULT_RX</Name>
 		<BitSize>48</BitSize>
 		<Alignment>4</Alignment>
 		<SubItems>
