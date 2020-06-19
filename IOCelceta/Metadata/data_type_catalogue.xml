@@ -176,7 +176,7 @@
 	<DataType>
 		<Name>DEVICENET_MFC_DEFAULT_TX</Name>
 		<BitSize>48</BitSize>
-		<Alignment>4</Alignment>
+		<Alignment>2</Alignment>
 		<SubItems>
 			<SubItem>
 				<Name>BYTE</Name>
@@ -198,7 +198,7 @@
 	<DataType>
 		<Name>DEVICENET_MFC_DEFAULT_RX</Name>
 		<BitSize>32</BitSize>
-		<Alignment>4</Alignment>
+		<Alignment>2</Alignment>
 		<SubItems>
 			<SubItem>
 				<Name>FLOAT</Name>
@@ -210,7 +210,7 @@
 	<DataType>
 		<Name>DEVICENET_UPC_DEFAULT_TX</Name>
 		<BitSize>80</BitSize>
-		<Alignment>4</Alignment>
+		<Alignment>2</Alignment>
 		<SubItems>
 			<SubItem>
 				<Name>BYTE</Name>
@@ -237,7 +237,7 @@
 	<DataType>
 		<Name>DEVICENET_UPC_DEFAULT_RX</Name>
 		<BitSize>48</BitSize>
-		<Alignment>4</Alignment>
+		<Alignment>2</Alignment>
 		<SubItems>
 			<SubItem>
 				<Name>FLOAT</Name>
@@ -254,7 +254,7 @@
 	<DataType>
 		<Name>DEVICENET_FRC_DEFAULT_RX</Name>
 		<BitSize>48</BitSize>
-		<Alignment>4</Alignment>
+		<Alignment>2</Alignment>
 		<SubItems>
 			<SubItem>
 				<Name>BYTE</Name>
@@ -276,7 +276,7 @@
 	<DataType>
 		<Name>DEVICENET_FRC_DEFAULT_TX</Name>
 		<BitSize>48</BitSize>
-		<Alignment>4</Alignment>
+		<Alignment>2</Alignment>
 		<SubItems>
 			<SubItem>
 				<Name>BYTE</Name>
@@ -298,7 +298,7 @@
 	<DataType>
 		<Name>ECAT_CIA402_DEFAULT_TX</Name>
 		<BitSize>336</BitSize>
-		<Alignment>4</Alignment>
+		<Alignment>2</Alignment>
 		<SubItems>
 			<SubItem>
 				<Name>BYTE</Name>
@@ -380,7 +380,7 @@
 	<DataType>
 		<Name>ECAT_CIA402_DEFAULT_RX</Name>
 		<BitSize>240</BitSize>
-		<Alignment>4</Alignment>
+		<Alignment>2</Alignment>
 		<SubItems>
 			<SubItem>
 				<Name>BYTE</Name>

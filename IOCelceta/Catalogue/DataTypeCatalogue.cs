@@ -125,7 +125,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.Catalogue
                         }
                     }
                 }
-                if ((subItems != null && bitSize % 8 == 0 && bitSize / 8 == subItemsByteSize) || (subItems == null))
+                if ((subItems != null && bitSize % 8 == 0 && bitSize / 8 >= subItemsByteSize) || (subItems == null))
                     dictionary.Add(name, new DataTypeDefinition(name, bitSize, alignment, 0, "N/A", subItems));
                 else
                     throw new DataTypeCatalogueParseExcepetion(DATA_TYPE_CATALOGUE_FILE_ERROR_CODE_T.ILLEGAL_DATA_TYPE_DEFINITION, null);

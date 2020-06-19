@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- edited with XMLSpy v2019 rel. 3 sp1 (http://www.altova.com) by HaihangRen (AMEC) -->
 <AMECControllerModels FormatVersion="1">
-	<ExtensionModels ConfigurationFields = "ExtraInputDataOffset;ExtraInputDataSize;ExtraOutputDataOffset;ExtraOutputDataSize">
+	<ExtensionModels ConfigurationFields = "ExtraInputDataOffset;ExtraInputDataSize;ExtraOutputDataOffset;ExtraOutputDataSize;">
 		<ExtensionModel>
 			<ID>0x0001</ID>
 			<Name>RX10</Name>
