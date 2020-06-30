@@ -18,14 +18,14 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Eresia
 
         INVALID_EXTENSION_MODULE_MODEL                      = 0x00000001,
         INVALID_EXTENSION_MODULE_MODEL_ID                   = 0x00000002,
-        INVALID_EXTENSION_MODULE_USERCONFIGURATION          = 0x00000003,
+        INVALID_EXTENSION_MODULE_USER_FIELD                 = 0x00000003,
         INVALID_EXTENSION_MODULE_ADDRESS                    = 0x00000004,     
         DUPLICATED_EXTENSION_MODULE_USERCONFIGURATION       = 0x00000005,
         EXTENSION_MODULE_ADDRESS_OVERLAPPED                 = 0x00000006,
         
 
         INVALID_ETHERNET_MODULE_IPV4_ADDRESS                = 0x00000011,
-        INVALID_ETHERNET_MODULE_USERCONFIGURATION           = 0x00000012,
+        INVALID_ETHERNET_MODULE_USER_FIELD                  = 0x00000012,
         INVALID_ETHERNET_MODULE_MODEL                       = 0x00000013,
         INVALID_ETHERNET_MODULE_MODEL_ID                    = 0x00000014,
         DUPLICATED_ETHERNET_MODULE_USERCONFIGURATION        = 0x00000015,
@@ -118,8 +118,6 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Eresia
 
         public void ImportModules(IReadOnlyList<CONTROLLER_EXTENSION_MODULE_T> modules, bool clear)
         {
-            foreach (var m in modules)
-                ModuleDataVerification(m);
             if (__extension_modules_address_overlap_detector(modules) == true)
                 throw new TaskUserParametersExcepetion(TASK_USER_PARAMETERS_ERROR_T.EXTENSION_MODULE_ADDRESS_OVERLAPPED, null);
 
@@ -131,9 +129,6 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Eresia
 
         public void ImportModules(IReadOnlyList<CONTROLLER_ETHERNET_MODULE_T> modules, bool clear)
         {
-            foreach (var m in modules)
-                ModuleDataVerification(m);
-
             if (clear)
                 __controller_ethernet_modules.Clear();
             foreach (var m in modules)
@@ -183,44 +178,6 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Eresia
             __controller_ethernet_modules.Clear();
         }
 
-        public void ModuleDataVerification(CONTROLLER_EXTENSION_MODULE_T module)
-        {
-            if (module.MODEL == null || 
-                __model_catalogue.ExtensionModels.Contains(new KeyValuePair<ushort, ControllerExtensionModel>(module.MODEL.ID, module.MODEL)) == false)
-                throw new TaskUserParametersExcepetion(TASK_USER_PARAMETERS_ERROR_T.INVALID_EXTENSION_MODULE_MODEL, null);
-            if(module.ADDRESS % 16 != 0)
-                throw new TaskUserParametersExcepetion(TASK_USER_PARAMETERS_ERROR_T.INVALID_EXTENSION_MODULE_ADDRESS, null);
-
-            if (module.USER_CONFIGURATIONS != null)
-            {
-                foreach (var k in module.USER_CONFIGURATIONS.Keys)
-                {
-                    if (__model_catalogue.ExtensionModelConfigruationFields.Contains(k) == false)
-                        throw new TaskUserParametersExcepetion(TASK_USER_PARAMETERS_ERROR_T.INVALID_EXTENSION_MODULE_USERCONFIGURATION, null);
-                }
-            }
-        }
-
-        public void ModuleDataVerification(CONTROLLER_ETHERNET_MODULE_T module)
-        {
-            if (module.MODEL == null || 
-                __model_catalogue.EthernetModels.Contains(new KeyValuePair<ushort, ControllerEthernetModel>(module.MODEL.ID, module.MODEL)) == false)
-                throw new TaskUserParametersExcepetion(TASK_USER_PARAMETERS_ERROR_T.INVALID_ETHERNET_MODULE_MODEL, null);
-
-            if (module.USER_CONFIGURATIONS != null)
-            {
-                List<string> fields = new List<string>();
-                foreach (var k in module.USER_CONFIGURATIONS.Keys)
-                {
-                    if (__model_catalogue.EthernetModelConfigruationFields.Contains(k) == false)
-                        throw new TaskUserParametersExcepetion(TASK_USER_PARAMETERS_ERROR_T.INVALID_ETHERNET_MODULE_USERCONFIGURATION, null);
-                }
-            }
-
-            if(VALID_IPV4_ADDRESS.IsMatch(module.IP_ADDRESS) != true)
-                throw new TaskUserParametersExcepetion(TASK_USER_PARAMETERS_ERROR_T.INVALID_ETHERNET_MODULE_IPV4_ADDRESS, null);
-        }
-
         public ushort HostCPUAddress
         {
             get { return __host_cpu_address; }
@@ -240,9 +197,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Eresia
 
         public IEnumerable<ControllerEthernetModel> AvailableEthernetModels { get { return __model_catalogue.EthernetModels.Values; } }
 
-        public IReadOnlyCollection<string> AvailableExtensionUserConfigurationFields { get { return __model_catalogue.ExtensionModelConfigruationFields; } }
+        public static IReadOnlyList<string> EXTENSION_MODULE_USER_FIELDS { get { return CONTROLLER_EXTENSION_MODULE_T.USER_FIELDS; } }
 
-        public IReadOnlyCollection<string> AvailableEthernetUserConfigurationFields { get { return __model_catalogue.EthernetModelConfigruationFields; } }
+        public static IReadOnlyList<string> ETHERNET_MODULE_USER_FIELDS { get { return CONTROLLER_ETHERNET_MODULE_T.USER_FIELDS; } }
 
 
         private void __load_host_cpu_info(XmlNode cpuNode)
@@ -275,7 +232,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Eresia
                         if (extensionModule.NodeType != XmlNodeType.Element || extensionModule.Name != "ExtensionModule")
                             continue;
 
-                        __load_extension_module(extensionModule);
+                        __controller_extension_modules.Add(new CONTROLLER_EXTENSION_MODULE_T(extensionModule, __model_catalogue));
                     }
                 }
                 else
@@ -302,7 +259,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Eresia
                         if (ethernentModule.NodeType != XmlNodeType.Element || ethernentModule.Name != "EthernetModule")
                             continue;
 
-                        __load_ethernet_module(ethernentModule);
+                        __controller_ethernet_modules.Add(new CONTROLLER_ETHERNET_MODULE_T(ethernentModule, __model_catalogue));
                     }
                 }
                 else
@@ -315,180 +272,6 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Eresia
             catch (Exception e)
             {
                 throw new TaskUserParametersExcepetion(TASK_USER_PARAMETERS_ERROR_T.FILE_DATA_EXCEPTION, e);
-            }
-        }
-
-        private void __load_extension_module(XmlNode extensionNode)
-        {
-            ushort id = 0;
-            string name = "";
-            ushort bitSize = 0;
-            ushort address = 0;
-            ControllerExtensionModel model = null;
-            CONTROLLER_EXTENSION_MODULE_T module = null;
-            uint mask = 0;
-            Dictionary<string, string> userConfigurations = new Dictionary<string, string>();
-            try
-            {
-                if (extensionNode.NodeType != XmlNodeType.Element)
-                    throw new TaskUserParametersExcepetion(TASK_USER_PARAMETERS_ERROR_T.ELEMENT_MISSING, null);
-
-                foreach (XmlNode filed in extensionNode.ChildNodes)
-                {
-                    if (filed.NodeType != XmlNodeType.Element)
-                        continue;
-
-                    switch (filed.Name)
-                    {
-                        case "ID":
-                            id = Convert.ToUInt16(filed.FirstChild.Value, 16);
-                            mask |= 0x00000001;
-                            break;
-                        case "Name":
-                            name = filed.FirstChild.Value;
-                            mask |= 0x00000002;
-                            break;
-                        case "BitSize":
-                            bitSize = Convert.ToUInt16(filed.FirstChild.Value, 16);
-                            mask |= 0x00000004;
-                            break;
-                        case "Address":
-                            address = Convert.ToUInt16(filed.FirstChild.Value, 16);
-                            mask |= 0x00000008;
-                            break;
-                        default:
-                            if (userConfigurations.Keys.Contains(filed.Name) == true)
-                                throw new TaskUserParametersExcepetion(TASK_USER_PARAMETERS_ERROR_T.DUPLICATED_EXTENSION_MODULE_USERCONFIGURATION, null);
-                            userConfigurations[filed.Name] = filed.FirstChild.Value;
-                            break;
-                    }
-                }
-
-                if((mask & 0x0000000F) == 0x0000000F)
-                {
-                    model = __inquire_extension_model(id, name, bitSize);
-                    if(userConfigurations.Count != 0)
-                        module = new CONTROLLER_EXTENSION_MODULE_T(model, address, userConfigurations);
-                    else
-                        module = new CONTROLLER_EXTENSION_MODULE_T(model, address, null);
-                    ModuleDataVerification(module);
-                    __controller_extension_modules.Add(module);
-                }
-                else
-                    throw new TaskUserParametersExcepetion(TASK_USER_PARAMETERS_ERROR_T.ELEMENT_MISSING, null);
-            }
-            catch (TaskUserParametersExcepetion e)
-            {
-                throw e;
-            }
-            catch (Exception e)
-            {
-                throw new TaskUserParametersExcepetion(TASK_USER_PARAMETERS_ERROR_T.FILE_DATA_EXCEPTION, e);
-            }
-        }
-
-        private void __load_ethernet_module(XmlNode extensionNode)
-        {
-            ushort id = 0;
-            string name = "";
-            string ip = "";
-            ushort port = 0;
-            ControllerEthernetModel model = null;
-            CONTROLLER_ETHERNET_MODULE_T module = null;
-            uint mask = 0;
-            Dictionary<string, string> userConfigurations = new Dictionary<string, string>();
-            try
-            {
-                if (extensionNode.NodeType != XmlNodeType.Element)
-                    throw new TaskUserParametersExcepetion(TASK_USER_PARAMETERS_ERROR_T.ELEMENT_MISSING, null);
-
-                foreach (XmlNode filed in extensionNode.ChildNodes)
-                {
-                    if (filed.NodeType != XmlNodeType.Element)
-                        continue;
-
-                    switch (filed.Name)
-                    {
-                        case "ID":
-                            id = Convert.ToUInt16(filed.FirstChild.Value, 16);
-                            mask |= 0x00000001;
-                            break;
-                        case "Name":
-                            name = filed.FirstChild.Value;
-                            mask |= 0x00000002;
-                            break;
-                        case "IP":
-                            ip = filed.FirstChild.Value;
-                            mask |= 0x00000004;
-                            break;
-                        case "Port":
-                            port = Convert.ToUInt16(filed.FirstChild.Value);
-                            mask |= 0x00000008;
-                            break;
-                        default:
-                            if (userConfigurations.Keys.Contains(filed.Name) == true)
-                                throw new TaskUserParametersExcepetion(TASK_USER_PARAMETERS_ERROR_T.DUPLICATED_ETHERNET_MODULE_USERCONFIGURATION, null);
-                            userConfigurations[filed.Name] = filed.FirstChild.Value;
-                            break;
-                    }
-                }
-
-                if ((mask & 0x0000000F) == 0x0000000F)
-                {
-                    model = __inquire_ethernet_model(id, name);
-                    if (userConfigurations.Count != 0)
-                        module = new CONTROLLER_ETHERNET_MODULE_T(model, ip, port, userConfigurations);
-                    else
-                        module = new CONTROLLER_ETHERNET_MODULE_T(model, ip, port, null);
-                    ModuleDataVerification(module);
-                    __controller_ethernet_modules.Add(module);
-                }
-                else
-                    throw new TaskUserParametersExcepetion(TASK_USER_PARAMETERS_ERROR_T.ELEMENT_MISSING, null);
-            }
-            catch (TaskUserParametersExcepetion e)
-            {
-                throw e;
-            }
-            catch (Exception e)
-            {
-                throw new TaskUserParametersExcepetion(TASK_USER_PARAMETERS_ERROR_T.FILE_DATA_EXCEPTION, e);
-            }
-        }
-
-        private ControllerExtensionModel __inquire_extension_model(ushort id, string name, ushort bitSize)
-        {
-            try
-            {
-                ControllerExtensionModel model = null;
-                model = __model_catalogue.ExtensionModels[id];
-                if (model.Name == name && model.BitSize == bitSize)
-                    return model;
-                else
-                    return null;
-
-            }
-            catch (KeyNotFoundException)
-            {
-                return null;
-            }
-        }
-
-        private ControllerEthernetModel __inquire_ethernet_model(ushort id, string name)
-        {
-            try
-            {
-                ControllerEthernetModel model = null;
-                model = __model_catalogue.EthernetModels[id];
-                if (model.Name == name)
-                    return model;
-                else
-                    return null;
-
-            }
-            catch (KeyNotFoundException)
-            {
-                return null;
             }
         }
 
@@ -532,110 +315,20 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Eresia
             return hostInfo;
         }
 
-        private XmlElement __create_module_node(XmlDocument doc, CONTROLLER_EXTENSION_MODULE_T module)
-        {
-            XmlElement moduleNode = doc.CreateElement("ExtensionModule");
-
-            XmlElement sub = doc.CreateElement("ID");
-            sub.AppendChild(doc.CreateTextNode($"0x{module.MODEL.ID:X4}"));
-            moduleNode.AppendChild(sub);
-
-            sub = doc.CreateElement("Name");
-            sub.AppendChild(doc.CreateTextNode(module.MODEL.Name));
-            moduleNode.AppendChild(sub);
-
-            sub = doc.CreateElement("Address");
-            sub.AppendChild(doc.CreateTextNode($"0x{module.ADDRESS:X4}"));
-            moduleNode.AppendChild(sub);
-
-            sub = doc.CreateElement("BitSize");
-            sub.AppendChild(doc.CreateTextNode($"0x{module.MODEL.BitSize:X4}"));
-            moduleNode.AppendChild(sub);
-
-            foreach(var c in module.USER_CONFIGURATIONS)
-            {
-                sub = doc.CreateElement(c.Key);
-                sub.AppendChild(doc.CreateTextNode(c.Value));
-                moduleNode.AppendChild(sub);
-            }
-
-            return moduleNode;
-        }
-
         public XmlElement __create_modules_node(XmlDocument doc, IReadOnlyList<CONTROLLER_EXTENSION_MODULE_T> modules)
         {
             XmlElement modulesNode = doc.CreateElement("ExtensionModules");
             foreach (var m in modules)
-                modulesNode.AppendChild(__create_module_node(doc, m));
+                modulesNode.AppendChild(m.ToXmlDoc(doc));
             return modulesNode;
-        }
-
-        private XmlElement __create_module_node(XmlDocument doc, CONTROLLER_ETHERNET_MODULE_T module)
-        {
-            XmlElement moduleNode = doc.CreateElement("EthernetModule");
-
-            XmlElement sub = doc.CreateElement("ID");
-            sub.AppendChild(doc.CreateTextNode($"0x{module.MODEL.ID:X4}"));
-            moduleNode.AppendChild(sub);
-
-            sub = doc.CreateElement("Name");
-            sub.AppendChild(doc.CreateTextNode(module.MODEL.Name));
-            moduleNode.AppendChild(sub);
-
-            sub = doc.CreateElement("IP");
-            sub.AppendChild(doc.CreateTextNode(module.IP_ADDRESS));
-            moduleNode.AppendChild(sub);
-
-            sub = doc.CreateElement("Port");
-            sub.AppendChild(doc.CreateTextNode(module.PORT.ToString()));
-            moduleNode.AppendChild(sub);
-
-            foreach (var c in module.USER_CONFIGURATIONS)
-            {
-                sub = doc.CreateElement(c.Key);
-                sub.AppendChild(doc.CreateTextNode(c.Value));
-                moduleNode.AppendChild(sub);
-            }
-
-            return moduleNode;
         }
 
         public XmlElement __create_modules_node(XmlDocument doc, IReadOnlyList<CONTROLLER_ETHERNET_MODULE_T> modules)
         {
             XmlElement modulesNode = doc.CreateElement("EthernetModules");
             foreach (var m in modules)
-                modulesNode.AppendChild(__create_module_node(doc, m));
+                modulesNode.AppendChild(m.ToXmlDoc(doc));
             return modulesNode;
-        }
-    }
-
-    public class CONTROLLER_EXTENSION_MODULE_T
-    {
-        public ControllerExtensionModel MODEL { get; private set; }
-        public ushort ADDRESS { get; private set; }
-        public IReadOnlyDictionary<string, string> USER_CONFIGURATIONS { get; private set; }
-
-        public CONTROLLER_EXTENSION_MODULE_T(ControllerExtensionModel model, ushort address, Dictionary<string, string> userConfigurations)
-        {
-            MODEL = model;
-            ADDRESS = address;
-            USER_CONFIGURATIONS = userConfigurations;
-        }
-    }
-
-    public class CONTROLLER_ETHERNET_MODULE_T
-    {
-        public ControllerEthernetModel MODEL { get; private set; }
-        public string IP_ADDRESS { get; private set; }
-        public ushort PORT { get; private set; }
-        public IReadOnlyDictionary<string, string> USER_CONFIGURATIONS { get; private set; }
-
-        public CONTROLLER_ETHERNET_MODULE_T(ControllerEthernetModel model, string ip, ushort port, Dictionary<string, string> userConfigurations)
-        {
-            MODEL = model;
-            IP_ADDRESS = ip;
-            PORT = port;
-            USER_CONFIGURATIONS = userConfigurations;
         }
     }
 }

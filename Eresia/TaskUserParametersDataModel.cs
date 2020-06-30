@@ -78,13 +78,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Eresia
             List<CONTROLLER_EXTENSION_MODULE_T> extensionModules = new List<CONTROLLER_EXTENSION_MODULE_T>(__extension_modules.Count);
             foreach(var dataModel in __extension_modules)
             {
-                Dictionary<string, string> userConfiguration = new Dictionary<string, string>(_data_helper.AvailableExtensionUserConfigurationFields.Count);
+               var userConfiguration = new List<Tuple<string, string>>(TaskUserParametersHelper.EXTENSION_MODULE_USER_FIELDS.Count);
+
                 foreach(var c in dataModel.UserConfigurations)
-                {
-                    string value = c.Value.Trim();
-                    if (value != "")
-                        userConfiguration[c.Name] = value;
-                }
+                    userConfiguration.Add(new Tuple<string, string>(c.Name, c.Value.Trim()));
                 extensionModules.Add(new CONTROLLER_EXTENSION_MODULE_T(dataModel.Model, dataModel.Address, userConfiguration));
             }
             _data_helper.ImportModules(extensionModules, true);
@@ -92,13 +89,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Eresia
             List<CONTROLLER_ETHERNET_MODULE_T> ethernetModules = new List<CONTROLLER_ETHERNET_MODULE_T>(__ethernet_modules.Count);
             foreach (var dataModel in __ethernet_modules)
             {
-                Dictionary<string, string> userConfiguration = new Dictionary<string, string>(_data_helper.AvailableEthernetUserConfigurationFields.Count);
+                var userConfiguration = new List<Tuple<string, string>>(TaskUserParametersHelper.ETHERNET_MODULE_USER_FIELDS.Count);
                 foreach (var c in dataModel.UserConfigurations)
-                {
-                    string value = c.Value.Trim();
-                    if (value != "")
-                        userConfiguration[c.Name] = value;
-                }
+                    userConfiguration.Add(new Tuple<string, string>(c.Name, c.Value.Trim()));
                 ethernetModules.Add(new CONTROLLER_ETHERNET_MODULE_T(dataModel.Model, dataModel.IPAddress, dataModel.Port, userConfiguration));
             }
             _data_helper.ImportModules(ethernetModules, true);
@@ -147,13 +140,13 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Eresia
         public void AddExtensionModuleDataModel()
         {
             __extension_modules.Add(new ExtensionModuleDataModel(this,
-                new CONTROLLER_EXTENSION_MODULE_T(AvailableExtensionModels[0], 0x0000, null)));
+                new CONTROLLER_EXTENSION_MODULE_T(AvailableExtensionModels[0], 0x0000)));
         }
 
         public void InsertExtensionModuleDataModel(int pos)
         {
             __extension_modules.Insert(pos, new ExtensionModuleDataModel(this,
-                new CONTROLLER_EXTENSION_MODULE_T(AvailableExtensionModels[0], 0x0000, null)));
+                new CONTROLLER_EXTENSION_MODULE_T(AvailableExtensionModels[0], 0x0000)));
         }
 
         public void RemoveExtensionModuleDataModel(int pos)
@@ -180,13 +173,13 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Eresia
         public void AddEthernetModuleDataModel()
         {
             __ethernet_modules.Add(new EthernetModuleDataModel(this,
-                new CONTROLLER_ETHERNET_MODULE_T(AvailableEthernetModels[0], "192.168.0.1", 8366, null)));
+                new CONTROLLER_ETHERNET_MODULE_T(AvailableEthernetModels[0], "192.168.0.1", 8366)));
         }
 
         public void InsertEthernetModuleDataModel(int pos)
         {
             __ethernet_modules.Insert(pos, new EthernetModuleDataModel(this,
-                new CONTROLLER_ETHERNET_MODULE_T(AvailableEthernetModels[0], "192.168.0.1", 8366, null)));
+                new CONTROLLER_ETHERNET_MODULE_T(AvailableEthernetModels[0], "192.168.0.1", 8366)));
         }
 
         public void RemoveEthernetModuleDataModel(int pos)
@@ -254,22 +247,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Eresia
             Address = module.ADDRESS;
             Model = module.MODEL;
             AvailableModels = host.AvailableExtensionModels;
-            __user_configurations = new List<ModuleUserConfiguration>(host.DataHelper.AvailableExtensionUserConfigurationFields.Count);
-            if (module.USER_CONFIGURATIONS != null)
-            {
-                foreach (var f in host.DataHelper.AvailableExtensionUserConfigurationFields)
-                {
-                    if(module.USER_CONFIGURATIONS.Keys.Contains(f))
-                        __user_configurations.Add(new ModuleUserConfiguration(this, f, module.USER_CONFIGURATIONS[f]));
-                    else
-                        __user_configurations.Add(new ModuleUserConfiguration(this, f));
-                }
-            }
-            else
-            {
-                foreach (var f in host.DataHelper.AvailableExtensionUserConfigurationFields)
-                    __user_configurations.Add(new ModuleUserConfiguration(this, f));
-            }
+            __user_configurations = new List<ModuleUserConfiguration>(TaskUserParametersHelper.EXTENSION_MODULE_USER_FIELDS.Count);
+            foreach (var f in TaskUserParametersHelper.EXTENSION_MODULE_USER_FIELDS)
+                __user_configurations.Add(new ModuleUserConfiguration(this, f, module.USER_CONFIGURATIONS[f]));
         }
 
         public IReadOnlyList<ControllerExtensionModel> AvailableModels { get; private set; }
@@ -319,22 +299,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Eresia
             Port = module.PORT;
             Model = module.MODEL;
             AvailableModels = host.AvailableEthernetModels;
-            __user_configurations = new List<ModuleUserConfiguration>(host.DataHelper.AvailableEthernetUserConfigurationFields.Count);
-            if (module.USER_CONFIGURATIONS != null)
-            {
-                foreach (var f in host.DataHelper.AvailableEthernetUserConfigurationFields)
-                {
-                    if (module.USER_CONFIGURATIONS.Keys.Contains(f))
-                        __user_configurations.Add(new ModuleUserConfiguration(this, f, module.USER_CONFIGURATIONS[f]));
-                    else
-                        __user_configurations.Add(new ModuleUserConfiguration(this, f));
-                }
-            }
-            else
-            {
-                foreach (var f in host.DataHelper.AvailableEthernetUserConfigurationFields)
-                    __user_configurations.Add(new ModuleUserConfiguration(this, f));
-            }
+            __user_configurations = new List<ModuleUserConfiguration>(TaskUserParametersHelper.ETHERNET_MODULE_USER_FIELDS.Count);
+            foreach (var f in TaskUserParametersHelper.ETHERNET_MODULE_USER_FIELDS)
+                __user_configurations.Add(new ModuleUserConfiguration(this, f, module.USER_CONFIGURATIONS[f]));
         }
 
         public IReadOnlyList<ControllerEthernetModel> AvailableModels { get; private set; }
