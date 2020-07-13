@@ -39,6 +39,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
         public MainWindow()
         {
             InitializeComponent();
+            System.Threading.Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
             __main_window_title = Title;
             try
             {

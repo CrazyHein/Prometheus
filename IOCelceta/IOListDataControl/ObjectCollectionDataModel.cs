@@ -367,7 +367,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
                     return "N/A";
                 else
                     //return string.Format("{0} -- [{1}, {2}] ({3})", ConverterDataTypeSelection.Name, ConverterDownScale, ConverterUpScale, ConverterUnitName);
-                    return string.Format("S[{0}, {1}]", ConverterDownScale, ConverterUpScale);
+                    return string.Format("S[{0:G17}, {1:G17}]", ConverterDownScale, ConverterUpScale);
             }
         }
 
@@ -430,7 +430,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             if ((bool)values[0] == false)
                 return "N/A";
             else
-                return string.Format("S[{0}, {1}]", (double)values[1], (double)values[2]);
+                return string.Format("S[{0:G17}, {1:G17}]", (double)values[1], (double)values[2]);
         }
 
         public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)

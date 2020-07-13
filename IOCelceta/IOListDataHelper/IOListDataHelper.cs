@@ -2246,11 +2246,11 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
             XmlElement sub;
 
             sub = doc.CreateElement("UpScale");
-            sub.AppendChild(doc.CreateTextNode(converterInfo.up_scale.ToString()));
+            sub.AppendChild(doc.CreateTextNode(converterInfo.up_scale.ToString("G17")));
             converter.AppendChild(sub);
 
             sub = doc.CreateElement("DownScale");
-            sub.AppendChild(doc.CreateTextNode(converterInfo.down_scale.ToString()));
+            sub.AppendChild(doc.CreateTextNode(converterInfo.down_scale.ToString("G17")));
             converter.AppendChild(sub);
 
             return converter;
@@ -2494,7 +2494,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                     return "N/A";
                 else
                     //return string.Format("{0} -- [{1}, {2}] ({3})", data_type.Name, down_scale, up_scale, unit_name);
-                    return string.Format("S[{0}, {1}]", down_scale, up_scale);
+                    return string.Format("S[{0:G17}, {1:G17}]", down_scale, up_scale);
             }
 
             public VALUE_CONVERTER_T(bool enabled, double upScale, double downScale)

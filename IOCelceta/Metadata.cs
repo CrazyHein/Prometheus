@@ -27,7 +27,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
         static Metadata()
         {
             Title = "IO Celceta";
-            Description = "A graphics editing tool for < AMEC IO List >.";
+            Description = "A graphical user interface for < Foliage Ocean IO List >.";
             DataTypeCatalogue = "Metadata/data_type_catalogue.xml";
             ControllerModelCatalogue = "Metadata/controller_model_catalogue.xml";
             VariableCatalogue = "Metadata/variable_catalogue.xml";

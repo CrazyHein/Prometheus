@@ -33,6 +33,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Eresia
         public MainWindow()
         {
             InitializeComponent();
+            System.Threading.Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
             __main_window_title = Title;
             try
             {

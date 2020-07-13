@@ -122,8 +122,8 @@
                     <TextBlock Text="Up Scale : " Grid.Row="2"/>
 
                     <!--ComboBox Grid.Column="1" Grid.Row="1" Name="__cmb_coverter_data_type_selection" SelectedItem="{Binding Path=ConverterDataTypeSelection}" Height="24" IsEnabled="{Binding ElementName=__chk_enable_converter,Path=IsChecked}"-->
-                    <TextBox Grid.Column="1" Grid.Row="1" IsEnabled="{Binding ElementName=__chk_enable_converter,Path=IsChecked}" Text="{Binding ConverterDownScale, NotifyOnValidationError=True}"/>
-                    <TextBox Grid.Column="1" Grid.Row="2" IsEnabled="{Binding ElementName=__chk_enable_converter,Path=IsChecked}" Text="{Binding ConverterUpScale, NotifyOnValidationError=True}"/>
+                    <TextBox Grid.Column="1" Grid.Row="1" IsEnabled="{Binding ElementName=__chk_enable_converter,Path=IsChecked}" Text="{Binding ConverterDownScale, NotifyOnValidationError=True, StringFormat={}{0:G17}}"/>
+                    <TextBox Grid.Column="1" Grid.Row="2" IsEnabled="{Binding ElementName=__chk_enable_converter,Path=IsChecked}" Text="{Binding ConverterUpScale, NotifyOnValidationError=True, StringFormat={}{0:G17}}"/>
                 </Grid>
             </GroupBox>
         </Grid>

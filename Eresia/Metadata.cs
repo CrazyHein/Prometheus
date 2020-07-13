@@ -18,7 +18,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Eresia
         static Metadata()
         {
             Title = "Eresia";
-            Description = "A graphics editing tool for < Task User Configuration Parameters >.";
+            Description = "A graphical user interface for < Task User Configuration Parameters >.";
             ControllerModelCatalogue = "Metadata/controller_model_catalogue.xml";
 
             AssemblyVersion = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
