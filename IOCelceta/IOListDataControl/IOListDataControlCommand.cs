@@ -30,7 +30,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             };
             InputGestureCollection gestureEditElement = new InputGestureCollection
             {
-                new KeyGesture(Key.M, ModifierKeys.Control, "Ctrl+E")
+                new KeyGesture(Key.E, ModifierKeys.Control, "Ctrl+E")
             };
             InputGestureCollection gestureMoveElementUp = new InputGestureCollection
             {
