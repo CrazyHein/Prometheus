@@ -87,7 +87,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             {
                 ControllerInformationDataModel host = DataContext as ControllerInformationDataModel;
                 ControllerExtensionModuleItemDataModel data = new ControllerExtensionModuleItemDataModel(host,
-                    selectedData.Model, selectedData.ReferenceName, selectedData.LocalAddress);
+                    selectedData.Model, selectedData.DeviceSwitch, selectedData.ReferenceName, selectedData.LocalAddress);
                 ControllerModuleDataControl moduleDataControl = new ControllerModuleDataControl(data, selectedData.ReferenceName);
                 if (moduleDataControl.ShowDialog() == true)
                 {
@@ -186,7 +186,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             {
                 ControllerInformationDataModel host = DataContext as ControllerInformationDataModel;
                 ControllerEthernetModuleItemDataModel data = new ControllerEthernetModuleItemDataModel(host,
-                    selectedData.Model, selectedData.ReferenceName, selectedData.IPAddress, selectedData.Port);
+                    selectedData.Model, selectedData.DeviceSwitch, selectedData.ReferenceName, selectedData.IPAddress, selectedData.Port);
                 ControllerModuleDataControl moduleDataControl = new ControllerModuleDataControl(data, selectedData.ReferenceName);
                 if (moduleDataControl.ShowDialog() == true)
                 {

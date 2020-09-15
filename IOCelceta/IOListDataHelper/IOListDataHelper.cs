@@ -219,6 +219,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
         private void __load_controller_extension_modules(XmlNode extensionModulesNode)
         {
             ControllerExtensionModel model = null;
+            uint deviceSwitch = 0;
             string referenceName = null;
             ushort localAddress = 0;
             try
@@ -234,10 +235,11 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                         if(ControllerCatalogue.ExtensionModels.TryGetValue(id, out model) == false)
                             throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_CONTROLLER_EXTENSION_MODEL, null);
 
+                        deviceSwitch = Convert.ToUInt32(extensionModule.SelectSingleNode("Switch").FirstChild.Value, 16);
                         referenceName = extensionModule.SelectSingleNode("Name").FirstChild.Value;
                         localAddress = Convert.ToUInt16(extensionModule.SelectSingleNode("Address").FirstChild.Value, 16);
 
-                        IO_LIST_CONTROLLER_INFORMATION_T.MODULE_T module = new IO_LIST_CONTROLLER_INFORMATION_T.MODULE_T(model, referenceName, localAddress);
+                        IO_LIST_CONTROLLER_INFORMATION_T.MODULE_T module = new IO_LIST_CONTROLLER_INFORMATION_T.MODULE_T(model, deviceSwitch, referenceName, localAddress);
                         ModuleDataVerification(module);
                         __controller_information.modules.Add(module.reference_name, module);
                         __module_reference_counter.Add(module.reference_name, 0);
@@ -257,6 +259,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
         private void __load_controller_ethernet_modules(XmlNode ethernetModulesNode)
         {
             ControllerEthernetModel model = null;
+            uint deviceSwitch = 0;
             string referenceName = null;
             string ip = null;
             ushort port = 0;
@@ -273,11 +276,12 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                         if (ControllerCatalogue.EthernetModels.TryGetValue(id, out model) == false)
                             throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_CONTROLLER_EXTENSION_MODEL, null);
 
+                        deviceSwitch = Convert.ToUInt32(extensionModule.SelectSingleNode("Switch").FirstChild.Value, 16);
                         referenceName = extensionModule.SelectSingleNode("Name").FirstChild.Value;
                         ip = extensionModule.SelectSingleNode("IP").FirstChild.Value;
                         port = Convert.ToUInt16(extensionModule.SelectSingleNode("Port").FirstChild.Value, 10);
 
-                        IO_LIST_CONTROLLER_INFORMATION_T.MODULE_T module = new IO_LIST_CONTROLLER_INFORMATION_T.MODULE_T(model, referenceName, ip, port);
+                        IO_LIST_CONTROLLER_INFORMATION_T.MODULE_T module = new IO_LIST_CONTROLLER_INFORMATION_T.MODULE_T(model, deviceSwitch, referenceName, ip, port);
                         ModuleDataVerification(module);
                         __controller_information.modules.Add(module.reference_name, module);
                         __module_reference_counter.Add(module.reference_name, 0);
@@ -2052,6 +2056,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                         sub.AppendChild(doc.CreateTextNode($"0x{module.model.ID:X4}"));
                         extension.AppendChild(sub);
 
+                        sub = doc.CreateElement("Switch");
+                        sub.AppendChild(doc.CreateTextNode($"0x{module.device_switch:X8}"));
+                        extension.AppendChild(sub);
+
                         sub = doc.CreateElement("Name");
                         sub.AppendChild(doc.CreateTextNode(module.reference_name));
                         extension.AppendChild(sub);
@@ -2072,6 +2080,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
 
                     XmlElement sub = doc.CreateElement("ID");
                     sub.AppendChild(doc.CreateTextNode($"0x{__controller_information.modules[reference].model.ID:X4}"));
+                    extension.AppendChild(sub);
+
+                    sub = doc.CreateElement("Switch");
+                    sub.AppendChild(doc.CreateTextNode($"0x{__controller_information.modules[reference].device_switch:X8}"));
                     extension.AppendChild(sub);
 
                     sub = doc.CreateElement("Name");
@@ -2104,6 +2116,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                         sub.AppendChild(doc.CreateTextNode($"0x{module.model.ID:X4}"));
                         ethernet.AppendChild(sub);
 
+                        sub = doc.CreateElement("Switch");
+                        sub.AppendChild(doc.CreateTextNode($"0x{module.device_switch:X8}"));
+                        ethernet.AppendChild(sub);
+
                         sub = doc.CreateElement("Name");
                         sub.AppendChild(doc.CreateTextNode(module.reference_name));
                         ethernet.AppendChild(sub);
@@ -2128,6 +2144,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
 
                     XmlElement sub = doc.CreateElement("ID");
                     sub.AppendChild(doc.CreateTextNode($"0x{__controller_information.modules[reference].model.ID:X4}"));
+                    ethernet.AppendChild(sub);
+
+                    sub = doc.CreateElement("Switch");
+                    sub.AppendChild(doc.CreateTextNode($"0x{__controller_information.modules[reference].device_switch:X8}"));
                     ethernet.AppendChild(sub);
 
                     sub = doc.CreateElement("Name");
@@ -2389,6 +2409,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
         public class MODULE_T
         {
             public ControllerModel model { get; private set; }
+            public uint device_switch { get; private set; }
             public string reference_name { get; private set; }
             public ushort local_address { get; private set; }
             public string ip_address { get; private set; }
@@ -2402,26 +2423,29 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
             public MODULE_T()
             {
                 model = null;
+                device_switch = 0;
                 reference_name = "Module";
                 local_address = 0x0000;
                 ip_address = "127.0.0.1";
                 port = 5010;
             }
 
-            public MODULE_T(ControllerModel model, string referenceName, ushort localAddress)
+            public MODULE_T(ControllerModel model, uint deviceSwitch, string referenceName, ushort localAddress)
             {
                 this.model = model;
                 reference_name = referenceName;
                 local_address = localAddress;
+                device_switch = deviceSwitch;
                 ip_address = "127.0.0.1";
                 port = 5010;
             }
 
-            public MODULE_T(ControllerModel model, string referenceName, string ip, ushort port)
+            public MODULE_T(ControllerModel model, uint deviceSwitch, string referenceName, string ip, ushort port)
             {
                 this.model = model;
                 reference_name = referenceName;
                 local_address = 0x0000;
+                device_switch = deviceSwitch;
                 ip_address = ip;
                 this.port = port;
             }

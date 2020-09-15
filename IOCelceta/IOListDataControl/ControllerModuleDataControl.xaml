@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDataControl"
         mc:Ignorable="d"
-        Title="Module Detail Information" Height="320" Width="500">
+        Title="Module Detail Information" Height="340" Width="500">
     <DockPanel Margin="8" LastChildFill="True">
         <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Right">
             <Button Content="_OK" Margin="8" Width="120" Click="__on_ok"/>
@@ -28,8 +28,10 @@
             <Grid.Resources>
                 <local:ModuleDataFieldVisibility x:Key="FieldVisibility"/>
                 <local:ModuleHexAddressToText x:Key="HexToText"/>
+                <local:ModuleHexSwitchToText x:Key="HexToText32"/>
             </Grid.Resources>
             <Grid.RowDefinitions>
+                <RowDefinition Height="auto"/>
                 <RowDefinition Height="auto"/>
                 <RowDefinition Height="auto"/>
                 <RowDefinition Height="auto"/>
@@ -40,16 +42,19 @@
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
 
-            <TextBlock Text="Local Address : " Grid.Row="0" Grid.Column="0" Margin="4" Visibility="{Binding IsExtensionModule, Converter={StaticResource FieldVisibility}}"/>
-            <TextBox  Grid.Row="0" Grid.Column="1" Margin="4" Text="{Binding LocalAddress, ValidatesOnExceptions=True,NotifyOnValidationError=True, Converter={StaticResource HexToText}}" Visibility="{Binding IsExtensionModule, Converter={StaticResource FieldVisibility}}"/>
+            <TextBlock Text="Device Switch : " Grid.Row="0" Grid.Column="0" Margin="4"/>
+            <TextBox  Grid.Row="0" Grid.Column="1" Margin="4" Text="{Binding DeviceSwitch, ValidatesOnExceptions=True,NotifyOnValidationError=True, Converter={StaticResource HexToText32}}"/>
+            
+            <TextBlock Text="Local Address : " Grid.Row="1" Grid.Column="0" Margin="4" Visibility="{Binding IsExtensionModule, Converter={StaticResource FieldVisibility}}"/>
+            <TextBox  Grid.Row="1" Grid.Column="1" Margin="4" Text="{Binding LocalAddress, ValidatesOnExceptions=True,NotifyOnValidationError=True, Converter={StaticResource HexToText}}" Visibility="{Binding IsExtensionModule, Converter={StaticResource FieldVisibility}}"/>
 
-            <TextBlock Text="IP Address : " Grid.Row="1" Grid.Column="0" Margin="4" Visibility="{Binding IsEthernetModule, Converter={StaticResource FieldVisibility}}"/>
-            <TextBox  Grid.Row="1" Grid.Column="1" Margin="4" Text="{Binding IPAddress, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Visibility="{Binding IsEthernetModule, Converter={StaticResource FieldVisibility}}"/>
-            <TextBlock Text="Port : " Grid.Row="2" Margin="4" Visibility="{Binding IsEthernetModule, Converter={StaticResource FieldVisibility}}"/>
-            <TextBox  Grid.Row="2" Grid.Column="1" Margin="4" Text="{Binding Port, NotifyOnValidationError=True}" Visibility="{Binding IsEthernetModule, Converter={StaticResource FieldVisibility}}"/>
+            <TextBlock Text="IP Address : " Grid.Row="2" Grid.Column="0" Margin="4" Visibility="{Binding IsEthernetModule, Converter={StaticResource FieldVisibility}}"/>
+            <TextBox  Grid.Row="2" Grid.Column="1" Margin="4" Text="{Binding IPAddress, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Visibility="{Binding IsEthernetModule, Converter={StaticResource FieldVisibility}}"/>
+            <TextBlock Text="Port : " Grid.Row="3" Margin="4" Visibility="{Binding IsEthernetModule, Converter={StaticResource FieldVisibility}}"/>
+            <TextBox  Grid.Row="3" Grid.Column="1" Margin="4" Text="{Binding Port, NotifyOnValidationError=True}" Visibility="{Binding IsEthernetModule, Converter={StaticResource FieldVisibility}}"/>
 
-            <TextBlock Text="Reference Name : " Grid.Row="3" Grid.Column="0" Margin="4"/>
-            <TextBox  Grid.Row="3" Grid.Column="1" Margin="4" Text="{Binding ReferenceName}"/>
+            <TextBlock Text="Reference Name : " Grid.Row="4" Grid.Column="0" Margin="4"/>
+            <TextBox  Grid.Row="4" Grid.Column="1" Margin="4" Text="{Binding ReferenceName}"/>
         </Grid>
     </DockPanel>
 </Window>

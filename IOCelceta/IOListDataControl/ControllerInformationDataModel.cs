@@ -49,14 +49,14 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
                 if(module.model as ControllerExtensionModel != null)
                 {
                     ControllerExtensionModuleItemDataModel temp = new ControllerExtensionModuleItemDataModel(this,
-                        module.model,module.reference_name, module.local_address);
+                        module.model, module.device_switch, module.reference_name, module.local_address);
                     __extension_modules.Add(temp);
                     __controller_module_dictionary.Add(temp.ReferenceName, temp);
                 }
                 else if(module.model as ControllerEthernetModel != null)
                 {
                     ControllerEthernetModuleItemDataModel temp = new ControllerEthernetModuleItemDataModel(this,
-                        module.model, module.reference_name, module.ip_address, module.port);
+                        module.model, module.device_switch, module.reference_name, module.ip_address, module.port);
                     __ethernet_modules.Add(temp);
                     __controller_module_dictionary.Add(temp.ReferenceName, temp);
                 }
@@ -126,7 +126,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             if (itemDataModel is ControllerExtensionModuleItemDataModel)
             {
                 var dataModel = itemDataModel as ControllerExtensionModuleItemDataModel;
-                var module = new IO_LIST_CONTROLLER_INFORMATION_T.MODULE_T(dataModel.Model, dataModel.ReferenceName, dataModel.LocalAddress);
+                var module = new IO_LIST_CONTROLLER_INFORMATION_T.MODULE_T(dataModel.Model, dataModel.DeviceSwitch, dataModel.ReferenceName, dataModel.LocalAddress);
                 _data_helper.AddControllerModule(module);
                 if (pos == -1)
                     __extension_modules.Add(dataModel);
@@ -137,7 +137,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             else if (itemDataModel is ControllerEthernetModuleItemDataModel)
             {
                 var dataModel = itemDataModel as ControllerEthernetModuleItemDataModel;
-                var module = new IO_LIST_CONTROLLER_INFORMATION_T.MODULE_T(dataModel.Model, dataModel.ReferenceName, dataModel.IPAddress, dataModel.Port);
+                var module = new IO_LIST_CONTROLLER_INFORMATION_T.MODULE_T(dataModel.Model, dataModel.DeviceSwitch, dataModel.ReferenceName, dataModel.IPAddress, dataModel.Port);
                 _data_helper.AddControllerModule(module);
                 if (pos == -1)
                     __ethernet_modules.Add(dataModel);
@@ -154,9 +154,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             {
                 var sourceDataModel = dataModel as ControllerExtensionModuleItemDataModel;
                 var destDataModel = __controller_module_dictionary[referenceName] as ControllerExtensionModuleItemDataModel;
-                var module = new IO_LIST_CONTROLLER_INFORMATION_T.MODULE_T(sourceDataModel.Model, sourceDataModel.ReferenceName, sourceDataModel.LocalAddress);
+                var module = new IO_LIST_CONTROLLER_INFORMATION_T.MODULE_T(sourceDataModel.Model, sourceDataModel.DeviceSwitch, sourceDataModel.ReferenceName, sourceDataModel.LocalAddress);
                 _data_helper.ModifyControllerModule(referenceName, module);
                 destDataModel.Model = sourceDataModel.Model;
+                destDataModel.DeviceSwitch = sourceDataModel.DeviceSwitch;
                 destDataModel.ReferenceName = sourceDataModel.ReferenceName;
                 destDataModel.LocalAddress = sourceDataModel.LocalAddress;
                 if (sourceDataModel.ReferenceName != referenceName)
@@ -169,9 +170,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             {
                 var sourceDataModel = dataModel as ControllerEthernetModuleItemDataModel;
                 var destDataModel = __controller_module_dictionary[referenceName] as ControllerEthernetModuleItemDataModel;
-                var module = new IO_LIST_CONTROLLER_INFORMATION_T.MODULE_T(sourceDataModel.Model, sourceDataModel.ReferenceName, sourceDataModel.IPAddress, sourceDataModel.Port);
+                var module = new IO_LIST_CONTROLLER_INFORMATION_T.MODULE_T(sourceDataModel.Model, sourceDataModel.DeviceSwitch, sourceDataModel.ReferenceName, sourceDataModel.IPAddress, sourceDataModel.Port);
                 _data_helper.ModifyControllerModule(referenceName, module);
                 destDataModel.Model = sourceDataModel.Model;
+                destDataModel.DeviceSwitch = sourceDataModel.DeviceSwitch;
                 destDataModel.ReferenceName = sourceDataModel.ReferenceName;
                 destDataModel.IPAddress = sourceDataModel.IPAddress;
                 destDataModel.Port = sourceDataModel.Port;
@@ -235,17 +237,19 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             OnPropertyChanged(propertyName);
         }
 
-        public ControllerModuleItemDataModel(ControllerInformationDataModel host, ControllerModel model, string referenceName)
+        public ControllerModuleItemDataModel(ControllerInformationDataModel host, ControllerModel model, uint deviceSwitch, string referenceName)
         {
             Host = host;
             __model = model;
             ID = model.ID;
+            DeviceSwitch = deviceSwitch;
             Name = model.Name;
             ReferenceName = referenceName;
         }
 
         private ControllerModel __model;
         private ushort __id;
+        private uint __device_switch;
         private string __name;
         private string __reference_name;
 
@@ -272,6 +276,12 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             private set { SetProperty(ref __name, value); }
         }
 
+        public uint DeviceSwitch
+        {
+            get { return __device_switch; }
+            set { SetProperty(ref __device_switch, value); }
+        }
+
         public string ReferenceName
         {
             get { return __reference_name; }
@@ -285,13 +295,11 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
 
     public class ControllerExtensionModuleItemDataModel : ControllerModuleItemDataModel
     {
-        public ControllerExtensionModuleItemDataModel(ControllerInformationDataModel host, ControllerModel model, string referenceName = "Extension_M0", 
-            ushort localAddress = 0): base(host, model, referenceName)
+        public ControllerExtensionModuleItemDataModel(ControllerInformationDataModel host, ControllerModel model, uint deviceSwitch = 0, string referenceName = "Extension_M0", 
+            ushort localAddress = 0): base(host, model, deviceSwitch, referenceName)
         {
             LocalAddress = localAddress;
         }
-
-
         private ushort __local_address;
         public ushort LocalAddress
         {
@@ -310,8 +318,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
 
     public class ControllerEthernetModuleItemDataModel : ControllerModuleItemDataModel
     {
-        public ControllerEthernetModuleItemDataModel(ControllerInformationDataModel host, ControllerModel model, string referenceName = "Ethernet_M0", 
-            string ip = "127.0.0.1", ushort port = 5010) : base(host, model, referenceName)
+        public ControllerEthernetModuleItemDataModel(ControllerInformationDataModel host, ControllerModel model, uint deviceSwitch = 0, string referenceName = "Ethernet_M0", 
+            string ip = "127.0.0.1", ushort port = 5010) : base(host, model, deviceSwitch, referenceName)
         {
             IPAddress = ip;
             Port = port;
@@ -386,6 +394,36 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
                     return new ArgumentException();
                 else
                     return address;
+            }
+            catch
+            {
+                return new ArgumentException();
+            }
+        }
+    }
+
+    class ModuleHexSwitchToText : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return string.Format("0x{0:X8}", value);
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            try
+            {
+                uint sw = System.Convert.ToUInt32((string)value, 10);
+                return sw;
+            }
+            catch
+            {
+
+            }
+            try
+            {
+                uint sw = System.Convert.ToUInt32((string)value, 16);
+                return sw;
             }
             catch
             {

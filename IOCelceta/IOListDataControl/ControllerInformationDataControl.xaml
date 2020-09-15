@@ -138,6 +138,13 @@
                             <TextBlock Text="{Binding Path=Name}" Margin="4" HorizontalAlignment="Left"/>
                         </DataTemplate>
 
+                        <DataTemplate x:Key="SwitchHeadTemplate">
+                            <TextBlock FontWeight="Bold" Text="Switch"/>
+                        </DataTemplate>
+                        <DataTemplate x:Key="SwitchContentTemplate">
+                            <TextBlock Text="{Binding Path=DeviceSwitch, StringFormat=0x{0:X8}}" Margin="4" HorizontalAlignment="Left"/>
+                        </DataTemplate>
+
                         <DataTemplate x:Key="ReferenceNameHeadTemplate">
                             <TextBlock FontWeight="Bold" Text="Reference Name"/>
                         </DataTemplate>
@@ -156,6 +163,7 @@
                         <GridView>
                             <GridViewColumn Width="80" HeaderTemplate="{StaticResource IDHeadTemplate}" CellTemplate="{StaticResource IDContentTemplate}"/>
                             <GridViewColumn Width="120" HeaderTemplate="{StaticResource NameHeadTemplate}" CellTemplate="{StaticResource NameContentTemplate}"/>
+                            <GridViewColumn Width="100" HeaderTemplate="{StaticResource SwitchHeadTemplate}" CellTemplate="{StaticResource SwitchContentTemplate}"/>
                             <GridViewColumn Width="200" HeaderTemplate="{StaticResource ReferenceNameHeadTemplate}" CellTemplate="{StaticResource ReferenceNameContentTemplate}"/>
                             <GridViewColumn Width="80" HeaderTemplate="{StaticResource AddressHeadTemplate}" CellTemplate="{StaticResource AddressContentTemplate}"/>
                         </GridView>
@@ -244,6 +252,13 @@
                             <TextBlock Text="{Binding Path=Name}" Margin="4" HorizontalAlignment="Left"/>
                         </DataTemplate>
 
+                        <DataTemplate x:Key="SwitchHeadTemplate">
+                            <TextBlock FontWeight="Bold" Text="Switch"/>
+                        </DataTemplate>
+                        <DataTemplate x:Key="SwitchContentTemplate">
+                            <TextBlock Text="{Binding Path=DeviceSwitch, StringFormat=0x{0:X8}}" Margin="4" HorizontalAlignment="Left"/>
+                        </DataTemplate>
+
                         <DataTemplate x:Key="ReferenceNameHeadTemplate">
                             <TextBlock FontWeight="Bold" Text="Reference Name"/>
                         </DataTemplate>
@@ -269,6 +284,7 @@
                         <GridView>
                             <GridViewColumn Width="80" HeaderTemplate="{StaticResource IDHeadTemplate}" CellTemplate="{StaticResource IDContentTemplate}"/>
                             <GridViewColumn Width="120" HeaderTemplate="{StaticResource NameHeadTemplate}" CellTemplate="{StaticResource NameContentTemplate}"/>
+                            <GridViewColumn Width="100" HeaderTemplate="{StaticResource SwitchHeadTemplate}" CellTemplate="{StaticResource SwitchContentTemplate}"/>
                             <GridViewColumn Width="200" HeaderTemplate="{StaticResource ReferenceNameHeadTemplate}" CellTemplate="{StaticResource ReferenceNameContentTemplate}"/>
                             <GridViewColumn Width="120" HeaderTemplate="{StaticResource IPAddressHeadTemplate}" CellTemplate="{StaticResource IPAddressContentTemplate}"/>
                             <GridViewColumn Width="80" HeaderTemplate="{StaticResource PortHeadTemplate}" CellTemplate="{StaticResource PortContentTemplate}"/>

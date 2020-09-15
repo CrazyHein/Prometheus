@@ -57,10 +57,12 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Eresia
 
         public static Regex VALID_IPV4_ADDRESS { get; private set; }
         public static Regex VALID_EXTENSION_MODULE_ADDRESS_FORMAT { get; private set; }
+        public static Regex VALID_MODULE_SWITCH_FORMAT { get; private set; }
         static TaskUserParametersHelper()
         {
             VALID_IPV4_ADDRESS = new Regex(@"^((2[0-4]\d|25[0-5]|[01]?\d\d?)\.){3}(2[0-4]\d|25[0-5]|[01]?\d\d?)$", RegexOptions.Compiled);
             VALID_EXTENSION_MODULE_ADDRESS_FORMAT = new Regex(@"^0x[0-9A-F]{3}0$", RegexOptions.Compiled);
+            VALID_MODULE_SWITCH_FORMAT = new Regex(@"^0x[0-9A-F]{8}$", RegexOptions.Compiled);
         }
 
         public TaskUserParametersHelper(ControllerModelCatalogue catalogue)

@@ -10,6 +10,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Eresia
         public static IReadOnlyList<string> USER_FIELDS { get; private set; }
 
         public ControllerExtensionModel MODEL { get; private set; }
+        public uint SWITCH { get; private set; }
+
         private ushort address;
         public ushort ADDRESS
         {
@@ -36,18 +38,20 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Eresia
             }; 
         }
 
-        public CONTROLLER_EXTENSION_MODULE_T(ControllerExtensionModel model, ushort address)
+        public CONTROLLER_EXTENSION_MODULE_T(ControllerExtensionModel model, uint sw, ushort address)
         {
             MODEL = model;
+            SWITCH = sw;
             ADDRESS = address;
             __user_configurations = new Dictionary<string, string>(USER_FIELDS.Count);
             foreach (var k in USER_FIELDS)
                 __user_configurations[k] = "";
         }
 
-        public CONTROLLER_EXTENSION_MODULE_T(ControllerExtensionModel model, ushort address, IEnumerable<Tuple<string, string>> users)
+        public CONTROLLER_EXTENSION_MODULE_T(ControllerExtensionModel model, uint sw, ushort address, IEnumerable<Tuple<string, string>> users)
         {
             MODEL = model;
+            SWITCH = sw;
             ADDRESS = address;
             __user_configurations = new Dictionary<string, string>(USER_FIELDS.Count);
             foreach (var k in USER_FIELDS)
@@ -74,6 +78,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Eresia
 
                 id = Convert.ToUInt16(node.SelectSingleNode("ID").FirstChild.Value, 16);
                 name = node.SelectSingleNode("Name").FirstChild.Value;
+                SWITCH = Convert.ToUInt32(node.SelectSingleNode("Switch").FirstChild.Value, 16);
                 bitSize = Convert.ToUInt16(node.SelectSingleNode("BitSize").FirstChild.Value, 16);
 
                 ADDRESS = Convert.ToUInt16(node.SelectSingleNode("Address").FirstChild.Value, 16);
@@ -109,6 +114,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Eresia
 
             sub = doc.CreateElement("Name");
             sub.AppendChild(doc.CreateTextNode(MODEL.Name));
+            moduleNode.AppendChild(sub);
+
+            sub = doc.CreateElement("Switch");
+            sub.AppendChild(doc.CreateTextNode($"0x{SWITCH:X8}"));
             moduleNode.AppendChild(sub);
 
             sub = doc.CreateElement("Address");
@@ -147,6 +156,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Eresia
         public static IReadOnlyList<string> USER_FIELDS { get; private set; }
 
         public ControllerEthernetModel MODEL { get; private set; }
+        public uint SWITCH { get; private set; }
         public ushort PORT { get; private set; }
         private string __ip_address;
         public string IP_ADDRESS
@@ -178,9 +188,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Eresia
             };
         }
 
-        public CONTROLLER_ETHERNET_MODULE_T(ControllerEthernetModel model, string ip, ushort port)
+        public CONTROLLER_ETHERNET_MODULE_T(ControllerEthernetModel model, uint sw, string ip, ushort port)
         {
             MODEL = model;
+            SWITCH = sw;
             IP_ADDRESS = ip;
             PORT = port;
 
@@ -189,9 +200,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Eresia
                 __user_configurations[k] = "";
         }
 
-        public CONTROLLER_ETHERNET_MODULE_T(ControllerEthernetModel model, string ip, ushort port, IEnumerable<Tuple<string, string>> users)
+        public CONTROLLER_ETHERNET_MODULE_T(ControllerEthernetModel model, uint sw, string ip, ushort port, IEnumerable<Tuple<string, string>> users)
         {
             MODEL = model;
+            SWITCH = sw;
             IP_ADDRESS = ip;
             PORT = port;
             __user_configurations = new Dictionary<string, string>(USER_FIELDS.Count);
@@ -218,6 +230,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Eresia
 
                 id = Convert.ToUInt16(node.SelectSingleNode("ID").FirstChild.Value, 16);
                 name = node.SelectSingleNode("Name").FirstChild.Value;
+                SWITCH = Convert.ToUInt32(node.SelectSingleNode("Switch").FirstChild.Value, 16);
 
                 IP_ADDRESS = node.SelectSingleNode("IP").FirstChild.Value;
                 PORT = Convert.ToUInt16(node.SelectSingleNode("Port").FirstChild.Value, 10);
@@ -253,6 +266,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Eresia
 
             sub = doc.CreateElement("Name");
             sub.AppendChild(doc.CreateTextNode(MODEL.Name));
+            moduleNode.AppendChild(sub);
+
+            sub = doc.CreateElement("Switch");
+            sub.AppendChild(doc.CreateTextNode($"0x{SWITCH:X8}"));
             moduleNode.AppendChild(sub);
 
             sub = doc.CreateElement("IP");

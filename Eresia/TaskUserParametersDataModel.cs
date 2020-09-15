@@ -82,7 +82,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Eresia
 
                 foreach(var c in dataModel.UserConfigurations)
                     userConfiguration.Add(new Tuple<string, string>(c.Name, c.Value.Trim()));
-                extensionModules.Add(new CONTROLLER_EXTENSION_MODULE_T(dataModel.Model, dataModel.Address, userConfiguration));
+                extensionModules.Add(new CONTROLLER_EXTENSION_MODULE_T(dataModel.Model, dataModel.Switch, dataModel.Address, userConfiguration));
             }
             _data_helper.ImportModules(extensionModules, true);
 
@@ -92,7 +92,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Eresia
                 var userConfiguration = new List<Tuple<string, string>>(TaskUserParametersHelper.ETHERNET_MODULE_USER_FIELDS.Count);
                 foreach (var c in dataModel.UserConfigurations)
                     userConfiguration.Add(new Tuple<string, string>(c.Name, c.Value.Trim()));
-                ethernetModules.Add(new CONTROLLER_ETHERNET_MODULE_T(dataModel.Model, dataModel.IPAddress, dataModel.Port, userConfiguration));
+                ethernetModules.Add(new CONTROLLER_ETHERNET_MODULE_T(dataModel.Model, dataModel.Switch, dataModel.IPAddress, dataModel.Port, userConfiguration));
             }
             _data_helper.ImportModules(ethernetModules, true);
 
@@ -140,13 +140,13 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Eresia
         public void AddExtensionModuleDataModel()
         {
             __extension_modules.Add(new ExtensionModuleDataModel(this,
-                new CONTROLLER_EXTENSION_MODULE_T(AvailableExtensionModels[0], 0x0000)));
+                new CONTROLLER_EXTENSION_MODULE_T(AvailableExtensionModels[0], 0, 0x0000)));
         }
 
         public void InsertExtensionModuleDataModel(int pos)
         {
             __extension_modules.Insert(pos, new ExtensionModuleDataModel(this,
-                new CONTROLLER_EXTENSION_MODULE_T(AvailableExtensionModels[0], 0x0000)));
+                new CONTROLLER_EXTENSION_MODULE_T(AvailableExtensionModels[0], 0, 0x0000)));
         }
 
         public void RemoveExtensionModuleDataModel(int pos)
@@ -173,13 +173,13 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Eresia
         public void AddEthernetModuleDataModel()
         {
             __ethernet_modules.Add(new EthernetModuleDataModel(this,
-                new CONTROLLER_ETHERNET_MODULE_T(AvailableEthernetModels[0], "192.168.0.1", 8366)));
+                new CONTROLLER_ETHERNET_MODULE_T(AvailableEthernetModels[0], 0,"192.168.0.1", 8366)));
         }
 
         public void InsertEthernetModuleDataModel(int pos)
         {
             __ethernet_modules.Insert(pos, new EthernetModuleDataModel(this,
-                new CONTROLLER_ETHERNET_MODULE_T(AvailableEthernetModels[0], "192.168.0.1", 8366)));
+                new CONTROLLER_ETHERNET_MODULE_T(AvailableEthernetModels[0], 0,"192.168.0.1", 8366)));
         }
 
         public void RemoveEthernetModuleDataModel(int pos)
@@ -244,6 +244,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Eresia
     {
         public ExtensionModuleDataModel(TaskUserParametersDataModel host, CONTROLLER_EXTENSION_MODULE_T module) : base(host)
         {
+            Switch = module.SWITCH;
             Address = module.ADDRESS;
             Model = module.MODEL;
             AvailableModels = host.AvailableExtensionModels;
@@ -263,6 +264,13 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Eresia
                 SetProperty(ref __model, value);
                 BitSize = value.BitSize;
             }
+        }
+
+        uint __switch;
+        public uint Switch
+        {
+            get { return __switch; }
+            set { SetProperty(ref __switch, value); }
         }
 
         private ushort __address;
@@ -295,6 +303,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Eresia
     {
         public EthernetModuleDataModel(TaskUserParametersDataModel host, CONTROLLER_ETHERNET_MODULE_T module) : base(host)
         {
+            Switch = module.SWITCH;
             IPAddress = module.IP_ADDRESS;
             Port = module.PORT;
             Model = module.MODEL;
@@ -311,6 +320,13 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Eresia
         {
             get { return __model; }
             set { SetProperty(ref __model, value); }
+        }
+
+        uint __switch;
+        public uint Switch
+        {
+            get { return __switch; }
+            set { SetProperty(ref __switch, value); }
         }
 
         private string __ip_address;
@@ -386,6 +402,30 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Eresia
                 string str = (string)value;
                 if (TaskUserParametersHelper.VALID_EXTENSION_MODULE_ADDRESS_FORMAT.IsMatch(str))
                     return System.Convert.ToUInt16(str, 16);
+                else
+                    return new ArgumentException();
+            }
+            catch
+            {
+                return new ArgumentException();
+            }
+        }
+    }
+
+    class ModuleHexSwitchToText : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return string.Format("0x{0:X8}", value);
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            try
+            {
+                string str = (string)value;
+                if (TaskUserParametersHelper.VALID_MODULE_SWITCH_FORMAT.IsMatch(str))
+                    return System.Convert.ToUInt32(str, 16);
                 else
                     return new ArgumentException();
             }
