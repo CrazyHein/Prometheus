@@ -3091,6 +3091,119 @@
 		<Comment>Onboard gas2 supply pressure reading (Obsolete)</Comment>
 	</Variable>
 
+  	<Variable>
+		<ID>2124</ID>
+		<Name>GB PG01 Pressure  (Obsolete)</Name>
+		<DataType>INT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Channel1 gas supply pressure reading (Obsolete)</Comment>
+	</Variable>
+  	<Variable>
+		<ID>2125</ID>
+		<Name>GB PG02 Pressure (Obsolete)</Name>
+		<DataType>INT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Channel2 gas supply pressure reading (Obsolete)</Comment>
+	</Variable>
+  	<Variable>
+		<ID>2126</ID>
+		<Name>GB PG03 Pressure (Obsolete)</Name>
+		<DataType>INT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Channel3 gas supply pressure reading (Obsolete)</Comment>
+	</Variable>
+  	<Variable>
+		<ID>2127</ID>
+		<Name>GB PG04 Pressure (Obsolete)</Name>
+		<DataType>INT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Channel4 gas supply pressure reading (Obsolete)</Comment>
+	</Variable>
+  	<Variable>
+		<ID>2128</ID>
+		<Name>GB PG05 Pressure (Obsolete)</Name>
+		<DataType>INT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Channel5 gas supply pressure reading (Obsolete)</Comment>
+	</Variable>
+  	<Variable>
+		<ID>2129</ID>
+		<Name>GB PG06 Pressure (Obsolete)</Name>
+		<DataType>INT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Channel6 gas supply pressure reading (Obsolete)</Comment>
+	</Variable>
+  	<Variable>
+		<ID>2130</ID>
+		<Name>GB PG07 Pressure (Obsolete)</Name>
+		<DataType>INT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Channel7 gas supply pressure reading (Obsolete)</Comment>
+	</Variable>
+  	<Variable>
+		<ID>2131</ID>
+		<Name>GB PG08 Pressure (Obsolete)</Name>
+		<DataType>INT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Channel8 gas supply pressure reading (Obsolete)</Comment>
+	</Variable>
+
+  	<Variable>
+		<ID>2132</ID>
+		<Name>GB PG09 Pressure (Obsolete)</Name>
+		<DataType>INT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Channel9 gas supply pressure reading (Obsolete)</Comment>
+	</Variable>
+  	<Variable>
+		<ID>2133</ID>
+		<Name>GB PG10 Pressure (Obsolete)</Name>
+		<DataType>INT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Channel10 gas supply pressure reading (Obsolete)</Comment>
+	</Variable>
+  	<Variable>
+		<ID>2134</ID>
+		<Name>GB PG11 Pressure (Obsolete)</Name>
+		<DataType>INT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Channel11 gas supply pressure reading (Obsolete)</Comment>
+	</Variable>
+  	<Variable>
+		<ID>2135</ID>
+		<Name>GB PG12 Pressure (Obsolete)</Name>
+		<DataType>INT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Channel12 gas supply pressure reading (Obsolete)</Comment>
+	</Variable>
+  	<Variable>
+		<ID>2136</ID>
+		<Name>GB PG13 Pressure (Obsolete)</Name>
+		<DataType>INT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Channel13 gas supply pressure reading (Obsolete)</Comment>
+	</Variable>
+  	<Variable>
+		<ID>2137</ID>
+		<Name>GB PG14 Pressure (Obsolete)</Name>
+		<DataType>INT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Channel14 gas supply pressure reading (Obsolete)</Comment>
+	</Variable>
+  	<Variable>
+		<ID>2138</ID>
+		<Name>GB PG15 Pressure (Obsolete)</Name>
+		<DataType>INT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Channel15 gas supply pressure reading (Obsolete)</Comment>
+	</Variable>
+  	<Variable>
+		<ID>2139</ID>
+		<Name>GB PG16 Pressure (Obsolete)</Name>
+		<DataType>INT</DataType>
+		<Unit>N/A</Unit>
+		<Comment>Channel16 gas supply pressure reading (Obsolete)</Comment>
+	</Variable>
 
 	<Variable>
 		<ID>3999</ID>
@@ -3231,6 +3344,35 @@
 		<Comment>Station2 E-Chuck outer zone coolant water outlet temperature</Comment>
 	</Variable>
 
+	<Variable>
+		<ID>4008</ID>
+		<Name>GB Gas Line 1 Temp</Name>
+		<DataType>FLOAT</DataType>
+		<Unit>℃</Unit>
+		<Comment>Gas box gas line 1 temperature</Comment>
+	</Variable>
+	<Variable>
+		<ID>4009</ID>
+		<Name>GB Gas Line 2 Temp</Name>
+		<DataType>FLOAT</DataType>
+		<Unit>℃</Unit>
+		<Comment>Gas box gas line 2 temperature</Comment>
+	</Variable>
+		<Variable>
+		<ID>4010</ID>
+		<Name>GB Gas Line 3 Temp</Name>
+		<DataType>FLOAT</DataType>
+		<Unit>℃</Unit>
+		<Comment>Gas box gas line 3 temperature</Comment>
+	</Variable>
+		<Variable>
+		<ID>4011</ID>
+		<Name>GB Gas Line 4 Temp</Name>
+		<DataType>FLOAT</DataType>
+		<Unit>℃</Unit>
+		<Comment>Gas box gas line 4 temperature</Comment>
+	</Variable>
+
   	<!-- Variables compatible with excel based io list -->
 	<Variable>
 		<ID>4100</ID>
@@ -3287,6 +3429,35 @@
 		<DataType>FIXEDPOINT3201</DataType>
 		<Unit>℃</Unit>
 		<Comment>Station2 E-Chuck outer zone coolant water outlet temperature (Obsolete)</Comment>
+	</Variable>
+
+	<Variable>
+		<ID>4108</ID>
+		<Name>GB Gas Line 1 Temp (Obsolete)</Name>
+		<DataType>FIXEDPOINT3201</DataType>
+		<Unit>℃</Unit>
+		<Comment>Gas box gas line 1 temperature (Obsolete)</Comment>
+	</Variable>
+	<Variable>
+		<ID>4109</ID>
+		<Name>GB Gas Line 2 Temp (Obsolete)</Name>
+		<DataType>FIXEDPOINT3201</DataType>
+		<Unit>℃</Unit>
+		<Comment>Gas box gas line 2 temperature (Obsolete)</Comment>
+	</Variable>
+		<Variable>
+		<ID>4110</ID>
+		<Name>GB Gas Line 3 Temp (Obsolete)</Name>
+		<DataType>FIXEDPOINT3201</DataType>
+		<Unit>℃</Unit>
+		<Comment>Gas box gas line 3 temperature (Obsolete)</Comment>
+	</Variable>
+		<Variable>
+		<ID>4111</ID>
+		<Name>GB Gas Line 4 Temp (Obsolete)</Name>
+		<DataType>FIXEDPOINT3201</DataType>
+		<Unit>℃</Unit>
+		<Comment>Gas box gas line 4 temperature (Obsolete)</Comment>
 	</Variable>
 
   	<Variable>

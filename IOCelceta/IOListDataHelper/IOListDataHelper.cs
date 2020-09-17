@@ -920,7 +920,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
 
             if (objectData.range.enabled == true)
             {
-                if (objectData.variable.DataType.BitSize != 1)
+                if (objectData.variable.DataType.BitSize != 1 && objectData.range.down_limit != null && objectData.range.up_limit != null)
                 {
                     try
                     {
