@@ -278,6 +278,7 @@
 			<BitSize>0x20</BitSize>
 			<TX>
 				<Raw>512</Raw>
+				<BitArea>4096</BitArea>
 				<Byte>512</Byte>
 				<SByte>512</SByte>
 				<Short>511</Short>
@@ -295,6 +296,7 @@
 			</TX>
 			<RX>
 				<Raw>512</Raw>
+				<BitArea>4096</BitArea>
 				<Byte>512</Byte>
 				<SByte>512</SByte>
 				<Short>511</Short>
@@ -319,9 +321,11 @@
 				<NetMLP>1</NetMLP>
 				<NetEVT>1</NetEVT>
 				<Raw>17552</Raw>
+				<BitArea>140416</BitArea>
 			</TX>
 			<RX>
 				<Raw>23696</Raw>
+				<BitArea>189568</BitArea>
 			</RX>
 		</ExtensionModel>
 	</ExtensionModels>
@@ -331,11 +335,13 @@
 			<Name>PC104_SERIAL_PORT_SERVER</Name>
 			<TX>
 				<Raw>2048</Raw>
+				<BitArea>16384</BitArea>
 				<NodeCFG>32</NodeCFG>
 				<NodeIOCOM>32</NodeIOCOM>
 			</TX>
 			<RX>
 				<Raw>2048</Raw>
+				<BitArea>16384</BitArea>
 			</RX>
 		</EthernetModel>
 	</EthernetModels>
