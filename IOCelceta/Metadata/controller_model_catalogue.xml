@@ -328,6 +328,44 @@
 				<BitArea>189568</BitArea>
 			</RX>
 		</ExtensionModel>
+		<ExtensionModel>
+			<ID>0x0102</ID>
+			<Name>RD55UP06_V_SMART_ECAT</Name>
+			<BitSize>0x20</BitSize>
+			<TX>
+				<NetSLV>1</NetSLV>
+				<NetCFG>1</NetCFG>
+				<NetIOCOM>1</NetIOCOM>
+				<NetLP>1</NetLP>
+				<NetMLP>1</NetMLP>
+				<NetEVT>1</NetEVT>
+				<Raw>28664</Raw>
+				<BitArea>229312</BitArea>
+			</TX>
+			<RX>
+				<Raw>28664</Raw>
+				<BitArea>229312</BitArea>
+			</RX>
+		</ExtensionModel>
+		<ExtensionModel>
+			<ID>0x0103</ID>
+			<Name>RD55UP12_V_SMART_ECAT</Name>
+			<BitSize>0x20</BitSize>
+			<TX>
+				<NetSLV>1</NetSLV>
+				<NetCFG>1</NetCFG>
+				<NetIOCOM>1</NetIOCOM>
+				<NetLP>1</NetLP>
+				<NetMLP>1</NetMLP>
+				<NetEVT>1</NetEVT>
+				<Raw>28664</Raw>
+				<BitArea>229312</BitArea>
+			</TX>
+			<RX>
+				<Raw>28664</Raw>
+				<BitArea>229312</BitArea>
+			</RX>
+		</ExtensionModel>
 	</ExtensionModels>
 	<EthernetModels ConfigurationFields = "Timeout;Timer;Interval;Priority;InputDataOffset;InputDataSize;OutputDataOffset;OutputDataSize;">
 		<EthernetModel>

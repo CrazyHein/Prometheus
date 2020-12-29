@@ -244,7 +244,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Eresia
 
         private void __remove_extension_module_can_executed(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = DataContext != null && __lsb_extension_modules.SelectedItem != null;
+            e.CanExecute = DataContext != null && __lsb_extension_modules.SelectedItem != null && (DataContext as TaskUserParametersDataModel).FieldDataBindingErrors == 0;
         }
 
         private void __move_up_extension_module_executed(object sender, ExecutedRoutedEventArgs e)
@@ -305,7 +305,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Eresia
 
         private void __remove_ethernet_module_can_executed(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = DataContext != null && __lsb_ethernet_modules.SelectedItem != null;
+            e.CanExecute = DataContext != null && __lsb_ethernet_modules.SelectedItem != null && (DataContext as TaskUserParametersDataModel).FieldDataBindingErrors == 0;
         }
 
         private void __move_up_ethernet_module_executed(object sender, ExecutedRoutedEventArgs e)
