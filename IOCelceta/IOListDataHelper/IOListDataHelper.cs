@@ -355,7 +355,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
             bool enabled = false;
             IO_LIST_CONTROLLER_INFORMATION_T.MODULE_T module = null;
             string channelName = null;
-            int channelIndex = 0;
+            uint channelIndex = 0;
             try
             {
                 foreach (XmlNode node in bindingNode.ChildNodes)
@@ -379,7 +379,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                             if (node.NodeType == XmlNodeType.Element)
                             {
                                 channelName = node.Name;
-                                channelIndex = Convert.ToInt32(node.FirstChild.Value, 10);
+                                channelIndex = Convert.ToUInt32(node.FirstChild.Value, 10);
                             }
                             break;
                     }
@@ -884,7 +884,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
             if(objectData.binding.enabled == true)
             {
                 ushort moduleID;
-                IReadOnlyDictionary<string, int> variables = null ;
+                IReadOnlyDictionary<string, uint> variables = null ;
                 if(objectData.binding.module == null)
                     throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_OBJECT_BINDING_MODULE, null);
                 if (__controller_information.modules.Keys.Contains(objectData.binding.module.reference_name) && 
@@ -2482,7 +2482,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
             public bool enabled { get; private set; }
             public IO_LIST_CONTROLLER_INFORMATION_T.MODULE_T module { get; private set; }
             public string channel_name { get; private set; }
-            public int channel_index { get; private set; }
+            public uint channel_index { get; private set; }
 
             public override string ToString()
             {
@@ -2492,7 +2492,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                     return string.Format("{0} -- [{1} : {2}]", module.reference_name, channel_name, channel_index);
             }
 
-            public MODULE_BINDING_T(bool enabled, IO_LIST_CONTROLLER_INFORMATION_T.MODULE_T module, string channelName, int channelIndex)
+            public MODULE_BINDING_T(bool enabled, IO_LIST_CONTROLLER_INFORMATION_T.MODULE_T module, string channelName, uint channelIndex)
             {
                 this.enabled = enabled;
                 this.module = module;

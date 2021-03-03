@@ -60,7 +60,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.Catalogue
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            Dictionary<string, int> dict = value as Dictionary<string, int>;
+            Dictionary<string, uint> dict = value as Dictionary<string, uint>;
             if(dict != null && dict.Count != 0)
             {
                 StringBuilder str = new StringBuilder();

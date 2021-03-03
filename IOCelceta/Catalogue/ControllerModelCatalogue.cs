@@ -54,8 +54,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.Catalogue
             ushort id = 0;
             string name = "";
             ushort bitSize = 0;
-            Dictionary<string, int> txVariables;
-            Dictionary<string, int> rxVariables;
+            Dictionary<string, uint> txVariables;
+            Dictionary<string, uint> rxVariables;
             XmlDocument xmlDoc = new XmlDocument();
 
             try
@@ -86,8 +86,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.Catalogue
                     {
                         if (extensionModelNode.NodeType != XmlNodeType.Element || extensionModelNode.Name != "ExtensionModel")
                             continue;
-                        txVariables = new Dictionary<string, int>();
-                        rxVariables = new Dictionary<string, int>();
+                        txVariables = new Dictionary<string, uint>();
+                        rxVariables = new Dictionary<string, uint>();
                         
                         id = Convert.ToUInt16(extensionModelNode.SelectSingleNode("ID").FirstChild.Value, 16);
                         name = extensionModelNode.SelectSingleNode("Name").FirstChild.Value;
@@ -99,7 +99,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.Catalogue
                             {
                                 if (tx.NodeType != XmlNodeType.Element)
                                     continue;
-                                txVariables.Add(tx.Name, Convert.ToInt32(tx.FirstChild.Value, 10));
+                                txVariables.Add(tx.Name, Convert.ToUInt32(tx.FirstChild.Value, 10));
                             }
                         }
                         x = extensionModelNode["RX"];
@@ -109,7 +109,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.Catalogue
                             {
                                 if (rx.NodeType != XmlNodeType.Element)
                                     continue;
-                                rxVariables.Add(rx.Name, Convert.ToInt32(rx.FirstChild.Value, 10));
+                                rxVariables.Add(rx.Name, Convert.ToUInt32(rx.FirstChild.Value, 10));
                             }
                         }
                             
@@ -141,8 +141,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.Catalogue
                     {
                         if (extensionModelNode.NodeType != XmlNodeType.Element || extensionModelNode.Name != "EthernetModel")
                             continue;
-                        txVariables = new Dictionary<string, int>();
-                        rxVariables = new Dictionary<string, int>();
+                        txVariables = new Dictionary<string, uint>();
+                        rxVariables = new Dictionary<string, uint>();
 
                         id = Convert.ToUInt16(extensionModelNode.SelectSingleNode("ID").FirstChild.Value, 16);
                         name = extensionModelNode.SelectSingleNode("Name").FirstChild.Value;
@@ -153,7 +153,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.Catalogue
                             {
                                 if (tx.NodeType != XmlNodeType.Element)
                                     continue;
-                                txVariables.Add(tx.Name, Convert.ToInt32(tx.FirstChild.Value, 10));
+                                txVariables.Add(tx.Name, Convert.ToUInt32(tx.FirstChild.Value, 10));
                             }
                         }
                         x = extensionModelNode["RX"];
@@ -163,7 +163,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.Catalogue
                             {
                                 if (rx.NodeType != XmlNodeType.Element)
                                     continue;
-                                rxVariables.Add(rx.Name, Convert.ToInt32(rx.FirstChild.Value, 10));
+                                rxVariables.Add(rx.Name, Convert.ToUInt32(rx.FirstChild.Value, 10));
                             }
                         }
                        
@@ -182,7 +182,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.Catalogue
             }
             finally
             {
-                ExtensionModels = __extension_models;
+                EthernetModels = __ethernet_models;
             }
         }
     }
@@ -205,11 +205,11 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.Catalogue
 
     public class ControllerExtensionModel: ControllerModel
     {
-        public IReadOnlyDictionary<string, int> TxVariables { get; private set; }
-        public IReadOnlyDictionary<string, int> RxVariables { get; private set; }
+        public IReadOnlyDictionary<string, uint> TxVariables { get; private set; }
+        public IReadOnlyDictionary<string, uint> RxVariables { get; private set; }
         public ushort BitSize { get; private set; }
 
-        public ControllerExtensionModel(ushort id, string name, ushort bitSize, Dictionary<string, int> txVariables, Dictionary<string, int> rxVariables) :base(id, name)
+        public ControllerExtensionModel(ushort id, string name, ushort bitSize, Dictionary<string, uint> txVariables, Dictionary<string, uint> rxVariables) :base(id, name)
         {
             TxVariables = txVariables;
             RxVariables = rxVariables;
@@ -219,10 +219,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.Catalogue
 
     public class ControllerEthernetModel: ControllerModel
     {
-        public IReadOnlyDictionary<string, int> TxVariables { get; private set; }
-        public IReadOnlyDictionary<string, int> RxVariables { get; private set; }
+        public IReadOnlyDictionary<string, uint> TxVariables { get; private set; }
+        public IReadOnlyDictionary<string, uint> RxVariables { get; private set; }
 
-        public ControllerEthernetModel(ushort id, string name, Dictionary<string, int> txVariables, Dictionary<string, int> rxVariables) :base(id, name)
+        public ControllerEthernetModel(ushort id, string name, Dictionary<string, uint> txVariables, Dictionary<string, uint> rxVariables) :base(id, name)
         {
             TxVariables = txVariables;
             RxVariables = rxVariables;

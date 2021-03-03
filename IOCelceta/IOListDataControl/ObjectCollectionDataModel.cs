@@ -208,7 +208,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
         private bool __binding_enable;
         private IO_LIST_CONTROLLER_INFORMATION_T.MODULE_T __binding_module;
         private string __binding_channel_name;
-        private int __binding_channel_index;
+        private uint __binding_channel_index;
 
         private bool __range_enable;
         private string __range_up_limit;
@@ -294,7 +294,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             get { return __binding_channel_name; }
             set { SetProperty(ref __binding_channel_name, value); }
         }
-        public int BindingChannelIndex
+        public uint BindingChannelIndex
         {
             get { return __binding_channel_index; }
             set { SetProperty(ref __binding_channel_index, value); }
@@ -408,7 +408,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta.IOListDat
             else
                 return string.Format("{0} -- [{1} : {2}]", 
                     ((IO_LIST_CONTROLLER_INFORMATION_T.MODULE_T)values[1]).reference_name, 
-                    (string)values[2], (int)values[3]);
+                    (string)values[2], (uint)values[3]);
         }
 
         public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
