@@ -14,6 +14,7 @@
         <CommandBinding Command="local:ConsoleControl.OpenAboutDialog" Executed="__open_about_dialog_executed"/>
         <CommandBinding Command="local:ConsoleControl.OpenCatalogueDialog" Executed="__open_catalogue_dialog_executed"/>
         <CommandBinding Command="local:ConsoleControl.ShowIOListFileHashCode" Executed="__show_io_list_hash_code_executed" CanExecute="__show_io_list_hash_code_can_executed"/>
+        <CommandBinding Command="local:ConsoleControl.ExportToExcelFile" Executed="__export_to_excel_file_executed" CanExecute="__export_to_excel_file_can_executed"/>
     </Window.CommandBindings>
     <Grid>
         <Grid.RowDefinitions>
@@ -42,6 +43,11 @@
                 <MenuItem Command="local:ConsoleControl.SaveIOListFileAs">
                     <MenuItem.Icon>
                         <Image Source="img/save_as.png"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Command="local:ConsoleControl.ExportToExcelFile">
+                    <MenuItem.Icon>
+                        <Image Source="img/export.png"/>
                     </MenuItem.Icon>
                 </MenuItem>
             </MenuItem>

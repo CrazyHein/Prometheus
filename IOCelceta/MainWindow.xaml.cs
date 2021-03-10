@@ -244,9 +244,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                 __io_list_file_md5_hash = null;
 
                 if (exp.ErrorCode == IO_LIST_FILE_ERROR_T.FILE_DATA_EXCEPTION)
-                    message = string.Format("At least one unexpected error occurred while reading [IO List] file . \n{0}", exp.DataException.ToString());
+                    message = string.Format("At least one unexpected error occurred while saving [IO List] file . \n{0}", exp.DataException.ToString());
                 else
-                    message = string.Format("At least one unexpected error occurred while reading [IO List] file . \n{0}", exp.ErrorCode.ToString());
+                    message = string.Format("At least one unexpected error occurred while saving [IO List] file . \n{0}", exp.ErrorCode.ToString());
 
                 MessageBox.Show(message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
@@ -318,9 +318,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                     __io_list_file_md5_hash = null;
 
                     if (exp.ErrorCode == IO_LIST_FILE_ERROR_T.FILE_DATA_EXCEPTION)
-                        message = string.Format("At least one unexpected error occurred while reading [IO List] file . \n{0}", exp.DataException.ToString());
+                        message = string.Format("At least one unexpected error occurred while saving [IO List] file . \n{0}", exp.DataException.ToString());
                     else
-                        message = string.Format("At least one unexpected error occurred while reading [IO List] file . \n{0}", exp.ErrorCode.ToString());
+                        message = string.Format("At least one unexpected error occurred while saving [IO List] file . \n{0}", exp.ErrorCode.ToString());
 
                     MessageBox.Show(message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 }              
@@ -375,6 +375,80 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                 $"{__io_list_file_md5_hash[12]:X2}{__io_list_file_md5_hash[13]:X2} - {__io_list_file_md5_hash[14]:X2}{__io_list_file_md5_hash[15]:X2}",
                 "Information", MessageBoxButton.OK, MessageBoxImage.Information);
         }
+
+        private void __export_to_excel_file_can_executed(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = __tab_target_inforamtion.Content != null;
+        }
+
+        private void __export_to_excel_file_executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            TargetInformationDataModel targetInfo = (__tab_target_inforamtion.Content as TargetInformationDataControl).DataContext as TargetInformationDataModel;
+
+            if (targetInfo.FieldDataBindingErrors != 0)
+            {
+                MessageBox.Show("Invalid User Input ... (Target Information)", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            ControllerInformationDataModel controllerInfo = (__tab_controller_inforamtion.Content as ControllerInformationDataControl).DataContext as ControllerInformationDataModel;
+
+            if (controllerInfo.FieldDataBindingErrors != 0)
+            {
+                MessageBox.Show("Invalid User Input ... (Controller Information)", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            ObjectCollectionDataModel objectsInfo = (__tab_object_collection.Content as ObjectCollectionDataControl).DataContext as ObjectCollectionDataModel;
+
+            if (objectsInfo.FieldDataBindingErrors != 0)
+            {
+                MessageBox.Show("Invalid User Input ... (Object Collection)", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            PDOCollectionDataModel pdoMappingsInfo = (__tab_pdo_intlk_collection.Content as PDOCollectionDataControl).DataContext as PDOCollectionDataModel;
+
+            if (pdoMappingsInfo.FieldDataBindingErrors != 0)
+            {
+                MessageBox.Show("Invalid User Input ... (PDO Mapping Collection)", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            System.Windows.Forms.SaveFileDialog save = new System.Windows.Forms.SaveFileDialog();
+            save.Filter = "Microsoft Office Excel 2007+ (*.xlsx)|*.xlsx";
+            save.AddExtension = true;
+            save.DefaultExt = "xlsx";
+
+            if (save.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                targetInfo.FinalizeDataHelper();
+                controllerInfo.FinalizeDataHelper();
+                objectsInfo.FinalizeDataHelper();
+                pdoMappingsInfo.FinalizeDataHelper();
+
+                string message;
+                try
+                {
+                    var pass = System.Security.Cryptography.SHA256.Create();
+                    var bytes = pass.ComputeHash(BitConverter.GetBytes((new object()).GetHashCode()));
+                    __io_list_data_helper.Export(controllerInfo.ExtensionModules.Select(dataModel => dataModel.ReferenceName),
+                        controllerInfo.EthernetModules.Select(dataModel => dataModel.ReferenceName),
+                        objectsInfo.Objects.Select(dataModel => dataModel.Index),
+                        save.FileName, IO_LIST_EXPORT_FORMAT.XLS2007, null, null,
+                        bytes[7].ToString("X2") + bytes[15].ToString("X2") + bytes[23].ToString("X2") + bytes[31].ToString("X2"));
+                }
+                catch (IOListParseExcepetion exp)
+                {
+                    if (exp.ErrorCode == IO_LIST_FILE_ERROR_T.FILE_DATA_EXCEPTION)
+                        message = string.Format("At least one unexpected error occurred while exporting [IO List] file . \n{0}", exp.DataException.ToString());
+                    else
+                        message = string.Format("At least one unexpected error occurred while exporting [IO List] file . \n{0}", exp.ErrorCode.ToString());
+
+                    MessageBox.Show(message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+        }
     }
 
     internal class IsDirtyDocumentConverter : IValueConverter
@@ -406,6 +480,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
 
         public static RoutedUICommand ShowIOListFileHashCode { get; private set; }
 
+        public static RoutedUICommand ExportToExcelFile { get; private set; }
+
         static ConsoleControl()
         {
             InputGestureCollection gestureOpenIOListFile = new InputGestureCollection
@@ -436,6 +512,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
             {
                 new KeyGesture(Key.H, ModifierKeys.Control, "Ctrl+H")
             };
+            InputGestureCollection gestureExportToExcelFile = new InputGestureCollection
+            {
+                new KeyGesture(Key.S, ModifierKeys.Control, "Ctrl+E")
+            };
             OpenIOListFile = new RoutedUICommand("Open", "OpenIOListFile", typeof(ConsoleControl), gestureOpenIOListFile);
             NewIOListFile = new RoutedUICommand("New", "NewIOListFile", typeof(ConsoleControl), gestureNewIOListFile);
             SaveIOListFileAs = new RoutedUICommand("Save As", "SaveIOListFileAs", typeof(ConsoleControl), gestureSaveIOListFileAs);
@@ -443,6 +523,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
             OpenAboutDialog = new RoutedUICommand("About", "OpenAboutDialog", typeof(ConsoleControl), gestureOpenAboutDialog);
             OpenCatalogueDialog = new RoutedUICommand("Catalogue", "OpenCatalogueDialog", typeof(ConsoleControl), gestureOpenCatalogueDialog);
             ShowIOListFileHashCode = new RoutedUICommand("Hash", "ShowIOListFileHashCode", typeof(ConsoleControl), gestureShowIOListFileHashCode);
+            ExportToExcelFile = new RoutedUICommand("Export", "ExportToExcelFile", typeof(ConsoleControl), gestureExportToExcelFile);
         }
 
     }

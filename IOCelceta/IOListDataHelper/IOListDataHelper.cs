@@ -8,6 +8,8 @@ using System.Threading.Tasks;
 using System.Xml;
 using System.Security.Cryptography;
 using System.IO;
+using Spire.Xls;
+using System.Data;
 
 namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
 {
@@ -22,6 +24,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
         UNSUPPORTED_FILE_FORMAT_VERSION                         = 0x00000002,
         ELEMENT_MISSING                                         = 0x00000003,
         FILE_DATA_EXCEPTION                                     = 0x00000004,
+        UNSUPPORTED_EXPORT_FORMAT                               = 0x00000005,
 
         INVALID_CONTROLLER_EXTENSION_MODEL                      = 0x00000010,
         INVALID_CONTROLLER_ETHERNET_MODEL                       = 0x00000011,
@@ -99,6 +102,11 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
     {
         MD5,
         SH256,
+    }
+
+    public enum IO_LIST_EXPORT_FORMAT : byte
+    {
+        XLS2007,
     }
 
     public class IOListParseExcepetion : Exception
@@ -2381,8 +2389,324 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                 return e;
             }
         }
-    }
 
+        public void Export(IEnumerable<string> extensionModules, IEnumerable<string> ethernetModules, IEnumerable<uint> objects, string fileName, IO_LIST_EXPORT_FORMAT fmt = IO_LIST_EXPORT_FORMAT.XLS2007,
+            string workbookOpenProtectionPassword = null,
+            string workbookWriteProtectionPassword = null,
+            string sheetWriteProtectionPassword = null)
+        {
+            bool overlap = __overlap_detector(new Tuple<uint, uint>[] {
+                    new Tuple<uint, uint>(__controller_pdo_collection.tx_pdo_diagnostic_area.offset_in_word, __controller_pdo_collection.tx_pdo_diagnostic_area.size_in_word),
+                    new Tuple<uint, uint>(__controller_pdo_collection.tx_pdo_bit_area.offset_in_word, __controller_pdo_collection.tx_pdo_bit_area.size_in_word),
+                    new Tuple<uint, uint>(__controller_pdo_collection.tx_pdo_block_area.offset_in_word, __controller_pdo_collection.tx_pdo_block_area.size_in_word),
+                    new Tuple<uint, uint>(__controller_pdo_collection.rx_pdo_control_area.offset_in_word, __controller_pdo_collection.rx_pdo_control_area.size_in_word),
+                    new Tuple<uint, uint>(__controller_pdo_collection.rx_pdo_bit_area.offset_in_word, __controller_pdo_collection.rx_pdo_bit_area.size_in_word),
+                    new Tuple<uint, uint>(__controller_pdo_collection.rx_pdo_block_area.offset_in_word, __controller_pdo_collection.rx_pdo_block_area.size_in_word)});
+            if (overlap == true)
+                throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.PDO_AREA_OVERLAPPED, null);
+
+            if (__controller_pdo_collection.tx_pdo_diagnostic_area.size_in_word * 2 < __controller_pdo_collection.tx_pdo_diagnostic_area.actual_size_in_byte ||
+                __controller_pdo_collection.tx_pdo_bit_area.size_in_word * 2 < __controller_pdo_collection.tx_pdo_bit_area.actual_size_in_byte ||
+                __controller_pdo_collection.tx_pdo_block_area.size_in_word * 2 < __controller_pdo_collection.tx_pdo_block_area.actual_size_in_byte ||
+                __controller_pdo_collection.rx_pdo_control_area.size_in_word * 2 < __controller_pdo_collection.rx_pdo_control_area.actual_size_in_byte ||
+                __controller_pdo_collection.rx_pdo_bit_area.size_in_word * 2 < __controller_pdo_collection.rx_pdo_bit_area.actual_size_in_byte ||
+                __controller_pdo_collection.rx_pdo_block_area.size_in_word * 2 < __controller_pdo_collection.rx_pdo_block_area.actual_size_in_byte)
+                throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.PDO_AREA_OUT_OF_RANGE, null);
+
+            overlap = __controller_extension_modules_overlap_detector();
+            if (overlap == true)
+                throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.MODULE_LOCAL_ADDRESS_OVERLAPPED, null);
+
+
+            Workbook xlsxWorkbook = new Workbook();
+            xlsxWorkbook.Protect(workbookOpenProtectionPassword, true, true);
+            if (workbookWriteProtectionPassword != null && workbookWriteProtectionPassword != "")
+                xlsxWorkbook.SetWriteProtectionPassword(workbookWriteProtectionPassword);
+            xlsxWorkbook.Worksheets.Clear();
+            CellStyle titleStyle = xlsxWorkbook.Styles.Add("Title");
+            titleStyle.Font.IsItalic = true;
+            titleStyle.Font.IsBold = true;
+            titleStyle.VerticalAlignment = VerticalAlignType.Center;
+            titleStyle.HorizontalAlignment = HorizontalAlignType.Left;
+
+            CellStyle contentStyle = xlsxWorkbook.Styles.Add("Content");
+            contentStyle.VerticalAlignment = VerticalAlignType.Center;
+            contentStyle.WrapText = true;
+            contentStyle.HorizontalAlignment = HorizontalAlignType.Left;
+
+            try
+            {
+                __create_target_information_sheet(xlsxWorkbook, titleStyle, contentStyle);
+                __create_controller_information_sheet(xlsxWorkbook, titleStyle, contentStyle, extensionModules, ethernetModules);
+                __ceate_object_collection_sheet(xlsxWorkbook, titleStyle, contentStyle, objects);
+                __create_pdo_area_sheet(xlsxWorkbook, titleStyle, contentStyle, IO_LIST_PDO_AREA_T.TX_DIAGNOSTIC);
+                __create_pdo_area_sheet(xlsxWorkbook, titleStyle, contentStyle, IO_LIST_PDO_AREA_T.TX_BIT);
+                __create_pdo_area_sheet(xlsxWorkbook, titleStyle, contentStyle, IO_LIST_PDO_AREA_T.TX_BLOCK);
+                __create_pdo_area_sheet(xlsxWorkbook, titleStyle, contentStyle, IO_LIST_PDO_AREA_T.RX_CONTROL);
+                __create_pdo_area_sheet(xlsxWorkbook, titleStyle, contentStyle, IO_LIST_PDO_AREA_T.RX_BIT);
+                __create_pdo_area_sheet(xlsxWorkbook, titleStyle, contentStyle, IO_LIST_PDO_AREA_T.RX_BLOCK);
+                __create_intlk_area_sheet(xlsxWorkbook, titleStyle, contentStyle);
+                if (sheetWriteProtectionPassword != null && sheetWriteProtectionPassword != "")
+                    foreach (var s in xlsxWorkbook.Worksheets)
+                        s.Protect(sheetWriteProtectionPassword, SheetProtectionType.LockedCells | SheetProtectionType.UnLockedCells);
+                switch(fmt)
+                {
+                    case IO_LIST_EXPORT_FORMAT.XLS2007:
+                        xlsxWorkbook.SaveToFile(fileName, FileFormat.Version2007);
+                        break;
+                    default:
+                        throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.UNSUPPORTED_EXPORT_FORMAT, null);
+                }
+                
+            }
+            catch (IOListParseExcepetion e)
+            {
+                throw e;
+            }
+            catch (Exception e)
+            {
+                throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.FILE_DATA_EXCEPTION, e);
+            }
+        }
+
+        private Worksheet __create_target_information_sheet(Workbook wb, CellStyle titleStyle, CellStyle contentStyle)
+        {
+            Worksheet sheet = wb.Worksheets.Add("TARGET INFO");
+            sheet.Range[1,1].Text = "Name";
+            sheet.Range[1,1].Style = titleStyle;
+            sheet.Range[1,2].Text = TargetInformation.name;
+            sheet.Range[1,2].Style = contentStyle;
+            sheet.Range[2,1].Text = "Description";
+            sheet.Range[2,1].Style = titleStyle;
+            sheet.Range[2,2].Text = TargetInformation.description;
+            sheet.Range[2,2].Style = contentStyle;
+
+            sheet.AllocatedRange.AutoFitColumns();
+            sheet.AllocatedRange.AutoFitRows();
+
+            return sheet;
+        }
+        
+        private Worksheet __create_controller_information_sheet(Workbook wb, CellStyle titleStyle, CellStyle contentStyle, IEnumerable<string> extensionModules, IEnumerable<string> ethernetModules)
+        {
+            Worksheet sheet = wb.Worksheets.Add("CONTROLLER INFO");
+            sheet.Range[1,1].Text = "MC Server Info";
+            sheet.Range[1,1].Style = titleStyle;
+
+            sheet.Range[2,1].Text = "IP Address";
+            sheet.Range[2,1].Style = titleStyle;
+            sheet.Range[2,2].Text = MCServerIPAddress;
+            sheet.Range[2,2].Style = contentStyle;
+
+            sheet.Range[3,1].Text = "Port";
+            sheet.Range[3,1].Style = titleStyle;
+            sheet.Range[3,2].Text = MCServerPort.ToString();
+            sheet.Range[3,2].Style = contentStyle;
+
+            sheet.Range[5,1].Text = "Extension Modules";
+            sheet.Range[5,1].Style = titleStyle;
+
+            DataTable dt = new DataTable();
+            dt.Columns.Add("ID");
+            dt.Columns.Add("Name");
+            dt.Columns.Add("Switch");
+            dt.Columns.Add("Reference Name");
+            dt.Columns.Add("Address");
+
+            if (extensionModules == null)
+            {
+                foreach (var module in __controller_information.modules.Values)
+                {
+                    if (module.model is ControllerExtensionModel)
+                        dt.Rows.Add("0x" + module.model.ID.ToString("X4"),
+                                    module.model.Name,
+                                    "0x" + module.device_switch.ToString("X8"),
+                                    module.reference_name,
+                                    "0x" + module.local_address.ToString("X4"));
+                       
+                }
+            }
+            else
+            {
+                foreach (var reference in extensionModules)
+                    dt.Rows.Add(    "0x" + __controller_information.modules[reference].model.ID.ToString("X4"),
+                                    __controller_information.modules[reference].model.Name,
+                                    "0x" + __controller_information.modules[reference].device_switch.ToString("X8"),
+                                    __controller_information.modules[reference].reference_name,
+                                    "0x" + __controller_information.modules[reference].local_address.ToString("X4"));
+            }
+            int extrows = sheet.InsertDataTable(dt, true, 6, 1, false);
+            sheet.Range[6, 1, 6, 5].Style = titleStyle;
+            if(extrows > 0) sheet.Range[7, 1, 6 + extrows, 5].Style = contentStyle;
+
+            sheet.Range[8 + extrows, 1].Text = "Ethernet Modules";
+            sheet.Range[8 + extrows, 1].Style = titleStyle;
+
+            dt.Columns.Clear();
+            dt.Columns.Add("ID");
+            dt.Columns.Add("Name");
+            dt.Columns.Add("Switch");
+            dt.Columns.Add("Reference Name");
+            dt.Columns.Add("IP Address");
+            dt.Columns.Add("Port");
+            dt.Rows.Clear();
+            if (ethernetModules == null)
+            {
+                foreach (var module in __controller_information.modules.Values)
+                {
+                    if (module.model is ControllerEthernetModel)
+                        dt.Rows.Add(    "0x" + module.model.ID.ToString("X4"),
+                                        module.model.Name,
+                                        "0x" + module.device_switch.ToString("X8"),
+                                        module.reference_name,
+                                        module.ip_address,
+                                        module.port.ToString());
+
+                }
+            }
+            else
+            {
+                foreach (var reference in ethernetModules)
+                    dt.Rows.Add(    "0x" + __controller_information.modules[reference].model.ID.ToString("X4"),
+                                    __controller_information.modules[reference].model.Name,
+                                    "0x" + __controller_information.modules[reference].device_switch.ToString("X8"),
+                                    __controller_information.modules[reference].reference_name,
+                                    __controller_information.modules[reference].ip_address,
+                                    __controller_information.modules[reference].port.ToString());
+            }
+
+            int ethrows = sheet.InsertDataTable(dt, true, 9 + extrows, 1, false);
+            sheet.Range[9 + extrows, 1, 9 + extrows, 6].Style = titleStyle;
+            if(ethrows > 0) sheet.Range[10 + extrows, 1, 9 + extrows + ethrows, 6].Style = contentStyle;
+
+            sheet.AllocatedRange.AutoFitColumns();
+            return sheet;
+        }
+        
+        private Worksheet __ceate_object_collection_sheet(Workbook wb, CellStyle titleStyle, CellStyle contentStyle, IEnumerable<uint> objects)
+        {
+            Worksheet sheet = wb.Worksheets.Add("OBJECT COLLECTION");
+
+            DataTable dt = new DataTable();
+            dt.Columns.Add("Index");
+            dt.Columns.Add("Variable Name");
+            dt.Columns.Add("Data Type");
+            dt.Columns.Add("Unit");
+            dt.Columns.Add("Binding");
+            dt.Columns.Add("Range");
+            dt.Columns.Add("Converter");
+
+            if(objects == null)
+            {
+                foreach(var o in __object_collection.objects.Values)
+                    dt.Rows.Add(    "0x" + o.index.ToString("X8"),
+                                    o.variable.Name,
+                                    o.variable.DataType.Name,
+                                    o.variable.Unit,
+                                    o.binding.ToString(),
+                                    o.range.ToString(),
+                                    o.converter.ToString());
+                    
+            }
+            else
+            {
+                foreach (var index in objects)
+                    dt.Rows.Add("0x" + __object_collection.objects[index].index.ToString("X8"),
+                                    __object_collection.objects[index].variable.Name,
+                                    __object_collection.objects[index].variable.DataType.Name,
+                                    __object_collection.objects[index].variable.Unit,
+                                    __object_collection.objects[index].binding.ToString(),
+                                    __object_collection.objects[index].range.ToString(),
+                                    __object_collection.objects[index].converter.ToString());
+            }
+
+            int rows = sheet.InsertDataTable(dt, true, 1, 1, false);
+            sheet.Range[1, 1, 1, 7].Style = titleStyle;
+            if(rows > 0) sheet.Range[2, 1, 1 + rows, 7].Style = contentStyle;
+            sheet.AllocatedRange.AutoFitColumns();
+
+            return sheet;
+        }
+
+        private Worksheet __create_pdo_area_sheet(Workbook wb, CellStyle titleStyle, CellStyle contentStyle, IO_LIST_PDO_AREA_T area)
+        {
+            Worksheet sheet = wb.Worksheets.Add(area.ToString());
+
+            var pdo = __controller_pdo_collection.Areas[area];
+
+            sheet.Range[1, 1].Text = "Offset In Word";
+            sheet.Range[2, 1].Text = "Size In Word";
+            sheet.Range[3, 1].Text = "Actual Size In Byte";
+            sheet.Range[1, 1, 3, 1].Style = titleStyle;
+
+            sheet.Range[1, 2].Text = pdo.offset_in_word.ToString();
+            sheet.Range[2, 2].Text = pdo.size_in_word.ToString();
+            sheet.Range[3, 2].Text = pdo.actual_size_in_byte.ToString();
+            sheet.Range[1, 2, 3, 2].Style = contentStyle;
+
+            DataTable dt = new DataTable();
+            dt.Columns.Add("Bit");
+            dt.Columns.Add("Byte");
+            dt.Columns.Add("Index");
+            dt.Columns.Add("Variable Name");
+            dt.Columns.Add("Data Type");
+            dt.Columns.Add("Unit");
+            dt.Columns.Add("Binding");
+            dt.Columns.Add("Range");
+            dt.Columns.Add("Converter");
+
+            foreach (var o in pdo.objects)
+                dt.Rows.Add(    o.offset_in_bit.ToString(),
+                                o.offset_in_byte.ToString(),
+                                "0x" + o.object_reference.index.ToString("X8"),
+                                o.object_reference.variable.Name,
+                                o.object_reference.variable.DataType.Name,
+                                o.object_reference.variable.Unit,
+                                o.object_reference.binding.ToString(),
+                                o.object_reference.range.ToString(),
+                                o.object_reference.converter.ToString());
+
+
+            int rows = sheet.InsertDataTable(dt, true, 5, 1, false);
+            sheet.Range[5, 1, 5, 9].Style = titleStyle;
+            if (rows > 0) sheet.Range[6, 1, 5 + rows, 9].Style = contentStyle;
+            sheet.AllocatedRange.AutoFitColumns();
+            return sheet;
+        }
+
+        private Worksheet __create_intlk_area_sheet(Workbook wb, CellStyle titleStyle, CellStyle contentStyle)
+        {
+            Worksheet sheet = wb.Worksheets.Add("INTERLOCK TABLE");
+            int counter = 0;
+            foreach(var i in __controller_interlock_collection.logic_definitions)
+            {
+                sheet.Range[1 + counter * 4, 1].Text = "Name";
+                sheet.Range[2 + counter * 4, 1].Text = "Target";
+                sheet.Range[3 + counter * 4, 1].Text = "Statement";
+
+                sheet.Range[1 + counter * 4, 2].Text = i.name;
+                StringBuilder target = new StringBuilder();
+                foreach (var t in i.target_objects)
+                {
+                    target.Append(t.ToString());
+                    target.Append("\r\n");
+                }
+                sheet.Range[2 + counter * 4, 2].Text = target.ToString();
+                sheet.Range[3 + counter * 4, 2].Text = i.statement.ToString();
+
+                counter++;
+            }
+            if (counter > 0)
+            {
+                sheet.Range[1, 1, counter * 4, 1].Style = titleStyle;
+                sheet.Range[1, 2, counter * 4, 2].Style = contentStyle;
+            }
+            sheet.AllocatedRange.AutoFitColumns();
+            sheet.AllocatedRange.AutoFitRows();
+            return sheet;
+        }
+    }
+    
     public class IO_LIST_TARGET_INFORMATION_T
     {
         public string name;
@@ -2868,6 +3192,14 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
             {
                 Operand = objectData;
             }
+
+            public override string ToString()
+            {
+                StringBuilder tabs = new StringBuilder();
+                for (int i = 0; i < layer; i++)
+                    tabs.Append("    ");
+                return tabs.Append(Operand.ToString()).ToString();
+            }
         }
 
         public class LOGIC_EXPRESSION_T : LOGIC_ELEMEMT_T
@@ -2878,6 +3210,18 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
             {
                 logic_operator = op;
                 elements = new List<LOGIC_ELEMEMT_T>();
+            }
+
+            public override string ToString()
+            {
+                StringBuilder tabs = new StringBuilder();
+                for (int i = 0; i < layer; i++)
+                    tabs.Append("    ");
+                StringBuilder str = new StringBuilder();
+                str.Append(tabs).Append(logic_operator);
+                foreach(var e in elements)
+                    str.Append("\r\n").Append(tabs).Append(e.ToString());
+                return str.ToString();
             }
         }
 
