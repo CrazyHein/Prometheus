@@ -1035,6 +1035,34 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                         throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.INVALID_OBJECT_REFERENCE_IN_PDO_AREA, null);
                     break;
             }
+            switch (area)
+            {
+                case IO_LIST_PDO_AREA_T.TX_DIAGNOSTIC:
+                    if(__controller_pdo_collection.tx_pdo_diagnostic_area.objects.Exists(o => o.object_reference.index == objectData.index))
+                        throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.DUPLICATE_OBJECT_INDEX, null);
+                    break;
+                case IO_LIST_PDO_AREA_T.TX_BIT:
+                    if (__controller_pdo_collection.tx_pdo_bit_area.objects.Exists(o => o.object_reference.index == objectData.index))
+                        throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.DUPLICATE_OBJECT_INDEX, null);
+                    break;
+                case IO_LIST_PDO_AREA_T.TX_BLOCK:
+                    if (__controller_pdo_collection.tx_pdo_block_area.objects.Exists(o => o.object_reference.index == objectData.index))
+                        throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.DUPLICATE_OBJECT_INDEX, null);
+                    break;
+                case IO_LIST_PDO_AREA_T.RX_CONTROL:
+                    if (__controller_pdo_collection.rx_pdo_control_area.objects.Exists(o => o.object_reference.index == objectData.index))
+                        throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.DUPLICATE_OBJECT_INDEX, null);
+                    break;
+                case IO_LIST_PDO_AREA_T.RX_BIT:
+                    if (__controller_pdo_collection.rx_pdo_bit_area.objects.Exists(o => o.object_reference.index == objectData.index))
+                        throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.DUPLICATE_OBJECT_INDEX, null);
+                    break;
+                case IO_LIST_PDO_AREA_T.RX_BLOCK:
+                    if (__controller_pdo_collection.rx_pdo_block_area.objects.Exists(o => o.object_reference.index == objectData.index))
+                        throw new IOListParseExcepetion(IO_LIST_FILE_ERROR_T.DUPLICATE_OBJECT_INDEX, null);
+                    break;
+            }
+            
         }
 
         public IO_LIST_OBJECT_COLLECTION_T.OBJECT_DEFINITION_T PdoObjectReferenceVerification(IO_LIST_PDO_AREA_T area, uint objectIndex)
@@ -2595,8 +2623,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
             dt.Columns.Add("Binding");
             dt.Columns.Add("Range");
             dt.Columns.Add("Converter");
+            dt.Columns.Add("Comment");
 
-            if(objects == null)
+            if (objects == null)
             {
                 foreach(var o in __object_collection.objects.Values)
                     dt.Rows.Add(    "0x" + o.index.ToString("X8"),
@@ -2605,7 +2634,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                                     o.variable.Unit,
                                     o.binding.ToString(),
                                     o.range.ToString(),
-                                    o.converter.ToString());
+                                    o.converter.ToString(),
+                                    o.variable.Comment);
                     
             }
             else
@@ -2617,14 +2647,15 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                                     __object_collection.objects[index].variable.Unit,
                                     __object_collection.objects[index].binding.ToString(),
                                     __object_collection.objects[index].range.ToString(),
-                                    __object_collection.objects[index].converter.ToString());
+                                    __object_collection.objects[index].converter.ToString(),
+                                    __object_collection.objects[index].variable.Comment);
             }
 
             int rows = sheet.InsertDataTable(dt, true, 1, 1, false);
-            sheet.Range[1, 1, 1, 7].Style = titleStyle;
-            if(rows > 0) sheet.Range[2, 1, 1 + rows, 7].Style = contentStyle;
+            sheet.Range[1, 1, 1, 8].Style = titleStyle;
+            if(rows > 0) sheet.Range[2, 1, 1 + rows, 8].Style = contentStyle;
             sheet.AllocatedRange.AutoFitColumns();
-
+            sheet.Range[2, 1].FreezePanes();
             return sheet;
         }
 
@@ -2654,6 +2685,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
             dt.Columns.Add("Binding");
             dt.Columns.Add("Range");
             dt.Columns.Add("Converter");
+            dt.Columns.Add("Comment");
 
             foreach (var o in pdo.objects)
                 dt.Rows.Add(    o.offset_in_bit.ToString(),
@@ -2664,13 +2696,15 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.IOCelceta
                                 o.object_reference.variable.Unit,
                                 o.object_reference.binding.ToString(),
                                 o.object_reference.range.ToString(),
-                                o.object_reference.converter.ToString());
+                                o.object_reference.converter.ToString(),
+                                o.object_reference.variable.Comment);
 
 
             int rows = sheet.InsertDataTable(dt, true, 5, 1, false);
-            sheet.Range[5, 1, 5, 9].Style = titleStyle;
-            if (rows > 0) sheet.Range[6, 1, 5 + rows, 9].Style = contentStyle;
+            sheet.Range[5, 1, 5, 10].Style = titleStyle;
+            if (rows > 0) sheet.Range[6, 1, 5 + rows, 10].Style = contentStyle;
             sheet.AllocatedRange.AutoFitColumns();
+            sheet.Range[6, 1].FreezePanes();
             return sheet;
         }
 

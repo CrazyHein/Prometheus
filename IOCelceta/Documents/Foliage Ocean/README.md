@@ -839,7 +839,7 @@ The name of these elements must be `Index` and the text of these elements must b
 <Index>0x00003001</Index>
 ```
 
-The object with same `Index` element should be defined in [Object dictionary](Objects) in advance.
+The object with same `Index` element should be defined in [Object dictionary](Objects) in advance. All indexes defined in PDO must have different values. All objects referred in the corresponding PDO area should have different index values;
 
 Objects layout in PDO areas is in sequence as defined.
 
