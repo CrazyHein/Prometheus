@@ -35,7 +35,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             __insert_index = insertIndex;
             IEnumerable<DeviceModel> deviceModels = models.ControllerModelCatalogue.LocalExtensionModels.Values;
             AvailableDeviceModels.ItemsSource = deviceModels.Concat(models.ControllerModelCatalogue.RemoteEthernetModels.Values);
-            AvailableDeviceModels.SelectedIndex = 0;
+            AvailableDeviceModels.SelectedItem = model.DeviceModel;
             DataContext = __result_device_configuration;
             switch (mode)
             {

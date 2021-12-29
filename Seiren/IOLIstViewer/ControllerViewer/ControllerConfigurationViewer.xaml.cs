@@ -1,6 +1,7 @@
 ﻿using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia;
 using Syncfusion.UI.Xaml.Grid;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -38,7 +39,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
 
         private void AddRecordCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            DeviceConfigurationViewer wnd = new DeviceConfigurationViewer(DataContext as ControllerConfigurationModel, new DeviceConfigurationModel(), InputDialogDisplayMode.Add);
+            LocalExtensionModel m = (DataContext as ControllerConfigurationModel).ControllerModelCatalogue.LocalExtensionModels.Values.FirstOrDefault();
+            DeviceConfigurationViewer wnd = new DeviceConfigurationViewer(DataContext as ControllerConfigurationModel, new DeviceConfigurationModel() { DeviceModel = m}, InputDialogDisplayMode.Add);
             wnd.WindowStartupLocation = WindowStartupLocation.CenterScreen;
             if (wnd.ShowDialog() == true)
             {
@@ -55,7 +57,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
 
         private void InsertRecordCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            DeviceConfigurationViewer wnd = new DeviceConfigurationViewer(DataContext as ControllerConfigurationModel, new DeviceConfigurationModel(), InputDialogDisplayMode.Insert, MainViewer.SelectedIndex);
+            LocalExtensionModel m = (DataContext as ControllerConfigurationModel).ControllerModelCatalogue.LocalExtensionModels.Values.FirstOrDefault();
+            DeviceConfigurationViewer wnd = new DeviceConfigurationViewer(DataContext as ControllerConfigurationModel, new DeviceConfigurationModel() { DeviceModel = m }, InputDialogDisplayMode.Insert, MainViewer.SelectedIndex);
             wnd.WindowStartupLocation = WindowStartupLocation.CenterScreen;
             if (wnd.ShowDialog() == true)
             {

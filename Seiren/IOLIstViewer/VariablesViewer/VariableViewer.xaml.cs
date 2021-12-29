@@ -23,7 +23,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             __input_mode = mode;
             __insert_index = insertIndex;
             AvailableDataTypes.ItemsSource = models.DataTypeCatalogue.DataTypes.Values;
-            AvailableDataTypes.SelectedIndex = 0;
+            AvailableDataTypes.SelectedItem = model.DataType;
             DataContext = __result_variable_model;
             switch (mode)
             {
