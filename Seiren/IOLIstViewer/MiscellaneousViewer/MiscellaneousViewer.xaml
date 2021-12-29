@@ -1,0 +1,35 @@
+﻿<UserControl x:Class="AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.MiscellaneousViewer"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren"
+             xmlns:sync="http://schemas.syncfusion.com/wpf"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <StackPanel Validation.Error="Input_Error" KeyDown="Input_KeyDown">
+        <GroupBox Header="Basic Information" Padding="0,8,0,0">
+            <StackPanel>
+                <sync:SfTextInputLayout Hint="IOList Name" HelperText="Input IOList name here" FontSize="12" FontStyle="Italic" ContainerType="Filled" Margin="4,8,4,8">
+                    <TextBox Name="InputIOListName"  Text="{Binding BasicInfoName}" FontStyle="Normal"/>
+                </sync:SfTextInputLayout>
+                <sync:SfTextInputLayout Hint="Description" HelperText="Input IOList description here" FontSize="12" FontStyle="Italic" ContainerType="Filled" Margin="4,8,4,8">
+                    <TextBox Name="InputDescription" Text="{Binding BasicInfoDescription}" FontStyle="Normal" AcceptsReturn="True" AcceptsTab="True" MaxHeight="128" VerticalScrollBarVisibility="Auto"/>
+                </sync:SfTextInputLayout>
+                <sync:SfTextInputLayout Hint="Variable Dictionary" HelperText="Input variable dictionary name here" FontSize="12" FontStyle="Italic" ContainerType="Filled" Margin="4,8,4,8" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}">
+                    <TextBox Name="InputVariableDictionary" Text="{Binding VariableDictionary}" FontStyle="Normal" VerticalScrollBarVisibility="Auto"/>
+                </sync:SfTextInputLayout>
+            </StackPanel>
+        </GroupBox>
+        <GroupBox Header="MC Server Information" Padding="0,8,0,0" Margin="0,8,0,0">
+            <StackPanel>
+                <sync:SfTextInputLayout Hint="IPv4" HelperText="Input MC Server IPv4 address here" FontSize="12" FontStyle="Italic" ContainerType="Filled" Margin="4,8,4,8" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}">
+                    <TextBox Name="InputMCServerIPv4" Text="{Binding MCServerIPv4, ValidatesOnExceptions=True, NotifyOnValidationError=True}" FontStyle="Normal"/>
+                </sync:SfTextInputLayout>
+                <sync:SfTextInputLayout Hint="Port" HelperText="Input MC Server port number here" FontSize="12" FontStyle="Italic" ContainerType="Filled" Margin="4,8,4,8" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}">
+                    <TextBox Name="InputMCServerPort" Text="{Binding MCServerPort}" FontStyle="Normal"/>
+                </sync:SfTextInputLayout>
+            </StackPanel>
+        </GroupBox>
+    </StackPanel>
+</UserControl>

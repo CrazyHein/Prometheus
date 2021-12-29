@@ -1,0 +1,160 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net5.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms>
+    <RootNamespace>AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren</RootNamespace>
+    <Nullable>annotations</Nullable>
+    <Version>0.1.0</Version>
+    <Authors>CrazyHein</Authors>
+    <Company>AMEC</Company>
+    <ApplicationIcon>imgs\logo.ico</ApplicationIcon>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="App.ico" />
+    <None Remove="imgs\about.png" />
+    <None Remove="imgs\add.png" />
+    <None Remove="imgs\cancel.png" />
+    <None Remove="imgs\close.png" />
+    <None Remove="imgs\configuration.png" />
+    <None Remove="imgs\confirm.png" />
+    <None Remove="imgs\datatypes.png" />
+    <None Remove="imgs\devices.png" />
+    <None Remove="imgs\edit.png" />
+    <None Remove="imgs\export.png" />
+    <None Remove="imgs\ftp.png" />
+    <None Remove="imgs\ftpd.png" />
+    <None Remove="imgs\ftpdownload.png" />
+    <None Remove="imgs\ftpu.png" />
+    <None Remove="imgs\ftpupload.png" />
+    <None Remove="imgs\import.png" />
+    <None Remove="imgs\insert.png" />
+    <None Remove="imgs\list.png" />
+    <None Remove="imgs\logo.png" />
+    <None Remove="imgs\meta.png" />
+    <None Remove="imgs\metadata.png" />
+    <None Remove="imgs\miscellaneous.png" />
+    <None Remove="imgs\navigation.png" />
+    <None Remove="imgs\new.png" />
+    <None Remove="imgs\open.png" />
+    <None Remove="imgs\process.png" />
+    <None Remove="imgs\quit.png" />
+    <None Remove="imgs\remove.png" />
+    <None Remove="imgs\save.png" />
+    <None Remove="imgs\saveas.png" />
+    <None Remove="imgs\save_as.png" />
+    <None Remove="imgs\search.png" />
+    <None Remove="imgs\setting.png" />
+    <None Remove="imgs\startdebugging.png" />
+    <None Remove="imgs\stopdebugging.png" />
+    <None Remove="imgs\variables.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="imgs\logo.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="imgs\about.png" />
+    <Resource Include="imgs\add.png" />
+    <Resource Include="imgs\cancel.png" />
+    <Resource Include="imgs\close.png" />
+    <Resource Include="imgs\configuration.png" />
+    <Resource Include="imgs\confirm.png" />
+    <Resource Include="imgs\edit.png" />
+    <Resource Include="imgs\export.png" />
+    <Resource Include="imgs\ftp.png" />
+    <Resource Include="imgs\ftpd.png" />
+    <Resource Include="imgs\ftpdownload.png" />
+    <Resource Include="imgs\ftpu.png" />
+    <Resource Include="imgs\ftpupload.png" />
+    <Resource Include="imgs\import.png" />
+    <Resource Include="imgs\insert.png" />
+    <Resource Include="imgs\logo.png" />
+    <Resource Include="imgs\miscellaneous.png" />
+    <Resource Include="imgs\new.png" />
+    <Resource Include="imgs\open.png" />
+    <Resource Include="imgs\process.png" />
+    <Resource Include="imgs\quit.png" />
+    <Resource Include="imgs\remove.png" />
+    <Resource Include="imgs\save.png" />
+    <Resource Include="imgs\saveas.png" />
+    <Resource Include="imgs\startdebugging.png" />
+    <Resource Include="imgs\stopdebugging.png" />
+    <Resource Include="imgs\variables.png" />
+  </ItemGroup>
+
+  
+  
+  <ItemGroup>
+    <None Include="Project_Readme.html" />
+  </ItemGroup>
+
+  
+  
+  <ItemGroup>
+    <ProjectReference Include="..\Lombardia\Lombardia.csproj" />
+  </ItemGroup>
+
+  
+  
+  <ItemGroup>
+    <Reference Include="Gagharv">
+      <HintPath>..\..\Weltuna\Gagharv\bin\Release\net5.0\Gagharv.dll</HintPath>
+      <Private>True</Private>
+      <CopyLocal>True</CopyLocal>
+    </Reference>
+    <Reference Include="Syncfusion.Data.WPF">
+      <HintPath>C:\Program Files (x86)\Syncfusion\Essential Studio\WPF\19.2.0.44\precompiledassemblies\net5.0\Syncfusion.Data.WPF.dll</HintPath>
+    </Reference>
+    <Reference Include="Syncfusion.SfBusyIndicator.WPF">
+      <HintPath>C:\Program Files (x86)\Syncfusion\Essential Studio\WPF\19.2.0.44\precompiledassemblies\net5.0\Syncfusion.SfBusyIndicator.WPF.dll</HintPath>
+    </Reference>
+    <Reference Include="Syncfusion.SfChart.WPF">
+      <HintPath>C:\Program Files (x86)\Syncfusion\Essential Studio\WPF\19.2.0.44\precompiledassemblies\net5.0\Syncfusion.SfChart.WPF.dll</HintPath>
+    </Reference>
+    <Reference Include="Syncfusion.SfDiagram.WPF">
+      <HintPath>C:\Program Files (x86)\Syncfusion\Essential Studio\WPF\19.2.0.44\precompiledassemblies\net5.0\Syncfusion.SfDiagram.WPF.dll</HintPath>
+    </Reference>
+    <Reference Include="Syncfusion.SfGrid.WPF">
+      <HintPath>C:\Program Files (x86)\Syncfusion\Essential Studio\WPF\19.2.0.44\precompiledassemblies\net5.0\Syncfusion.SfGrid.WPF.dll</HintPath>
+    </Reference>
+    <Reference Include="Syncfusion.SfInput.Wpf">
+      <HintPath>C:\Program Files (x86)\Syncfusion\Essential Studio\WPF\19.2.0.44\precompiledassemblies\net5.0\Syncfusion.SfInput.WPF.dll</HintPath>
+    </Reference>
+    <Reference Include="Syncfusion.SfNavigationDrawer.WPF">
+      <HintPath>C:\Program Files (x86)\Syncfusion\Essential Studio\WPF\19.2.0.44\precompiledassemblies\net5.0\Syncfusion.SfNavigationDrawer.WPF.dll</HintPath>
+    </Reference>
+    <Reference Include="Syncfusion.SfSkinManager.WPF">
+      <HintPath>C:\Program Files (x86)\Syncfusion\Essential Studio\WPF\19.2.0.44\precompiledassemblies\net5.0\Syncfusion.SfSkinManager.WPF.dll</HintPath>
+    </Reference>
+    <Reference Include="Syncfusion.SfTextInputLayout.WPF">
+      <HintPath>C:\Program Files (x86)\Syncfusion\Essential Studio\WPF\19.2.0.44\precompiledassemblies\net5.0\Syncfusion.SfTextInputLayout.WPF.dll</HintPath>
+    </Reference>
+    <Reference Include="Syncfusion.Shared.WPF">
+      <HintPath>C:\Program Files (x86)\Syncfusion\Essential Studio\WPF\19.2.0.44\precompiledassemblies\net5.0\Syncfusion.Shared.WPF.dll</HintPath>
+    </Reference>
+    <Reference Include="Syncfusion.Themes.FluentLight.WPF">
+      <HintPath>C:\Program Files (x86)\Syncfusion\Essential Studio\WPF\19.2.0.44\precompiledassemblies\net5.0\Syncfusion.Themes.FluentLight.Wpf.dll</HintPath>
+    </Reference>
+    <Reference Include="Syncfusion.Tools.Wpf">
+      <HintPath>C:\Program Files (x86)\Syncfusion\Essential Studio\WPF\19.2.0.44\precompiledassemblies\net5.0\Syncfusion.Tools.WPF.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  
+  
+  <ItemGroup>
+    <Resource Include="App.ico" />
+    <Resource Include="imgs\datatypes.png" />
+    <Resource Include="imgs\devices.png" />
+    <Resource Include="imgs\list.png" />
+    <Resource Include="imgs\meta.png" />
+    <Resource Include="imgs\navigation.png" />
+    <Resource Include="imgs\setting.png" />
+  </ItemGroup>
+
+</Project>

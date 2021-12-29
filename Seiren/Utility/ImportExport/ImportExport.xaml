@@ -1,0 +1,83 @@
+﻿<Window x:Class="AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility.ImportExport"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren"
+        xmlns:sync="http://schemas.syncfusion.com/wpf"
+        xmlns:syncfusionskin ="clr-namespace:Syncfusion.SfSkinManager;assembly=Syncfusion.SfSkinManager.WPF"
+        mc:Ignorable="d"
+        Title="{Binding Mode}" Height="420" Width="500" WindowStartupLocation="CenterScreen" Closing="Window_Closing">
+    <DockPanel syncfusionskin:SfSkinManager.Theme="{syncfusionskin:SkinManagerExtension ThemeName=FluentLight}"  Margin="8,4,8,4" LastChildFill="True">
+        <DockPanel.Resources>
+            <local:InvertBooleanValue x:Key="InvertBoolean"/>
+        </DockPanel.Resources>
+        <UniformGrid Columns="2" Margin="0,10,0,0" DockPanel.Dock="Bottom">
+            <Button Content="Close" Height="30" Margin="0,0,4,4" Click="Cancel_Click" IsEnabled="{Binding IsBusy, Converter={StaticResource InvertBoolean}}"/>
+            <Button Content="{Binding Mode}"  Height="30" Margin="4,0,0,4"  Click="OK_Click" IsEnabled="{Binding IsBusy, Converter={StaticResource InvertBoolean}}"/>
+        </UniformGrid>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
+            </Grid.RowDefinitions>
+            <sync:SfBusyIndicator Name="BusyIndicator" Grid.RowSpan="2" IsBusy="{Binding IsBusy}"/>
+            <GroupBox Padding="3,8,0,0" Margin="0,4,0,0" Grid.Row="0">
+                <GroupBox.Header>
+                    <CheckBox Content="XML" x:Name="CheckboxXML" IsChecked="{Binding XML}"/>
+                </GroupBox.Header>
+                <Grid IsEnabled="{Binding ElementName=CheckboxXML, Path=IsChecked}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="auto"/>
+                        <ColumnDefinition />
+                        <ColumnDefinition Width="auto"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto" IsEnabled="{Binding ElementName=CheckboxXMLVAR, Path=IsChecked}"/>
+                        <RowDefinition Height="auto" IsEnabled="{Binding ElementName=CheckboxXMLIO, Path=IsChecked}"/>
+                    </Grid.RowDefinitions>
+                    <CheckBox x:Name="CheckboxXMLVAR" IsChecked="{Binding XMLVAR}"></CheckBox>
+                    <CheckBox Grid.Row="1" x:Name="CheckboxXMLIO" IsChecked="{Binding XMLIO}"></CheckBox>
+                    <sync:SfTextInputLayout Hint="Variable Dictionary File" FontSize="12" FontStyle="Italic" ContainerType="Filled" Margin="4,8,4,8" HintFloatMode="AlwaysFloat" Grid.Column="1">
+                        <TextBox FontStyle="Normal" Text="{Binding VariableDictionaryPath}"/>
+                    </sync:SfTextInputLayout>
+                    <sync:SfTextInputLayout Grid.Row="1" Hint="IO List File" FontSize="12" FontStyle="Italic" ContainerType="Filled" Margin="4,8,4,8" HintFloatMode="AlwaysFloat" Grid.Column="1">
+                        <TextBox FontStyle="Normal" Text="{Binding IOListPath}"/>
+                    </sync:SfTextInputLayout>
+                    <sync:ButtonAdv Grid.Column="3" Margin="4,25,4,25" Height="32" Width="100" Label="Browse" Click="BrowseVariableDictionary_Click" IsEnabled="{Binding IsBusy, Converter={StaticResource InvertBoolean}}">
+                        <sync:ButtonAdv.SmallIcon>
+                            <BitmapImage  UriSource="../../imgs/open.png"/>
+                        </sync:ButtonAdv.SmallIcon>
+                    </sync:ButtonAdv>
+                    <sync:ButtonAdv Grid.Column="3" Grid.Row="1" Margin="4,25,4,25" Height="32" Width="100" Label="Browse" Click="BrowseIOList_Click" IsEnabled="{Binding IsBusy, Converter={StaticResource InvertBoolean}}">
+                        <sync:ButtonAdv.SmallIcon>
+                            <BitmapImage  UriSource="../../imgs/open.png"/>
+                        </sync:ButtonAdv.SmallIcon>
+                    </sync:ButtonAdv>
+                </Grid>
+            </GroupBox>
+            <GroupBox Padding="0,8,0,0" Margin="0,4,0,0" Grid.Row="1">
+                <GroupBox.Header>
+                    <CheckBox Content="XLS(2007)" x:Name="CheckboxXLS" IsChecked="{Binding XLS}"/>
+                </GroupBox.Header>
+                <Grid IsEnabled="{Binding ElementName=CheckboxXLS, Path=IsChecked}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition Width="auto"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto"/>
+                    </Grid.RowDefinitions>
+                    <sync:SfTextInputLayout Hint="Microsoft Excel 2007 File" FontSize="12" FontStyle="Italic" ContainerType="Filled" Margin="4,8,4,8" HintFloatMode="AlwaysFloat">
+                        <TextBox FontStyle="Normal" Text="{Binding XlsArchivesPath}"/>
+                    </sync:SfTextInputLayout>
+                    <sync:ButtonAdv Grid.Column="1" Margin="4,8,4,8" Height="32" Width="100" Label="Browse" Click="BrowseXlsArchives_Click" IsEnabled="{Binding IsBusy, Converter={StaticResource InvertBoolean}}">
+                        <sync:ButtonAdv.SmallIcon>
+                            <BitmapImage  UriSource="../../imgs/open.png"/>
+                        </sync:ButtonAdv.SmallIcon>
+                    </sync:ButtonAdv>
+                </Grid>
+            </GroupBox>
+        </Grid>
+    </DockPanel>
+</Window>

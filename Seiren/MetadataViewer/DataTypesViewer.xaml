@@ -1,0 +1,20 @@
+﻿<UserControl x:Class="AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.DataTypesViewer"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren"
+             xmlns:sync="http://schemas.syncfusion.com/wpf"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <sync:SfTreeGrid ItemsSource="{Binding}" 
+                     ColumnSizer="FillColumn" ChildPropertyName="SubItems" AutoGenerateColumns="False" AllowResizingColumns="True" AllowSorting="False">
+        <sync:SfTreeGrid.Columns>
+            <sync:TreeGridTextColumn HeaderText="Name" MappingName="Name" MinimumWidth="160"/>
+            <sync:TreeGridNumericColumn HeaderText="Size (Bit)" MappingName="BitSize" NumberDecimalDigits="0" MinimumWidth="100"/>
+            <sync:TreeGridNumericColumn HeaderText="Alignment (Byte)" MappingName="Alignment" NumberDecimalDigits="0" MinimumWidth="100"/>
+            <sync:TreeGridNumericColumn HeaderText="Offset (Byte)" MappingName="ByteOffset" NumberDecimalDigits="0" MinimumWidth="100"/>
+            <sync:TreeGridTextColumn HeaderText="Comment" MappingName="Comment" AllowResizing="False"/>
+        </sync:SfTreeGrid.Columns>
+    </sync:SfTreeGrid>
+</UserControl>

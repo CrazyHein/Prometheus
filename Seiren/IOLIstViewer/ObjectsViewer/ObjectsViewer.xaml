@@ -1,0 +1,156 @@
+﻿<UserControl x:Class="AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.ObjectsViewer"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren" 
+             xmlns:sync="http://schemas.syncfusion.com/wpf"
+             mc:Ignorable="d" 
+             d:DesignHeight="1080" d:DesignWidth="1500">
+    <Grid>
+        <Grid.Resources>
+            <local:ModifiedIndicatorToColor x:Key="ModifiedConverter"/>
+        </Grid.Resources>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="2*"/>
+            <ColumnDefinition Width="4"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="4"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <sync:SfGridSplitter Grid.Column="1" Grid.RowSpan="3" HorizontalAlignment="Stretch" ShowsPreview="True"/>
+        <sync:SfGridSplitter Grid.Row="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" ShowsPreview="True"/>
+        <DockPanel Grid.Column="0">
+            <DockPanel.CommandBindings>
+                <CommandBinding Command="local:ConsoleControl.AddRecord" Executed="AddRecordCommand_Executed" CanExecute="AddRecordCommand_CanExecute"/>
+                <CommandBinding Command="local:ConsoleControl.InsertRecord" Executed="InsertRecordCommand_Executed" CanExecute="InsertRecordCommand_CanExecute"/>
+                <CommandBinding Command="local:ConsoleControl.EditRecord" Executed="EditRecordCommand_Executed" CanExecute="EditRecordCommand_CanExecute"/>
+                <CommandBinding Command="local:ConsoleControl.RemoveRecord" Executed="RemoveRecordCommand_Executed" CanExecute="EditRecordCommand_CanExecute"/>
+            </DockPanel.CommandBindings>
+            <DockPanel.Resources>
+                <ContextMenu x:Key="GridContextMenu">
+                    <MenuItem Command="local:ConsoleControl.EditRecord">
+                        <MenuItem.Icon>
+                            <Image Source="/imgs/edit.png" Height="20" Margin="4"/>
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem Command="local:ConsoleControl.InsertRecord">
+                        <MenuItem.Icon>
+                            <Image Source="/imgs/insert.png" Height="20" Margin="4"/>
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem Command="local:ConsoleControl.RemoveRecord">
+                        <MenuItem.Icon>
+                            <Image Source="/imgs/remove.png" Height="20" Margin="4"/>
+                        </MenuItem.Icon>
+                    </MenuItem>
+                </ContextMenu>
+                <DataTemplate x:Key="RecordDragDropTemplate">
+                    <Border Padding="4" Background="#ececec" BorderBrush="#c8c8c8" BorderThickness="1.2">
+                        <Grid VerticalAlignment="Center" HorizontalAlignment="Left">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="Index : " Grid.Row="0" Grid.Column="0" FontWeight="Bold"/>
+                            <TextBlock Text="{Binding DraggingRecords[0].Index, StringFormat='0x{0:X08}'}" Grid.Row="0" Grid.Column="1"/>
+                            <TextBlock Text="Name : " Grid.Row="1" Grid.Column="0" FontWeight="Bold"/>
+                            <TextBlock Text="{Binding DraggingRecords[0].VariableName}" Grid.Row="1" Grid.Column="1"/>
+                            <TextBlock Text="Data Type : " Grid.Row="2" Grid.Column="0" FontWeight="Bold"/>
+                            <TextBlock Text="{Binding DraggingRecords[0].VariableDataType}" Grid.Row="2" Grid.Column="1"/>
+                            <TextBlock Text="Unit : " Grid.Row="3" Grid.Column="0" FontWeight="Bold"/>
+                            <TextBlock Text="{Binding DraggingRecords[0].VariableUnit}" Grid.Row="3" Grid.Column="1"/>
+                            <TextBlock Text="Binding : " Grid.Row="4" Grid.Column="0" FontWeight="Bold"/>
+                            <TextBlock Text="{Binding DraggingRecords[0].DeviceBindingInfo}" Grid.Row="4" Grid.Column="1"/>
+                            <TextBlock Text="Range : " Grid.Row="5" Grid.Column="0" FontWeight="Bold"/>
+                            <TextBlock Text="{Binding DraggingRecords[0].ValueRangeInfo}" Grid.Row="5" Grid.Column="1"/>
+                            <TextBlock Text="Converter : " Grid.Row="6" Grid.Column="0" FontWeight="Bold"/>
+                            <TextBlock Text="{Binding DraggingRecords[0].ValueConverterInfo}" Grid.Row="6" Grid.Column="1"/>
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+                <DataTemplate x:Key="RecordToolTipTemplate">
+                    <TextBlock Text="{Binding VariableComment}"/>
+                </DataTemplate>
+            </DockPanel.Resources>
+            <StackPanel DockPanel.Dock="Bottom" HorizontalAlignment="Right" Margin="4" Orientation="Horizontal">
+                <sync:ButtonAdv Label="Add" VerticalAlignment="Center" Height="30" Width="128" Command="local:ConsoleControl.AddRecord" Margin="4">
+                    <sync:ButtonAdv.SmallIcon>
+                        <BitmapImage  UriSource="/imgs/add.png"/>
+                    </sync:ButtonAdv.SmallIcon>
+                </sync:ButtonAdv>
+                <sync:ButtonAdv Label="Insert" VerticalAlignment="Center" Height="30" Width="128" Command="local:ConsoleControl.InsertRecord" Margin="4">
+                    <sync:ButtonAdv.SmallIcon>
+                        <BitmapImage  UriSource="/imgs/insert.png"/>
+                    </sync:ButtonAdv.SmallIcon>
+                </sync:ButtonAdv>
+                <sync:ButtonAdv Label="Edit" VerticalAlignment="Center" Height="30" Width="128" Command="local:ConsoleControl.EditRecord" Margin="4">
+                    <sync:ButtonAdv.SmallIcon>
+                        <BitmapImage  UriSource="/imgs/edit.png"/>
+                    </sync:ButtonAdv.SmallIcon>
+                </sync:ButtonAdv>
+                <sync:ButtonAdv Label="Remove" VerticalAlignment="Center" Height="30" Width="128" Command="local:ConsoleControl.RemoveRecord" Margin="4">
+                    <sync:ButtonAdv.SmallIcon>
+                        <BitmapImage  UriSource="/imgs/remove.png"/>
+                    </sync:ButtonAdv.SmallIcon>
+                </sync:ButtonAdv>
+            </StackPanel>
+            <sync:SfDataGrid Name="MainViewer" AutoGenerateColumns="False" 
+                             ItemsSource="{Binding Objects}" ColumnSizer="AutoLastColumnFill" AllowResizingColumns="True"
+                             AllowGrouping="True" ShowGroupDropArea="True"
+                             AllowFiltering="True" 
+                             AllowSorting="True"  AllowTriStateSorting="True"
+                             AllowDraggingRows="True" AllowDrop="True" RowDragDropTemplate="{StaticResource RecordDragDropTemplate}"
+                             ShowSortNumbers="True" ShowRowHeader="True" 
+                             LiveDataUpdateMode="AllowDataShaping" ScrollMode="Async"
+                             CellDoubleTapped="MainViewer_CellDoubleTapped" 
+                             RecordContextMenu="{StaticResource GridContextMenu}">
+                <sync:SfDataGrid.Columns>
+                    <sync:GridTextColumn ValueBinding="{Binding Index, StringFormat='0x{0:X08}'}" HeaderText="Index"/>
+                    <sync:GridTextColumn ValueBinding="{Binding VariableName}" HeaderText="Name" ToolTipTemplate="{StaticResource RecordToolTipTemplate}" ShowToolTip="True"/>
+                    <sync:GridTextColumn ValueBinding="{Binding VariableDataType}" HeaderText="Data Type"/>
+                    <sync:GridTextColumn ValueBinding="{Binding VariableUnit}" HeaderText="Unit"/>
+                    <sync:GridTextColumn DisplayBinding="{Binding DeviceBindingInfo}" ValueBinding="{Binding BindingDeviceName}" HeaderText="Binding"/>
+                    <sync:GridTextColumn ValueBinding="{Binding ValueRangeInfo}" HeaderText="Range"/>
+                    <sync:GridTextColumn ValueBinding="{Binding ValueConverterInfo}" HeaderText="Converter"/>
+                </sync:SfDataGrid.Columns>
+            </sync:SfDataGrid>
+        </DockPanel>
+        <sync:TabControlExt Grid.Row="2" TabItemLayout="SingleLineStar" TabStripPlacement="Bottom" CloseButtonType="Hide" ShowTabItemContextMenu="False" EnableLabelEdit="False">
+            <sync:TabItemExt Name="TxDiagnosticArea" Header="Tx Diagnostic Area" Foreground="{Binding Modified, Converter={StaticResource ModifiedConverter}}">
+
+            </sync:TabItemExt>
+            <sync:TabItemExt Name="TxBitArea" Header="Tx Bit Area" Foreground="{Binding Modified, Converter={StaticResource ModifiedConverter}}">
+                
+            </sync:TabItemExt>
+            <sync:TabItemExt Name="TxBlockArea" Header="Tx Block Area" Foreground="{Binding Modified, Converter={StaticResource ModifiedConverter}}">
+                
+            </sync:TabItemExt>
+            <sync:TabItemExt Name="RxControlArea" Header="Rx Control Area" Foreground="{Binding Modified, Converter={StaticResource ModifiedConverter}}">
+                
+            </sync:TabItemExt>
+            <sync:TabItemExt Name="RxBitArea" Header="Rx Bit Area" Foreground="{Binding Modified, Converter={StaticResource ModifiedConverter}}">
+                
+            </sync:TabItemExt>
+            <sync:TabItemExt Name="RxBlockArea" Header="Rx Block Area" Foreground="{Binding Modified, Converter={StaticResource ModifiedConverter}}">
+                
+            </sync:TabItemExt>
+        </sync:TabControlExt>
+        <sync:TabControlExt Grid.Column="2" Grid.RowSpan="3" TabItemLayout="SingleLineStar" TabStripPlacement="Bottom" CloseButtonType="Hide" ShowTabItemContextMenu="False" EnableLabelEdit="False">
+            <sync:TabItemExt Name="InterlockArea" Header="Interlock Area" Foreground="{Binding Modified, Converter={StaticResource ModifiedConverter}}">
+            </sync:TabItemExt>
+        </sync:TabControlExt>
+    </Grid>
+</UserControl>

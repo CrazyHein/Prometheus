@@ -1,0 +1,35 @@
+﻿<Window x:Class="AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.VariableViewer"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren"
+        xmlns:sync="http://schemas.syncfusion.com/wpf"   
+        xmlns:syncfusionskin ="clr-namespace:Syncfusion.SfSkinManager;assembly=Syncfusion.SfSkinManager.WPF"
+        mc:Ignorable="d"
+        Title="Variable Viewer" Height="450" Width="500" ResizeMode="NoResize"
+        >
+    <DockPanel Margin="8,4,8,4" syncfusionskin:SfSkinManager.Theme="{syncfusionskin:SkinManagerExtension ThemeName=FluentLight}" LastChildFill="True">
+        <UniformGrid Columns="2" Margin="0,10,0,0" DockPanel.Dock="Bottom">
+            <Button Content="Cancel" Height="30" Margin="0,0,4,4" Click="Cancel_Click"/>
+            <Button Content="OK" Height="30" Margin="4,0,0,4" Click="OK_Click"/>
+        </UniformGrid>
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <StackPanel>
+                <sync:SfTextInputLayout Hint="Name" HelperText="Input variable name here" ContainerType="Filled" FontStyle="Italic" FontSize="12" Margin="4,8,4,8">
+                    <TextBox Text="{Binding Name}" FontStyle="Normal"/>
+                </sync:SfTextInputLayout>
+                <sync:SfTextInputLayout Hint="Data Type" HelperText="Select variable data type here" ContainerType="Filled"  FontStyle="Italic" FontSize="12" Margin="4,8,4,8">
+                    <ComboBox Name="AvailableDataTypes" SelectedItem="{Binding DataType}" FontStyle="Normal"/>
+                </sync:SfTextInputLayout>
+                <sync:SfTextInputLayout Hint="Unit" HelperText="Input variable unit here" ContainerType="Filled" FontStyle="Italic" FontSize="12" Margin="4,8,4,8">
+                    <TextBox Text="{Binding Unit}" FontStyle="Normal"/>
+                </sync:SfTextInputLayout>
+                <sync:SfTextInputLayout Hint="Comment" HelperText="Input variable Comment here" ContainerType="Filled" FontStyle="Italic" FontSize="12" Margin="4,8,4,8">
+                    <TextBox Text="{Binding Comment}" FontStyle="Normal" AcceptsReturn="True"/>
+                </sync:SfTextInputLayout>
+            </StackPanel>
+        </ScrollViewer>
+        
+    </DockPanel>
+</Window>

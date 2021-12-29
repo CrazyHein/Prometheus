@@ -1,0 +1,279 @@
+<Window x:Class="AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:sync="http://schemas.syncfusion.com/wpf"
+        xmlns:syncfusionskin ="clr-namespace:Syncfusion.SfSkinManager;assembly=Syncfusion.SfSkinManager.WPF"
+        xmlns:local="clr-namespace:AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren"
+        Title="MainWindow" Height="1080" Width="1920" WindowState="Maximized" Closing="MainWindow_Closing">
+    <Window.CommandBindings>
+        <CommandBinding Command="local:ConsoleControl.New" Executed="NewCommand_Executed" CanExecute="NewCommand_CanExecuted"/>
+        <CommandBinding Command="local:ConsoleControl.Open" Executed="OpenCommand_Executed" CanExecute="OpenCommand_CanExecuted"/>
+        <CommandBinding Command="local:ConsoleControl.Save" Executed="SaveCommand_Executed" CanExecute="SaveCommand_CanExecuted"/>
+        <CommandBinding Command="local:ConsoleControl.SaveAs" Executed="SaveAsCommand_Executed" CanExecute="SaveAsCommand_CanExecuted"/>
+        <CommandBinding Command="local:ConsoleControl.Export" Executed="ExportCommand_Executed" CanExecute="ExportCommand_CanExecuted"/>
+        <CommandBinding Command="local:ConsoleControl.Import" Executed="ImportCommand_Executed" CanExecute="ImportCommand_CanExecuted"/>
+        <CommandBinding Command="local:ConsoleControl.DownloadviaFTP" Executed="DownloadviaFTPCommand_Executed" CanExecute="DownloadviaFTPCommand_CanExecuted"/>
+        <CommandBinding Command="local:ConsoleControl.UploadviaFTP" Executed="UploadviaFTPCommand_Executed" CanExecute="UploadviaFTPCommand_CanExecuted"/>
+        <CommandBinding Command="local:ConsoleControl.Close" Executed="CloseCommand_Executed" CanExecute="CloseCommand_CanExecuted"/>
+        <CommandBinding Command="local:ConsoleControl.Quit" Executed="QuitCommand_Executed"/>
+        <CommandBinding Command="local:ConsoleControl.About" Executed="AboutCommand_Executed"/>
+        <CommandBinding Command="local:ConsoleControl.StartDebugging" Executed="StartDebuggingCommand_Executed" CanExecute="StartDebuggingCommand_CanExecuted"/>
+        <CommandBinding Command="local:ConsoleControl.StopDebugging" Executed="StopDebuggingCommand_Executed" CanExecute="StopDebuggingCommand_CanExecuted"/>
+    </Window.CommandBindings>
+    <Window.Resources>
+        <local:InvertBooleanValue x:Key="InvertBoolean"/>
+    </Window.Resources>
+    <Grid syncfusionskin:SfSkinManager.Theme="{syncfusionskin:SkinManagerExtension ThemeName=FluentLight}">
+        <Grid.Resources>
+            <local:ModifiedIndicatorToVisibility x:Key="ModifiedConverter"/>
+            <local:HeartbeatIndicator x:Key="HeartbeatIndicator"/>
+        </Grid.Resources>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition />
+            <RowDefinition Height="auto"/>
+        </Grid.RowDefinitions>
+        <StackPanel Grid.Row="1" Orientation="Horizontal">
+            <sync:ButtonAdv Command="local:ConsoleControl.New" SizeMode="Large" Label="New" Margin="2" Width="60">
+                <sync:ButtonAdv.LargeIcon>
+                    <BitmapImage  UriSource="imgs/new.png"/>
+                </sync:ButtonAdv.LargeIcon>
+            </sync:ButtonAdv>
+            <sync:ButtonAdv Command="local:ConsoleControl.Open" SizeMode="Large" Label="Open" Margin="2" Width="60">
+                <sync:ButtonAdv.LargeIcon>
+                    <BitmapImage  UriSource="imgs/open.png"/>
+                </sync:ButtonAdv.LargeIcon>
+            </sync:ButtonAdv>
+            <sync:ButtonAdv Command="local:ConsoleControl.Close" SizeMode="Large" Label="Close" Margin="2" Width="60">
+                <sync:ButtonAdv.LargeIcon>
+                    <BitmapImage  UriSource="imgs/close.png"/>
+                </sync:ButtonAdv.LargeIcon>
+            </sync:ButtonAdv>
+            <sync:ButtonAdv Command="local:ConsoleControl.Save" SizeMode="Large" Label="Save" Margin="2" Width="60">
+                <sync:ButtonAdv.LargeIcon>
+                    <BitmapImage  UriSource="imgs/save.png"/>
+                </sync:ButtonAdv.LargeIcon>
+            </sync:ButtonAdv>
+            <sync:ToolBarItemSeparator/>
+            <sync:ButtonAdv Command="local:ConsoleControl.StartDebugging" SizeMode="Large" Label="Start Debugging" Margin="2" Width="100">
+                <sync:ButtonAdv.LargeIcon>
+                    <BitmapImage  UriSource="imgs/startdebugging.png"/>
+                </sync:ButtonAdv.LargeIcon>
+            </sync:ButtonAdv>
+            <sync:ButtonAdv Command="local:ConsoleControl.StopDebugging" SizeMode="Large" Label="Stop Debugging" Margin="2" Width="100">
+                <sync:ButtonAdv.LargeIcon>
+                    <BitmapImage  UriSource="imgs/stopdebugging.png"/>
+                </sync:ButtonAdv.LargeIcon>
+            </sync:ButtonAdv>
+
+            <sync:ToolBarItemSeparator/>
+            <sync:ButtonAdv Command="local:ConsoleControl.Import" SizeMode="Large" Label="Import" Margin="2" Width="60" ToolTip="Import XML">
+                <sync:ButtonAdv.LargeIcon>
+                    <BitmapImage  UriSource="imgs/import.png"/>
+                </sync:ButtonAdv.LargeIcon>
+            </sync:ButtonAdv>
+            <sync:ButtonAdv Command="local:ConsoleControl.Export" SizeMode="Large" Label="Export" Margin="2" Width="60" ToolTip="Export XML/XLS">
+                <sync:ButtonAdv.LargeIcon>
+                    <BitmapImage  UriSource="imgs/export.png"/>
+                </sync:ButtonAdv.LargeIcon>
+            </sync:ButtonAdv>
+            <sync:ButtonAdv Command="local:ConsoleControl.UploadviaFTP" SizeMode="Large" Label="FTP" Margin="2" Width="60" ToolTip="Upload via FTP">
+                <sync:ButtonAdv.LargeIcon>
+                    <BitmapImage  UriSource="imgs/ftpu.png"/>
+                </sync:ButtonAdv.LargeIcon>
+            </sync:ButtonAdv>
+            <sync:ButtonAdv Command="local:ConsoleControl.DownloadviaFTP" SizeMode="Large" Label="FTP" Margin="2" Width="60" ToolTip="Download via FTP">
+                <sync:ButtonAdv.LargeIcon>
+                    <BitmapImage  UriSource="imgs/ftpd.png"/>
+                </sync:ButtonAdv.LargeIcon>
+            </sync:ButtonAdv>
+            <sync:ToolBarItemSeparator/>
+            <sync:ButtonAdv Command="local:ConsoleControl.About" SizeMode="Large" Label="About" Margin="2" Width="60">
+                <sync:ButtonAdv.LargeIcon>
+                    <BitmapImage  UriSource="imgs/about.png"/>
+                </sync:ButtonAdv.LargeIcon>
+            </sync:ButtonAdv>
+        </StackPanel>
+        <StatusBar Grid.Row="3" HorizontalAlignment="Left">
+            <sync:SfBusyIndicator IsBusy="{Binding IsOffline, Converter={StaticResource InvertBoolean}}" AnimationType="BarChart" ViewboxHeight="28" ViewboxWidth="28" Background="Transparent" Width="28" Height="28"/>
+            <TextBlock Text="{Binding DebuggerHeartbeat, Converter={StaticResource HeartbeatIndicator}}" Width="20"/>
+            <Separator/>
+            <TextBlock Text="{Binding DebuggerState}" Width="80" ToolTip="{Binding DebuggerExceptionMessage}"/>
+            <Separator/>
+            <TextBlock Text="{Binding DebuggerPollingInterval}" Width="80"/>
+            <Separator/>
+            <TextBlock Margin="8,2" Text="{Binding CurrentlyOpenFile}"/>
+        </StatusBar>
+        <sync:MenuAdv Grid.Row="0" Margin="2" PopUpAnimationType="Scroll">
+            <sync:MenuItemAdv  Header="_File" Margin="2">
+                <sync:MenuItemAdv Command="local:ConsoleControl.New">
+                    <sync:MenuItemAdv.Icon>
+                        <Image Source="imgs/new.png" Height="28" Width="28"/>
+                    </sync:MenuItemAdv.Icon>
+                </sync:MenuItemAdv>
+                <sync:MenuItemAdv Command="local:ConsoleControl.Open">
+                    <sync:MenuItemAdv.Icon>
+                        <Image Source="imgs/open.png" Height="28" Width="28"/>
+                    </sync:MenuItemAdv.Icon>
+                </sync:MenuItemAdv>
+                <sync:MenuItemSeparator/>
+                <sync:MenuItemAdv Command="local:ConsoleControl.Close">
+                    <sync:MenuItemAdv.Icon>
+                        <Image Source="imgs/close.png" Height="28" Width="28"/>
+                    </sync:MenuItemAdv.Icon>
+                </sync:MenuItemAdv>
+                <sync:MenuItemSeparator/>
+                <sync:MenuItemAdv Command="local:ConsoleControl.Save">
+                    <sync:MenuItemAdv.Icon>
+                        <Image Source="imgs/save.png" Height="28" Width="28"/>
+                    </sync:MenuItemAdv.Icon>
+                </sync:MenuItemAdv>
+                <sync:MenuItemAdv Command="local:ConsoleControl.SaveAs">
+                    <sync:MenuItemAdv.Icon>
+                        <Image Source="imgs/saveas.png" Height="28" Width="28"/>
+                    </sync:MenuItemAdv.Icon>
+                </sync:MenuItemAdv>
+                <sync:MenuItemSeparator/>
+                <sync:MenuItemAdv Command="local:ConsoleControl.Quit">
+                    <sync:MenuItemAdv.Icon>
+                        <Image Source="imgs/quit.png" Height="28" Width="28"/>
+                    </sync:MenuItemAdv.Icon>
+                </sync:MenuItemAdv>
+            </sync:MenuItemAdv>
+            <sync:MenuItemAdv  Header="_Run" Margin="2">
+                <sync:MenuItemAdv Command="local:ConsoleControl.StartDebugging" ToolTip="Start Debugging">
+                    <sync:MenuItemAdv.Icon>
+                        <Image Source="imgs/startdebugging.png" Height="28" Width="28"/>
+                    </sync:MenuItemAdv.Icon>
+                </sync:MenuItemAdv>
+                <sync:MenuItemAdv Command="local:ConsoleControl.StopDebugging" ToolTip="Stop Debugging">
+                    <sync:MenuItemAdv.Icon>
+                        <Image Source="imgs/stopdebugging.png" Height="28" Width="28"/>
+                    </sync:MenuItemAdv.Icon>
+                </sync:MenuItemAdv>
+            </sync:MenuItemAdv>
+            <sync:MenuItemAdv  Header="_Utility" Margin="2">
+                <sync:MenuItemAdv Command="local:ConsoleControl.Import" ToolTip="Import XML">
+                    <sync:MenuItemAdv.Icon>
+                        <Image Source="imgs/import.png" Height="28" Width="28"/>
+                    </sync:MenuItemAdv.Icon>
+                </sync:MenuItemAdv>
+                <sync:MenuItemAdv Command="local:ConsoleControl.Export" ToolTip="Export XML/XLS">
+                    <sync:MenuItemAdv.Icon>
+                        <Image Source="imgs/export.png" Height="28" Width="28"/>
+                    </sync:MenuItemAdv.Icon>
+                </sync:MenuItemAdv>
+                <sync:MenuItemSeparator/>
+                <sync:MenuItemAdv Command="local:ConsoleControl.UploadviaFTP" ToolTip="Upload via FTP">
+                    <sync:MenuItemAdv.Icon>
+                        <Image Source="imgs/ftpu.png" Height="28" Width="28"/>
+                    </sync:MenuItemAdv.Icon>
+                </sync:MenuItemAdv>
+                <sync:MenuItemAdv Command="local:ConsoleControl.DownloadviaFTP" ToolTip="Download via FTP">
+                    <sync:MenuItemAdv.Icon>
+                        <Image Source="imgs/ftpd.png" Height="28" Width="28"/>
+                    </sync:MenuItemAdv.Icon>
+                </sync:MenuItemAdv>
+            </sync:MenuItemAdv>
+            <sync:MenuItemAdv  Header="_Help" Margin="2">
+                <sync:MenuItemAdv Command="local:ConsoleControl.About">
+                    <sync:MenuItemAdv.Icon>
+                        <Image Source="imgs/about.png" Height="28" Width="28"/>
+                    </sync:MenuItemAdv.Icon>
+                </sync:MenuItemAdv>
+            </sync:MenuItemAdv>
+        </sync:MenuAdv>
+        <sync:SfNavigationDrawer x:Name="MainNavigator" Grid.Row="2" DisplayMode="Expanded" Margin="2" ItemClicked="MainNavigator_ItemClicked">
+            <sync:SfNavigationDrawer.ToggleButtonIconTemplate>
+                <DataTemplate>
+                    <Image Source="imgs/navigation.png" Width="30"/>
+                </DataTemplate>
+            </sync:SfNavigationDrawer.ToggleButtonIconTemplate>
+            <sync:SfNavigationDrawer.ToggleButtonContentTemplate>
+                <DataTemplate>
+                    <Label HorizontalAlignment="Left" VerticalAlignment="Center" Content="Navigator" />
+                </DataTemplate>
+            </sync:SfNavigationDrawer.ToggleButtonContentTemplate>
+            <sync:NavigationItem Header="Metadata Viewer" IsExpanded="True" ItemType="Button">
+                <sync:NavigationItem.Icon>
+                    <Image Source="imgs/meta.png"/>
+                </sync:NavigationItem.Icon>
+                <sync:NavigationItem Header="Data Types" Name="NavDataTypes" Uid="Data Types">
+                    <sync:NavigationItem.Icon>
+                        <Image Source="imgs/datatypes.png"/>
+                    </sync:NavigationItem.Icon>
+                </sync:NavigationItem>
+                <sync:NavigationItem Header="Device Models" Name="NavDeviceModels" Uid="Device Models">
+                    <sync:NavigationItem.Icon>
+                        <Image Source="imgs/devices.png"/>
+                    </sync:NavigationItem.Icon>
+                </sync:NavigationItem>
+            </sync:NavigationItem>
+            <sync:NavigationItem Header="IO List" IsExpanded="{Binding IsOpened}" ItemType="Button" IsEnabled="{Binding IsOpened}">
+                <sync:NavigationItem.Icon>
+                    <Image Source="imgs/list.png"/>
+                </sync:NavigationItem.Icon>
+                <sync:NavigationItem Name="NavVariableDictionary" Uid="Variable Dictionary">
+                    <sync:NavigationItem.Header>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Variable Dictionary"/>
+                            <TextBlock Text=" *" Foreground="Red" FontWeight="Bold" Visibility="{Binding Modified, Converter={StaticResource ModifiedConverter}}"/>
+                        </StackPanel>
+                    </sync:NavigationItem.Header>
+                    <sync:NavigationItem.Icon>
+                        <Image Source="imgs/variables.png"/>
+                    </sync:NavigationItem.Icon>
+                </sync:NavigationItem>
+                <sync:NavigationItem Name="NavControllerConfiguration" Uid="Controller Configuration">
+                    <sync:NavigationItem.Header>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Controller Configuration"/>
+                            <TextBlock Text=" *" Foreground="Red" FontWeight="Bold" Visibility="{Binding Modified, Converter={StaticResource ModifiedConverter}}"/>
+                        </StackPanel>
+                    </sync:NavigationItem.Header>
+                    <sync:NavigationItem.Icon>
+                        <Image Source="imgs/configuration.png"/>
+                    </sync:NavigationItem.Icon>
+                </sync:NavigationItem>
+                <sync:NavigationItem Name="NavProcessDataDictionary" Uid="PDO Dictionary &amp; Interlocks">
+                    <sync:NavigationItem.Header>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="PDO Dictionary &amp; INTLK"/>
+                            <TextBlock Text=" *" Foreground="Red" FontWeight="Bold" Visibility="{Binding Modified, Converter={StaticResource ModifiedConverter}}"/>
+                        </StackPanel>
+                    </sync:NavigationItem.Header>
+                    <sync:NavigationItem.Icon>
+                        <Image Source="imgs/process.png"/>
+                    </sync:NavigationItem.Icon>
+                </sync:NavigationItem>
+                <sync:NavigationItem Name="NavMiscellaneous" Uid="Miscellaneous">
+                    <sync:NavigationItem.Header>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Miscellaneous"/>
+                            <TextBlock Text=" *" Foreground="Red" FontWeight="Bold" Visibility="{Binding Modified, Converter={StaticResource ModifiedConverter}}"/>
+                        </StackPanel>
+                    </sync:NavigationItem.Header>
+                    <sync:NavigationItem.Icon>
+                        <Image Source="imgs/miscellaneous.png"/>
+                    </sync:NavigationItem.Icon>
+                </sync:NavigationItem>
+            </sync:NavigationItem>
+            <sync:SfNavigationDrawer.FooterItems>
+                <sync:NavigationItem ItemType="Separator"/>
+                <sync:NavigationItem Header="Settings" ItemType="Button" Uid="Settings">
+                    <sync:NavigationItem.Icon>
+                        <Image Source="imgs/setting.png"/>
+                    </sync:NavigationItem.Icon>
+                </sync:NavigationItem>
+            </sync:SfNavigationDrawer.FooterItems>
+            <sync:SfNavigationDrawer.ContentView>
+                <DockPanel Margin="4">
+                    <TextBlock DockPanel.Dock="Top" Text="{Binding ElementName=MainNavigator, Path=SelectedItem.Uid}" HorizontalAlignment="Center" FontSize="20" Margin="4"/>
+                    <Separator DockPanel.Dock="Top" Margin="0,0,0,4"/>
+                    <ContentControl x:Name="UserControl"/>
+                </DockPanel>
+            </sync:SfNavigationDrawer.ContentView>
+        </sync:SfNavigationDrawer>
+    </Grid>
+</Window>

@@ -1,0 +1,197 @@
+﻿<UserControl x:Class="AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.InterlockCollectionViewer"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren"
+             xmlns:iolist="clr-namespace:AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia;assembly=Lombardia"
+             xmlns:sync="http://schemas.syncfusion.com/wpf"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <GroupBox Header="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=sync:TabItemExt}, Path=Header}" Padding="0,8,0,0">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="4"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <sync:SfGridSplitter Grid.Row="1" HorizontalAlignment="Stretch"/>
+            <DockPanel LastChildFill="True" Grid.Row="0" Name="InterlockLogicContainer">
+                <DockPanel.CommandBindings>
+                    <CommandBinding Command="local:ConsoleControl.EditRecord" Executed="EditRecordCommand_Executed" CanExecute="EditRecordCommand_CanExecute"/>
+                    <CommandBinding Command="local:ConsoleControl.AddRecord" Executed="AddRecordCommand_Executed" CanExecute="AddRecordCommand_CanExecute"/>
+                    <CommandBinding Command="local:ConsoleControl.InsertRecord" Executed="InsertRecordCommand_Executed" CanExecute="InsertRecordCommand_CanExecute"/>
+                    <CommandBinding Command="local:ConsoleControl.RemoveRecord" Executed="RemoveRecordCommand_Executed" CanExecute="RemoveRecordCommand_CanExecute"/>
+                </DockPanel.CommandBindings>
+                <DockPanel.Resources>
+                    <ContextMenu x:Key="ListContextMenu">
+                        <MenuItem Command="local:ConsoleControl.InsertRecord">
+                            <MenuItem.Icon>
+                                <Image Source="/imgs/insert.png" Height="20" Margin="4"/>
+                            </MenuItem.Icon>
+                        </MenuItem>
+                        <MenuItem Command="local:ConsoleControl.EditRecord">
+                            <MenuItem.Icon>
+                                <Image Source="/imgs/edit.png" Height="20" Margin="4"/>
+                            </MenuItem.Icon>
+                        </MenuItem>
+                        <MenuItem Command="local:ConsoleControl.RemoveRecord">
+                            <MenuItem.Icon>
+                                <Image Source="/imgs/remove.png" Height="20" Margin="4"/>
+                            </MenuItem.Icon>
+                        </MenuItem>
+                    </ContextMenu>
+                </DockPanel.Resources>
+                <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Right" Margin="4">
+                    <sync:ButtonAdv Label="Add" VerticalAlignment="Center" Height="30" Width="128" Command="local:ConsoleControl.AddRecord" Margin="4">
+                        <sync:ButtonAdv.SmallIcon>
+                            <BitmapImage  UriSource="/imgs/add.png"/>
+                        </sync:ButtonAdv.SmallIcon>
+                    </sync:ButtonAdv>
+                    <sync:ButtonAdv Label="Insert" VerticalAlignment="Center" Height="30" Width="128" Command="local:ConsoleControl.InsertRecord" Margin="4">
+                        <sync:ButtonAdv.SmallIcon>
+                            <BitmapImage  UriSource="/imgs/insert.png"/>
+                        </sync:ButtonAdv.SmallIcon>
+                    </sync:ButtonAdv>
+                    <sync:ButtonAdv Label="Edit" VerticalAlignment="Center" Height="30" Width="128" Command="local:ConsoleControl.EditRecord" Margin="4">
+                        <sync:ButtonAdv.SmallIcon>
+                            <BitmapImage  UriSource="/imgs/edit.png"/>
+                        </sync:ButtonAdv.SmallIcon>
+                    </sync:ButtonAdv>
+                    <sync:ButtonAdv Label="Remove" VerticalAlignment="Center" Height="30" Width="128" Command="local:ConsoleControl.RemoveRecord" Margin="4">
+                        <sync:ButtonAdv.SmallIcon>
+                            <BitmapImage  UriSource="/imgs/remove.png"/>
+                        </sync:ButtonAdv.SmallIcon>
+                    </sync:ButtonAdv>
+                </StackPanel>
+                <ListBox x:Name="InterlockLogicList" ItemsSource="{Binding InterlockLogicModels}" ScrollViewer.CanContentScroll="False" HorizontalContentAlignment="Stretch" Margin="0,0,0,8" ContextMenu="{StaticResource ListContextMenu}">
+                    <ListBox.Resources>
+                        <Style TargetType="Expander">
+                            <Setter Property="Expander.HeaderTemplate">
+                                <Setter.Value>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding}"/>
+                                    </DataTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                        <local:BooleanValueIndicator True="LightGreen" False="Gray" x:Key="BooleanValueIndicator"/>
+                        <local:WarningValueColumn True="LightGreen" False="Gray" Warning="Red"  x:Key="WarningValueIndicator"/>
+                    </ListBox.Resources>
+                    <ListBox.ItemContainerStyle>
+                        <Style>
+                            <Setter Property="Control.Padding" Value="0"/>
+                            <Setter Property="Control.Margin" Value="2,1"/>
+                            <Style.Triggers>
+                                <EventTrigger RoutedEvent="Mouse.PreviewMouseDown">
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <BooleanAnimationUsingKeyFrames Storyboard.TargetProperty="(ListBoxItem.IsSelected)">
+                                                <DiscreteBooleanKeyFrame KeyTime="0" Value="True" />
+                                            </BooleanAnimationUsingKeyFrames>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </EventTrigger>
+                                <Trigger Property="ListBoxItem.IsSelected" Value="True">
+                                    <Setter Property="ListBoxItem.Background" Value="LightYellow"/>
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ListBox.ItemContainerStyle>
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Grid Margin="0" Background="White">
+                                <Border Margin="4" BorderThickness="1" BorderBrush="SteelBlue" CornerRadius="4" Background="{Binding Path=Background, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ListBoxItem}}}">
+                                    <Expander Header="{Binding Logic.Name}" Margin="4">
+                                        <StackPanel Margin="16,4">
+                                            <Expander Header="Targets" Margin="4">
+                                                <ListBox ItemsSource="{Binding Targets}" Margin="16,4">
+                                                    <ListBox.ItemTemplate>
+                                                        <DataTemplate>
+                                                            <StackPanel Orientation="Horizontal">
+                                                                <Rectangle Width="6" Height="16" Margin="0,0,4,0" RadiusX="2" RadiusY="2">
+                                                                    <Rectangle.Fill>
+                                                                        <MultiBinding Converter="{StaticResource WarningValueIndicator}">
+                                                                            <Binding Path="Value"/>
+                                                                            <Binding Path="Warning"/>
+                                                                        </MultiBinding>
+                                                                    </Rectangle.Fill>
+                                                                </Rectangle>
+                                                                <TextBlock Text="{Binding Path=Display}"  VerticalAlignment="Center"/>
+                                                            </StackPanel>
+                                                        </DataTemplate>
+                                                    </ListBox.ItemTemplate>
+                                                </ListBox>
+                                            </Expander>
+                                            <Expander Header="Statement" Margin="4">
+                                                <TreeView Margin="16,4">
+                                                    <TreeViewItem ItemsSource="{Binding Statement.Elements}">
+                                                        <TreeViewItem.Header>
+                                                            <StackPanel Orientation="Horizontal">
+                                                                <Rectangle Fill="{Binding Statement.Value, Converter={StaticResource BooleanValueIndicator}}" Width="6" Height="16" Margin="0,0,4,0" RadiusX="2" RadiusY="2"/>
+                                                                <TextBlock Text="{Binding Statement.Display}" VerticalAlignment="Center"/>
+                                                            </StackPanel>
+                                                        </TreeViewItem.Header>
+                                                        <TreeViewItem.Resources>
+                                                            <HierarchicalDataTemplate ItemsSource="{Binding Elements}" DataType="{x:Type local:LogicExpressionModel}">
+                                                                <StackPanel Orientation="Horizontal">
+                                                                    <Rectangle Fill="{Binding Value, Converter={StaticResource BooleanValueIndicator}}" Width="6" Height="16" Margin="0,0,4,0" RadiusX="2" RadiusY="2"/>
+                                                                    <TextBlock Text="{Binding Display}" VerticalAlignment="Center"/>
+                                                                </StackPanel>
+                                                            </HierarchicalDataTemplate>
+                                                            <HierarchicalDataTemplate DataType="{x:Type local:LogicOperandModel}">
+                                                                <StackPanel Orientation="Horizontal">
+                                                                    <Rectangle Fill="{Binding Value, Converter={StaticResource BooleanValueIndicator}}" Width="6" Height="16" Margin="0,0,4,0" RadiusX="2" RadiusY="2"/>
+                                                                    <TextBlock Text="{Binding Display}" VerticalAlignment="Center"/>
+                                                                </StackPanel>
+                                                            </HierarchicalDataTemplate>
+                                                        </TreeViewItem.Resources>
+                                                    </TreeViewItem>
+                                                </TreeView>
+                                            </Expander>
+                                        </StackPanel>
+                                    </Expander>
+                                </Border>
+                            </Grid>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </DockPanel>
+            <DockPanel Grid.Row="2"  Margin="0,8,0,0" Name="InputArea" IsEnabled="False">
+                <DockPanel.CommandBindings>
+                    <CommandBinding Command="local:ConsoleControl.Cancel" Executed="CancelCommand_Executed" CanExecute="CancelCommand_CanExecute"/>
+                    <CommandBinding Command="local:ConsoleControl.Confirm" Executed="ConfirmCommand_Executed" CanExecute="CancelCommand_CanExecute"/>
+                </DockPanel.CommandBindings>
+                <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0">
+                    <sync:ButtonAdv Label="Cancel" VerticalAlignment="Center" Height="30" Width="128" Command="local:ConsoleControl.Cancel" Margin="4">
+                        <sync:ButtonAdv.SmallIcon>
+                            <BitmapImage  UriSource="/imgs/cancel.png"/>
+                        </sync:ButtonAdv.SmallIcon>
+                    </sync:ButtonAdv>
+                    <sync:ButtonAdv Label="Confirm" VerticalAlignment="Center" Height="30" Width="128" Command="local:ConsoleControl.Confirm" Margin="4">
+                        <sync:ButtonAdv.SmallIcon>
+                            <BitmapImage  UriSource="/imgs/confirm.png"/>
+                        </sync:ButtonAdv.SmallIcon>
+                    </sync:ButtonAdv>
+                </StackPanel>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="2*"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="auto"/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="Name --> " VerticalAlignment="Center" Margin="2,0,0,4"/>
+                    <TextBlock Text="Targets --> " Grid.Row="1" VerticalAlignment="Center" Margin="2,0,0,4"/>
+                    <TextBlock Text="Statement --> " Grid.Row="2" VerticalAlignment="Center" Margin="2,0,0,4"/>
+                    <TextBox x:Name="InputInterlockLogicName" Grid.Row="0" Grid.Column="1" Margin="4,0,0,4" Padding="4"/>
+                    <TextBox x:Name="InputInterlockLogicTargets" Grid.Row="1" Grid.Column="1" Margin="4,0,0,4" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" Padding="4" VerticalContentAlignment="Top"/>
+                    <TextBox x:Name="InputInterlockLogicStatement" Grid.Row="2" Grid.Column="1" Margin="4,0,0,4" AcceptsReturn="True" AcceptsTab="True" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" Padding="4" VerticalContentAlignment="Top"/>
+                </Grid>
+            </DockPanel>
+        </Grid>
+    </GroupBox>
+</UserControl>
