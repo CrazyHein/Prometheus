@@ -201,7 +201,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Debugger
                 readIndex = __process_data.Where(d => d.access == false).Select(d => new ValueTuple<string, uint, ushort>("D", d.start, d.size));
                 readArray = (__process_data.Where(d => d.access == false).Select(d => d.data.AsMemory<ushort>())).ToArray();
             }
-            if (read == DeviceAccessMode.Inconsecutive)
+            if (write == DeviceAccessMode.Inconsecutive)
             {
                 writeIndex = __process_data.Where(d => d.access == true).Select(d => new ValueTuple<string, uint, ushort, ReadOnlyMemory<ushort>>("D", d.start, d.size, d.data.AsMemory<ushort>()));
             }
