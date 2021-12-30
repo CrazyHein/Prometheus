@@ -55,12 +55,13 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         {
             if(path == null)
                 path = SettingsPath;
-            ReadOnlySpan<byte> fs = File.ReadAllBytes(path);
-            if (fs.StartsWith(__UTF8_BOM)) fs = fs.Slice(__UTF8_BOM.Length);
-
-            var reader = new Utf8JsonReader(fs, new JsonReaderOptions() { CommentHandling = JsonCommentHandling.Skip });
             try
             {
+                ReadOnlySpan<byte> fs = File.ReadAllBytes(path);
+                if (fs.StartsWith(__UTF8_BOM)) fs = fs.Slice(__UTF8_BOM.Length);
+
+                var reader = new Utf8JsonReader(fs, new JsonReaderOptions() { CommentHandling = JsonCommentHandling.Skip });
+            
                 while (reader.Read())
                 {
                     switch (reader.TokenType, reader.CurrentDepth)
@@ -80,7 +81,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             catch (Exception)
             {
                 SlmpTargetProperty = new SlmpTargetProperty();
-                throw;
+                //throw;
             }
         }
     }
