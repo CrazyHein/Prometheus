@@ -48,13 +48,11 @@
     <None Remove="imgs\save_as.png" />
     <None Remove="imgs\search.png" />
     <None Remove="imgs\setting.png" />
+    <None Remove="imgs\slash.jpg" />
     <None Remove="imgs\startdebugging.png" />
     <None Remove="imgs\stopdebugging.png" />
     <None Remove="imgs\variables.png" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="imgs\logo.ico" />
+    <None Remove="splash.jpg" />
   </ItemGroup>
 
   <ItemGroup>
@@ -155,6 +153,12 @@
     <Resource Include="imgs\meta.png" />
     <Resource Include="imgs\navigation.png" />
     <Resource Include="imgs\setting.png" />
+  </ItemGroup>
+
+  
+  
+  <ItemGroup>
+    <SplashScreen Include="splash.jpg" />
   </ItemGroup>
 
 </Project>

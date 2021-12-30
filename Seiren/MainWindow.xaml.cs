@@ -103,6 +103,16 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             this.Loaded += OnLoaded;
 
             DataContext = __main_model;
+        }
+        /// <summary>
+        /// Called when [loaded].
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
+        private void OnLoaded(object sender, RoutedEventArgs e)
+        {
+            CurrentVisualStyle = "FluentLight";
+            CurrentSizeMode = "Default";
 
             try
             {
@@ -116,24 +126,14 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
 
                 __viewers[NavDataTypes] = __data_types_viewer;
                 __viewers[NavDeviceModels] = __device_models_viewer;
+
+                __user_interface_synchronizer = new UserInterfaceSynchronizer(this, __ui_data_refresh_handler);
             }
-            catch (LombardiaException e)
+            catch (LombardiaException ex)
             {
-                MessageBox.Show("At least one exception has occurred during loading metadata :\n" + e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("At least one exception has occurred during loading metadata :\n" + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 this.Close();
             }
-
-            __user_interface_synchronizer = new UserInterfaceSynchronizer(this, __ui_data_refresh_handler);
-        }
-        /// <summary>
-        /// Called when [loaded].
-        /// </summary>
-        /// <param name="sender">The sender.</param>
-        /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
-        private void OnLoaded(object sender, RoutedEventArgs e)
-        {
-            CurrentVisualStyle = "FluentLight";
-            CurrentSizeMode = "Default";
         }
         /// <summary>
         /// On Visual Style Changed.

@@ -108,7 +108,7 @@
                 </sync:ButtonAdv>
             </StackPanel>
             <sync:SfDataGrid Name="MainViewer" AutoGenerateColumns="False" 
-                             ItemsSource="{Binding Objects}" ColumnSizer="AutoLastColumnFill" AllowResizingColumns="True"
+                             ItemsSource="{Binding Objects}" ColumnSizer="Auto" AllowResizingColumns="True"
                              AllowGrouping="True" ShowGroupDropArea="True"
                              AllowFiltering="True" 
                              AllowSorting="True"  AllowTriStateSorting="True"

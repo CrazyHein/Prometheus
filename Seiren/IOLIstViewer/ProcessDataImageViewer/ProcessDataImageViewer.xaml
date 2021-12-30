@@ -98,7 +98,7 @@
                 </StackPanel>
             </DockPanel>
             <sync:SfDataGrid Name="ProcessDataImageGrid" ItemsSource="{Binding ProcessDataModels}" AutoGenerateColumns="False"
-                             ColumnSizer="AutoLastColumnFill"
+                             ColumnSizer="Auto"
                          AllowGrouping="False" AllowFiltering="False" AllowSorting="False" AllowResizingColumns="True"
                          ShowSortNumbers="True" ShowRowHeader="True" 
                          LiveDataUpdateMode="AllowDataShaping" ScrollMode="Async"
