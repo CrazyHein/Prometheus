@@ -198,12 +198,12 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Debugger
             Memory<ushort>[] readArray = null;
             if (read == DeviceAccessMode.Inconsecutive)
             {
-                readIndex = __process_data.Where(d => d.access == false).Select(d => new ValueTuple<string, uint, ushort>("D", d.start, d.size));
-                readArray = (__process_data.Where(d => d.access == false).Select(d => d.data.AsMemory<ushort>())).ToArray();
+                readIndex = __process_data.Where(d => d.access == false && d.size > 0).Select(d => new ValueTuple<string, uint, ushort>("D", d.start, d.size));
+                readArray = (__process_data.Where(d => d.access == false && d.size > 0).Select(d => d.data.AsMemory<ushort>())).ToArray();
             }
             if (write == DeviceAccessMode.Inconsecutive)
             {
-                writeIndex = __process_data.Where(d => d.access == true).Select(d => new ValueTuple<string, uint, ushort, ReadOnlyMemory<ushort>>("D", d.start, d.size, d.data.AsMemory<ushort>()));
+                writeIndex = __process_data.Where(d => d.access == true && d.size > 0).Select(d => new ValueTuple<string, uint, ushort, ReadOnlyMemory<ushort>>("D", d.start, d.size, d.data.AsMemory<ushort>()));
             }
 
             sw.Start();
@@ -219,9 +219,25 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Debugger
                     {
                         for (int i = 0; i < __process_data.Count; ++i)
                         {
-                            if (__process_data[i].access == false)
+                            if (__process_data[i].access == false && __process_data[i].size > 0)
+                            {
                                 master.ReadLocalDeviceInWord(monitoring, "D", __process_data[i].start, __process_data[i].size, out end, __process_data[i].data);
-                            __process_data_end = end;
+                                __process_data_end = end;
+                                if (end != 0)
+                                {
+                                    ExceptionMessage = $"End Code : {end:X04}";
+                                    Counter = 0;
+                                    State = DataSynchronizerState.Exception;
+                                    return;
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (readArray.Length != 0)
+                        {
+                            master.ReadLocalDeviceInWord(monitoring, readIndex, null, out end, readArray, null);
                             if (end != 0)
                             {
                                 ExceptionMessage = $"End Code : {end:X04}";
@@ -229,17 +245,6 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Debugger
                                 State = DataSynchronizerState.Exception;
                                 return;
                             }
-                        }
-                    }
-                    else
-                    {
-                        master.ReadLocalDeviceInWord(monitoring, readIndex, null, out end, readArray, null);
-                        if (end != 0)
-                        {
-                            ExceptionMessage = $"End Code : {end:X04}";
-                            Counter = 0;
-                            State = DataSynchronizerState.Exception;
-                            return;
                         }
                     }
 
@@ -247,9 +252,25 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Debugger
                     {
                         for (int i = 0; i < __process_data.Count; ++i)
                         {
-                            if (__process_data[i].access == true)
+                            if (__process_data[i].access == true && __process_data[i].size > 0)
+                            {
                                 master.WriteLocalDeviceInWord(monitoring, "D", __process_data[i].start, __process_data[i].size, out end, __process_data[i].data);
-                            __process_data_end = end;
+                                __process_data_end = end;
+                                if (end != 0)
+                                {
+                                    ExceptionMessage = $"End Code : {end:X04}";
+                                    Counter = 0;
+                                    State = DataSynchronizerState.Exception;
+                                    return;
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (writeIndex.Any() == true)
+                        {
+                            master.WriteLocalDeviceInWord(monitoring, writeIndex, null, out end);
                             if (end != 0)
                             {
                                 ExceptionMessage = $"End Code : {end:X04}";
@@ -257,17 +278,6 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Debugger
                                 State = DataSynchronizerState.Exception;
                                 return;
                             }
-                        }
-                    }
-                    else
-                    {
-                        master.WriteLocalDeviceInWord(monitoring, writeIndex, null, out end);
-                        if (end != 0)
-                        {
-                            ExceptionMessage = $"End Code : {end:X04}";
-                            Counter = 0;
-                            State = DataSynchronizerState.Exception;
-                            return;
                         }
                     }
                     Counter = counter++;
@@ -288,8 +298,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Debugger
                             __process_data[i].data.CopyTo(__internal_process_data[i].data, 0);
                         else
                             __internal_process_data[i].data.CopyTo(__process_data[i].data, 0);
-                        __internal_process_data_end = __process_data_end;
                     }
+                    __internal_process_data_end = __process_data_end;
                 }
                 int ms = (int)(sw.ElapsedMilliseconds);
                 if (ms < interval)
@@ -330,8 +340,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Debugger
                             __process_data[i].data.CopyTo(__internal_process_data[i].data, 0);
                         else
                             __internal_process_data[i].data.CopyTo(__process_data[i].data, 0);
-                        __internal_process_data_end = __process_data_end;
                     }
+                    __internal_process_data_end = __process_data_end;
                 }
                 int ms = (int)(sw.ElapsedMilliseconds);
                 PollingInterval = (int)sw.ElapsedMilliseconds;
