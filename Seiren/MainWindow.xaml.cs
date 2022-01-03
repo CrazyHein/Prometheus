@@ -161,7 +161,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                     (__miscellaneous_viewer.DataContext as MiscellaneousModel).Modified;
         }
 
-        public void __reset_layout()
+        private void __reset_layout()
         {
             __variables_viewer = new VariablesViewer(__variable_dictionary, __data_type_catalogue);
             __controller_configuration_viewer = new ControllerConfigurationViewer(__controller_configuration, __controller_model_catalogue);
@@ -648,7 +648,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
 
             __close_layout();
             __main_model.CurrentlyOpenFile = null;
-    }
+        }
 
         private void CloseCommand_CanExecuted(object sender, System.Windows.Input.CanExecuteRoutedEventArgs e)
         {

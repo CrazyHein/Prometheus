@@ -67,6 +67,11 @@
     </UserControl.Resources>
     <DockPanel>
         <StackPanel DockPanel.Dock="Bottom" HorizontalAlignment="Right" Margin="4" Orientation="Horizontal">
+            <sync:ButtonAdv Label="Import" VerticalAlignment="Center" Height="30" Width="128" Margin="4" Click="Import_Click">
+                <sync:ButtonAdv.SmallIcon>
+                    <BitmapImage  UriSource="/imgs/import_p.png"/>
+                </sync:ButtonAdv.SmallIcon>
+            </sync:ButtonAdv>
             <sync:ButtonAdv Label="Add" VerticalAlignment="Center" Height="30" Width="128" Command="local:ConsoleControl.AddRecord" Margin="4">
                 <sync:ButtonAdv.SmallIcon>
                     <BitmapImage  UriSource="/imgs/add.png"/>

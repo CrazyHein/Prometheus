@@ -108,6 +108,43 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             __controller_configuration_collection.Save(doc, ReferenceNames, root);
             Modified = false;
         }
+
+        public void ImportDevices(string path)
+        {
+            TaskUserParameterHelper helper = new TaskUserParameterHelper(ControllerModelCatalogue, path, out _);
+            uint i = 0;
+            string refer = string.Empty;
+            foreach (var d in helper.LocalHardwareCollection)
+            {
+                while (true)
+                {
+                    refer = $"unnamed_device_reference_{i}";
+                    if (__controller_configuration_collection.Configurations.ContainsKey(refer))
+                        i++;
+                    else
+                        break;
+                }
+                DeviceConfigurationModel model = new DeviceConfigurationModel() { DeviceModel = d.DeviceModel, Switch = d.Switch, LocalAddress = d.LocalAddress, ReferenceName = refer };
+                __controller_configuration_collection.Add(model.DeviceModel.ID, model.Switch, model.LocalAddress, model.IPv4, model.Port, model.ReferenceName);
+                __device_configurations.Add(model);
+            }
+            foreach (var d in helper.RemoteHardwareCollection)
+            {
+                while (true)
+                {
+                    refer = $"unnamed_device_reference_{i}";
+                    if (__controller_configuration_collection.Configurations.ContainsKey(refer))
+                        i++;
+                    else
+                        break;
+                }
+                DeviceConfigurationModel model = new DeviceConfigurationModel() { DeviceModel = d.DeviceModel, Switch = d.Switch, IPv4 = d.IPv4, Port = d.Port, ReferenceName = refer };
+                __controller_configuration_collection.Add(model.DeviceModel.ID, model.Switch, model.LocalAddress, model.IPv4, model.Port, model.ReferenceName);
+                __device_configurations.Add(model);
+            }
+            if (helper.LocalHardwareCollection.Count != 0 || helper.RemoteHardwareCollection.Count != 0)
+                Modified = false;
+        }
     }
 
     public class DeviceConfigurationModel : IEquatable<DeviceConfigurationModel>

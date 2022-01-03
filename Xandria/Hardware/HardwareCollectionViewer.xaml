@@ -1,0 +1,239 @@
+﻿<UserControl x:Class="AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Xandria.HardwareCollectionViewer"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Xandria"
+             xmlns:sync="http://schemas.syncfusion.com/wpf"
+             xmlns:syncfusionskin ="clr-namespace:Syncfusion.SfSkinManager;assembly=Syncfusion.SfSkinManager.WPF"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="1920">
+    <Grid syncfusionskin:SfSkinManager.Theme="{syncfusionskin:SkinManagerExtension ThemeName=FluentLight}" Validation.Error="Input_Error">
+        <Grid.Resources>
+            <local:LocalAddressTextConverter x:Key="LocalAddress"/>
+            <ContextMenu x:Key="LocalContextMenu">
+                <MenuItem Command="local:ConsoleControl.EditLocalModule">
+                    <MenuItem.Icon>
+                        <Image Source="/imgs/edit.png" Height="20" Margin="4"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Command="local:ConsoleControl.InsertLocalModule">
+                    <MenuItem.Icon>
+                        <Image Source="/imgs/insert.png" Height="20" Margin="4"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Command="local:ConsoleControl.RemoveLocalModule">
+                    <MenuItem.Icon>
+                        <Image Source="/imgs/remove.png" Height="20" Margin="4"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+            </ContextMenu>
+            <ContextMenu x:Key="RemoteContextMenu">
+                <MenuItem Command="local:ConsoleControl.EditRemoteModule">
+                    <MenuItem.Icon>
+                        <Image Source="/imgs/edit.png" Height="20" Margin="4"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Command="local:ConsoleControl.InsertRemoteModule">
+                    <MenuItem.Icon>
+                        <Image Source="/imgs/insert.png" Height="20" Margin="4"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Command="local:ConsoleControl.RemoveRemoteModule">
+                    <MenuItem.Icon>
+                        <Image Source="/imgs/remove.png" Height="20" Margin="4"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+            </ContextMenu>
+            <DataTemplate x:Key="LocalRecordDragDropTemplate">
+                <Border Padding="4" Background="#ececec" BorderBrush="#c8c8c8" BorderThickness="1.2">
+                    <Grid VerticalAlignment="Center" HorizontalAlignment="Left">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="ID : " Grid.Row="0" Grid.Column="0" FontWeight="Bold"/>
+                        <TextBlock Text="{Binding DraggingRecords[0].ID, StringFormat='0x{0:X04}'}" Grid.Row="0" Grid.Column="1"/>
+                        <TextBlock Text="Name : " Grid.Row="1" Grid.Column="0" FontWeight="Bold"/>
+                        <TextBlock Text="{Binding DraggingRecords[0].Name}" Grid.Row="1" Grid.Column="1"/>
+                        <TextBlock Text="Switch : " Grid.Row="2" Grid.Column="0" FontWeight="Bold"/>
+                        <TextBlock Text="{Binding DraggingRecords[0].Switch, StringFormat='0x{0:X08}'}" Grid.Row="2" Grid.Column="1"/>
+                        <TextBlock Text="Local Address : " Grid.Row="3" Grid.Column="0" FontWeight="Bold"/>
+                        <TextBlock Text="{Binding DraggingRecords[0].LocalAddress, StringFormat='0x{0:X04}'}" Grid.Row="3" Grid.Column="1"/>
+                    </Grid>
+                </Border>
+            </DataTemplate>
+            <DataTemplate x:Key="RemoteRecordDragDropTemplate">
+                <Border Padding="4" Background="#ececec" BorderBrush="#c8c8c8" BorderThickness="1.2">
+                    <Grid VerticalAlignment="Center" HorizontalAlignment="Left">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="ID : " Grid.Row="0" Grid.Column="0" FontWeight="Bold"/>
+                        <TextBlock Text="{Binding DraggingRecords[0].ID, StringFormat='0x{0:X04}'}" Grid.Row="0" Grid.Column="1"/>
+                        <TextBlock Text="Name : " Grid.Row="1" Grid.Column="0" FontWeight="Bold"/>
+                        <TextBlock Text="{Binding DraggingRecords[0].Name}" Grid.Row="1" Grid.Column="1"/>
+                        <TextBlock Text="Switch : " Grid.Row="2" Grid.Column="0" FontWeight="Bold"/>
+                        <TextBlock Text="{Binding DraggingRecords[0].Switch, StringFormat='0x{0:X08}'}" Grid.Row="2" Grid.Column="1"/>
+                        <TextBlock Text="Remote IPv4 : " Grid.Row="4" Grid.Column="0" FontWeight="Bold"/>
+                        <TextBlock Text="{Binding DraggingRecords[0].IPv4}" Grid.Row="4" Grid.Column="1"/>
+                        <TextBlock Text="Remote Port : " Grid.Row="5" Grid.Column="0" FontWeight="Bold"/>
+                        <TextBlock Text="{Binding DraggingRecords[0].Port}" Grid.Row="5" Grid.Column="1"/>
+                    </Grid>
+                </Border>
+            </DataTemplate>
+            <DataTemplate x:Key="DetailsViewTemplate">
+                <StackPanel>
+                    <TextBlock Text="Extra :" FontWeight="Bold" Margin="4"/>
+                    <ListBox Margin="8,2,2,2" ItemsSource="{Binding Data.CustomFields}"/>
+                </StackPanel>
+            </DataTemplate>
+        </Grid.Resources>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition Width="auto"/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        <sync:SfGridSplitter Grid.Column="1" Grid.Row="1" HorizontalAlignment="Stretch" ShowsPreview="True" Margin="2"/>
+        <GroupBox Grid.ColumnSpan="3" Margin="2">
+            <GroupBox.Header>
+                <StackPanel Orientation="Horizontal">
+                    <Image Source="/imgs/cpu.png" Height="28"/>
+                    <TextBlock Text="CPU" VerticalAlignment="Center" Margin="4,0,0,0"/>
+                </StackPanel>
+            </GroupBox.Header>
+            <sync:SfTextInputLayout  Hint="Host Address" HelperText="Input host cpu address here" ContainerType="Filled" FontStyle="Italic" FontSize="12" Margin="4,8,4,8" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}">
+                <TextBox Name="HostAddress" Text="{Binding HostAddress, ValidatesOnExceptions=True, NotifyOnValidationError=True, Converter={StaticResource LocalAddress}}" FontStyle="Normal" KeyDown="Input_KeyDown"/>
+            </sync:SfTextInputLayout>
+        </GroupBox>
+        <GroupBox Grid.Row="1" Margin="2" Padding="4,8,4,4">
+            <GroupBox.CommandBindings>
+                <CommandBinding Command="local:ConsoleControl.AddLocalModule" Executed="AddLocalModuleCommand_Executed" CanExecute="AddLocalModuleCommand_CanExecute"/>
+                <CommandBinding Command="local:ConsoleControl.InsertLocalModule" Executed="InsertLocalModuleCommand_Executed" CanExecute="InsertLocalModuleCommand_CanExecute"/>
+                <CommandBinding Command="local:ConsoleControl.EditLocalModule" Executed="EditLocalModuleCommand_Executed" CanExecute="EditLocalModuleCommand_CanExecute"/>
+                <CommandBinding Command="local:ConsoleControl.RemoveLocalModule" Executed="RemoveLocalModuleCommand_Executed" CanExecute="RemoveLocalModuleCommand_CanExecute"/>
+            </GroupBox.CommandBindings>
+            <GroupBox.Header>
+                <StackPanel Orientation="Horizontal">
+                    <Image Source="/imgs/local.png" Height="28"/>
+                    <TextBlock Text="Local Modules" VerticalAlignment="Center" Margin="4,0,0,0"/>
+                </StackPanel>
+            </GroupBox.Header>
+            <DockPanel>
+                <StackPanel DockPanel.Dock="Bottom" HorizontalAlignment="Right" Margin="4" Orientation="Horizontal">
+                    <sync:ButtonAdv Label="Add" VerticalAlignment="Center" Height="30" Width="128" Command="local:ConsoleControl.AddLocalModule" Margin="4">
+                        <sync:ButtonAdv.SmallIcon>
+                            <BitmapImage  UriSource="/imgs/add.png"/>
+                        </sync:ButtonAdv.SmallIcon>
+                    </sync:ButtonAdv>
+                    <sync:ButtonAdv Label="Insert" VerticalAlignment="Center" Height="30" Width="128" Command="local:ConsoleControl.InsertLocalModule" Margin="4">
+                        <sync:ButtonAdv.SmallIcon>
+                            <BitmapImage  UriSource="/imgs/insert.png"/>
+                        </sync:ButtonAdv.SmallIcon>
+                    </sync:ButtonAdv>
+                    <sync:ButtonAdv Label="Edit" VerticalAlignment="Center" Height="30" Width="128" Command="local:ConsoleControl.EditLocalModule" Margin="4">
+                        <sync:ButtonAdv.SmallIcon>
+                            <BitmapImage  UriSource="/imgs/edit.png"/>
+                        </sync:ButtonAdv.SmallIcon>
+                    </sync:ButtonAdv>
+                    <sync:ButtonAdv Label="Remove" VerticalAlignment="Center" Height="30" Width="128" Command="local:ConsoleControl.RemoveLocalModule" Margin="4">
+                        <sync:ButtonAdv.SmallIcon>
+                            <BitmapImage  UriSource="/imgs/remove.png"/>
+                        </sync:ButtonAdv.SmallIcon>
+                    </sync:ButtonAdv>
+                </StackPanel>
+                <sync:SfDataGrid Name="LocalModuleViewer"  AutoGenerateColumns="False" ItemsSource="{Binding LocalHardwareModelCollection}"
+                            ColumnSizer="AutoWithLastColumnFill" AllowResizingColumns="True"
+                            AllowGrouping="False" AllowFiltering="False" AllowSorting="False" AllowDraggingRows="True" AllowDrop="True" RowDragDropTemplate="{StaticResource LocalRecordDragDropTemplate}"
+                            ShowSortNumbers="True" ShowRowHeader="True"
+                            LiveDataUpdateMode="AllowDataShaping"
+                            CellDoubleTapped="LocalModuleViewer_CellDoubleTapped" 
+                            RecordContextMenu="{StaticResource LocalContextMenu}">
+                    <sync:SfDataGrid.DetailsViewDefinition>
+                        <sync:TemplateViewDefinition  RowTemplate="{StaticResource DetailsViewTemplate}"/>
+                    </sync:SfDataGrid.DetailsViewDefinition>
+                    <sync:SfDataGrid.Columns>
+                        <sync:GridTextColumn DisplayBinding="{Binding ID, StringFormat='0x{0:X04}'}" HeaderText="ID" MinimumWidth="60"/>
+                        <sync:GridTextColumn DisplayBinding="{Binding Name}" HeaderText="Name" MinimumWidth="120"/>
+                        <sync:GridTextColumn DisplayBinding="{Binding Switch, StringFormat='0x{0:X08}'}" HeaderText="Switch" MinimumWidth="80"/>
+                        <sync:GridTextColumn DisplayBinding="{Binding LocalAddress, StringFormat='0x{0:X04}'}" HeaderText="Local Address"/>
+                    </sync:SfDataGrid.Columns>
+                </sync:SfDataGrid>
+            </DockPanel>
+        </GroupBox>
+        <GroupBox Grid.Row="1" Grid.Column="2" Margin="2" Padding="4,8,4,4">
+            <GroupBox.CommandBindings>
+                <CommandBinding Command="local:ConsoleControl.AddRemoteModule" Executed="AddRemoteModuleCommand_Executed" CanExecute="AddRemoteModuleCommand_CanExecute"/>
+                <CommandBinding Command="local:ConsoleControl.InsertRemoteModule" Executed="InsertRemoteModuleCommand_Executed" CanExecute="InsertRemoteModuleCommand_CanExecute"/>
+                <CommandBinding Command="local:ConsoleControl.EditRemoteModule" Executed="EditRemoteModuleCommand_Executed" CanExecute="EditRemoteModuleCommand_CanExecute"/>
+                <CommandBinding Command="local:ConsoleControl.RemoveRemoteModule" Executed="RemoveRemoteModuleCommand_Executed" CanExecute="RemoveRemoteModuleCommand_CanExecute"/>
+            </GroupBox.CommandBindings>
+            <GroupBox.Header>
+                <StackPanel Orientation="Horizontal">
+                    <Image Source="/imgs/remote.png" Height="28"/>
+                    <TextBlock Text="Remote Modules" VerticalAlignment="Center" Margin="4,0,0,0"/>
+                </StackPanel>
+            </GroupBox.Header>
+            <DockPanel>
+                <StackPanel DockPanel.Dock="Bottom" HorizontalAlignment="Right" Margin="4" Orientation="Horizontal">
+                    <sync:ButtonAdv Label="Add" VerticalAlignment="Center" Height="30" Width="128" Command="local:ConsoleControl.AddRemoteModule" Margin="4">
+                        <sync:ButtonAdv.SmallIcon>
+                            <BitmapImage  UriSource="/imgs/add.png"/>
+                        </sync:ButtonAdv.SmallIcon>
+                    </sync:ButtonAdv>
+                    <sync:ButtonAdv Label="Insert" VerticalAlignment="Center" Height="30" Width="128" Command="local:ConsoleControl.InsertRemoteModule" Margin="4">
+                        <sync:ButtonAdv.SmallIcon>
+                            <BitmapImage  UriSource="/imgs/insert.png"/>
+                        </sync:ButtonAdv.SmallIcon>
+                    </sync:ButtonAdv>
+                    <sync:ButtonAdv Label="Edit" VerticalAlignment="Center" Height="30" Width="128" Command="local:ConsoleControl.EditRemoteModule" Margin="4">
+                        <sync:ButtonAdv.SmallIcon>
+                            <BitmapImage  UriSource="/imgs/edit.png"/>
+                        </sync:ButtonAdv.SmallIcon>
+                    </sync:ButtonAdv>
+                    <sync:ButtonAdv Label="Remove" VerticalAlignment="Center" Height="30" Width="128" Command="local:ConsoleControl.RemoveRemoteModule" Margin="4">
+                        <sync:ButtonAdv.SmallIcon>
+                            <BitmapImage  UriSource="/imgs/remove.png"/>
+                        </sync:ButtonAdv.SmallIcon>
+                    </sync:ButtonAdv>
+                </StackPanel>
+                <sync:SfDataGrid Name="RemoteModuleViewer"  AutoGenerateColumns="False" ItemsSource="{Binding RemoteHardwareModelCollection}"
+                            ColumnSizer="AutoWithLastColumnFill" AllowResizingColumns="True"
+                            AllowGrouping="False" AllowFiltering="False" AllowSorting="False" AllowDraggingRows="True" AllowDrop="True" RowDragDropTemplate="{StaticResource RemoteRecordDragDropTemplate}"
+                            ShowSortNumbers="True" ShowRowHeader="True"
+                            LiveDataUpdateMode="AllowDataShaping"
+                            CellDoubleTapped="RemoteModuleViewer_CellDoubleTapped" 
+                            RecordContextMenu="{StaticResource RemoteContextMenu}">
+                    <sync:SfDataGrid.DetailsViewDefinition>
+                        <sync:TemplateViewDefinition  RowTemplate="{StaticResource DetailsViewTemplate}"/>
+                    </sync:SfDataGrid.DetailsViewDefinition>
+                    <sync:SfDataGrid.Columns>
+                        <sync:GridTextColumn DisplayBinding="{Binding ID, StringFormat='0x{0:X04}'}" HeaderText="ID" MinimumWidth="60"/>
+                        <sync:GridTextColumn DisplayBinding="{Binding Name}" HeaderText="Name" MinimumWidth="120"/>
+                        <sync:GridTextColumn DisplayBinding="{Binding Switch, StringFormat='0x{0:X08}'}" HeaderText="Switch" MinimumWidth="80"/>
+                        <sync:GridTextColumn DisplayBinding="{Binding IPv4}" HeaderText="Remote IPv4" MinimumWidth="80"/>
+                        <sync:GridTextColumn DisplayBinding="{Binding Port}" HeaderText="Remote Port"/>
+                    </sync:SfDataGrid.Columns>
+                </sync:SfDataGrid>
+            </DockPanel>
+        </GroupBox>
+    </Grid>
+</UserControl>

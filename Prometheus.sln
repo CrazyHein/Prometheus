@@ -7,9 +7,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IOCelceta", "IOCelceta\IOCe
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Eresia", "Eresia\Eresia.csproj", "{D857430E-8FF8-4044-8C11-7FB4B602D309}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lombardia", "Lombardia\Lombardia.csproj", "{6A0FCA85-8CCB-42E2-9464-9D0C64B2F930}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lombardia", "Lombardia\Lombardia.csproj", "{6A0FCA85-8CCB-42E2-9464-9D0C64B2F930}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Seiren", "Seiren\Seiren.csproj", "{F3BD6F93-3CAE-42AF-8091-70481226AF9B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Seiren", "Seiren\Seiren.csproj", "{F3BD6F93-3CAE-42AF-8091-70481226AF9B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Xandria", "Xandria\Xandria.csproj", "{12AF1162-A037-4877-B822-A31533DC0201}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{F3BD6F93-3CAE-42AF-8091-70481226AF9B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F3BD6F93-3CAE-42AF-8091-70481226AF9B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F3BD6F93-3CAE-42AF-8091-70481226AF9B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{12AF1162-A037-4877-B822-A31533DC0201}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{12AF1162-A037-4877-B822-A31533DC0201}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{12AF1162-A037-4877-B822-A31533DC0201}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{12AF1162-A037-4877-B822-A31533DC0201}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

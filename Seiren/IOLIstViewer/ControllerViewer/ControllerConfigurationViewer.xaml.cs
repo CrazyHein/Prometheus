@@ -112,5 +112,25 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                 }
             }
         }
+
+        private void Import_Click(object sender, RoutedEventArgs e)
+        {
+            System.Windows.Forms.OpenFileDialog open = new System.Windows.Forms.OpenFileDialog();
+            open.Filter = "Task User Parameters File(*.xml)|*.xml";
+            open.Multiselect = false;
+            if (open.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                try
+                {
+                    MainViewer.BeginInit();
+                    (DataContext as ControllerConfigurationModel).ImportDevices(open.FileName);
+                    MainViewer.EndInit();
+                }
+                catch (LombardiaException ex)
+                {
+                    MessageBox.Show("At least one exception has occurred during the operation :\n" + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+        }
     }
 }

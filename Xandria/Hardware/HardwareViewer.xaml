@@ -1,0 +1,43 @@
+﻿<Window x:Class="AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Xandria.HardwareViewer"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Xandria"
+        xmlns:sync="http://schemas.syncfusion.com/wpf"   
+        xmlns:syncfusionskin ="clr-namespace:Syncfusion.SfSkinManager;assembly=Syncfusion.SfSkinManager.WPF"
+        mc:Ignorable="d" ResizeMode="NoResize"
+        Title="Hardware Module" Height="700" Width="500" WindowStartupLocation="CenterScreen">
+    <DockPanel syncfusionskin:SfSkinManager.Theme="{syncfusionskin:SkinManagerExtension ThemeName=FluentLight}"  Margin="8,4,8,4" LastChildFill="True">
+        <DockPanel.Resources>
+            <local:DeviceSwitchTextConverter x:Key="DeviceSwitch"/>
+            <local:LocalAddressTextConverter x:Key="LocalAddress"/>
+            <local:IPv4TextConverter x:Key="IPv4"/>
+        </DockPanel.Resources>
+        <UniformGrid Columns="2" Margin="0,10,0,0" DockPanel.Dock="Bottom">
+            <Button Content="Cancel" Height="30" Margin="0,0,4,4" Click="Cancel_Click"/>
+            <Button Content="OK"  Height="30" Margin="4,0,0,4"  Click="OK_Click"/>
+        </UniformGrid>
+        <StackPanel Name="InputsStack" Validation.Error="InputsStack_Error">
+            <sync:SfTextInputLayout Hint="Model" HelperText="Select device model here" FontSize="12" FontStyle="Italic" ContainerType="Filled" Margin="4,8,4,8">
+                <ComboBox FontStyle="Normal" Name="AvailableDeviceModels" SelectedItem="{Binding DeviceModel}"/>
+            </sync:SfTextInputLayout>
+            <sync:SfTextInputLayout Hint="Switch" HelperText="Input device switch value here" FontSize="12" FontStyle="Italic" ContainerType="Filled" Margin="4,8,4,8" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}">
+                <TextBox Text="{Binding Switch, Converter={StaticResource DeviceSwitch}, ValidatesOnExceptions=True, NotifyOnValidationError=True}" FontStyle="Normal"/>
+            </sync:SfTextInputLayout>
+            <sync:SfTextInputLayout Name="InputLocalAddress" Hint="Local Address" HelperText="Input device local address here" FontSize="12" FontStyle="Italic" ContainerType="Filled" Margin="4,8,4,8" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}">
+                <TextBox Text="{Binding LocalAddress, Converter={StaticResource LocalAddress}, ValidatesOnExceptions=True, NotifyOnValidationError=True}" FontStyle="Normal"/>
+            </sync:SfTextInputLayout>
+            <sync:SfTextInputLayout Name="InputRemoteIPv4" Hint="Remote IPv4" HelperText="Input device remote IPv4 here" FontSize="12" FontStyle="Italic" ContainerType="Filled" Margin="4,8,4,8" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}">
+                <TextBox Text="{Binding IPv4, Converter={StaticResource IPv4}, ValidatesOnExceptions=True, NotifyOnValidationError=True}" FontStyle="Normal"/>
+            </sync:SfTextInputLayout>
+            <sync:SfTextInputLayout Name="InputRemotePort" Hint="Remote Port" HelperText="Input device remote port number here" FontSize="12" FontStyle="Italic" ContainerType="Filled" Margin="4,8,4,8" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}">
+                <TextBox Text="{Binding Port, ValidatesOnExceptions=True, NotifyOnValidationError=True}" FontStyle="Normal"/>
+            </sync:SfTextInputLayout>
+            <sync:SfTextInputLayout Hint="Custom Fields" HelperText="Input custom fields here" FontSize="12" FontStyle="Italic" ContainerType="Filled" Margin="4,8,4,8" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}" HintFloatMode="AlwaysFloat">
+                <sync:SfTextBoxExt Name="CustomInput" AutoCompleteMode="SuggestAppend" IgnoreCase="True" SuggestionMode="Contains" HighlightedTextColor="Red" TextHighlightMode="MultipleOccurrence" MultiSelectMode="Delimiter" Delimiter="&#10;"
+                                   Text="{Binding CustomString, ValidatesOnExceptions=True, NotifyOnValidationError=True}" FontStyle="Normal" AcceptsReturn="True" MaxHeight="128" VerticalScrollBarVisibility="Auto" />
+            </sync:SfTextInputLayout>
+        </StackPanel>
+    </DockPanel>
+</Window>
