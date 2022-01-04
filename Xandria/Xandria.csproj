@@ -9,6 +9,7 @@
     <Version>0.1.0</Version>
     <Company>AMEC</Company>
     <Authors>CrazyHein</Authors>
+    <ApplicationIcon>imgs\logo.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
@@ -31,6 +32,10 @@
     <None Remove="imgs\save.png" />
     <None Remove="imgs\saveas.png" />
     <None Remove="splash.jpg" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="imgs\logo.ico" />
   </ItemGroup>
 
   

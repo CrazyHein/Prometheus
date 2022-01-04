@@ -45,6 +45,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Xandria.Utility
         public ushort HostPort { get; set; } = 21;
         public string User { get; set; } = "target";
         public string Password { get; set; } = "password";
+        public int Timeout { get; set; } = 5000;
+        public int ReadWriteTimeout { get; set; } = 5000;
         private string __task_user_parameters_path = "/2/r2h_task_user_parameters.xml";
         public string TaskUserParametersPath
         {
@@ -76,6 +78,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Xandria.Utility
             request.KeepAlive = false;
             request.Method = WebRequestMethods.Ftp.DownloadFile;
             request.UseBinary = true;
+            request.Timeout = Timeout;
+            request.ReadWriteTimeout = ReadWriteTimeout;
 
             using (FtpWebResponse response = (FtpWebResponse)request.GetResponse())
             using (System.IO.Stream sm = response.GetResponseStream())
@@ -98,6 +102,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Xandria.Utility
             request.KeepAlive = false;
             request.Method = WebRequestMethods.Ftp.UploadFile;
             request.UseBinary = true;
+            request.Timeout = Timeout;
+            request.ReadWriteTimeout = ReadWriteTimeout;
             using (System.IO.Stream sm = request.GetRequestStream())
             {
                 __task_user_parameter_helper.Save(sm);

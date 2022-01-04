@@ -19,6 +19,7 @@
     <Grid syncfusionskin:SfSkinManager.Theme="{syncfusionskin:SkinManagerExtension ThemeName=FluentLight}">
         <Grid.Resources>
             <local:ModifiedIndicatorToColor x:Key="ModifiedConverter"/>
+            <local:BooleanValueToVisibility x:Key="BooleanValueToVisibility"/>
         </Grid.Resources>
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"/>
@@ -126,7 +127,7 @@
         <StatusBar Grid.Row="3" HorizontalAlignment="Left" Height="28">
             <TextBlock Margin="8,2" Text="{Binding CurrentlyOpenFile}" />
         </StatusBar>
-        <sync:TabControlExt Grid.Row="2" TabItemLayout="SingleLineStar" TabStripPlacement="Bottom" CloseButtonType="Hide" ShowTabItemContextMenu="False" EnableLabelEdit="False">
+        <sync:TabControlExt Grid.Row="2" TabItemLayout="SingleLineStar" TabStripPlacement="Bottom" CloseButtonType="Hide" ShowTabItemContextMenu="False" EnableLabelEdit="False" Visibility="{Binding IsOpened, Converter={StaticResource BooleanValueToVisibility}}">
             <sync:TabItemExt Name="HardwareModuleConfiguraton" Header="Hardware Module Configuration" Foreground="{Binding Modified, Converter={StaticResource ModifiedConverter}}">
 
             </sync:TabItemExt>

@@ -187,7 +187,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility
                     save.InitialDirectory = System.IO.Path.GetDirectoryName(model.IOListPath);
                     save.Filter = "Microsoft Office Excel 2007+ (*.xlsx)|*.xlsx";
                     if (save.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-                        model.IOListPath = save.FileName;
+                        model.XlsArchivesPath = save.FileName;
                     break;
             }
         }

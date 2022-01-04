@@ -16,7 +16,7 @@
         <UniformGrid Columns="2" Margin="0,10,0,0" DockPanel.Dock="Bottom">
             <Button Height="30" Content="Close" Click="Cancel_Click" Margin="0,0,4,4" IsEnabled="{Binding IsBusy, Converter={StaticResource InvertBoolean}}">
             </Button>
-            <Button Height="30" Content="{Binding Mode}" Click="OK_Click" Margin="0,0,4,4" IsEnabled="{Binding IsBusy, Converter={StaticResource InvertBoolean}}">
+            <Button Height="30" Content="{Binding Mode}" Click="OK_Click" Margin="4,0,0,4" IsEnabled="{Binding IsBusy, Converter={StaticResource InvertBoolean}}">
             </Button>
         </UniformGrid>
         <Grid x:Name="InputsGrid">
@@ -31,18 +31,26 @@
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
             <sync:SfBusyIndicator Name="BusyIndicator" IsBusy="{Binding IsBusy}" Grid.ColumnSpan="2" Grid.RowSpan="4"/>
-            <sync:SfTextInputLayout Grid.ColumnSpan="2" Hint="Host" HelperText="Input FTP host IPv4 here" ContainerType="Filled" FontStyle="Italic" FontSize="12" Margin="4,8,4,8" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}">
+            <sync:SfTextInputLayout Hint="Host" HelperText="Input FTP host IPv4 here" ContainerType="Filled" FontStyle="Italic" FontSize="12" Margin="4,8,4,8" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}">
                 <TextBox Text="{Binding HostIPv4, Converter={StaticResource IPv4}, ValidatesOnExceptions=True, NotifyOnValidationError=True}" FontStyle="Normal"/>
             </sync:SfTextInputLayout>
-            <sync:SfTextInputLayout Grid.Row="1" Hint="Port" HelperText="Input FTP host port here" ContainerType="Filled" FontStyle="Italic" FontSize="12" Margin="4,8,4,8" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}">
+            <sync:SfTextInputLayout Grid.Column="1" Hint="Port" HelperText="Input FTP host port here" ContainerType="Filled" FontStyle="Italic" FontSize="12" Margin="4,8,4,8" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}">
                 <TextBox Text="{Binding HostPort, ValidatesOnExceptions=True, NotifyOnValidationError=True}" FontStyle="Normal"/>
             </sync:SfTextInputLayout>
-            <sync:SfTextInputLayout Grid.Row="2" Hint="User" HelperText="Input login user name here" ContainerType="Filled" FontStyle="Italic" FontSize="12" Margin="4,8,4,8">
+            <sync:SfTextInputLayout Grid.Row="1" Hint="User" HelperText="Input login user name here" ContainerType="Filled" FontStyle="Italic" FontSize="12" Margin="4,8,4,8">
                 <TextBox Text="{Binding User}" FontStyle="Normal"/>
             </sync:SfTextInputLayout>
-            <sync:SfTextInputLayout Grid.Row="2" Grid.Column="1" Hint="Password" HelperText="Input login password here" ContainerType="Filled" FontStyle="Italic" FontSize="12" Margin="4,8,4,8">
+            <sync:SfTextInputLayout Grid.Row="1" Grid.Column="1" Hint="Password" HelperText="Input login password here" ContainerType="Filled" FontStyle="Italic" FontSize="12" Margin="4,8,4,8">
                 <TextBox Text="{Binding Password}" FontStyle="Normal"/>
             </sync:SfTextInputLayout>
+
+            <sync:SfTextInputLayout Grid.Row="2" Hint="Timeout" HelperText="Input timeout value here" ContainerType="Filled" FontStyle="Italic" FontSize="12" Margin="4,8,4,8" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}">
+                <TextBox Text="{Binding Timeout}" FontStyle="Normal"/>
+            </sync:SfTextInputLayout>
+            <sync:SfTextInputLayout Grid.Row="2" Grid.Column="1" Hint="Read &amp; Write Timeout" HelperText="Input read/write timeout value here" ContainerType="Filled" FontStyle="Italic" FontSize="12" Margin="4,8,4,8" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}">
+                <TextBox Text="{Binding ReadWriteTimeout}" FontStyle="Normal"/>
+            </sync:SfTextInputLayout>
+            
             <DockPanel Grid.Row="3">
                 <CheckBox DockPanel.Dock="Left" IsChecked="{Binding VAR}" Name="CheckboxVAR" Margin="3,0,0,0"></CheckBox>
                 <sync:SfTextInputLayout Hint="Variable Dictionary" HelperText="Input variable dictionary file name here" ContainerType="Filled" FontStyle="Italic" FontSize="12" Margin="4,8,4,8" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}">

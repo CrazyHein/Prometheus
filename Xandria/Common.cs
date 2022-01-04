@@ -214,6 +214,22 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Xandria
         }
     }
 
+    public class BooleanValueToVisibility : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value is bool && targetType == typeof(System.Windows.Visibility))
+                return (bool)value ? System.Windows.Visibility.Visible : System.Windows.Visibility.Hidden;
+            else
+                throw new ArgumentException();
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
     public class ByteArrayString : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)

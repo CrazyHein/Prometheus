@@ -80,6 +80,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility
         public ushort HostPort { get; set; } = 21;
         public string User { get; set; } = "target";
         public string Password { get; set; } = "password";
+        public int Timeout { get; set; } = 5000;
+        public int ReadWriteTimeout { get; set; } = 5000;
         private string __variable_dictionary_path = "/2/variable_catalogue.xml";
         public string VariableDictionaryPath
         {
@@ -135,8 +137,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility
                 request.KeepAlive = false;
                 request.Method = WebRequestMethods.Ftp.DownloadFile;
                 request.UseBinary = true;
+                request.Timeout = Timeout;
+                request.ReadWriteTimeout = ReadWriteTimeout;
 
-                
                 using (FtpWebResponse response = (FtpWebResponse)request.GetResponse())
                 using (System.IO.Stream sm = response.GetResponseStream())
                 {
@@ -183,6 +186,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility
                 request.KeepAlive = false;
                 request.Method = WebRequestMethods.Ftp.UploadFile;
                 request.UseBinary = true;
+                request.Timeout = Timeout;
+                request.ReadWriteTimeout = ReadWriteTimeout;
 
                 using (System.IO.Stream sm = request.GetRequestStream())
                 {
