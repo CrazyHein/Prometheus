@@ -321,6 +321,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             __main_model.IsOffline = true;
             __main_model.DebuggerPollingInterval = 0;
             __main_model.DebuggerHeartbeat = 0;
+            if (__main_model.DebuggerState != DataSynchronizerState.Exception)
+                __main_model.DebuggerState = DataSynchronizerState.Ready;
             CommandManager.InvalidateRequerySuggested();
         }
 

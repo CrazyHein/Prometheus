@@ -195,7 +195,7 @@
                     <Label HorizontalAlignment="Left" VerticalAlignment="Center" Content="Navigator" />
                 </DataTemplate>
             </sync:SfNavigationDrawer.ToggleButtonContentTemplate>
-            <sync:NavigationItem Header="Metadata Viewer" IsExpanded="True" ItemType="Button">
+            <sync:NavigationItem Header="Metadata Viewer" IsExpanded="True" ItemType="Tab">
                 <sync:NavigationItem.Icon>
                     <Image Source="imgs/meta.png"/>
                 </sync:NavigationItem.Icon>
@@ -210,7 +210,7 @@
                     </sync:NavigationItem.Icon>
                 </sync:NavigationItem>
             </sync:NavigationItem>
-            <sync:NavigationItem Header="IO List" IsExpanded="{Binding IsOpened}" ItemType="Button" IsEnabled="{Binding IsOpened}">
+            <sync:NavigationItem Header="IO List" IsExpanded="{Binding IsOpened}" ItemType="Tab" IsEnabled="{Binding IsOpened}">
                 <sync:NavigationItem.Icon>
                     <Image Source="imgs/list.png"/>
                 </sync:NavigationItem.Icon>

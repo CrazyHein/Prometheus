@@ -77,6 +77,7 @@
                         </Style>
                         <local:BooleanValueIndicator True="LightGreen" False="Gray" x:Key="BooleanValueIndicator"/>
                         <local:WarningValueColumn True="LightGreen" False="Gray" Warning="Red"  x:Key="WarningValueIndicator"/>
+                        <local:BooleanValueToVisibility x:Key="BooleanValueToVisibility" True="Collapsed" False="Visible"/>
                     </ListBox.Resources>
                     <ListBox.ItemContainerStyle>
                         <Style>
@@ -109,7 +110,7 @@
                                                     <ListBox.ItemTemplate>
                                                         <DataTemplate>
                                                             <StackPanel Orientation="Horizontal">
-                                                                <Rectangle Width="6" Height="16" Margin="0,0,4,0" RadiusX="2" RadiusY="2">
+                                                                <Rectangle Width="6" Height="16" Margin="0,0,4,0" RadiusX="2" RadiusY="2" Visibility="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=local:InterlockCollectionViewer}, Path=DataContext.IsOffline, Converter={StaticResource BooleanValueToVisibility}}">
                                                                     <Rectangle.Fill>
                                                                         <MultiBinding Converter="{StaticResource WarningValueIndicator}">
                                                                             <Binding Path="Value"/>
@@ -128,20 +129,20 @@
                                                     <TreeViewItem ItemsSource="{Binding Statement.Elements}">
                                                         <TreeViewItem.Header>
                                                             <StackPanel Orientation="Horizontal">
-                                                                <Rectangle Fill="{Binding Statement.Value, Converter={StaticResource BooleanValueIndicator}}" Width="6" Height="16" Margin="0,0,4,0" RadiusX="2" RadiusY="2"/>
+                                                                <Rectangle Fill="{Binding Statement.Value, Converter={StaticResource BooleanValueIndicator}}" Width="6" Height="16" Margin="0,0,4,0" RadiusX="2" RadiusY="2" Visibility="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=local:InterlockCollectionViewer}, Path=DataContext.IsOffline, Converter={StaticResource BooleanValueToVisibility}}"/>
                                                                 <TextBlock Text="{Binding Statement.Display}" VerticalAlignment="Center"/>
                                                             </StackPanel>
                                                         </TreeViewItem.Header>
                                                         <TreeViewItem.Resources>
                                                             <HierarchicalDataTemplate ItemsSource="{Binding Elements}" DataType="{x:Type local:LogicExpressionModel}">
                                                                 <StackPanel Orientation="Horizontal">
-                                                                    <Rectangle Fill="{Binding Value, Converter={StaticResource BooleanValueIndicator}}" Width="6" Height="16" Margin="0,0,4,0" RadiusX="2" RadiusY="2"/>
+                                                                    <Rectangle Fill="{Binding Value, Converter={StaticResource BooleanValueIndicator}}" Width="6" Height="16" Margin="0,0,4,0" RadiusX="2" RadiusY="2" Visibility="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=local:InterlockCollectionViewer}, Path=DataContext.IsOffline, Converter={StaticResource BooleanValueToVisibility}}"/>
                                                                     <TextBlock Text="{Binding Display}" VerticalAlignment="Center"/>
                                                                 </StackPanel>
                                                             </HierarchicalDataTemplate>
                                                             <HierarchicalDataTemplate DataType="{x:Type local:LogicOperandModel}">
                                                                 <StackPanel Orientation="Horizontal">
-                                                                    <Rectangle Fill="{Binding Value, Converter={StaticResource BooleanValueIndicator}}" Width="6" Height="16" Margin="0,0,4,0" RadiusX="2" RadiusY="2"/>
+                                                                    <Rectangle Fill="{Binding Value, Converter={StaticResource BooleanValueIndicator}}" Width="6" Height="16" Margin="0,0,4,0" RadiusX="2" RadiusY="2" Visibility="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=local:InterlockCollectionViewer}, Path=DataContext.IsOffline, Converter={StaticResource BooleanValueToVisibility}}"/>
                                                                     <TextBlock Text="{Binding Display}" VerticalAlignment="Center"/>
                                                                 </StackPanel>
                                                             </HierarchicalDataTemplate>

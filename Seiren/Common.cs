@@ -443,6 +443,24 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         }
     }
 
+    public class BooleanValueToVisibility : IValueConverter
+    {
+        public System.Windows.Visibility True { get; set; } = Visibility.Visible;
+        public System.Windows.Visibility False { get; set; } = Visibility.Collapsed;
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value is bool && targetType == typeof(System.Windows.Visibility))
+                return (bool)value ? True : False;
+            else
+                throw new ArgumentException();
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
     public class WarningValueColumn : IMultiValueConverter
     {
         public SolidColorBrush True { get; set; }
