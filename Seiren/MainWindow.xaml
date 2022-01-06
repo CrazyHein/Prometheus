@@ -271,7 +271,14 @@
                 <DockPanel Margin="4">
                     <TextBlock DockPanel.Dock="Top" Text="{Binding ElementName=MainNavigator, Path=SelectedItem.Uid}" HorizontalAlignment="Center" FontSize="20" Margin="4"/>
                     <Separator DockPanel.Dock="Top" Margin="0,0,0,4"/>
-                    <ContentControl x:Name="UserControl"/>
+                    <Grid Name="UserControl">
+                        <ContentControl Grid.Column="0" Name="DataTypes" Visibility="Collapsed"/>
+                        <ContentControl Grid.Column="0" Name="DeviceModels" Visibility="Collapsed"/>
+                        <ContentControl Grid.Column="0" Name="Variables" Visibility="Collapsed"/>
+                        <ContentControl Grid.Column="0" Name="ControllerModules" Visibility="Collapsed"/>
+                        <ContentControl Grid.Column="0" Name="Objects" Visibility="Collapsed"/>
+                        <ContentControl Grid.Column="0" Name="Miscellaneous" Visibility="Collapsed"/>
+                    </Grid>
                 </DockPanel>
             </sync:SfNavigationDrawer.ContentView>
         </sync:SfNavigationDrawer>

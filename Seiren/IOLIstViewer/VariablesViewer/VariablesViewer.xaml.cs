@@ -13,8 +13,6 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
     /// </summary>
     public partial class VariablesViewer : UserControl
     {
-        private double[] __trick = new double[2] { -1, 1 };
-        private int __trick_index = 0;
         public VariablesViewer(VariableDictionary dic, DataTypeCatalogue dtc)
         {
             InitializeComponent();
@@ -139,17 +137,6 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                     e.Height = autoHeight + 12;
                     e.Handled = true;
                 }
-            }
-        }
-
-        private void UserControl_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
-        {
-            int l = MainViewer.Columns.Count - 1;
-
-            if ((bool)e.NewValue == true)
-            {
-                MainViewer.Columns[l].Width += __trick[__trick_index % 2];
-                __trick_index++;
             }
         }
     }

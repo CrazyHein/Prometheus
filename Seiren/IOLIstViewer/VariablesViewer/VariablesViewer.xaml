@@ -7,7 +7,7 @@
              xmlns:linq="clr-namespace:Syncfusion.Data;assembly=Syncfusion.Data.WPF"
              xmlns:sync="http://schemas.syncfusion.com/wpf"
              mc:Ignorable="d" 
-             d:DesignHeight="1000" d:DesignWidth="1000" IsVisibleChanged="UserControl_IsVisibleChanged">
+             d:DesignHeight="1000" d:DesignWidth="1000">
     <UserControl.CommandBindings>
         <CommandBinding Command="local:ConsoleControl.AddRecord" Executed="AddRecordCommand_Executed" CanExecute="AddRecordCommand_CanExecute"/>
         <CommandBinding Command="local:ConsoleControl.InsertRecord" Executed="InsertRecordCommand_Executed" CanExecute="InsertRecordCommand_CanExecute"/>
@@ -82,7 +82,7 @@
                 </sync:ButtonAdv.SmallIcon>
             </sync:ButtonAdv>
         </StackPanel>
-        <sync:SfDataGrid Name="MainViewer"  ItemsSource="{Binding Variables}" ColumnSizer="Auto" AllowResizingColumns="True" AllowTriStateSorting="True" AutoGenerateColumns="False" 
+        <sync:SfDataGrid Name="MainViewer"  ItemsSource="{Binding Variables}" ColumnSizer="AutoWithLastColumnFill" AllowResizingColumns="True" AllowTriStateSorting="True" AutoGenerateColumns="False" 
                      AllowGrouping="True" ShowGroupDropArea="True"
                      AllowFiltering="True"
                      ShowSortNumbers="True" ShowRowHeader="True"
@@ -98,7 +98,7 @@
                 <sync:GridTextColumn MappingName="Name" HeaderText="Name"/>
                 <sync:GridTextColumn ValueBinding="{Binding DataType, Converter={StaticResource DTConverter}}" HeaderText="Data Type" FilterRowEditorType="MultiSelectComboBox" SortMode="Value" GroupMode="Value"/>
                 <sync:GridTextColumn MappingName="Unit" HeaderText="Unit"/>
-                <sync:GridTextColumn MappingName="Comment" HeaderText="Comment" Width="400"/>
+                <sync:GridTextColumn MappingName="Comment" HeaderText="Comment"/>
             </sync:SfDataGrid.Columns>
         </sync:SfDataGrid>
     </DockPanel>

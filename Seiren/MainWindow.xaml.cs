@@ -124,8 +124,15 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                 __data_types_viewer = new DataTypesViewer(__data_type_catalogue);
                 __device_models_viewer = new DeviceModelsViewer(__controller_model_catalogue);
 
-                __viewers[NavDataTypes] = __data_types_viewer;
-                __viewers[NavDeviceModels] = __device_models_viewer;
+                __viewers[NavDataTypes] = DataTypes;
+                __viewers[NavDeviceModels] = DeviceModels;
+                __viewers[NavVariableDictionary] = Variables;
+                __viewers[NavControllerConfiguration] = ControllerModules;
+                __viewers[NavProcessDataDictionary] = Objects;
+                __viewers[NavMiscellaneous] = Miscellaneous;
+
+                DataTypes.Content = __data_types_viewer;
+                DeviceModels.Content = __device_models_viewer;
 
                 __user_interface_synchronizer = new UserInterfaceSynchronizer(this, __ui_data_refresh_handler);
             }
@@ -161,6 +168,14 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                     (__miscellaneous_viewer.DataContext as MiscellaneousModel).Modified;
         }
 
+        private void __collapse_all_viewers()
+        {
+            foreach(var v in UserControl.Children)
+                (v as System.Windows.Controls.ContentControl).Visibility = Visibility.Collapsed;
+            __current_user_control = null;
+            MainNavigator.SelectedItem = null;
+        }
+
         private void __reset_layout()
         {
             __variables_viewer = new VariablesViewer(__variable_dictionary, __data_type_catalogue);
@@ -177,13 +192,12 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             NavProcessDataDictionary.DataContext = __objects_viewer.DataContext;
             NavMiscellaneous.DataContext = __miscellaneous_viewer.DataContext;
 
-            __viewers[NavVariableDictionary] = __variables_viewer;
-            __viewers[NavControllerConfiguration] = __controller_configuration_viewer;
-            __viewers[NavProcessDataDictionary] = __objects_viewer;
-            __viewers[NavMiscellaneous] = __miscellaneous_viewer;
+            Variables.Content = __variables_viewer;
+            ControllerModules.Content = __controller_configuration_viewer;
+            Objects.Content = __objects_viewer;
+            Miscellaneous.Content = __miscellaneous_viewer;
 
-            UserControl.Content = null;
-            __current_user_control = null;
+            __collapse_all_viewers();
         }
 
         private void __close_layout()
@@ -193,13 +207,12 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             __objects_viewer = null;
             __miscellaneous_viewer = null;
 
-            __viewers[NavVariableDictionary] = __variables_viewer;
-            __viewers[NavControllerConfiguration] = __controller_configuration_viewer;
-            __viewers[NavProcessDataDictionary] = __objects_viewer;
-            __viewers[NavMiscellaneous] = __miscellaneous_viewer;
+            Variables.Content = __variables_viewer;
+            ControllerModules.Content = __controller_configuration_viewer;
+            Objects.Content = __objects_viewer;
+            Miscellaneous.Content = __miscellaneous_viewer;
 
-            UserControl.Content = null;
-            __current_user_control = null;
+            __collapse_all_viewers();
         }
 
         public string? __update_binding_source()
@@ -379,7 +392,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             }
             else if (__viewers.TryGetValue(e.Item, out v) && v != __current_user_control)
             {
-                UserControl.Content = v;
+                foreach (var content in UserControl.Children)
+                    (content as System.Windows.Controls.ContentControl).Visibility = Visibility.Collapsed;
+                (v as System.Windows.Controls.ContentControl).Visibility = Visibility.Visible;
+
                 __current_user_control = v;
             }
         }

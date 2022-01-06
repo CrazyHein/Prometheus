@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren"
              xmlns:sync="http://schemas.syncfusion.com/wpf"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800" IsVisibleChanged="UserControl_IsVisibleChanged">
+             d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
         <Grid.Resources>
             <local:RxTxVariablesText x:Key="RxTxConverter"/>
@@ -27,7 +27,7 @@
                     <sync:GridTextColumn HeaderText="Name" DisplayBinding="{Binding Path=Name}" MinimumWidth="200"/>
                     <sync:GridTextColumn HeaderText="Size (Bit)" DisplayBinding="{Binding Path=BitSize}" MinimumWidth="80"/>
                     <sync:GridTextColumn HeaderText="Rx" DisplayBinding="{Binding Path=RxVariables, Converter={StaticResource RxTxConverter}}" MinimumWidth="200"/>
-                    <sync:GridTextColumn HeaderText="Tx" DisplayBinding="{Binding Path=TxVariables, Converter={StaticResource RxTxConverter}}" Width="200"/>
+                    <sync:GridTextColumn HeaderText="Tx" DisplayBinding="{Binding Path=TxVariables, Converter={StaticResource RxTxConverter}}" MinimumWidth="200"/>
                 </sync:SfDataGrid.Columns>
             </sync:SfDataGrid>
         </DockPanel>
@@ -38,7 +38,7 @@
                     <sync:GridTextColumn HeaderText="ID" DisplayBinding="{Binding Path=ID, StringFormat='0x{0:X04}'}" MinimumWidth="80"/>
                     <sync:GridTextColumn HeaderText="Name" DisplayBinding="{Binding Path=Name}" MinimumWidth="200"/>
                     <sync:GridTextColumn HeaderText="Rx" DisplayBinding="{Binding Path=RxVariables, Converter={StaticResource RxTxConverter}}" MinimumWidth="200"/>
-                    <sync:GridTextColumn HeaderText="Tx" DisplayBinding="{Binding Path=TxVariables, Converter={StaticResource RxTxConverter}}" Width="200"/>
+                    <sync:GridTextColumn HeaderText="Tx" DisplayBinding="{Binding Path=TxVariables, Converter={StaticResource RxTxConverter}}" MinimumWidth="200"/>
                 </sync:SfDataGrid.Columns>
             </sync:SfDataGrid>
         </DockPanel>

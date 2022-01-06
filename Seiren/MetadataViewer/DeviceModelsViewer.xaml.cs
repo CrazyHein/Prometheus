@@ -14,8 +14,6 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
     /// </summary>
     public partial class DeviceModelsViewer : UserControl
     {
-        private double[] __trick = new double[2] { -1, 1 };
-        private int __trick_index = 0;
         public DeviceModelsViewer(ControllerModelCatalogue cmc)
         {
             InitializeComponent();
@@ -46,28 +44,6 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                     e.Handled = true;
                 }
             }
-        }
-
-        private void UserControl_IsVisibleChanged(object sender, System.Windows.DependencyPropertyChangedEventArgs e)
-        {
-            int l = LocalExtensionModelsViewer.Columns.Count - 1;
-            int r = RemoteEthernetModelsViewer.Columns.Count - 1;
-            
-            if ((bool)e.NewValue == true)
-            {
-                LocalExtensionModelsViewer.Columns[l].Width += __trick[__trick_index%2];
-                RemoteEthernetModelsViewer.Columns[r].Width += __trick[__trick_index%2];
-                __trick_index++;
-            }
-            /*
-            else
-            {
-                if (LocalExtensionModelsViewer.Columns[l].Width == double.NaN)
-                    LocalExtensionModelsViewer.Columns[l].Width = LocalExtensionModelsViewer.Columns[l].ActualWidth;
-                LocalExtensionModelsViewer.Columns[l].Width--;
-                RemoteEthernetModelsViewer.Columns[r].Width--;
-            }
-            */
         }
     }
 
