@@ -118,9 +118,14 @@
                     <sync:GridTextColumn DisplayBinding="{Binding DeviceBindingInfo}" HeaderText="Binding"/>
                     <sync:GridTextColumn DisplayBinding="{Binding ValueRangeInfo}" HeaderText="Range"/>
                     <sync:GridTextColumn DisplayBinding="{Binding ValueConverterInfo}" HeaderText="Converter"/>
-                    <sync:GridTextColumn DisplayBinding="{Binding DataStringDisplay}" ValueBinding="{Binding DataStringValue}" HeaderText="Value" 
-                                         AllowEditing="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}, Path=DataContext.Access, Converter={StaticResource AllowEditing}}" 
-                                         >
+                    <sync:GridTextColumn DisplayBinding="{Binding DataStringDisplay}" ValueBinding="{Binding DataStringValue}" HeaderText="Value" Width="200">
+                        <sync:GridTextColumn.AllowEditing>
+                            <MultiBinding Converter="{StaticResource AllowEditing}">
+                                <Binding RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=UserControl}" Path="DataContext.Access"/>
+                                <Binding RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=UserControl}" Path="DataContext.IsMonitoring"/>
+                                <Binding Path="DataContext.IsOffline" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=UserControl}"/>
+                            </MultiBinding>
+                        </sync:GridTextColumn.AllowEditing>
                         <sync:GridTextColumn.IsHidden>
                             <MultiBinding Converter="{StaticResource HideStringValueColumn}">
                                 <Binding Path="DataContext.IsOffline" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=UserControl}"/>
@@ -128,9 +133,15 @@
                             </MultiBinding>
                         </sync:GridTextColumn.IsHidden>
                     </sync:GridTextColumn>
-                    <sync:GridCheckBoxColumn MappingName="DataBooleanValue" HeaderText="Value" 
-                                         AllowEditing="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}, Path=DataContext.Access, Converter={StaticResource AllowEditing}}" 
-                                         >
+
+                    <sync:GridCheckBoxColumn MappingName="DataBooleanValue" HeaderText="Value" Width="80">
+                        <sync:GridCheckBoxColumn.AllowEditing>
+                            <MultiBinding Converter="{StaticResource AllowEditing}">
+                                <Binding RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=UserControl}" Path="DataContext.Access"/>
+                                <Binding RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=UserControl}" Path="DataContext.IsMonitoring"/>
+                                <Binding Path="DataContext.IsOffline" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=UserControl}"/>
+                            </MultiBinding>
+                        </sync:GridCheckBoxColumn.AllowEditing>
                         <sync:GridCheckBoxColumn.IsHidden>
                             <MultiBinding Converter="{StaticResource HideBooleanValueColumn}">
                                 <Binding Path="DataContext.IsOffline" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=UserControl}"/>

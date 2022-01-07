@@ -38,6 +38,20 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                 }
             }
         }
+
+        private bool __is_monitoring = true;
+        public bool IsMonitoring
+        {
+            get { return __is_monitoring; }
+            set
+            {
+                if (value != __is_monitoring)
+                {
+                    __is_monitoring = value;
+                    OnPropertyChanged("IsMonitoring");
+                }
+            }
+        }
         public ProcessDataImageLayout Layout { get; private set; }
 
         public ProcessDataImageModel(ProcessDataImage pdi, ObjectDictionary od, ObjectsModel objectsSource)
@@ -124,7 +138,15 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         {
             foreach(var d in __process_data_models)
             {
-                d.ValueChanged(dataSource);
+                d.ValueChanged(dataSource, IsMonitoring);
+            }
+        }
+
+        public void InitProcessDataValue(ushort[] dataSource)
+        {
+            foreach (var d in __process_data_models)
+            {
+                d.InitValue(dataSource);
             }
         }
 
@@ -278,11 +300,15 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             get { return __data_string_value; }
             set
             {
-                __data_string_value = value;
-                __rx_changed = true;
-                //_notify_property_changed("DataStringValue");
+                if (Access == ProcessDataImageAccess.RX)
+                {
+                    __data_string_value = value;
+                    __rx_changed = true;
+                    //_notify_property_changed("DataStringValue");
+                }
             }
         }
+        private ProcessDataStorage __non_bit_data_storage;
 
         private string __data_string_display = "N/A";
         public string DataStringDisplay
@@ -312,7 +338,83 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             }
         }
 
-        public void ValueChanged(ushort[] dataSource)
+        public void InitValue(ushort[] dataSource)
+        {
+            if (dataSource != null && dataSource.Length * 16 - Bit >= __data_type.BitSize)
+            {
+                var span = MemoryMarshal.AsBytes(dataSource.AsSpan()).Slice((int)Byte);
+                switch (__data_type.Name)
+                {
+                    case "BIT":
+                        if (Access == ProcessDataImageAccess.RX)
+                        {
+                            ushort bitpos = (ushort)(1 << (int)(Bit % 16));
+                            if ((dataSource[Bit / 16] & bitpos) == 0)
+                                DataBooleanValue = false;
+                            else
+                                DataBooleanValue = true;
+                        }
+                        break;
+                    case "BYTE":
+                        DataStringValue = MemoryMarshal.Read<byte>(span).ToString();
+                        break;
+                    case "SBYTE":
+                        DataStringValue = MemoryMarshal.Read<sbyte>(span).ToString();
+                        break;
+                    case "USHORT":
+                        DataStringValue = MemoryMarshal.Read<ushort>(span).ToString();
+                        break;
+                    case "SHORT":
+                        DataStringValue = MemoryMarshal.Read<short>(span).ToString();
+                        break;
+                    case "UINT":
+                        DataStringValue = MemoryMarshal.Read<uint>(span).ToString();
+                        break;
+                    case "INT":
+                        DataStringValue = MemoryMarshal.Read<int>(span).ToString();
+                        break;
+                    case "UDINT":
+                    case "DUINT":
+                        DataStringValue = MemoryMarshal.Read<ulong>(span).ToString();
+                        break;
+                    case "DINT":
+                        DataStringValue = MemoryMarshal.Read<long>(span).ToString();
+                        break;
+                    case "FLOAT":
+                        DataStringValue = MemoryMarshal.Read<float>(span).ToString("G9");
+                        break;
+                    case "DOUBLE":
+                        DataStringValue = MemoryMarshal.Read<double>(span).ToString("G17");
+                        break;
+                    case "FIXEDPOINT3201":
+                        DataStringValue = (MemoryMarshal.Read<int>(span) / 10.0).ToString("F1");
+                        break;
+                    case "FIXEDPOINT3202":
+                        DataStringValue = (MemoryMarshal.Read<int>(span) / 10.0).ToString("F2");
+                        break;
+                    case "FIXEDPOINT6401":
+                        DataStringValue = (MemoryMarshal.Read<long>(span) / 10.0).ToString("F1");
+                        break;
+                    case "FIXEDPOINT6402":
+                        DataStringValue = (MemoryMarshal.Read<long>(span) / 10.0).ToString("F2");
+                        break;
+                    case "FIXEDPOINT6404":
+                        DataStringValue = (MemoryMarshal.Read<long>(span) / 10.0).ToString("F4");
+                        break;
+                    case "FINGERPRINT":
+                        StringBuilder sb = new StringBuilder(32);
+                        for (int i = 0; i < 16; ++i)
+                            sb.Append(span[i].ToString("X2"));
+                        DataStringValue = sb.ToString();
+                        break;
+                    default:
+                        DataStringValue = "0";
+                        break;
+                }
+            }
+        }
+
+        public void ValueChanged(ushort[] dataSource, bool isMonitoring)
         {
             if(dataSource != null && dataSource.Length * 16 - Bit >= __data_type.BitSize)
             {
@@ -320,7 +422,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                 switch (__data_type.Name)
                 {
                     case "BIT":
-                        if (Access == ProcessDataImageAccess.TX)
+                        if (Access == ProcessDataImageAccess.TX || isMonitoring == true)
                         {
                             ushort bitpos = (ushort)(1 << (int)(Bit % 16));
                             if ((dataSource[Bit / 16] & bitpos) == 0)
@@ -385,7 +487,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                         DataStringDisplay = "Not yet supported";
                         break;
                 }
-                if (Access == ProcessDataImageAccess.RX && __rx_changed)
+                if (Access == ProcessDataImageAccess.RX && __rx_changed && isMonitoring == false)
                 {
                     ProcessDataStorage storage = new ProcessDataStorage();
                     switch (__data_type.Name)
@@ -521,5 +623,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         public float floatData;
         [FieldOffset(0)]
         public double doubleData;
+        [FieldOffset(0)]
+        public unsafe fixed byte FINGERPRINT[16];
     }
 }

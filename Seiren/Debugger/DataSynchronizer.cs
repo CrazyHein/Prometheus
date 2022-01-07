@@ -20,6 +20,13 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Debugger
         Connected = 0x04,
     }
 
+    public enum DataSyncMode
+    {
+        Read,
+        Write,
+        Readback,
+    }
+
     public class DataSynchronizer
     {
         private object __sync_property_access_lock = new object();
@@ -27,8 +34,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Debugger
         SocketInterface __io = null;
         private string __sync_exception_message = "";
         private int __polling_interval = 0;
-        private List<(uint start, ushort size, bool access, ushort[] data)> __process_data;
-        private List<(uint start, ushort size, bool access, ushort[] data)> __internal_process_data;
+        private List<(uint start, ushort size, DataSyncMode access, ushort[] data)> __process_data;
+        private List<ushort[]> __internal_process_data;
         private ushort __process_data_end;
         private ushort __internal_process_data_end;
         private AutoResetEvent __stop_event = new AutoResetEvent(false);
@@ -36,17 +43,16 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Debugger
         private DataSynchronizerState __sync_state = DataSynchronizerState.Ready;
         private uint __heartbeat_counter = 0;
 
-        public DataSynchronizer(IEnumerable<(uint start, ushort size, bool access)> datas)
+        public DataSynchronizer(IEnumerable<(uint start, ushort size, DataSyncMode access)> datas)
         {
-            __process_data = new List<(uint start, ushort size, bool access, ushort[] data)>(
-                datas.Select(i => (i.start, i.size, i.access, new ushort[i.size])));
-            __internal_process_data = new List<(uint start, ushort size, bool access, ushort[] data)>(
-                datas.Select(i => (i.start, i.size, i.access, new ushort[i.size])));
+            __process_data = new List<(uint start, ushort size, DataSyncMode access, ushort[] data)>(
+                    datas.Select(i => (i.start, i.size, i.access, new ushort[i.size])));
+            __internal_process_data = new List<ushort[]>(datas.Select(i => new ushort[i.size]));
             __process_data_end = 0;
             __internal_process_data_end = 0;
         }
 
-        public async Task<DataSynchronizerState> Startup(SlmpTargetProperty target)
+        public async Task<DataSynchronizerState> Startup(SlmpTargetProperty target, IReadOnlyList<ushort[]> datas)
         {
             __sync_operation_access_lock.Wait();
             try
@@ -79,22 +85,33 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Debugger
 
                 DeviceAccessMaster master = new DeviceAccessMaster(target.FrameType, target.DataCode, target.R_DedicatedMessageFormat, __io,
                                                                     ref destination, target.SendBufferSize, target.ReceiveBufferSize);
-                DeviceAccessMode deviceReadMode, deviceWriteMode;
+                DeviceAccessMode deviceReadMode, deviceWriteMode, deviceReadbackMode;
                 if (target.DeviceReadMode == DeviceAccessMode.Auto)
                 {
-                    var reads = __process_data.Where(d => d.access == false);
+                    var reads = __process_data.Where(d => d.access == DataSyncMode.Read);
                     int totalDeive = reads.Sum(d => d.size);
                     int totalBlock = reads.Count();
                     if (totalDeive <= 960 && ((totalBlock <= 60 && target.R_DedicatedMessageFormat == true) || (totalBlock <= 120 && target.R_DedicatedMessageFormat == false)))
                         deviceReadMode = DeviceAccessMode.Inconsecutive;
                     else
                         deviceReadMode = DeviceAccessMode.Consecutive;
+
+                    reads = __process_data.Where(d => d.access == DataSyncMode.Readback);
+                    totalDeive = reads.Sum(d => d.size);
+                    totalBlock = reads.Count();
+                    if (totalDeive <= 960 && ((totalBlock <= 60 && target.R_DedicatedMessageFormat == true) || (totalBlock <= 120 && target.R_DedicatedMessageFormat == false)))
+                        deviceReadbackMode = DeviceAccessMode.Inconsecutive;
+                    else
+                        deviceReadbackMode = DeviceAccessMode.Consecutive;
                 }
                 else
+                {
                     deviceReadMode = target.DeviceReadMode;
+                    deviceReadbackMode = target.DeviceReadMode;
+                }
                 if (target.DeviceWriteMode == DeviceAccessMode.Auto)
                 {
-                    var writes = __process_data.Where(d => d.access == true);
+                    var writes = __process_data.Where(d => d.access == DataSyncMode.Write);
                     int totalDeive = writes.Sum(d => d.size);
                     int totalBlock = writes.Count();
                     int extraDevice = totalBlock * (target.R_DedicatedMessageFormat == true ? 9 : 4);
@@ -113,13 +130,19 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Debugger
                     //await Task.Delay(2000);
                 }
 
+                State = DataSynchronizerState.Connected;
+                ExceptionMessage = "N/A";
+
+                await Task.Run(() => __init_rx_data(Tuple.Create(master, (ushort)(target.MonitoringTimer / 250), deviceWriteMode, datas)));
+
+                if (State == DataSynchronizerState.Exception)
+                    return State;
+
                 __heartbeat_counter = 0;
                 __data_sync_thread = new Thread(new ParameterizedThreadStart(__data_sync_routine));
                 //__data_sync_thread = new Thread(new ParameterizedThreadStart(__data_sync_delay));
-                __data_sync_thread.Start(Tuple.Create(master, (ushort)(target.MonitoringTimer / 250), target.PollingInterval, deviceReadMode, deviceWriteMode));
-                State = DataSynchronizerState.Connected;
-                ExceptionMessage = "N/A";
-                return DataSynchronizerState.Connected;
+                __data_sync_thread.Start(Tuple.Create(master, (ushort)(target.MonitoringTimer / 250), target.PollingInterval, deviceReadMode, deviceWriteMode, deviceReadbackMode));
+                return State;
             }
             catch (Exception ex)
             {
@@ -176,34 +199,94 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Debugger
             {
                 for (int i = 0; i < __process_data.Count; ++i)
                 {
-                    if (__process_data[i].access == false)
-                        __internal_process_data[i].data.CopyTo(datas[i], 0);
+                    if (__process_data[i].access == DataSyncMode.Read || __process_data[i].access == DataSyncMode.Readback)
+                        __internal_process_data[i].CopyTo(datas[i], 0);
                     else
-                        datas[i].CopyTo(__internal_process_data[i].data, 0);
-                    end = __internal_process_data_end;
+                        datas[i].CopyTo(__internal_process_data[i], 0);
+                }
+                end = __internal_process_data_end;
+            }
+        }
+
+        private void __init_rx_data(object param)
+        {
+            (DeviceAccessMaster master, ushort monitoring, DeviceAccessMode write, IReadOnlyList<ushort[]> datas) =
+                (Tuple<DeviceAccessMaster, ushort, DeviceAccessMode, IReadOnlyList<ushort[]>>)param;
+
+            IEnumerable<(string, uint, ushort)> readIndex = null;
+            Memory<ushort>[] readArray = null;
+            ushort end = 0;
+            if (write == DeviceAccessMode.Inconsecutive)
+            {
+                readIndex = __process_data.Where(d => d.access == DataSyncMode.Write && d.size > 0).Select(d => new ValueTuple<string, uint, ushort>("D", d.start, d.size));
+                readArray = (__process_data.Where(d => d.access == DataSyncMode.Write && d.size > 0).Select(d => d.data.AsMemory<ushort>())).ToArray();
+                if (readArray.Length != 0)
+                {
+                    master.ReadLocalDeviceInWord(monitoring, readIndex, null, out end, readArray, null);
+                    __process_data_end = end;
+                    if (end != 0)
+                    {
+                        ExceptionMessage = $"End Code : {end:X04}";
+                        Counter = 0;
+                        State = DataSynchronizerState.Exception;
+                        return;
+                    }
+                }
+            }
+            else
+            {
+                for (int i = 0; i < __process_data.Count; ++i)
+                {
+                    if (__process_data[i].access == DataSyncMode.Write && __process_data[i].size > 0)
+                    {
+                        master.ReadLocalDeviceInWord(monitoring, "D", __process_data[i].start, __process_data[i].size, out end, __process_data[i].data);
+                        __process_data_end = end;
+                        if (end != 0)
+                        {
+                            ExceptionMessage = $"End Code : {end:X04}";
+                            Counter = 0;
+                            State = DataSynchronizerState.Exception;
+                            return;
+                        }
+                    }
+                }
+            }
+
+            for(int i = 0; i < __process_data.Count; ++i)
+            {
+                if (__process_data[i].access == DataSyncMode.Write)
+                {
+                    __process_data[i].data.CopyTo(datas[i], 0);
                 }
             }
         }
 
         private void __data_sync_routine(object param)
         {
-            (DeviceAccessMaster master, ushort monitoring, int interval, DeviceAccessMode read, DeviceAccessMode write) =
-                (Tuple<DeviceAccessMaster, ushort, int, DeviceAccessMode, DeviceAccessMode>)param;
+            (DeviceAccessMaster master, ushort monitoring, int interval, DeviceAccessMode read, DeviceAccessMode write, DeviceAccessMode readback) =
+                (Tuple<DeviceAccessMaster, ushort, int, DeviceAccessMode, DeviceAccessMode, DeviceAccessMode>)param;
             uint counter = 0;
             ushort end = 0;
             Stopwatch sw = new Stopwatch();
 
             IEnumerable<(string, uint, ushort)> readIndex = null;
+            IEnumerable<(string, uint, ushort)> readbackIndex = null;
             IEnumerable<(string, uint, ushort, ReadOnlyMemory<ushort>)> writeIndex = null;
             Memory<ushort>[] readArray = null;
+            Memory<ushort>[] readbackArray = null;
             if (read == DeviceAccessMode.Inconsecutive)
             {
-                readIndex = __process_data.Where(d => d.access == false && d.size > 0).Select(d => new ValueTuple<string, uint, ushort>("D", d.start, d.size));
-                readArray = (__process_data.Where(d => d.access == false && d.size > 0).Select(d => d.data.AsMemory<ushort>())).ToArray();
+                readIndex = __process_data.Where(d => d.access == DataSyncMode.Read && d.size > 0).Select(d => new ValueTuple<string, uint, ushort>("D", d.start, d.size));
+                readArray = (__process_data.Where(d => d.access == DataSyncMode.Read && d.size > 0).Select(d => d.data.AsMemory<ushort>())).ToArray();
+            }
+            if (readback == DeviceAccessMode.Inconsecutive)
+            {
+                readbackIndex = __process_data.Where(d => d.access == DataSyncMode.Readback && d.size > 0).Select(d => new ValueTuple<string, uint, ushort>("D", d.start, d.size));
+                readbackArray = (__process_data.Where(d => d.access == DataSyncMode.Readback && d.size > 0).Select(d => d.data.AsMemory<ushort>())).ToArray();
             }
             if (write == DeviceAccessMode.Inconsecutive)
             {
-                writeIndex = __process_data.Where(d => d.access == true && d.size > 0).Select(d => new ValueTuple<string, uint, ushort, ReadOnlyMemory<ushort>>("D", d.start, d.size, d.data.AsMemory<ushort>()));
+                writeIndex = __process_data.Where(d => d.access == DataSyncMode.Write && d.size > 0).Select(d => new ValueTuple<string, uint, ushort, ReadOnlyMemory<ushort>>("D", d.start, d.size, d.data.AsMemory<ushort>()));
             }
 
             sw.Start();
@@ -219,7 +302,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Debugger
                     {
                         for (int i = 0; i < __process_data.Count; ++i)
                         {
-                            if (__process_data[i].access == false && __process_data[i].size > 0)
+                            if (__process_data[i].access == DataSyncMode.Read && __process_data[i].size > 0)
                             {
                                 master.ReadLocalDeviceInWord(monitoring, "D", __process_data[i].start, __process_data[i].size, out end, __process_data[i].data);
                                 __process_data_end = end;
@@ -238,6 +321,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Debugger
                         if (readArray.Length != 0)
                         {
                             master.ReadLocalDeviceInWord(monitoring, readIndex, null, out end, readArray, null);
+                            __process_data_end = end;
                             if (end != 0)
                             {
                                 ExceptionMessage = $"End Code : {end:X04}";
@@ -248,11 +332,45 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Debugger
                         }
                     }
 
-                    if(write == DeviceAccessMode.Consecutive)
+                    if (readback == DeviceAccessMode.Consecutive)
                     {
                         for (int i = 0; i < __process_data.Count; ++i)
                         {
-                            if (__process_data[i].access == true && __process_data[i].size > 0)
+                            if (__process_data[i].access == DataSyncMode.Readback && __process_data[i].size > 0)
+                            {
+                                master.ReadLocalDeviceInWord(monitoring, "D", __process_data[i].start, __process_data[i].size, out end, __process_data[i].data);
+                                __process_data_end = end;
+                                if (end != 0)
+                                {
+                                    ExceptionMessage = $"End Code : {end:X04}";
+                                    Counter = 0;
+                                    State = DataSynchronizerState.Exception;
+                                    return;
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (readbackArray.Length != 0)
+                        {
+                            master.ReadLocalDeviceInWord(monitoring, readbackIndex, null, out end, readbackArray, null);
+                            __process_data_end = end;
+                            if (end != 0)
+                            {
+                                ExceptionMessage = $"End Code : {end:X04}";
+                                Counter = 0;
+                                State = DataSynchronizerState.Exception;
+                                return;
+                            }
+                        }
+                    }
+
+                    if (write == DeviceAccessMode.Consecutive)
+                    {
+                        for (int i = 0; i < __process_data.Count; ++i)
+                        {
+                            if (__process_data[i].access == DataSyncMode.Write && __process_data[i].size > 0)
                             {
                                 master.WriteLocalDeviceInWord(monitoring, "D", __process_data[i].start, __process_data[i].size, out end, __process_data[i].data);
                                 __process_data_end = end;
@@ -271,6 +389,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Debugger
                         if (writeIndex.Any() == true)
                         {
                             master.WriteLocalDeviceInWord(monitoring, writeIndex, null, out end);
+                            __process_data_end = end;
                             if (end != 0)
                             {
                                 ExceptionMessage = $"End Code : {end:X04}";
@@ -294,10 +413,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Debugger
                 {
                     for (int i = 0; i < __process_data.Count; ++i)
                     {
-                        if (__process_data[i].access == false)
-                            __process_data[i].data.CopyTo(__internal_process_data[i].data, 0);
+                        if (__process_data[i].access == DataSyncMode.Read || __process_data[i].access == DataSyncMode.Readback)
+                            __process_data[i].data.CopyTo(__internal_process_data[i], 0);
                         else
-                            __internal_process_data[i].data.CopyTo(__process_data[i].data, 0);
+                            __internal_process_data[i].CopyTo(__process_data[i].data, 0);
                     }
                     __internal_process_data_end = __process_data_end;
                 }
@@ -336,10 +455,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Debugger
                 {
                     for (int i = 0; i < __process_data.Count; ++i)
                     {
-                        if (__process_data[i].access == false)
-                            __process_data[i].data.CopyTo(__internal_process_data[i].data, 0);
+                        if (__process_data[i].access == DataSyncMode.Read || __process_data[i].access == DataSyncMode.Readback)
+                            __process_data[i].data.CopyTo(__internal_process_data[i], 0);
                         else
-                            __internal_process_data[i].data.CopyTo(__process_data[i].data, 0);
+                            __internal_process_data[i].CopyTo(__process_data[i].data, 0);
                     }
                     __internal_process_data_end = __process_data_end;
                 }

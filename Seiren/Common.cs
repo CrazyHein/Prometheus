@@ -47,7 +47,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         public static RoutedUICommand Cancel { get; private set; }
         public static RoutedUICommand Confirm { get; private set; }
         public static RoutedUICommand About { get; private set; }
-
+        public static RoutedUICommand StartMonitoring { get; private set; }
         public static RoutedUICommand StartDebugging { get; private set; }
         public static RoutedUICommand StopDebugging { get; private set; }
 
@@ -153,6 +153,12 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             };
             About = new RoutedUICommand("About", "About", typeof(ConsoleControl), gestureAbout);
 
+            InputGestureCollection gestureStartMonitoring = new InputGestureCollection
+            {
+                new KeyGesture(Key.F6, ModifierKeys.Control, "Ctrl+F7")
+            };
+            StartMonitoring = new RoutedUICommand("Start Monitoring", "Start Monitoring", typeof(ConsoleControl), gestureStartMonitoring);
+
             InputGestureCollection gestureStartDebugging = new InputGestureCollection
             {
                 new KeyGesture(Key.F6, ModifierKeys.Control, "Ctrl+F6")
@@ -163,7 +169,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             {
                 new KeyGesture(Key.F6, ModifierKeys.Control|ModifierKeys.Shift, "Ctrl+Shift+F6")
             };
-            StopDebugging = new RoutedUICommand("Stop Debugging", "Stop Debugging", typeof(ConsoleControl), gestureStopDebugging);
+            StopDebugging = new RoutedUICommand("Stop Monitoring/Debugging", "Stop Monitoring/Debugging", typeof(ConsoleControl), gestureStopDebugging);        
         }
     }
 
@@ -356,23 +362,30 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         }
     }
 
-    public class ProcessDataImageAllowEditing : IValueConverter
+    public class ProcessDataImageAllowEditing : IMultiValueConverter
     {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value is ProcessDataImageAccess && targetType == typeof(bool))
+            if (values[0] is ProcessDataImageAccess && values[1] is Boolean && values[2] is Boolean && targetType == typeof(bool))
             {
-                var access = (ProcessDataImageAccess)value;
-                if (access == ProcessDataImageAccess.TX)
+                var access = (ProcessDataImageAccess)values[0];
+                var monitoring = (bool)values[1];
+                var isoffline = (bool)values[2];
+                if (monitoring == true || isoffline == true)
                     return false;
                 else
-                    return true;
+                {
+                    if (access == ProcessDataImageAccess.TX)
+                        return false;
+                    else
+                        return true;
+                }
             }
             else
-                throw new ArgumentException();
+                return false;
         }
 
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
         {
             throw new NotImplementedException();
         }

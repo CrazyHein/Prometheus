@@ -17,6 +17,7 @@
         <CommandBinding Command="local:ConsoleControl.Close" Executed="CloseCommand_Executed" CanExecute="CloseCommand_CanExecuted"/>
         <CommandBinding Command="local:ConsoleControl.Quit" Executed="QuitCommand_Executed"/>
         <CommandBinding Command="local:ConsoleControl.About" Executed="AboutCommand_Executed"/>
+        <CommandBinding Command="local:ConsoleControl.StartMonitoring" Executed="StartMonitoringCommand_Executed" CanExecute="StartDebuggingCommand_CanExecuted"/>
         <CommandBinding Command="local:ConsoleControl.StartDebugging" Executed="StartDebuggingCommand_Executed" CanExecute="StartDebuggingCommand_CanExecuted"/>
         <CommandBinding Command="local:ConsoleControl.StopDebugging" Executed="StopDebuggingCommand_Executed" CanExecute="StopDebuggingCommand_CanExecuted"/>
     </Window.CommandBindings>
@@ -56,6 +57,11 @@
                 </sync:ButtonAdv.LargeIcon>
             </sync:ButtonAdv>
             <sync:ToolBarItemSeparator/>
+            <sync:ButtonAdv Command="local:ConsoleControl.StartMonitoring" SizeMode="Large" Label="Start Monitoring" Margin="2" Width="100">
+                <sync:ButtonAdv.LargeIcon>
+                    <BitmapImage  UriSource="imgs/startmonitoring.png"/>
+                </sync:ButtonAdv.LargeIcon>
+            </sync:ButtonAdv>
             <sync:ButtonAdv Command="local:ConsoleControl.StartDebugging" SizeMode="Large" Label="Start Debugging" Margin="2" Width="100">
                 <sync:ButtonAdv.LargeIcon>
                     <BitmapImage  UriSource="imgs/startdebugging.png"/>
@@ -142,12 +148,17 @@
                 </sync:MenuItemAdv>
             </sync:MenuItemAdv>
             <sync:MenuItemAdv  Header="_Run" Margin="2">
+                <sync:MenuItemAdv Command="local:ConsoleControl.StartDebugging" ToolTip="Start Monitoring">
+                    <sync:MenuItemAdv.Icon>
+                        <Image Source="imgs/startmonitoring.png" Height="28" Width="28"/>
+                    </sync:MenuItemAdv.Icon>
+                </sync:MenuItemAdv>
                 <sync:MenuItemAdv Command="local:ConsoleControl.StartDebugging" ToolTip="Start Debugging">
                     <sync:MenuItemAdv.Icon>
                         <Image Source="imgs/startdebugging.png" Height="28" Width="28"/>
                     </sync:MenuItemAdv.Icon>
                 </sync:MenuItemAdv>
-                <sync:MenuItemAdv Command="local:ConsoleControl.StopDebugging" ToolTip="Stop Debugging">
+                <sync:MenuItemAdv Command="local:ConsoleControl.StopDebugging" ToolTip="Stop Monitoring/Debugging">
                     <sync:MenuItemAdv.Icon>
                         <Image Source="imgs/stopdebugging.png" Height="28" Width="28"/>
                     </sync:MenuItemAdv.Icon>

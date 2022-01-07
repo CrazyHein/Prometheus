@@ -11,6 +11,7 @@
     <Authors>CrazyHein</Authors>
     <Company>AMEC</Company>
     <ApplicationIcon>imgs\logo.ico</ApplicationIcon>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
   </PropertyGroup>
 
   <ItemGroup>
@@ -51,6 +52,7 @@
     <None Remove="imgs\setting.png" />
     <None Remove="imgs\slash.jpg" />
     <None Remove="imgs\startdebugging.png" />
+    <None Remove="imgs\startmonitoring.png" />
     <None Remove="imgs\stopdebugging.png" />
     <None Remove="imgs\variables.png" />
     <None Remove="splash.jpg" />
@@ -75,6 +77,7 @@
     <Resource Include="imgs\insert.png" />
     <Resource Include="imgs\logo.png" />
     <Resource Include="imgs\miscellaneous.png" />
+    <Resource Include="imgs\startmonitoring.png" />
     <Resource Include="imgs\new.png" />
     <Resource Include="imgs\open.png" />
     <Resource Include="imgs\process.png" />
