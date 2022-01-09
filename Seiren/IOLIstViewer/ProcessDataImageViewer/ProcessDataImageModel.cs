@@ -61,7 +61,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             ObjectDictionary = od;
             __process_data_models = new ObservableCollection<ProcessDataModel>(
                 pdi.ProcessDatas.Select(
-                    d => new ProcessDataModel(d.ProcessObject, __process_data_image.Access) { Bit = d.BitPos }));
+                    d => new ProcessDataModel(d.ProcessObject, __process_data_image.Access, __process_data_image.Layout) { Bit = d.BitPos }));;
             Access = __process_data_image.Access;
             Layout = pdi.Layout;
             ProcessDataModels = __process_data_models;
@@ -85,7 +85,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             {
                 if (__process_data_models[i].Index == origin)
                 {
-                    __process_data_models[i] = new ProcessDataModel(ObjectDictionary.ProcessObjects[newcome], __process_data_models[i].Access)
+                    __process_data_models[i] = new ProcessDataModel(ObjectDictionary.ProcessObjects[newcome], __process_data_models[i].Access, __process_data_image.Layout)
                     {
                         Bit = __process_data_models[i].Bit
                     };
@@ -106,7 +106,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             {
                 if (__process_data_models[i].VariableName == origin)
                 {
-                    __process_data_models[i] = new ProcessDataModel(ObjectDictionary.ProcessObjects[__process_data_models[i].Index], __process_data_models[i].Access)
+                    __process_data_models[i] = new ProcessDataModel(ObjectDictionary.ProcessObjects[__process_data_models[i].Index], __process_data_models[i].Access, __process_data_image.Layout)
                     {
                         Bit = __process_data_models[i].Bit
                     };
@@ -123,7 +123,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             {
                 if (__process_data_models[i].EnableBinding && __process_data_models[i].BindingDeviceName == origin)
                 {
-                    __process_data_models[i] = new ProcessDataModel(ObjectDictionary.ProcessObjects[__process_data_models[i].Index], __process_data_models[i].Access)
+                    __process_data_models[i] = new ProcessDataModel(ObjectDictionary.ProcessObjects[__process_data_models[i].Index], __process_data_models[i].Access, __process_data_image.Layout)
                     {
                         Bit = __process_data_models[i].Bit
                     };
@@ -154,9 +154,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         {
             foreach (var d in __process_data_models)
             {
-                d.DataStringDisplay = "N/A";
-                d.DataStringValue = "0";
-                d.DataBooleanValue = false;
+                d.ResetDataStorage();
             }
         }
 
@@ -256,15 +254,22 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
 
     public class ProcessDataModel : ObjectModel
     {
-        public ProcessDataModel(ProcessObject o, ProcessDataImageAccess access) : base(o)
+        public ProcessDataModel(ProcessObject o, ProcessDataImageAccess access, ProcessDataImageLayout layout) : base(o)
         {
             Access = access;
+            Layout = layout;
             __data_type = o.Variable.Type;
+            //__data_size_in_byte = (int)__data_type.BitSize / 8;
+            if(__data_type.BitSize == 1)
+                __data_storage = new byte[2];
+            else
+                __data_storage = new byte[__data_type.BitSize / 8];
         }
 
         private DataType __data_type;
-        private bool __rx_changed = false;
+        //private int __data_size_in_byte;
         public ProcessDataImageAccess Access { get; private set; }
+        public ProcessDataImageLayout Layout { get; private set; }
         public uint Byte { get { return Bit / 8; } }
         
         private uint __bits;
@@ -279,47 +284,250 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             }
         }
 
-        private bool __data_boolean_value = false;
+        private byte[] __data_storage;
+        //private byte[] __unsupported_data_type;
+        private bool __rx_pending = false;
+
+        public void ResetDataStorage()
+        {
+            Array.Clear(__data_storage, 0, __data_storage.Length);
+            _notify_property_changed("DataBooleanValue");
+            _notify_property_changed("DataStringValue");
+            __rx_pending = true;
+        }
+
         public bool DataBooleanValue 
         {
-            get { return __data_boolean_value; }
+            get 
+            {
+                if (Layout == ProcessDataImageLayout.Bit)
+                {
+                    ushort bitpos = (ushort)(1 << (int)(Bit % 16));
+                    var data = MemoryMarshal.Read<ushort>(__data_storage);
+                    if ((data & bitpos) == 0)
+                        return false;
+                    else
+                        return true;
+                }
+                else
+                    return false;
+            }
             set
             {
-                if (__data_boolean_value != value)
+                if (Layout == ProcessDataImageLayout.Bit)
                 {
-                    __data_boolean_value = value;
-                    __rx_changed = true;
-                    _notify_property_changed("DataBooleanValue");
+                    ushort bitpos = (ushort)(1 << (int)(Bit % 16));
+                    var data = MemoryMarshal.Read<ushort>(__data_storage);
+                    if (value == true && (data & bitpos) == 0)
+                    {
+                        data |= bitpos;
+                        MemoryMarshal.Write<ushort>(__data_storage, ref data);
+                        _notify_property_changed("DataBooleanValue");
+                        __rx_pending = true;
+                    }
+                    else if (value == false && (data & bitpos) != 0)
+                    {
+                        data &= (ushort)(~bitpos);
+                        MemoryMarshal.Write<ushort>(__data_storage, ref data);
+                        _notify_property_changed("DataBooleanValue");
+                        __rx_pending = true;
+                    }
                 }
             }
         }
 
-        private string __data_string_value = "0";
         public string DataStringValue 
         {
-            get { return __data_string_value; }
-            set
+            get 
             {
-                if (Access == ProcessDataImageAccess.RX)
+                if (Layout == ProcessDataImageLayout.Bit)
+                    return "N/A";
+                string res;
+                switch (__data_type.Name)
                 {
-                    __data_string_value = value;
-                    __rx_changed = true;
-                    //_notify_property_changed("DataStringValue");
+                    case "BYTE":
+                        res = MemoryMarshal.Read<byte>(__data_storage).ToString();
+                        break;
+                    case "SBYTE":
+                        res = MemoryMarshal.Read<sbyte>(__data_storage).ToString();
+                        break;
+                    case "USHORT":
+                        res = MemoryMarshal.Read<ushort>(__data_storage).ToString();
+                        break;
+                    case "SHORT":
+                        res = MemoryMarshal.Read<short>(__data_storage).ToString();
+                        break;
+                    case "UINT":
+                        res = MemoryMarshal.Read<uint>(__data_storage).ToString();
+                        break;
+                    case "INT":
+                        res = MemoryMarshal.Read<int>(__data_storage).ToString();
+                        break;
+                    case "UDINT":
+                    case "DUINT":
+                        res = MemoryMarshal.Read<ulong>(__data_storage).ToString();
+                        break;
+                    case "DINT":
+                        res = MemoryMarshal.Read<long>(__data_storage).ToString();
+                        break;
+                    case "FLOAT":
+                        res = MemoryMarshal.Read<float>(__data_storage).ToString("G9");
+                        break;
+                    case "DOUBLE":
+                        res = MemoryMarshal.Read<double>(__data_storage).ToString("G17");
+                        break;
+                    case "FIXEDPOINT3201":
+                        res = (MemoryMarshal.Read<int>(__data_storage) / 10.0).ToString("F1");
+                        break;
+                    case "FIXEDPOINT3202":
+                        res = (MemoryMarshal.Read<int>(__data_storage) / 100.0).ToString("F2");
+                        break;
+                    case "FIXEDPOINT6401":
+                        res = (MemoryMarshal.Read<long>(__data_storage) / 10.0).ToString("F1");
+                        break;
+                    case "FIXEDPOINT6402":
+                        res = (MemoryMarshal.Read<long>(__data_storage) / 100.0).ToString("F2");
+                        break;
+                    case "FIXEDPOINT6404":
+                        res = (MemoryMarshal.Read<long>(__data_storage.AsSpan()) / 10000.0).ToString("F4");
+                        break;
+                    case "FINGERPRINT":
+                        StringBuilder sb = new StringBuilder(__data_storage.Length * 2);
+                        for (int i = 0; i < __data_storage.Length; ++i)
+                            sb.Append(__data_storage[i].ToString("X2"));
+                        res = sb.ToString();
+                        break;
+                    default:
+                        res = "Not yet supported";
+                        break;
                 }
+                return res; 
             }
-        }
-        private ProcessDataStorage __non_bit_data_storage;
-
-        private string __data_string_display = "N/A";
-        public string DataStringDisplay
-        {
-            get { return __data_string_display; }
             set
             {
-                if (__data_string_display != value)
+                if (Access == ProcessDataImageAccess.RX && Layout != ProcessDataImageLayout.Bit)
                 {
-                    __data_string_display = value;
-                    _notify_property_changed("DataStringDisplay");
+                    bool res = false;
+                    ProcessDataStorage storage = new ProcessDataStorage();
+                    switch (__data_type.Name)
+                    {
+                        case "BYTE":
+                            res = byte.TryParse(value, out storage.byteData);
+                            if (res)
+                                MemoryMarshal.Write<byte>(__data_storage, ref storage.byteData);
+                            break;
+                        case "SBYTE":
+                            res = sbyte.TryParse(value, out storage.sbyteData);
+                            if(res)
+                                MemoryMarshal.Write<sbyte>(__data_storage, ref storage.sbyteData);
+                            break;
+                        case "USHORT":
+                            res = ushort.TryParse(value, out storage.ushortData);
+                            if(res)
+                                MemoryMarshal.Write<ushort>(__data_storage, ref storage.ushortData);
+                            break;
+                        case "SHORT":
+                            res = short.TryParse(value, out storage.shortData);
+                            if(res)
+                                MemoryMarshal.Write<short>(__data_storage, ref storage.shortData);
+                            break;
+                        case "UINT":
+                            res = uint.TryParse(value, out storage.uintData);
+                            if(res)
+                                MemoryMarshal.Write<uint>(__data_storage, ref storage.uintData);
+                            break;
+                        case "INT":
+                            res = int.TryParse(value, out storage.intData);
+                            if (res)
+                                MemoryMarshal.Write<int>(__data_storage, ref storage.intData);
+                            break;
+                        case "UDINT":
+                        case "DUINT":
+                            res = ulong.TryParse(value, out storage.ulongData);
+                            if (res)
+                                MemoryMarshal.Write<ulong>(__data_storage, ref storage.ulongData);
+                            break;
+                        case "DINT":
+                            res = long.TryParse(value, out storage.longData);
+                            if (res)
+                                MemoryMarshal.Write<long>(__data_storage, ref storage.longData);
+                            break;
+                        case "FLOAT":
+                            res = float.TryParse(value, out storage.floatData);
+                            if (res)
+                                MemoryMarshal.Write<float>(__data_storage, ref storage.floatData);
+                            break;
+                        case "DOUBLE":
+                            res = double.TryParse(value, out storage.doubleData);
+                            if (res)
+                                MemoryMarshal.Write<double>(__data_storage, ref storage.doubleData);
+                            break;
+                        case "FIXEDPOINT3201":
+                            res = double.TryParse(value, out storage.doubleData);
+                            if (res)
+                            {
+                                storage.intData = (int)(storage.doubleData * 10);
+                                MemoryMarshal.Write<int>(__data_storage, ref storage.intData);
+                            }
+                            break;
+                        case "FIXEDPOINT3202":
+                            res = double.TryParse(value, out storage.doubleData);
+                            if (res)
+                            {
+                                storage.intData = (int)(storage.doubleData * 100);
+                                MemoryMarshal.Write<int>(__data_storage, ref storage.intData);
+                            }
+                            break;
+                        case "FIXEDPOINT6401":
+                            res = double.TryParse(value, out storage.doubleData);
+                            if (res)
+                            {
+                                storage.longData = (long)(storage.doubleData * 10);
+                                MemoryMarshal.Write<long>(__data_storage, ref storage.longData);
+                            }
+                            break;
+                        case "FIXEDPOINT6402":
+                            res = double.TryParse(value, out storage.doubleData);
+                            if (res)
+                            {
+                                storage.longData = (long)(storage.doubleData * 100);
+                                MemoryMarshal.Write<long>(__data_storage, ref storage.longData);
+                            }
+                            break;
+                        case "FIXEDPOINT6404":
+                            res = double.TryParse(value, out storage.doubleData);
+                            if (res)
+                            {
+                                storage.longData = (long)(storage.doubleData * 10000);
+                                MemoryMarshal.Write<long>(__data_storage, ref storage.longData);
+                            }
+                            break;
+                        case "FINGERPRINT":
+                            int i = 0;
+                            byte[] buffer = new byte[__data_storage.Length];
+                            try
+                            {
+                                for (i = 0; i < __data_storage.Length; ++i)
+                                {
+                                    var byteData = Convert.ToByte(value.Substring(i * 2, 2), 16);
+                                    buffer[i] = byteData;
+                                }
+                            }
+                            catch
+                            {
+                                res = false;
+                            }
+                            buffer.CopyTo(__data_storage, 0);
+                            res = true;
+                            break;
+                        default:
+                            break;
+                    }
+                    if (res)
+                    {
+                        _notify_property_changed("DataStringValue");
+                        __rx_pending = true;
+                    }
                 }
             }
         }
@@ -340,75 +548,31 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
 
         public void InitValue(ushort[] dataSource)
         {
-            if (dataSource != null && dataSource.Length * 16 - Bit >= __data_type.BitSize)
+            if (dataSource != null && dataSource.Length * 16 - Bit >= __data_type.BitSize && Access == ProcessDataImageAccess.RX)
             {
                 var span = MemoryMarshal.AsBytes(dataSource.AsSpan()).Slice((int)Byte);
                 switch (__data_type.Name)
                 {
                     case "BIT":
-                        if (Access == ProcessDataImageAccess.RX)
+                        ushort bitpos = (ushort)(1 << (int)(Bit % 16));
+                        var data = MemoryMarshal.Read<ushort>(__data_storage.AsSpan());
+                        if ((dataSource[Bit / 16] & bitpos) != 0 && (data & bitpos) == 0)
                         {
-                            ushort bitpos = (ushort)(1 << (int)(Bit % 16));
-                            if ((dataSource[Bit / 16] & bitpos) == 0)
-                                DataBooleanValue = false;
-                            else
-                                DataBooleanValue = true;
+
+                            data |= bitpos;
+                            MemoryMarshal.Write<ushort>(__data_storage.AsSpan(), ref data);
+                            _notify_property_changed("DataBooleanValue");
+                        }
+                        else if ((dataSource[Bit / 16] & bitpos) == 0 && (data & bitpos) != 0)
+                        {
+                            data &= (ushort)(~bitpos);
+                            MemoryMarshal.Write<ushort>(__data_storage.AsSpan(), ref data);
+                            _notify_property_changed("DataBooleanValue");
                         }
                         break;
-                    case "BYTE":
-                        DataStringValue = MemoryMarshal.Read<byte>(span).ToString();
-                        break;
-                    case "SBYTE":
-                        DataStringValue = MemoryMarshal.Read<sbyte>(span).ToString();
-                        break;
-                    case "USHORT":
-                        DataStringValue = MemoryMarshal.Read<ushort>(span).ToString();
-                        break;
-                    case "SHORT":
-                        DataStringValue = MemoryMarshal.Read<short>(span).ToString();
-                        break;
-                    case "UINT":
-                        DataStringValue = MemoryMarshal.Read<uint>(span).ToString();
-                        break;
-                    case "INT":
-                        DataStringValue = MemoryMarshal.Read<int>(span).ToString();
-                        break;
-                    case "UDINT":
-                    case "DUINT":
-                        DataStringValue = MemoryMarshal.Read<ulong>(span).ToString();
-                        break;
-                    case "DINT":
-                        DataStringValue = MemoryMarshal.Read<long>(span).ToString();
-                        break;
-                    case "FLOAT":
-                        DataStringValue = MemoryMarshal.Read<float>(span).ToString("G9");
-                        break;
-                    case "DOUBLE":
-                        DataStringValue = MemoryMarshal.Read<double>(span).ToString("G17");
-                        break;
-                    case "FIXEDPOINT3201":
-                        DataStringValue = (MemoryMarshal.Read<int>(span) / 10.0).ToString("F1");
-                        break;
-                    case "FIXEDPOINT3202":
-                        DataStringValue = (MemoryMarshal.Read<int>(span) / 10.0).ToString("F2");
-                        break;
-                    case "FIXEDPOINT6401":
-                        DataStringValue = (MemoryMarshal.Read<long>(span) / 10.0).ToString("F1");
-                        break;
-                    case "FIXEDPOINT6402":
-                        DataStringValue = (MemoryMarshal.Read<long>(span) / 10.0).ToString("F2");
-                        break;
-                    case "FIXEDPOINT6404":
-                        DataStringValue = (MemoryMarshal.Read<long>(span) / 10.0).ToString("F4");
-                        break;
-                    case "FINGERPRINT":
-                        StringBuilder sb = new StringBuilder(32);
-                        for (int i = 0; i < 16; ++i)
-                            sb.Append(span[i].ToString("X2"));
-                        DataStringValue = sb.ToString();
-                        break;
                     default:
-                        DataStringValue = "0";
+                        span.Slice(0, __data_storage.Length).CopyTo(__data_storage);
+                        _notify_property_changed("DataStringValue");
                         break;
                 }
             }
@@ -419,77 +583,35 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             if(dataSource != null && dataSource.Length * 16 - Bit >= __data_type.BitSize)
             {
                 var span = MemoryMarshal.AsBytes(dataSource.AsSpan()).Slice((int)Byte);
-                switch (__data_type.Name)
+                if (Access == ProcessDataImageAccess.TX || isMonitoring == true)
                 {
-                    case "BIT":
-                        if (Access == ProcessDataImageAccess.TX || isMonitoring == true)
-                        {
+                    switch (__data_type.Name)
+                    {
+                        case "BIT":
                             ushort bitpos = (ushort)(1 << (int)(Bit % 16));
-                            if ((dataSource[Bit / 16] & bitpos) == 0)
-                                DataBooleanValue = false;
-                            else
-                                DataBooleanValue = true;
-                        }
-                        break;
-                    case "BYTE":
-                        DataStringDisplay = MemoryMarshal.Read<byte>(span).ToString();
-                        break;
-                    case "SBYTE":
-                        DataStringDisplay = MemoryMarshal.Read<sbyte>(span).ToString();
-                        break;
-                    case "USHORT":
-                        DataStringDisplay = MemoryMarshal.Read<ushort>(span).ToString();
-                        break;
-                    case "SHORT":
-                        DataStringDisplay = MemoryMarshal.Read<short>(span).ToString();
-                        break;
-                    case "UINT":
-                        DataStringDisplay = MemoryMarshal.Read<uint>(span).ToString();
-                        break;
-                    case "INT":
-                        DataStringDisplay = MemoryMarshal.Read<int>(span).ToString();
-                        break;
-                    case "UDINT":
-                    case "DUINT":
-                        DataStringDisplay = MemoryMarshal.Read<ulong>(span).ToString();
-                        break;
-                    case "DINT":
-                        DataStringDisplay = MemoryMarshal.Read<long>(span).ToString();
-                        break;
-                    case "FLOAT":
-                        DataStringDisplay = MemoryMarshal.Read<float>(span).ToString("G9");
-                        break;
-                    case "DOUBLE":
-                        DataStringDisplay = MemoryMarshal.Read<double>(span).ToString("G17");
-                        break;
-                    case "FIXEDPOINT3201":
-                        DataStringDisplay = (MemoryMarshal.Read<int>(span) / 10.0).ToString("F1");
-                        break;
-                    case "FIXEDPOINT3202":
-                        DataStringDisplay = (MemoryMarshal.Read<int>(span) / 10.0).ToString("F2");
-                        break;
-                    case "FIXEDPOINT6401":
-                        DataStringDisplay = (MemoryMarshal.Read<long>(span) / 10.0).ToString("F1");
-                        break;
-                    case "FIXEDPOINT6402":
-                        DataStringDisplay = (MemoryMarshal.Read<long>(span) / 10.0).ToString("F2");
-                        break;
-                    case "FIXEDPOINT6404":
-                        DataStringDisplay = (MemoryMarshal.Read<long>(span) / 10.0).ToString("F4");
-                        break;
-                    case "FINGERPRINT":
-                        StringBuilder sb = new StringBuilder(32);
-                        for (int i = 0; i < 16; ++i)
-                            sb.Append(span[i].ToString("X2"));
-                        DataStringDisplay = sb.ToString();
-                        break;
-                    default:
-                        DataStringDisplay = "Not yet supported";
-                        break;
+                            var data = MemoryMarshal.Read<ushort>(__data_storage.AsSpan());
+                            if ((dataSource[Bit / 16] & bitpos) != 0 && (data & bitpos) == 0)
+                            {
+
+                                data |= bitpos;
+                                MemoryMarshal.Write<ushort>(__data_storage.AsSpan(), ref data);
+                                _notify_property_changed("DataBooleanValue");
+                            }
+                            else if ((dataSource[Bit / 16] & bitpos) == 0 && (data & bitpos) != 0)
+                            {
+                                data &= (ushort)(~bitpos);
+                                MemoryMarshal.Write<ushort>(__data_storage.AsSpan(), ref data);
+                                _notify_property_changed("DataBooleanValue");
+                            }
+                            break;
+                        default:
+                            span.Slice(0, __data_storage.Length).CopyTo(__data_storage);
+                            _notify_property_changed("DataStringValue");
+                            break;
+                    }
                 }
-                if (Access == ProcessDataImageAccess.RX && __rx_changed && isMonitoring == false)
+                else if (Access == ProcessDataImageAccess.RX && isMonitoring == false && __rx_pending)
                 {
-                    ProcessDataStorage storage = new ProcessDataStorage();
                     switch (__data_type.Name)
                     {
                         case "BIT":
@@ -498,103 +620,11 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                             else
                                 dataSource[Bit / 16] &= (ushort)(~(1 << (int)(Bit % 16)));
                             break;
-                        case "BYTE":
-                            if (byte.TryParse(DataStringValue, out storage.byteData))
-                                MemoryMarshal.Write<byte>(span, ref storage.byteData);
-                            break;
-                        case "SBYTE":
-                            if(sbyte.TryParse(DataStringValue, out storage.sbyteData))
-                                MemoryMarshal.Write<sbyte>(span, ref storage.sbyteData);
-                            break;
-                        case "USHORT":
-                            if (ushort.TryParse(DataStringValue, out storage.ushortData))
-                                MemoryMarshal.Write<ushort>(span, ref storage.ushortData);
-                            break;
-                        case "SHORT":
-                            if (short.TryParse(DataStringValue, out storage.shortData))
-                                MemoryMarshal.Write<short>(span, ref storage.shortData);
-                            break;
-                        case "UINT":
-                            if (uint.TryParse(DataStringValue, out storage.uintData))
-                                MemoryMarshal.Write<uint>(span, ref storage.uintData);
-                            break;
-                        case "INT":
-                            if (int.TryParse(DataStringValue, out storage.intData))
-                                MemoryMarshal.Write<int>(span, ref storage.intData);
-                            break;
-                        case "UDINT":
-                        case "DUINT":
-                            if (ulong.TryParse(DataStringValue, out storage.ulongData))
-                                MemoryMarshal.Write<ulong>(span, ref storage.ulongData);
-                            break;
-                        case "DINT":
-                            if (long.TryParse(DataStringValue, out storage.longData))
-                                MemoryMarshal.Write<long>(span, ref storage.longData);
-                            break;
-                        case "FLOAT":
-                            if (float.TryParse(DataStringValue, out storage.floatData))
-                                MemoryMarshal.Write<float>(span, ref storage.floatData);
-                            break;
-                        case "DOUBLE":
-                            if (double.TryParse(DataStringValue, out storage.doubleData))
-                                MemoryMarshal.Write<double>(span, ref storage.doubleData);
-                            break;
-
-                        case "FIXEDPOINT3201":
-                            if (double.TryParse(DataStringValue, out storage.doubleData))
-                            {
-                                storage.intData = (int)(storage.doubleData * 10);
-                                MemoryMarshal.Write<int>(span, ref storage.intData);
-                            }
-                            break;
-                        case "FIXEDPOINT3202":
-                            if (double.TryParse(DataStringValue, out storage.doubleData))
-                            {
-                                storage.intData = (int)(storage.doubleData * 100);
-                                MemoryMarshal.Write<int>(span, ref storage.intData);
-                            }
-                            break;
-                        case "FIXEDPOINT6401":
-                            if (double.TryParse(DataStringValue, out storage.doubleData))
-                            {
-                                storage.longData = (long)(storage.doubleData * 10);
-                                MemoryMarshal.Write<long>(span, ref storage.longData);
-                            }
-                            break;
-                        case "FIXEDPOINT6402":
-                            if (double.TryParse(DataStringValue, out storage.doubleData))
-                            {
-                                storage.longData = (long)(storage.doubleData * 100);
-                                MemoryMarshal.Write<long>(span, ref storage.longData);
-                            }
-                            break;
-                        case "FIXEDPOINT6404":
-                            if (double.TryParse(DataStringValue, out storage.doubleData))
-                            {
-                                storage.longData = (long)(storage.doubleData * 10000);
-                                MemoryMarshal.Write<long>(span, ref storage.longData);
-                            }
-                            break;
-                        case "FINGERPRINT":
-                            byte[] bytes = new byte[16];
-                            int i = 0;
-                            if (DataStringValue.Length == 32)
-                            {
-                                for (i = 0; i < 16; ++i)
-                                {
-                                    if (byte.TryParse(DataStringValue.Substring(i*2, 2), out storage.byteData))
-                                        bytes[i] = storage.byteData;
-                                }
-                                if(i == 16)
-                                    for (i = 0; i < 16; ++i)
-                                        MemoryMarshal.Write(span.Slice(i, 1), ref bytes[i]);
-                            }
-                            break;
                         default:
-                            //DataStringValue = "Not yet supported";
+                            __data_storage.AsSpan().CopyTo(span);
                             break;
                     }
-                    __rx_changed = false;
+                    __rx_pending = false;
                 }
             }
         }
@@ -623,7 +653,5 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         public float floatData;
         [FieldOffset(0)]
         public double doubleData;
-        [FieldOffset(0)]
-        public unsafe fixed byte FINGERPRINT[16];
     }
 }

@@ -16,12 +16,14 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         private SfDataGrid __object_source;
         private ObjectDictionary __object_dictionary;
         private ProcessDataImageAccess __process_data_access;
+        private ProcessDataImageLayout __process_data_layout;
         private ObjectsModel __objects_model;
         public ProcessDataImageViewer(ProcessDataImage pdi, ObjectDictionary od, SfDataGrid source, ObjectsModel objects)
         {
             InitializeComponent();
             DataContext = new ProcessDataImageModel(pdi, od, source.DataContext as ObjectsModel);
             __process_data_access = pdi.Access;
+            __process_data_layout = pdi.Layout;
             __object_source = source;
             __object_dictionary = od;
             __objects_model = objects;
@@ -75,7 +77,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                 }
                 else
                     o = __object_source.SelectedItem as ObjectModel;
-                (DataContext as ProcessDataImageModel).Add(new ProcessDataModel(__object_dictionary.ProcessObjects[o.Index], __process_data_access));
+                (DataContext as ProcessDataImageModel).Add(new ProcessDataModel(__object_dictionary.ProcessObjects[o.Index], __process_data_access, __process_data_layout));
             }
             catch (LombardiaException ex)
             {
@@ -105,7 +107,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                 }
                 else
                     o = __object_source.SelectedItem as ObjectModel;
-                (DataContext as ProcessDataImageModel).Insert(ProcessDataImageGrid.SelectedIndex, new ProcessDataModel(__object_dictionary.ProcessObjects[o.Index], __process_data_access));
+                (DataContext as ProcessDataImageModel).Insert(ProcessDataImageGrid.SelectedIndex, new ProcessDataModel(__object_dictionary.ProcessObjects[o.Index], __process_data_access, __process_data_layout));
             }
             catch (LombardiaException ex)
             {

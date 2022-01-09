@@ -127,14 +127,21 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Debugger
                 {
                     State = DataSynchronizerState.Connecting;
                     await Task.Run(() => (__io as TCP).Connect());
-                    //await Task.Delay(2000);
+                    //await Task.Delay(1000);
                 }
 
                 State = DataSynchronizerState.Connected;
                 ExceptionMessage = "N/A";
 
                 await Task.Run(() => __init_rx_data(Tuple.Create(master, (ushort)(target.MonitoringTimer / 250), deviceWriteMode, datas)));
-
+                /*
+                for (int i = 0; i < datas[3].Length; ++i)
+                    datas[3][i] = (ushort)i;
+                for (int i = 0; i < datas[4].Length; ++i)
+                    datas[4][i] = (ushort)i;
+                for (int i = 0; i < datas[5].Length; ++i)
+                    datas[5][i] = (ushort)i;
+                */
                 if (State == DataSynchronizerState.Exception)
                     return State;
 
@@ -443,13 +450,14 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Debugger
 
                 Counter = counter++;
 
-                Thread.Sleep(5000);
+                Thread.Sleep(2000);
 
-                for(int i = 0; i < __process_data[1].size; ++i)
-                {
-                    __process_data[1].data[i] = (ushort)r.Next(0, 65536);
-                    //__process_data[1].data[i] = 0xFFFF;
-                }
+                for(int j = 0; j < __process_data[0].size; ++j)
+                    __process_data[0].data[j] = (ushort)r.Next(0, 65536);
+                for (int j = 0; j < __process_data[1].size; ++j)
+                    __process_data[1].data[j]++;
+                for (int j = 0; j < __process_data[2].size; ++j)
+                    __process_data[2].data[j] = (ushort)r.Next(0, 65536);
 
                 lock (__sync_property_access_lock)
                 {
@@ -464,6 +472,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Debugger
                 }
                 int ms = (int)(sw.ElapsedMilliseconds);
                 PollingInterval = (int)sw.ElapsedMilliseconds;
+                sw.Restart();
             }
         }
 

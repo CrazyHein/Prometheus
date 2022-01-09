@@ -118,7 +118,7 @@
                     <sync:GridTextColumn DisplayBinding="{Binding DeviceBindingInfo}" HeaderText="Binding"/>
                     <sync:GridTextColumn DisplayBinding="{Binding ValueRangeInfo}" HeaderText="Range"/>
                     <sync:GridTextColumn DisplayBinding="{Binding ValueConverterInfo}" HeaderText="Converter"/>
-                    <sync:GridTextColumn DisplayBinding="{Binding DataStringDisplay}" ValueBinding="{Binding DataStringValue}" HeaderText="Value" Width="200">
+                    <sync:GridTextColumn MappingName="DataStringValue" HeaderText="Value" Width="200">
                         <sync:GridTextColumn.AllowEditing>
                             <MultiBinding Converter="{StaticResource AllowEditing}">
                                 <Binding RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=UserControl}" Path="DataContext.Access"/>

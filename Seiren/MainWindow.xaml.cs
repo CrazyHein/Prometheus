@@ -301,12 +301,15 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             (__objects_viewer.DataContext as ObjectsModel).RxBitObjects.IsMonitoring = monitoring;
             (__objects_viewer.DataContext as ObjectsModel).RxBlockObjects.IsMonitoring = monitoring;
 
-            (__objects_viewer.DataContext as ObjectsModel).TxDiagnosticObjects.InitProcessDataValue(__tx_diagnotic_area_data);
-            (__objects_viewer.DataContext as ObjectsModel).TxBitObjects.InitProcessDataValue(__tx_bit_area_data);
-            (__objects_viewer.DataContext as ObjectsModel).TxBlockObjects.InitProcessDataValue(__tx_block_area_data);
-            (__objects_viewer.DataContext as ObjectsModel).RxControlObjects.InitProcessDataValue(__rx_control_area_data);
-            (__objects_viewer.DataContext as ObjectsModel).RxBitObjects.InitProcessDataValue(__rx_bit_area_data);
-            (__objects_viewer.DataContext as ObjectsModel).RxBlockObjects.InitProcessDataValue(__rx_block_area_data);
+            if (monitoring == false)
+            {
+                (__objects_viewer.DataContext as ObjectsModel).TxDiagnosticObjects.InitProcessDataValue(__tx_diagnotic_area_data);
+                (__objects_viewer.DataContext as ObjectsModel).TxBitObjects.InitProcessDataValue(__tx_bit_area_data);
+                (__objects_viewer.DataContext as ObjectsModel).TxBlockObjects.InitProcessDataValue(__tx_block_area_data);
+                (__objects_viewer.DataContext as ObjectsModel).RxControlObjects.InitProcessDataValue(__rx_control_area_data);
+                (__objects_viewer.DataContext as ObjectsModel).RxBitObjects.InitProcessDataValue(__rx_bit_area_data);
+                (__objects_viewer.DataContext as ObjectsModel).RxBlockObjects.InitProcessDataValue(__rx_block_area_data);
+            }
 
             __main_model.IsOffline = false;
             __main_model.DebuggerExceptionMessage = "N/A";
