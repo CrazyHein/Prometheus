@@ -330,6 +330,31 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         }
     }
 
+    public class DebuggingModeIndicator : IMultiValueConverter
+    {
+        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (values[0] is Boolean && values[1] is Boolean && targetType == typeof(string))
+            {
+                bool isoffline = (bool)values[0];
+                bool ismonitorring  = (bool)values[1];
+                if (isoffline == true)
+                    return "Offline";
+                else if (ismonitorring == true)
+                    return "Monitorring";
+                return "Debugging";
+
+            }
+            else
+                throw new NotImplementedException();
+        }
+
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
     public class ByteArrayString : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)

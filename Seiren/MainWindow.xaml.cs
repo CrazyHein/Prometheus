@@ -312,6 +312,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             }
 
             __main_model.IsOffline = false;
+            __main_model.IsMonitorring = monitoring;
             __main_model.DebuggerExceptionMessage = "N/A";
             __main_model.DebuggerState =  DataSynchronizerState.Ready;
             __main_model.DebuggerPollingInterval = 0;
@@ -523,6 +524,13 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
 
         private void ExportCommand_Executed(object sender, System.Windows.Input.ExecutedRoutedEventArgs e)
         {
+            string? error = __update_binding_source();
+            if (error != null)
+            {
+                MessageBox.Show(error, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
             var wnd = new ImportExport(ImportExportMode.Export,
                     __variable_dictionary, (__variables_viewer.DataContext as VariablesModel).VariableNames,
                     __controller_configuration, (__controller_configuration_viewer.DataContext as ControllerConfigurationModel).ReferenceNames,
@@ -535,7 +543,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
 
         private void ExportCommand_CanExecuted(object sender, System.Windows.Input.CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = __main_model.IsNonTemporaryFile && !__data_model_has_changes();
+            e.CanExecute = __main_model.IsOpened;//__main_model.IsNonTemporaryFile && !__data_model_has_changes();
         }
 
         private void ImportCommand_Executed(object sender, System.Windows.Input.ExecutedRoutedEventArgs e)
@@ -607,6 +615,13 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
 
         private void DownloadviaFTPCommand_Executed(object sender, System.Windows.Input.ExecutedRoutedEventArgs e)
         {
+            string? error = __update_binding_source();
+            if (error != null)
+            {
+                MessageBox.Show(error, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
             var wnd = new FTPUtility(FTPMode.Download,
                    __variable_dictionary, (__variables_viewer.DataContext as VariablesModel).VariableNames,
                    __controller_configuration, (__controller_configuration_viewer.DataContext as ControllerConfigurationModel).ReferenceNames,
@@ -619,7 +634,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
 
         private void DownloadviaFTPCommand_CanExecuted(object sender, System.Windows.Input.CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = __main_model.IsNonTemporaryFile && !__data_model_has_changes();
+            e.CanExecute = __main_model.IsOpened;//__main_model.IsNonTemporaryFile && !__data_model_has_changes();
         }
 
         private void UploadviaFTPCommand_Executed(object sender, System.Windows.Input.ExecutedRoutedEventArgs e)

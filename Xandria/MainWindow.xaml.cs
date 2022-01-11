@@ -311,11 +311,18 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Xandria
 
         private void DownloadviaFTPCommand_CanExecuted(object sender, System.Windows.Input.CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = __main_model.IsNonTemporaryFile && !__data_model_has_changes();
+            e.CanExecute = __main_model.IsOpened;//__main_model.IsNonTemporaryFile && !__data_model_has_changes();
         }
 
         private void DownloadviaFTPCommand_Executed(object sender, System.Windows.Input.ExecutedRoutedEventArgs e)
         {
+            string error = __update_binding_source();
+            if (error != null)
+            {
+                MessageBox.Show(error, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
             var wnd = new FTPUtility(FTPMode.Download, __controller_model_catalogue, __task_user_parameter_helper);
             wnd.ShowDialog();
         }

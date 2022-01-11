@@ -28,6 +28,7 @@
         <Grid.Resources>
             <local:ModifiedIndicatorToVisibility x:Key="ModifiedConverter"/>
             <local:HeartbeatIndicator x:Key="HeartbeatIndicator"/>
+            <local:DebuggingModeIndicator x:Key="DebuggingModeIndicator"/>
         </Grid.Resources>
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"/>
@@ -108,6 +109,15 @@
             <TextBlock Text="{Binding DebuggerState}" Width="80" ToolTip="{Binding DebuggerExceptionMessage}"/>
             <Separator/>
             <TextBlock Text="{Binding DebuggerPollingInterval}" Width="80"/>
+            <Separator/>
+            <TextBlock Width="80">
+                <TextBlock.Text>
+                    <MultiBinding Converter="{StaticResource DebuggingModeIndicator}">
+                        <Binding Path="IsOffline"/>
+                        <Binding Path="IsMonitorring"/>
+                    </MultiBinding>
+                </TextBlock.Text>
+            </TextBlock>
             <Separator/>
             <TextBlock Margin="8,2" Text="{Binding CurrentlyOpenFile}"/>
         </StatusBar>
