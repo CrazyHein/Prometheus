@@ -207,6 +207,11 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             __objects_viewer = null;
             __miscellaneous_viewer = null;
 
+            NavVariableDictionary.DataContext = null;
+            NavControllerConfiguration.DataContext = null;
+            NavProcessDataDictionary.DataContext = null;
+            NavMiscellaneous.DataContext = null;
+
             Variables.Content = __variables_viewer;
             ControllerModules.Content = __controller_configuration_viewer;
             Objects.Content = __objects_viewer;

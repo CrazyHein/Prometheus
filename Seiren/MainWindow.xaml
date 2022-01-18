@@ -231,7 +231,7 @@
                     </sync:NavigationItem.Icon>
                 </sync:NavigationItem>
             </sync:NavigationItem>
-            <sync:NavigationItem Header="IO List" IsExpanded="{Binding IsOpened}" ItemType="Tab" IsEnabled="{Binding IsOpened}">
+            <sync:NavigationItem Header="IO List" ItemType="Tab" Visibility="{Binding IsOpened, Converter={StaticResource ModifiedConverter}}">
                 <sync:NavigationItem.Icon>
                     <Image Source="imgs/list.png"/>
                 </sync:NavigationItem.Icon>

@@ -120,16 +120,16 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             open.Multiselect = false;
             if (open.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
+                MainViewer.BeginInit();
                 try
                 {
-                    MainViewer.BeginInit();
-                    (DataContext as ControllerConfigurationModel).ImportDevices(open.FileName);
-                    MainViewer.EndInit();
+                    (DataContext as ControllerConfigurationModel).ImportDevices(open.FileName); 
                 }
                 catch (LombardiaException ex)
                 {
                     MessageBox.Show("At least one exception has occurred during the operation :\n" + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
+                MainViewer.EndInit();
             }
         }
     }

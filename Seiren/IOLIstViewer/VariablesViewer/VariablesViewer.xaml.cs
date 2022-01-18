@@ -13,6 +13,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
     /// </summary>
     public partial class VariablesViewer : UserControl
     {
+        private VariableModel __default_variable_model;
         public VariablesViewer(VariableDictionary dic, DataTypeCatalogue dtc)
         {
             InitializeComponent();
@@ -52,7 +53,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         private void AddRecordCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             DataType dt = (DataContext as VariablesModel).DataTypeCatalogue.DataTypes.Values.FirstOrDefault();
-            VariableViewer wnd = new VariableViewer(DataContext as VariablesModel, new VariableModel() { DataType = dt }, InputDialogDisplayMode.Add);
+            VariableViewer wnd = new VariableViewer(DataContext as VariablesModel, __default_variable_model ?? new VariableModel() { DataType = dt }, InputDialogDisplayMode.Add);
             wnd.WindowStartupLocation = WindowStartupLocation.CenterScreen;
             if (wnd.ShowDialog() == true)
             {
@@ -84,7 +85,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         private void InsertRecordCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             DataType dt = (DataContext as VariablesModel).DataTypeCatalogue.DataTypes.Values.FirstOrDefault();
-            VariableViewer wnd = new VariableViewer(DataContext as VariablesModel, new VariableModel() { DataType = dt }, InputDialogDisplayMode.Insert, MainViewer.SelectedIndex);
+            VariableViewer wnd = new VariableViewer(DataContext as VariablesModel, __default_variable_model ?? new VariableModel() { DataType = dt }, InputDialogDisplayMode.Insert, MainViewer.SelectedIndex);
             wnd.WindowStartupLocation = WindowStartupLocation.CenterScreen;
             if (wnd.ShowDialog() == true)
             {
@@ -113,6 +114,11 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                     MessageBox.Show("At least one exception has occurred during the operation :\n" + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
+        }
+
+        private void DefaultRecordCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            __default_variable_model = MainViewer.SelectedItem as VariableModel;
         }
 
         private void MainViewer_CellDoubleTapped(object sender, GridCellDoubleTappedEventArgs e)

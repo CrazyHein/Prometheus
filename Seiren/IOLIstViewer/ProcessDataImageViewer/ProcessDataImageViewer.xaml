@@ -78,23 +78,25 @@
                         <TextBox Text="{Binding ActualSizeInWord}" FontStyle="Normal" IsReadOnly="True"/>
                     </sync:SfTextInputLayout>
                 </StackPanel>
-                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Bottom">
+                <StackPanel DockPanel.Dock="Right" HorizontalAlignment="Right" VerticalAlignment="Bottom">
                     <CheckBox VerticalAlignment="Center" IsChecked="{Binding DirectModeOperation, Mode=OneWayToSource}" Margin="4" Content="Direct Mode Operation"/>
-                    <sync:ButtonAdv Label="Add" VerticalAlignment="Center" Height="30" Width="128" Command="local:ConsoleControl.AddRecord" Margin="4">
-                        <sync:ButtonAdv.SmallIcon>
-                            <BitmapImage  UriSource="/imgs/add.png"/>
-                        </sync:ButtonAdv.SmallIcon>
-                    </sync:ButtonAdv>
-                    <sync:ButtonAdv Label="Insert" VerticalAlignment="Center" Height="30" Width="128" Command="local:ConsoleControl.InsertRecord" Margin="4">
-                        <sync:ButtonAdv.SmallIcon>
-                            <BitmapImage  UriSource="/imgs/insert.png"/>
-                        </sync:ButtonAdv.SmallIcon>
-                    </sync:ButtonAdv>
-                    <sync:ButtonAdv Label="Remove" VerticalAlignment="Center" Height="30" Width="128" Command="local:ConsoleControl.RemoveRecord" Margin="4">
-                        <sync:ButtonAdv.SmallIcon>
-                            <BitmapImage  UriSource="/imgs/remove.png"/>
-                        </sync:ButtonAdv.SmallIcon>
-                    </sync:ButtonAdv>
+                    <StackPanel Orientation="Horizontal">
+                        <sync:ButtonAdv Label="Add" VerticalAlignment="Center" Height="30" Width="128" Command="local:ConsoleControl.AddRecord" Margin="4">
+                            <sync:ButtonAdv.SmallIcon>
+                                <BitmapImage  UriSource="/imgs/add.png"/>
+                            </sync:ButtonAdv.SmallIcon>
+                        </sync:ButtonAdv>
+                        <sync:ButtonAdv Label="Insert" VerticalAlignment="Center" Height="30" Width="128" Command="local:ConsoleControl.InsertRecord" Margin="4">
+                            <sync:ButtonAdv.SmallIcon>
+                                <BitmapImage  UriSource="/imgs/insert.png"/>
+                            </sync:ButtonAdv.SmallIcon>
+                        </sync:ButtonAdv>
+                        <sync:ButtonAdv Label="Remove" VerticalAlignment="Center" Height="30" Width="128" Command="local:ConsoleControl.RemoveRecord" Margin="4">
+                            <sync:ButtonAdv.SmallIcon>
+                                <BitmapImage  UriSource="/imgs/remove.png"/>
+                            </sync:ButtonAdv.SmallIcon>
+                        </sync:ButtonAdv>
+                    </StackPanel>
                 </StackPanel>
             </DockPanel>
             <sync:SfDataGrid Name="ProcessDataImageGrid" ItemsSource="{Binding ProcessDataModels}" AutoGenerateColumns="False"

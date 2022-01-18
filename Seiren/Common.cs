@@ -44,6 +44,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         public static RoutedUICommand InsertRecord { get; private set; }
         public static RoutedUICommand InsertRecordEx { get; private set; }
         public static RoutedUICommand SearchRecord { get; private set; }
+        public static RoutedUICommand DefaultRecord { get; private set; }
+        public static RoutedUICommand RecordRedo { get; private set; }
+        public static RoutedUICommand RecordUndo { get; private set; }
         public static RoutedUICommand Cancel { get; private set; }
         public static RoutedUICommand Confirm { get; private set; }
         public static RoutedUICommand About { get; private set; }
@@ -142,6 +145,24 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                 new KeyGesture(Key.R, ModifierKeys.Control, "Ctrl+R")
             };
             RemoveRecord = new RoutedUICommand("Remove", "Remove Record", typeof(ConsoleControl), gestureRemoveRecord);
+
+            InputGestureCollection gestureDefaultRecord = new InputGestureCollection
+            {
+                new KeyGesture(Key.D, ModifierKeys.Control, "Ctrl+D")
+            };
+            DefaultRecord = new RoutedUICommand("Set As Default", "Set As Default Record", typeof(ConsoleControl), gestureDefaultRecord);
+
+            InputGestureCollection gestureRecordRedo = new InputGestureCollection
+            {
+                new KeyGesture(Key.Y, ModifierKeys.Control, "Ctrl+Y")
+            };
+            RecordRedo = new RoutedUICommand("Redo", "Redo", typeof(ConsoleControl), gestureRecordRedo);
+
+            InputGestureCollection gestureRecordUndo = new InputGestureCollection
+            {
+                new KeyGesture(Key.Z, ModifierKeys.Control, "Ctrl+Z")
+            };
+            RecordUndo = new RoutedUICommand("Undo", "Undo", typeof(ConsoleControl), gestureRecordUndo);
 
             Cancel = new RoutedUICommand("Cancel", "Cancel", typeof(ConsoleControl));
 

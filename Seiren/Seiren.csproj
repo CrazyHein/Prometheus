@@ -22,6 +22,7 @@
     <None Remove="imgs\close.png" />
     <None Remove="imgs\configuration.png" />
     <None Remove="imgs\confirm.png" />
+    <None Remove="imgs\copy.png" />
     <None Remove="imgs\datatypes.png" />
     <None Remove="imgs\devices.png" />
     <None Remove="imgs\edit.png" />
@@ -42,6 +43,7 @@
     <None Remove="imgs\navigation.png" />
     <None Remove="imgs\new.png" />
     <None Remove="imgs\open.png" />
+    <None Remove="imgs\paste.png" />
     <None Remove="imgs\process.png" />
     <None Remove="imgs\quit.png" />
     <None Remove="imgs\remove.png" />
@@ -65,6 +67,7 @@
     <Resource Include="imgs\close.png" />
     <Resource Include="imgs\configuration.png" />
     <Resource Include="imgs\confirm.png" />
+    <Resource Include="imgs\copy.png" />
     <Resource Include="imgs\edit.png" />
     <Resource Include="imgs\export.png" />
     <Resource Include="imgs\ftp.png" />
@@ -77,6 +80,7 @@
     <Resource Include="imgs\insert.png" />
     <Resource Include="imgs\logo.png" />
     <Resource Include="imgs\miscellaneous.png" />
+    <Resource Include="imgs\paste.png" />
     <Resource Include="imgs\startmonitoring.png" />
     <Resource Include="imgs\new.png" />
     <Resource Include="imgs\open.png" />
