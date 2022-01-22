@@ -39,7 +39,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             RxBlockObjects?.CommitChanges();
             InterlockLogics?.CommitChanges();
         }
-        public ObjectsModel(ObjectDictionary od, VariableDictionary vd, ControllerConfiguration cmc)
+        public ObjectsModel(ObjectDictionary od, VariableDictionary vd, ControllerConfiguration cmc, OperatingHistory history)
         {
             __object_dictionary = od;
             Variables = vd;
@@ -47,6 +47,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             __objects = new ObservableCollection<ObjectModel>(od.ProcessObjects.Values.Select(o => new ObjectModel(o)));
             Objects = __objects;
             Modified = false;
+            OperatingHistory = history;
+            Name = "Object Dictionary";
         }
 
         protected ProcessObject _create_process_object(ObjectModel model)
@@ -73,7 +75,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                 model.EnableValueConverter == true ? new ValueConverter(model.ValueConverterUp, model.ValueConverterDown) : null);
         }
 
-        public void Add(ObjectModel model)
+        public void Add(ObjectModel model, bool log = true)
         {
             var p = _process_object_property(model);
             __object_dictionary.Add(p.Index, p.VariableName, 
@@ -81,33 +83,43 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                 p.Range, p.Converter);
             __objects.Add(model);
             Modified = true;
+            if (log && OperatingHistory != null)
+                OperatingHistory.PushOperatingRecord(new OperatingRecord() { Host = this, Operation = Operation.Add, OriginaPos = -1, NewPos = __objects.Count - 1, OriginalValue = null, NewValue = model });
         }
 
-        public ObjectModel RemoveAt(int index, bool force = false)
+        public ObjectModel RemoveAt(int index, bool force = false, bool log = true)
         {
             ObjectModel model = __objects[index];
             __object_dictionary.Remove(model.Index, force);
             __objects.RemoveAt(index);
             Modified = true;
+            if (log && OperatingHistory != null)
+                OperatingHistory.PushOperatingRecord(new OperatingRecord() { Host = this, Operation = Operation.Remove, OriginaPos = index, NewPos = -1, OriginalValue = model, NewValue = null });
             return model;
         }
 
-        public ObjectModel Remove(uint index, bool force = false)
+        public ObjectModel Remove(uint index, bool force = false, bool log = true)
         {
             __object_dictionary.Remove(index, force);
             var o = __objects.First(o => o.Index == index);
+            int i = __objects.IndexOf(o);
             __objects.Remove(o);
+            if (log && OperatingHistory != null)
+                OperatingHistory.PushOperatingRecord(new OperatingRecord() { Host = this, Operation = Operation.Remove, OriginaPos = i, NewPos = -1, OriginalValue = o, NewValue = null });
             return o;
         }
 
-        public void Remove(ObjectModel model, bool force = false)
+        public void Remove(ObjectModel model, bool force = false, bool log = true)
         {
             __object_dictionary.Remove(model.Index, force);
+            int index = __objects.IndexOf(model);
             __objects.Remove(model);
             Modified = true;
+            if (log && OperatingHistory != null)
+                OperatingHistory.PushOperatingRecord(new OperatingRecord() { Host = this, Operation = Operation.Remove, OriginaPos = index, NewPos = -1, OriginalValue = model, NewValue = null });
         }
 
-        public void Insert(int index, ObjectModel model)
+        public void Insert(int index, ObjectModel model, bool log = true)
         {
             if (index > __objects.Count)
                 throw new ArgumentOutOfRangeException();
@@ -119,6 +131,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                 p.Range, p.Converter);
             __objects.Insert(index, model);
             Modified = true;
+            if (log && OperatingHistory != null)
+                OperatingHistory.PushOperatingRecord(new OperatingRecord() { Host = this, Operation = Operation.Insert, OriginaPos = -1, NewPos = index, OriginalValue = null, NewValue = model });
         }
 
         public int IndexOf(ObjectModel model)
@@ -136,7 +150,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             return __object_dictionary.ProcessObjects.ContainsKey(index);
         }
 
-        public void Replace(int index, ObjectModel newModel)
+        public void Replace(int index, ObjectModel newModel, bool log = true)
         {
             ObjectModel original = __objects[index];
             var p = _process_object_property(newModel);
@@ -146,8 +160,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                 p.Range, p.Converter);
             __objects[index] = newModel;
             Modified = true;
+            if (log && OperatingHistory != null)
+                OperatingHistory?.PushOperatingRecord(new OperatingRecord() { Host = this, Operation = Operation.Replace, OriginaPos = index, NewPos = index, OriginalValue = original, NewValue = newModel });
             //Notify others here
-            if(original.VariableDataType == "BIT")
+            if (original.VariableDataType == "BIT")
             {
                 if (TxBitObjects?.UpdateProcessData(original.Index, newModel.Index) == true)
                     return;
@@ -167,15 +183,18 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             }
         }
 
-        public void Replace(ObjectModel originalModel, ObjectModel newModel)
+        public void Replace(ObjectModel originalModel, ObjectModel newModel, bool log = true)
         {
             var p = _process_object_property(newModel);
             __object_dictionary.Replace(originalModel.Index, 
                 p.Index, p.VariableName,
                 p.BindingDeviceName, p.BindingChannelName, p.BindingChannelIndex,
                 p.Range, p.Converter);
-            __objects[__objects.IndexOf(originalModel)] = newModel;
+            int index = __objects.IndexOf(originalModel);
+            __objects[index] = newModel;
             Modified = true;
+            if (log && OperatingHistory != null)
+                OperatingHistory?.PushOperatingRecord(new OperatingRecord() { Host = this, Operation = Operation.Replace, OriginaPos = index, NewPos = index, OriginalValue = originalModel, NewValue = newModel });
             //Notify others here
             //TxDiagnosticObjects?.UpdateProcessData(originalModel.Index, newModel.Index);
             //TxBitObjects?.UpdateProcessData(originalModel.Index, newModel.Index);
@@ -247,6 +266,55 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             RxControlObjects?.UpdateBinding(origin);
             RxBitObjects?.UpdateBinding(origin);
             RxBlockObjects?.UpdateBinding(origin);
+        }
+
+        public override void Undo(OperatingRecord r)
+        {
+            switch (r.Operation)
+            {
+                case Operation.Add:
+                    Remove(r.NewValue as ObjectModel, false, false);
+                    break;
+                case Operation.Move:
+                    Remove(r.NewValue as ObjectModel, true, false);
+                    Insert(r.OriginaPos, r.OriginalValue as ObjectModel, false);
+                    break;
+                case Operation.Remove:
+                    if (r.OriginaPos == __objects.Count)
+                        Add(r.OriginalValue as ObjectModel, false);
+                    else
+                        Insert(r.OriginaPos, r.OriginalValue as ObjectModel, false);
+                    break;
+                case Operation.Insert:
+                    Remove(r.NewValue as ObjectModel, false, false);
+                    break;
+                case Operation.Replace:
+                    Replace(r.NewValue as ObjectModel, r.OriginalValue as ObjectModel, false);
+                    break;
+            }
+        }
+
+        public override void Redo(OperatingRecord r)
+        {
+            switch (r.Operation)
+            {
+                case Operation.Add:
+                    Add(r.NewValue as ObjectModel, false);
+                    break;
+                case Operation.Move:
+                    Remove(r.OriginalValue as ObjectModel, true, false);
+                    Insert(r.NewPos, r.NewValue as ObjectModel, false);
+                    break;
+                case Operation.Remove:
+                    Remove(r.OriginalValue as ObjectModel, false, false);
+                    break;
+                case Operation.Insert:
+                    Insert(r.NewPos, r.NewValue as ObjectModel, false);
+                    break;
+                case Operation.Replace:
+                    Replace(r.OriginalValue as ObjectModel, r.NewValue as ObjectModel, false);
+                    break;
+            }
         }
     }
 

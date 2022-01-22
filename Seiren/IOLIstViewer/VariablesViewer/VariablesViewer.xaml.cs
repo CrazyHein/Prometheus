@@ -14,10 +14,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
     public partial class VariablesViewer : UserControl
     {
         private VariableModel __default_variable_model;
-        public VariablesViewer(VariableDictionary dic, DataTypeCatalogue dtc)
+        public VariablesViewer(VariableDictionary dic, DataTypeCatalogue dtc, OperatingHistory history = null)
         {
             InitializeComponent();
-            DataContext = new VariablesModel(dic, dtc);
+            DataContext = new VariablesModel(dic, dtc, history);
             MainViewer.RowDragDropController.DragStart += OnMainViewer_DragStart;
             MainViewer.RowDragDropController.Dropped += OnMainViewer_Dropped;
         }
@@ -36,11 +36,19 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                 VariableModel targetVariable = variablesModel.Variables[(int)e.TargetRecord];
 
                 MainViewer.BeginInit();
-                variablesModel.Remove(draggingRecords[0] as VariableModel, true);
+                int dragIndex = variablesModel.IndexOf(draggingRecords[0] as VariableModel);
+                variablesModel.Remove(draggingRecords[0] as VariableModel, true, false);
                 int targetIndex = variablesModel.IndexOf(targetVariable);
                 int insertionIndex = e.DropPosition == DropPosition.DropAbove ? targetIndex : targetIndex + 1;
-                variablesModel.Insert(insertionIndex, draggingRecords[0] as VariableModel);
+                variablesModel.Insert(insertionIndex, draggingRecords[0] as VariableModel, false);
                 MainViewer.EndInit();
+                variablesModel.OperatingHistory?.PushOperatingRecord(
+                    new OperatingRecord() { 
+                        Host = variablesModel, 
+                        Operation = Operation.Move, 
+                        OriginaPos = dragIndex, NewPos = insertionIndex, 
+                        OriginalValue = draggingRecords[0] as VariableModel, NewValue = draggingRecords[0] as VariableModel });
+                CommandManager.InvalidateRequerySuggested();
             }
         }
 

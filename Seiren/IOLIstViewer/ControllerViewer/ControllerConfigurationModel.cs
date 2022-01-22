@@ -14,7 +14,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         private ObservableCollection<DeviceConfigurationModel> __device_configurations;
         public IReadOnlyList<DeviceConfigurationModel> DeviceConfigurations { get; private set; }
         public ObjectsModel? SubscriberObjects { get; set; }
-        public ControllerConfigurationModel(ControllerConfiguration cc, ControllerModelCatalogue cmc)
+        public ControllerConfigurationModel(ControllerConfiguration cc, ControllerModelCatalogue cmc, OperatingHistory history)
         {
             __controller_configuration_collection = cc;
             ControllerModelCatalogue = cmc;
@@ -30,38 +30,49 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                 }));
             DeviceConfigurations = __device_configurations;
             Modified = false;
+            OperatingHistory = history;
+            Name = "Controller Configuration";
         }
 
-        public void Add(DeviceConfigurationModel model)
+        public void Add(DeviceConfigurationModel model, bool log = true)
         {
             __controller_configuration_collection.Add(model.DeviceModel.ID, model.Switch, model.LocalAddress, model.IPv4, model.Port, model.ReferenceName);
             __device_configurations.Add(model);
             Modified = true;
+            if (log && OperatingHistory != null)
+                OperatingHistory.PushOperatingRecord(new OperatingRecord() { Host = this, Operation = Operation.Add, OriginaPos = -1, NewPos = __device_configurations.Count - 1, OriginalValue = null, NewValue = model });
         }
 
-        public DeviceConfigurationModel RemoveAt(int index, bool force = false)
+        public DeviceConfigurationModel RemoveAt(int index, bool force = false, bool log = true)
         {
             DeviceConfigurationModel model = __device_configurations[index];
             __controller_configuration_collection.Remove(model.ReferenceName, force);
             __device_configurations.RemoveAt(index);
             Modified = true;
+            if (log && OperatingHistory != null)
+                OperatingHistory.PushOperatingRecord(new OperatingRecord() { Host = this, Operation = Operation.Remove, OriginaPos = index, NewPos = -1, OriginalValue = model, NewValue = null });
             return model;
         }
 
-        public void Remove(DeviceConfigurationModel model, bool force = false)
+        public void Remove(DeviceConfigurationModel model, bool force = false, bool log = true)
         {
             __controller_configuration_collection.Remove(model.ReferenceName, force);
+            int index = __device_configurations.IndexOf(model);
             __device_configurations.Remove(model);
             Modified = true;
+            if (log && OperatingHistory != null)
+                OperatingHistory.PushOperatingRecord(new OperatingRecord() { Host = this, Operation = Operation.Remove, OriginaPos = index, NewPos = -1, OriginalValue = model, NewValue = null });
         }
 
-        public void Insert(int index, DeviceConfigurationModel model)
+        public void Insert(int index, DeviceConfigurationModel model, bool log = true)
         {
             if (index > __device_configurations.Count)
                 throw new ArgumentOutOfRangeException();
             __controller_configuration_collection.Add(model.DeviceModel.ID, model.Switch, model.LocalAddress, model.IPv4, model.Port, model.ReferenceName);
             __device_configurations.Insert(index, model);
             Modified = true;
+            if (log && OperatingHistory != null)
+                OperatingHistory.PushOperatingRecord(new OperatingRecord() { Host = this, Operation = Operation.Insert, OriginaPos = -1, NewPos = index, OriginalValue = null, NewValue = model });
         }
 
         public int IndexOf(DeviceConfigurationModel model)
@@ -79,21 +90,26 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             return __controller_configuration_collection.Configurations.ContainsKey(name);
         }
 
-        public void Replace(int index, DeviceConfigurationModel newModel)
+        public void Replace(int index, DeviceConfigurationModel newModel, bool log = true)
         {
             DeviceConfigurationModel original = __device_configurations[index];
             __controller_configuration_collection.Replace(original.ReferenceName, newModel.DeviceModel.ID, newModel.Switch, newModel.LocalAddress, newModel.IPv4, newModel.Port, newModel.ReferenceName);
             __device_configurations[index] = newModel;
             Modified = true;
+            if (log && OperatingHistory != null)
+                OperatingHistory?.PushOperatingRecord(new OperatingRecord() { Host = this, Operation = Operation.Replace, OriginaPos = index, NewPos = index, OriginalValue = original, NewValue = newModel });
             //Notify others here
             SubscriberObjects?.UpdateBinding(original.ReferenceName);
         }
 
-        public void Replace(DeviceConfigurationModel originalModel, DeviceConfigurationModel newModel)
+        public void Replace(DeviceConfigurationModel originalModel, DeviceConfigurationModel newModel, bool log = true)
         {
             __controller_configuration_collection.Replace(originalModel.ReferenceName, newModel.DeviceModel.ID, newModel.Switch, newModel.LocalAddress, newModel.IPv4, newModel.Port, newModel.ReferenceName);
-            __device_configurations[__device_configurations.IndexOf(originalModel)] = newModel;
+            int index = __device_configurations.IndexOf(originalModel);
+            __device_configurations[index] = newModel;
             Modified = true;
+            if (log && OperatingHistory != null)
+                OperatingHistory?.PushOperatingRecord(new OperatingRecord() { Host = this, Operation = Operation.Replace, OriginaPos = index, NewPos = index, OriginalValue = originalModel, NewValue = newModel });
             //Notify others here
             SubscriberObjects?.UpdateBinding(originalModel.ReferenceName);
         }
@@ -109,7 +125,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             Modified = false;
         }
 
-        public void ImportDevices(string path)
+        public void ImportDevices(string path, bool log = true)
         {
             TaskUserParameterHelper helper = new TaskUserParameterHelper(ControllerModelCatalogue, path, out _);
             uint i = 0;
@@ -127,6 +143,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                 DeviceConfigurationModel model = new DeviceConfigurationModel() { DeviceModel = d.DeviceModel, Switch = d.Switch, LocalAddress = d.LocalAddress, ReferenceName = refer };
                 __controller_configuration_collection.Add(model.DeviceModel.ID, model.Switch, model.LocalAddress, model.IPv4, model.Port, model.ReferenceName);
                 __device_configurations.Add(model);
+                if (log && OperatingHistory != null)
+                    OperatingHistory.PushOperatingRecord(new OperatingRecord() { Host = this, Operation = Operation.Add, OriginaPos = -1, NewPos = __device_configurations.Count - 1, OriginalValue = null, NewValue = model });
             }
             foreach (var d in helper.RemoteHardwareCollection)
             {
@@ -141,9 +159,60 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                 DeviceConfigurationModel model = new DeviceConfigurationModel() { DeviceModel = d.DeviceModel, Switch = d.Switch, IPv4 = d.IPv4, Port = d.Port, ReferenceName = refer };
                 __controller_configuration_collection.Add(model.DeviceModel.ID, model.Switch, model.LocalAddress, model.IPv4, model.Port, model.ReferenceName);
                 __device_configurations.Add(model);
+                if (log && OperatingHistory != null)
+                    OperatingHistory.PushOperatingRecord(new OperatingRecord() { Host = this, Operation = Operation.Add, OriginaPos = -1, NewPos = __device_configurations.Count - 1, OriginalValue = null, NewValue = model });
             }
             if (helper.LocalHardwareCollection.Count != 0 || helper.RemoteHardwareCollection.Count != 0)
                 Modified = false;
+        }
+
+        public override void Undo(OperatingRecord r)
+        {
+            switch (r.Operation)
+            {
+                case Operation.Add:
+                    Remove(r.NewValue as DeviceConfigurationModel, false, false);
+                    break;
+                case Operation.Move:
+                    Remove(r.NewValue as DeviceConfigurationModel, true, false);
+                    Insert(r.OriginaPos, r.OriginalValue as DeviceConfigurationModel, false);
+                    break;
+                case Operation.Remove:
+                    if (r.OriginaPos == __device_configurations.Count)
+                        Add(r.OriginalValue as DeviceConfigurationModel, false);
+                    else
+                        Insert(r.OriginaPos, r.OriginalValue as DeviceConfigurationModel, false);
+                    break;
+                case Operation.Insert:
+                    Remove(r.NewValue as DeviceConfigurationModel, false, false);
+                    break;
+                case Operation.Replace:
+                    Replace(r.NewValue as DeviceConfigurationModel, r.OriginalValue as DeviceConfigurationModel, false);
+                    break;
+            }
+        }
+
+        public override void Redo(OperatingRecord r)
+        {
+            switch (r.Operation)
+            {
+                case Operation.Add:
+                    Add(r.NewValue as DeviceConfigurationModel, false);
+                    break;
+                case Operation.Move:
+                    Remove(r.OriginalValue as DeviceConfigurationModel, true, false);
+                    Insert(r.NewPos, r.NewValue as DeviceConfigurationModel, false);
+                    break;
+                case Operation.Remove:
+                    Remove(r.OriginalValue as DeviceConfigurationModel, false, false);
+                    break;
+                case Operation.Insert:
+                    Insert(r.NewPos, r.NewValue as DeviceConfigurationModel, false);
+                    break;
+                case Operation.Replace:
+                    Replace(r.OriginalValue as DeviceConfigurationModel, r.NewValue as DeviceConfigurationModel, false);
+                    break;
+            }
         }
     }
 

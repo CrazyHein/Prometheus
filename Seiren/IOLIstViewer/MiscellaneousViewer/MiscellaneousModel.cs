@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
 {
-    public class MiscellaneousModel : RecordContainerModel
+    public class MiscellaneousModel : ContainerModel
     {
         private Miscellaneous __misc;
         public MiscellaneousModel(Miscellaneous misc)

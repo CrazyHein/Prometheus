@@ -7,7 +7,7 @@
     <UseWindowsForms>true</UseWindowsForms>
     <RootNamespace>AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren</RootNamespace>
     <Nullable>annotations</Nullable>
-    <Version>0.3.0</Version>
+    <Version>0.4.0</Version>
     <Authors>CrazyHein</Authors>
     <Company>AMEC</Company>
     <ApplicationIcon>imgs\logo.ico</ApplicationIcon>
@@ -46,6 +46,7 @@
     <None Remove="imgs\paste.png" />
     <None Remove="imgs\process.png" />
     <None Remove="imgs\quit.png" />
+    <None Remove="imgs\redo.png" />
     <None Remove="imgs\remove.png" />
     <None Remove="imgs\save.png" />
     <None Remove="imgs\saveas.png" />
@@ -56,6 +57,7 @@
     <None Remove="imgs\startdebugging.png" />
     <None Remove="imgs\startmonitoring.png" />
     <None Remove="imgs\stopdebugging.png" />
+    <None Remove="imgs\undo.png" />
     <None Remove="imgs\variables.png" />
     <None Remove="splash.jpg" />
   </ItemGroup>
@@ -81,6 +83,7 @@
     <Resource Include="imgs\logo.png" />
     <Resource Include="imgs\miscellaneous.png" />
     <Resource Include="imgs\paste.png" />
+    <Resource Include="imgs\redo.png" />
     <Resource Include="imgs\startmonitoring.png" />
     <Resource Include="imgs\new.png" />
     <Resource Include="imgs\open.png" />
@@ -91,6 +94,7 @@
     <Resource Include="imgs\saveas.png" />
     <Resource Include="imgs\startdebugging.png" />
     <Resource Include="imgs\stopdebugging.png" />
+    <Resource Include="imgs\undo.png" />
     <Resource Include="imgs\variables.png" />
   </ItemGroup>
 

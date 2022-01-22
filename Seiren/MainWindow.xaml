@@ -20,6 +20,8 @@
         <CommandBinding Command="local:ConsoleControl.StartMonitoring" Executed="StartMonitoringCommand_Executed" CanExecute="StartDebuggingCommand_CanExecuted"/>
         <CommandBinding Command="local:ConsoleControl.StartDebugging" Executed="StartDebuggingCommand_Executed" CanExecute="StartDebuggingCommand_CanExecuted"/>
         <CommandBinding Command="local:ConsoleControl.StopDebugging" Executed="StopDebuggingCommand_Executed" CanExecute="StopDebuggingCommand_CanExecuted"/>
+        <CommandBinding Command="local:ConsoleControl.RecordUndo" Executed="RecordUndoCommand_Executed" CanExecute="RecordUndoCommand_CanExecuted"/>
+        <CommandBinding Command="local:ConsoleControl.RecordRedo" Executed="RecordRedoCommand_Executed" CanExecute="RecordRedoCommand_CanExecuted"/>
     </Window.CommandBindings>
     <Window.Resources>
         <local:InvertBooleanValue x:Key="InvertBoolean"/>
@@ -57,6 +59,33 @@
                     <BitmapImage  UriSource="imgs/save.png"/>
                 </sync:ButtonAdv.LargeIcon>
             </sync:ButtonAdv>
+            <sync:ToolBarItemSeparator/>
+            <sync:SplitButtonAdv Command="local:ConsoleControl.RecordUndo" SizeMode="Large" Label="Undo" Margin="2" Width="60" LargeIcon="imgs/undo.png" Name="UndoButton">
+                <sync:DropDownMenuGroup ItemsSource="{Binding UndoOperatingRecords}" ScrollBarVisibility="Auto">
+                    <sync:DropDownMenuGroup.ItemTemplate>
+                        <DataTemplate>
+                            <sync:MenuItemAdv Command="local:ConsoleControl.RecordUndo" Header="{Binding Info}" Margin="2" CommandParameter="{Binding}" Click="UndoMenuItemAdv_Click">
+                                <sync:MenuItemAdv.Icon>
+                                    <Image Source="imgs/undo.png" Height="20"/>
+                                </sync:MenuItemAdv.Icon>
+                            </sync:MenuItemAdv>
+                        </DataTemplate>
+                    </sync:DropDownMenuGroup.ItemTemplate>
+                </sync:DropDownMenuGroup>
+            </sync:SplitButtonAdv>
+            <sync:SplitButtonAdv Command="local:ConsoleControl.RecordRedo" SizeMode="Large" Label="Redo" Margin="2" Width="60" LargeIcon="imgs/redo.png" Name="RedoButton">
+                <sync:DropDownMenuGroup ItemsSource="{Binding RedoOperatingRecords}" ScrollBarVisibility="Auto">
+                    <sync:DropDownMenuGroup.ItemTemplate>
+                        <DataTemplate>
+                            <sync:MenuItemAdv Command="local:ConsoleControl.RecordRedo" Header="{Binding Info}" Margin="2" CommandParameter="{Binding}" Click="RedoMenuItemAdv_Click">
+                                <sync:MenuItemAdv.Icon>
+                                    <Image Source="imgs/undo.png" Height="20"/>
+                                </sync:MenuItemAdv.Icon>
+                            </sync:MenuItemAdv>
+                        </DataTemplate>
+                    </sync:DropDownMenuGroup.ItemTemplate>
+                </sync:DropDownMenuGroup>
+            </sync:SplitButtonAdv>
             <sync:ToolBarItemSeparator/>
             <sync:ButtonAdv Command="local:ConsoleControl.StartMonitoring" SizeMode="Large" Label="Start Monitoring" Margin="2" Width="100">
                 <sync:ButtonAdv.LargeIcon>
@@ -154,6 +183,18 @@
                 <sync:MenuItemAdv Command="local:ConsoleControl.Quit">
                     <sync:MenuItemAdv.Icon>
                         <Image Source="imgs/quit.png" Height="28" Width="28"/>
+                    </sync:MenuItemAdv.Icon>
+                </sync:MenuItemAdv>
+            </sync:MenuItemAdv>
+            <sync:MenuItemAdv  Header="_Edit" Margin="2">
+                <sync:MenuItemAdv Command="local:ConsoleControl.RecordUndo">
+                    <sync:MenuItemAdv.Icon>
+                        <Image Source="imgs/undo.png" Height="28" Width="28"/>
+                    </sync:MenuItemAdv.Icon>
+                </sync:MenuItemAdv>
+                <sync:MenuItemAdv Command="local:ConsoleControl.RecordRedo">
+                    <sync:MenuItemAdv.Icon>
+                        <Image Source="imgs/redo.png" Height="28" Width="28"/>
                     </sync:MenuItemAdv.Icon>
                 </sync:MenuItemAdv>
             </sync:MenuItemAdv>

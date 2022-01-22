@@ -22,10 +22,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
     /// </summary>
     public partial class InterlockCollectionViewer : UserControl
     {
-        public InterlockCollectionViewer(InterlockCollection ic, ObjectDictionary od, ProcessDataImage txbit, ProcessDataImage rxbit, SfDataGrid source)
+        public InterlockCollectionViewer(InterlockCollection ic, ObjectDictionary od, ProcessDataImage txbit, ProcessDataImage rxbit, SfDataGrid source, OperatingHistory history)
         {
             InitializeComponent();
-            DataContext = new InterlockCollectionModel(ic, od, txbit, rxbit, (source.DataContext as ObjectsModel));
+            DataContext = new InterlockCollectionModel(ic, od, txbit, rxbit, (source.DataContext as ObjectsModel), history);
         }
 
         private InputDialogDisplayMode __display_mode;

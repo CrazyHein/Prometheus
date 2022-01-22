@@ -17,6 +17,15 @@
             <Button Content="OK"  Height="30" Margin="4,0,0,4" Click="OK_Click"/>
         </UniformGrid>
         <TabControl>
+            <TabControl.Resources>
+                <Style TargetType="TextBox">
+                    <Style.Triggers>
+                        <Trigger Property="Validation.HasError" Value="true">
+                            <Setter Property="ToolTip" Value="{Binding RelativeSource={RelativeSource Mode=Self}, Path=(Validation.Errors)[0].ErrorContent}" />
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </TabControl.Resources>
             <TabItem Header="Debugger" Width="135" Name="DebuggerSettingsTab">
                 <Grid d:DataContext="{d:DesignInstance Type=debugger:SlmpTargetProperty}" x:Name="DebuggerSettings" Validation.Error="DebuggerSettings_Error">
                     <Grid.Resources>
@@ -145,8 +154,19 @@
                     </GroupBox>
                 </Grid>
             </TabItem>
-            <TabItem Header="Preferences"  Width="135">
-
+            <TabItem Header="Preferences"  Width="135" x:Name="PreferenceSettings">
+                <Grid Validation.Error="DebuggerSettings_Error">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="auto" />
+                    </Grid.RowDefinitions>
+                    <GroupBox Header="Undo Queue of Record Operating" Padding="3,0,3,0" Margin="0,4,0,0">
+                        <sync:SfTextInputLayout Hint="Depth"  FontSize="12" FontStyle="Italic" ContainerType="Filled" Margin="4" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}"
+                                                HelperText="Restarting the application to put the change in effect.">
+                            <TextBox FontStyle="Normal" Text="{Binding RecordOperatingUndoQueueDepth, ValidatesOnExceptions=True, NotifyOnValidationError=True}"/>
+                        </sync:SfTextInputLayout>
+                    </GroupBox>
+                </Grid>
             </TabItem>
         </TabControl>
     </DockPanel>

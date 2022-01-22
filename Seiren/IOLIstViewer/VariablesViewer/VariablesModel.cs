@@ -13,45 +13,56 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         private ObservableCollection<VariableModel> __variables;
         public IReadOnlyList<VariableModel> Variables { get; private set; }
         public ObjectsModel? SubscriberObjects { get; set; }
-        public VariablesModel(VariableDictionary dic, DataTypeCatalogue dtc)
+        public VariablesModel(VariableDictionary dic, DataTypeCatalogue dtc, OperatingHistory history)
         {
             __variable_dictionary = dic;
             DataTypeCatalogue = dtc;
             __variables = new ObservableCollection<VariableModel>(dic.Variables.Values.Select(v => new VariableModel { Name = v.Name, DataType = v.Type, Unit = v.Unit, Comment = v.Comment }));
             Variables = __variables;
             Modified = false;
+            OperatingHistory = history;
+            Name = "Variable Dictionary";
         }
 
-        public void Add(VariableModel model)
+        public void Add(VariableModel model, bool log = true)
         {
             __variable_dictionary.Add(model.Name, model.DataType.Name, model.Unit, model.Comment);
             __variables.Add(model);
             Modified = true;
+            if (log && OperatingHistory != null)
+                OperatingHistory.PushOperatingRecord(new OperatingRecord(){ Host = this, Operation= Operation.Add, OriginaPos = -1, NewPos = __variables.Count - 1, OriginalValue = null, NewValue = model});
         }
 
-        public VariableModel RemoveAt(int index, bool force = false)
+        public VariableModel RemoveAt(int index, bool force = false, bool log = true)
         {
             VariableModel model = __variables[index];
             __variable_dictionary.Remove(model.Name, force);
             __variables.RemoveAt(index);
             Modified = true;
+            if (log && OperatingHistory != null)
+                OperatingHistory.PushOperatingRecord(new OperatingRecord(){ Host = this, Operation = Operation.Remove, OriginaPos = index, NewPos = -1, OriginalValue = model, NewValue = null });
             return model;
         }
 
-        public void Remove(VariableModel model, bool force = false)
+        public void Remove(VariableModel model, bool force = false, bool log = true)
         {
             __variable_dictionary.Remove(model.Name, force);
+            int index = __variables.IndexOf(model);
             __variables.Remove(model);
             Modified = true;
+            if (log && OperatingHistory != null)
+                OperatingHistory.PushOperatingRecord(new OperatingRecord(){ Host = this, Operation = Operation.Remove, OriginaPos = index, NewPos = -1, OriginalValue = model, NewValue = null });
         }
 
-        public void Insert(int index, VariableModel model)
+        public void Insert(int index, VariableModel model, bool log = true)
         {
             if (index > __variables.Count)
                 throw new ArgumentOutOfRangeException();
             __variable_dictionary.Add(model.Name, model.DataType.Name, model.Unit, model.Comment);
             __variables.Insert(index, model);
             Modified = true;
+            if (log && OperatingHistory != null)
+                OperatingHistory.PushOperatingRecord(new OperatingRecord(){ Host = this, Operation = Operation.Insert, OriginaPos = -1, NewPos = index, OriginalValue = null, NewValue = model });
         }
 
         public int IndexOf(VariableModel model)
@@ -69,21 +80,26 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             return __variable_dictionary.Variables.ContainsKey(name);
         }
 
-        public void Replace(int index, VariableModel newModel)
+        public void Replace(int index, VariableModel newModel, bool log = true)
         {
             VariableModel original = __variables[index];
             __variable_dictionary.Replace(original.Name, newModel.Name, newModel.DataType.Name, newModel.Unit, newModel.Comment);
             __variables[index] = newModel;
             Modified = true;
+            if (log && OperatingHistory != null)
+                OperatingHistory?.PushOperatingRecord(new OperatingRecord() { Host = this, Operation = Operation.Replace, OriginaPos = index, NewPos = index, OriginalValue = original, NewValue = newModel });
             //Notify others here
             SubscriberObjects?.UpdateVariable(original.Name);
         }
 
-        public void Replace(VariableModel originalModel, VariableModel newModel)
+        public void Replace(VariableModel originalModel, VariableModel newModel, bool log = true)
         {
             __variable_dictionary.Replace(originalModel.Name, newModel.Name, newModel.DataType.Name, newModel.Unit, newModel.Comment);
-            __variables[__variables.IndexOf(originalModel)] = newModel;
+            int index = __variables.IndexOf(originalModel);
+            __variables[index] = newModel;
             Modified = true;
+            if (log && OperatingHistory != null)
+                OperatingHistory?.PushOperatingRecord(new OperatingRecord(){ Host = this, Operation = Operation.Replace, OriginaPos = index, NewPos = index, OriginalValue = originalModel, NewValue = newModel });
             //Notify others here
             SubscriberObjects?.UpdateVariable(originalModel.Name);
         }
@@ -97,6 +113,55 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         {
             __variable_dictionary.Save(path, VariableNames);
             Modified = false;
+        }
+
+        public override void Undo(OperatingRecord r)
+        {
+            switch(r.Operation)
+            {
+                case Operation.Add:
+                    Remove(r.NewValue as VariableModel, false, false);
+                    break;
+                case Operation.Move:
+                    Remove(r.NewValue as VariableModel, true, false);
+                    Insert(r.OriginaPos, r.OriginalValue as VariableModel, false);
+                    break;
+                case Operation.Remove:
+                    if (r.OriginaPos == __variables.Count)
+                        Add(r.OriginalValue as VariableModel, false);
+                    else
+                        Insert(r.OriginaPos, r.OriginalValue as VariableModel, false);
+                    break;
+                case Operation.Insert:
+                    Remove(r.NewValue as VariableModel, false, false);
+                    break;
+                case Operation.Replace:
+                    Replace(r.NewValue as VariableModel, r.OriginalValue as VariableModel, false);
+                    break;
+            }
+        }
+
+        public override void Redo(OperatingRecord r)
+        {
+            switch (r.Operation)
+            {
+                case Operation.Add:
+                    Add(r.NewValue as VariableModel, false);
+                    break;
+                case Operation.Move:
+                    Remove(r.OriginalValue as VariableModel, true, false);
+                    Insert(r.NewPos, r.NewValue as VariableModel, false);
+                    break;
+                case Operation.Remove:
+                    Remove(r.OriginalValue as VariableModel, false, false);
+                    break;
+                case Operation.Insert:
+                    Insert(r.NewPos, r.NewValue as VariableModel, false);
+                    break;
+                case Operation.Replace:
+                    Replace(r.OriginalValue as VariableModel, r.NewValue as VariableModel, false);
+                    break;
+            }
         }
     }
 

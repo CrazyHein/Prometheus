@@ -32,6 +32,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             InitializeComponent();
             Settings = settings;
             DebuggerSettings.DataContext = Settings.SlmpTargetProperty;
+            PreferenceSettings.DataContext = Settings.PreferenceProperty;
         }
 
         private void DebuggerSettings_Error(object sender, ValidationErrorEventArgs e)
@@ -112,6 +113,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
 
                 }
                 catch (SLMPException ex)
+                {
+                    MessageBox.Show(this, "At least one unexpected error occured while doing communication test.\n" + ex.Message, "Error Message", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+                catch(Exception ex)
                 {
                     MessageBox.Show(this, "At least one unexpected error occured while doing communication test.\n" + ex.Message, "Error Message", MessageBoxButton.OK, MessageBoxImage.Error);
                 }

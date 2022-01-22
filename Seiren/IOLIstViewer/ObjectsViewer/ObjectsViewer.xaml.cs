@@ -24,22 +24,22 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         public ObjectsViewer(ObjectDictionary od, VariableDictionary vd, ControllerConfiguration cmc,
             ProcessDataImage txdiagnostic, ProcessDataImage txbit, ProcessDataImage txblock,
             ProcessDataImage rxcontrol, ProcessDataImage rxbit, ProcessDataImage rxblock,
-            InterlockCollection interlock)
+            InterlockCollection interlock, OperatingHistory history = null)
         {
             InitializeComponent();
-            DataContext = new ObjectsModel(od, vd, cmc);
+            DataContext = new ObjectsModel(od, vd, cmc, history);
             MainViewer.RowDragDropController.DragStart += OnMainViewer_DragStart;
             MainViewer.RowDragDropController.DragOver += OnMainViewer_DragOver;
             MainViewer.RowDragDropController.Drop += OnMainViewer_Drop;
             MainViewer.RowDragDropController.Dropped += OnMainViewer_Dropped;
 
-            __tx_diagnostic_area_viewer = new ProcessDataImageViewer(txdiagnostic, od, MainViewer, DataContext as ObjectsModel);
-            __tx_bit_area_viewer = new ProcessDataImageViewer(txbit, od, MainViewer, DataContext as ObjectsModel);
-            __tx_block_area_viewer = new ProcessDataImageViewer(txblock, od, MainViewer, DataContext as ObjectsModel);
-            __rx_control_area_viewer = new ProcessDataImageViewer(rxcontrol, od, MainViewer, DataContext as ObjectsModel);
-            __rx_bit_area_viewer = new ProcessDataImageViewer(rxbit, od, MainViewer, DataContext as ObjectsModel);
-            __rx_block_area_viewer = new ProcessDataImageViewer(rxblock, od, MainViewer, DataContext as ObjectsModel);
-            __interlock_viewer = new InterlockCollectionViewer(interlock, od, txbit, rxbit, MainViewer);
+            __tx_diagnostic_area_viewer = new ProcessDataImageViewer(txdiagnostic, od, MainViewer, DataContext as ObjectsModel, history);
+            __tx_bit_area_viewer = new ProcessDataImageViewer(txbit, od, MainViewer, DataContext as ObjectsModel, history);
+            __tx_block_area_viewer = new ProcessDataImageViewer(txblock, od, MainViewer, DataContext as ObjectsModel, history);
+            __rx_control_area_viewer = new ProcessDataImageViewer(rxcontrol, od, MainViewer, DataContext as ObjectsModel, history);
+            __rx_bit_area_viewer = new ProcessDataImageViewer(rxbit, od, MainViewer, DataContext as ObjectsModel, history);
+            __rx_block_area_viewer = new ProcessDataImageViewer(rxblock, od, MainViewer, DataContext as ObjectsModel, history);
+            __interlock_viewer = new InterlockCollectionViewer(interlock, od, txbit, rxbit, MainViewer, history);
 
             TxDiagnosticArea.Content = __tx_diagnostic_area_viewer;
             TxDiagnosticArea.DataContext = __tx_diagnostic_area_viewer.DataContext;
@@ -99,11 +99,23 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                 ObjectModel targetObject = objects.Objects[(int)e.TargetRecord];
 
                 MainViewer.BeginInit();
-                objects.Remove(draggingRecords[0] as ObjectModel, true);
+                int dragIndex = objects.IndexOf(draggingRecords[0] as ObjectModel);
+                objects.Remove(draggingRecords[0] as ObjectModel, true, false);
                 int targetIndex = objects.IndexOf(targetObject);
                 int insertionIndex = e.DropPosition == DropPosition.DropAbove ? targetIndex : targetIndex + 1;
-                objects.Insert(insertionIndex, draggingRecords[0] as ObjectModel);
+                objects.Insert(insertionIndex, draggingRecords[0] as ObjectModel, false);
                 MainViewer.EndInit();
+                objects.OperatingHistory?.PushOperatingRecord(
+                    new OperatingRecord()
+                    {
+                        Host = objects,
+                        Operation = Operation.Move,
+                        OriginaPos = dragIndex,
+                        NewPos = insertionIndex,
+                        OriginalValue = draggingRecords[0] as ObjectModel,
+                        NewValue = draggingRecords[0] as ObjectModel
+                    });
+                CommandManager.InvalidateRequerySuggested();
             }
         }
 

@@ -88,7 +88,7 @@
                 </sync:ButtonAdv.SmallIcon>
             </sync:ButtonAdv>
         </StackPanel>
-        <sync:SfDataGrid Name="MainViewer"  ItemsSource="{Binding Variables}" ColumnSizer="AutoWithLastColumnFill" AllowResizingColumns="True" AllowTriStateSorting="True" AutoGenerateColumns="False" 
+        <sync:SfDataGrid Name="MainViewer"  ItemsSource="{Binding Variables}" ColumnSizer="AutoLastColumnFill" AllowResizingColumns="True" AllowTriStateSorting="True" AutoGenerateColumns="False" 
                      AllowGrouping="True" ShowGroupDropArea="True"
                      AllowFiltering="True"
                      ShowSortNumbers="True" ShowRowHeader="True"

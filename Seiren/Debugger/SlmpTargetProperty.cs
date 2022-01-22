@@ -84,14 +84,79 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Debugger
         public DeviceAccessMode DeviceReadMode { get; set; } = DeviceAccessMode.Auto;
         public DeviceAccessMode DeviceWriteMode { get; set; } = DeviceAccessMode.Auto;
 
+        private int __send_timeout_value = 200;
+        public int SendTimeoutValue 
+        {
+            get { return __send_timeout_value; } 
+            set
+            {
+                if (value < 0)
+                    throw new ArgumentOutOfRangeException("The setting value should be greater than or equal to 0.");
+                else
+                    __send_timeout_value = value;
+            }
+        }
+        private int __receive_timeout_value = 200;
+        public int ReceiveTimeoutValue
+        {
+            get { return __receive_timeout_value; }
+            set
+            {
+                if (value < 0)
+                    throw new ArgumentOutOfRangeException("The setting value should be greater than or equal to 0.");
+                else
+                    __receive_timeout_value = value;
+            }
+        }
+        private int __send_buffer_size = 8192;
+        public int SendBufferSize
+        {
+            get { return __send_buffer_size; }
+            set
+            {
+                if (value < 4096)
+                    throw new ArgumentOutOfRangeException("The setting value should be greater than or equal to 4096.");
+                else
+                    __send_buffer_size = value;
+            }
+        }
+        private int __receive_buffer_size = 8192;
+        public int ReceiveBufferSize
+        {
+            get { return __receive_buffer_size; }
+            set
+            {
+                if (value < 4096)
+                    throw new ArgumentOutOfRangeException("The setting value should be greater than or equal to 4096.");
+                else
+                    __receive_buffer_size = value;
+            }
+        }
+        private int __polling_intervale = 100;
+        public int PollingInterval
+        {
+            get { return __polling_intervale; }
+            set
+            {
+                if (value < 10)
+                    throw new ArgumentOutOfRangeException("The setting value should be greater than or equal to 10.");
+                else
+                    __polling_intervale = value;
+            }
+        }
+        private ushort __monitoring_timer = 100;
+        public ushort MonitoringTimer
+        {
+            get { return __monitoring_timer; }
+            set
+            {
+                if (value < 10)
+                    throw new ArgumentOutOfRangeException("The setting value should be greater than or equal to 10.");
+                else
+                    __monitoring_timer = value;
+            }
+        }
 
-        public int SendTimeoutValue { get; set; } = 200;
-        public int ReceiveTimeoutValue { get; set; } = 200;
-        public int SendBufferSize { get; set; } = 8192;
-        public int ReceiveBufferSize { get; set; } = 8192;
-        public int PollingInterval { get; set; } = 100;
-        public ushort MonitoringTimer { get; set; } = 500;
-        
         public override string ToString()
         {
             var option = new JsonSerializerOptions

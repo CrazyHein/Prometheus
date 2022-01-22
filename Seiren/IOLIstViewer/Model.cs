@@ -4,7 +4,7 @@ using System.Runtime.CompilerServices;
 
 namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
 {
-    public abstract class RecordContainerModel : INotifyPropertyChanged
+    public abstract class ContainerModel : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
         virtual internal protected void OnPropertyChanged(string propertyName)
@@ -32,5 +32,13 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         {
             Modified = false;
         }
+        public string Name { get; init; } = "Unnamed Container";
+    }
+
+    public abstract class RecordContainerModel : ContainerModel
+    {
+        public abstract void Undo(OperatingRecord r);
+        public abstract void Redo(OperatingRecord r);
+        public OperatingHistory OperatingHistory { get; init; }
     }
 }

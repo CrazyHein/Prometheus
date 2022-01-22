@@ -32,6 +32,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         public uint SupportedIOFileFormatVersion { get; init; } = IOCelcetaHelper.SupportedIOFileFormatVersion;
 
         public SlmpTargetProperty SlmpTargetProperty { get; private set; }
+        public PreferenceProperty PreferenceProperty { get; private set; }
 
         private static ReadOnlySpan<byte> __UTF8_BOM => new byte[] { 0xEF, 0xBB, 0xBF };
 
@@ -42,6 +43,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             writer.WriteStartObject();
             writer.WritePropertyName("Debugger");
             SlmpTargetProperty.Save(writer);
+            writer.WritePropertyName("Preference");
+            PreferenceProperty.Save(writer);
             writer.WriteEndObject();
             writer.Flush();
 
@@ -71,6 +74,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                             {
                                 case "Debugger":
                                     SlmpTargetProperty = SlmpTargetProperty.RESTORE(ref reader); break;
+                                case "Preference":
+                                    PreferenceProperty = PreferenceProperty.RESTORE(ref reader); break;
                             }
                             break;
                         default:
@@ -80,9 +85,46 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             }
             catch (Exception)
             {
-                SlmpTargetProperty = new SlmpTargetProperty();
-                //throw;
+                
+            }
+            finally
+            {
+                SlmpTargetProperty ??= new SlmpTargetProperty();
+                PreferenceProperty ??= new PreferenceProperty();
             }
         }
     }
+
+    public class PreferenceProperty
+    {
+        private int __record_operating_undo_queue_depth = 64;
+        public int RecordOperatingUndoQueueDepth
+        {
+            get { return __record_operating_undo_queue_depth; }
+            set
+            {
+                if (value < 2)
+                    throw new ArgumentOutOfRangeException("The depth value should be greater than or equal to 2.");
+                else if (value > 1024)
+                    throw new ArgumentOutOfRangeException("The depth value should be less than or equal to 1024.");
+                else
+                    __record_operating_undo_queue_depth = value;
+            }
+        }
+
+        private static JsonSerializerOptions __JSON_OPTION = new JsonSerializerOptions
+        {
+            WriteIndented = true,
+        };
+        public void Save(Utf8JsonWriter writer)
+        {
+            JsonSerializer.Serialize(writer, this, __JSON_OPTION);
+        }
+
+        public static PreferenceProperty RESTORE(ref Utf8JsonReader reader)
+        {
+            return JsonSerializer.Deserialize<PreferenceProperty>(ref reader, __JSON_OPTION);
+        }
+    }
+
 }

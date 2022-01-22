@@ -13,10 +13,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
     /// </summary>
     public partial class ControllerConfigurationViewer : UserControl
     {
-        public ControllerConfigurationViewer(ControllerConfiguration cc, ControllerModelCatalogue cmc)
+        public ControllerConfigurationViewer(ControllerConfiguration cc, ControllerModelCatalogue cmc, OperatingHistory history = null)
         {
             InitializeComponent();
-            DataContext = new ControllerConfigurationModel(cc, cmc);
+            DataContext = new ControllerConfigurationModel(cc, cmc, history);
             MainViewer.RowDragDropController.Dropped += OnMainViewer_Dropped;
         }
 
@@ -29,11 +29,23 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                 DeviceConfigurationModel targetDeviceConfiguration = controllerConfiguration.DeviceConfigurations[(int)e.TargetRecord];
 
                 MainViewer.BeginInit();
+                int dragIndex = controllerConfiguration.IndexOf(draggingRecords[0] as DeviceConfigurationModel);
                 controllerConfiguration.Remove(draggingRecords[0] as DeviceConfigurationModel, true);
                 int targetIndex = controllerConfiguration.IndexOf(targetDeviceConfiguration);
                 int insertionIndex = e.DropPosition == DropPosition.DropAbove ? targetIndex : targetIndex + 1;
                 controllerConfiguration.Insert(insertionIndex, draggingRecords[0] as DeviceConfigurationModel);
                 MainViewer.EndInit();
+                controllerConfiguration.OperatingHistory?.PushOperatingRecord(
+                    new OperatingRecord()
+                    {
+                        Host = controllerConfiguration,
+                        Operation = Operation.Move,
+                        OriginaPos = dragIndex,
+                        NewPos = insertionIndex,
+                        OriginalValue = draggingRecords[0] as DeviceConfigurationModel,
+                        NewValue = draggingRecords[0] as DeviceConfigurationModel
+                    });
+                CommandManager.InvalidateRequerySuggested();
             }
         }
 

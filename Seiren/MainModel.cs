@@ -113,5 +113,21 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             get { return __debugger_heartbeat; }
             set { SetProperty(ref __debugger_heartbeat, value); }
         }
+
+        private IReadOnlyList<OperatingRecord> __undo_operating_records;
+        public IReadOnlyList<OperatingRecord> UndoOperatingRecords 
+        { 
+            get { return __undo_operating_records; }
+            set { SetProperty(ref __undo_operating_records, value); }
+        }
+        private IReadOnlyList<OperatingRecord> __redo_operating_records;
+        public IReadOnlyList<OperatingRecord> RedoOperatingRecords
+        {
+            get { return __redo_operating_records; }
+            set { SetProperty(ref __redo_operating_records, value); }
+        }
+
+        public bool CanUndo { get { return __undo_operating_records.Count != 0; } }
+        public bool CanRedo { get { return __redo_operating_records.Count != 0; } }
     }
 }

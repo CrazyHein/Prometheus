@@ -34,7 +34,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                 }
             }
         }
-        public InterlockCollectionModel(InterlockCollection ic, ObjectDictionary od, ProcessDataImage txbit, ProcessDataImage rxbit, ObjectsModel objectsSource)
+        public InterlockCollectionModel(InterlockCollection ic, ObjectDictionary od, ProcessDataImage txbit, ProcessDataImage rxbit, ObjectsModel objectsSource, OperatingHistory history)
         {
             __interlock_collection = ic;
             //__interlock_logic_models = new ObservableCollection<InterlockLogic>(ic.Logics);
@@ -44,6 +44,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             InterlockLogicModels = __interlock_logic_models;
             __objects_source = objectsSource;
             Modified = false;
+            OperatingHistory = history;
+            Name = "Interlock Area";
         }
 
         public void UpdateInterlockLogic()
@@ -61,36 +63,67 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             }
         }
 
-        public void Add(string name, string target, string statement)
+        public void Add(string name, string target, string statement, bool log = true)
         {
             //__interlock_logic_models.Add(__interlock_collection.Add(name, target, statement));
             __interlock_logic_models.Add(new InterlockLogicModel(__interlock_collection.Add(name, target, statement)));
             Modified = true;
             __objects_source.SubsModified = true;
+            if (log && OperatingHistory != null)
+                OperatingHistory.PushOperatingRecord(new OperatingRecord() { Host = this, Operation = Operation.Add, OriginaPos = -1, NewPos = __interlock_logic_models.Count - 1, OriginalValue = null, 
+                    NewValue = new Tuple<string, string, string>(name, target, statement) });
         }
 
-        public void Insert(int index, string name, string target, string statement)
+        public void Insert(int index, string name, string target, string statement, bool log = true)
         {
             //__interlock_logic_models.Insert(index, __interlock_collection.Insert(index, name, target, statement));
             __interlock_logic_models.Insert(index, new InterlockLogicModel(__interlock_collection.Insert(index, name, target, statement)));
             Modified = true;
             __objects_source.SubsModified = true;
+            if (log && OperatingHistory != null)
+                OperatingHistory.PushOperatingRecord(new OperatingRecord() { Host = this, Operation = Operation.Insert, OriginaPos = -1, NewPos = index, OriginalValue = null, 
+                    NewValue = new Tuple<string, string, string>(name, target, statement) });
         }
 
-        public void Remove(int index)
+        public void Remove(int index, bool log = true)
         {
-            __interlock_collection.Remove(index);
+            var logic = __interlock_collection.Remove(index);
             __interlock_logic_models.RemoveAt(index);
             Modified = true;
             __objects_source.SubsModified = true;
+            if (log && OperatingHistory != null)
+            {
+                StringBuilder sb = new StringBuilder();
+                foreach (var t in logic.Targets)
+                {
+                    sb.Append("0x").Append(t.ProcessObject.Index.ToString("X08"));
+                    sb.Append("\r\n");
+                }
+                var v = new Tuple<string, string, string>(logic.Name, sb.ToString(), logic.Statement.Serialize());
+                OperatingHistory.PushOperatingRecord(new OperatingRecord() { Host = this, Operation = Operation.Remove, OriginaPos = index, NewPos = -1, OriginalValue = v, NewValue = null });
+            }
         }
 
-        public void Replace(int index, string name, string target, string statement)
+        public void Replace(int index, string name, string target, string statement, bool log = true)
         {
             //__interlock_logic_models[index] = __interlock_collection.Replace(index, name, target, statement);
+            var logic = __interlock_collection.Logics[index];
             __interlock_logic_models[index] = new InterlockLogicModel(__interlock_collection.Replace(index, name, target, statement));
             Modified = true;
             __objects_source.SubsModified = true;
+            if (log && OperatingHistory != null)
+            {
+                StringBuilder sb = new StringBuilder();
+                foreach (var t in logic.Targets)
+                {
+                    sb.Append("0x").Append(t.ProcessObject.Index.ToString("X08"));
+                    sb.Append("\r\n");
+                }
+                var v = new Tuple<string, string, string>(logic.Name, sb.ToString(), logic.Statement.Serialize());
+                OperatingHistory?.PushOperatingRecord(new OperatingRecord() { Host = this, Operation = Operation.Replace, OriginaPos = index, NewPos = index, 
+                    OriginalValue = v, 
+                    NewValue = new Tuple<string, string, string>(name, target, statement) });
+            }
         }
 
         public void Save(XmlDocument doc, XmlElement root)
@@ -110,6 +143,56 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             //reset bit offset and so on
             foreach (var logic in __interlock_logic_models)
                 logic.Rebuild();
+        }
+
+        public override void Undo(OperatingRecord r)
+        {
+            switch (r.Operation)
+            {
+                case Operation.Add:
+                    Remove(r.NewPos, false);
+                    break;
+                case Operation.Remove:
+                    var v = r.OriginalValue as Tuple<string, string, string>;
+                    if (r.OriginaPos == __interlock_logic_models.Count)
+                        Add(v.Item1, v.Item2, v.Item3, false);
+                    else
+                        Insert(r.OriginaPos, v.Item1, v.Item2, v.Item3, false);
+                    break;
+                case Operation.Insert:
+                    Remove(r.NewPos, false);
+                    break;
+                case Operation.Replace:
+                    v = r.OriginalValue as Tuple<string, string, string>;
+                    Replace(r.NewPos, v.Item1, v.Item2, v.Item3, false);
+                    break;
+                default:
+                    throw new NotImplementedException();
+            }
+        }
+
+        public override void Redo(OperatingRecord r)
+        {
+            switch (r.Operation)
+            {
+                case Operation.Add:
+                    var v = r.NewValue as Tuple<string, string, string>;
+                    Add(v.Item1, v.Item2, v.Item3, false);
+                    break;
+                case Operation.Remove:
+                    Remove(r.OriginaPos, false);
+                    break;
+                case Operation.Insert:
+                    v = r.NewValue as Tuple<string, string, string>;
+                    Insert(r.NewPos, v.Item1, v.Item2, v.Item3, false);
+                    break;
+                case Operation.Replace:
+                    v = r.NewValue as Tuple<string, string, string>;
+                    Replace(r.OriginaPos, v.Item1, v.Item2, v.Item3, false);
+                    break;
+                default:
+                    throw new NotImplementedException();
+            }
         }
     }
 

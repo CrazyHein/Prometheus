@@ -60,6 +60,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         private List<ushort[]> __area_data_array;
         private ushort __area_data_end;
 
+        private OperatingHistory __operating_history;
+
         #region Properties
         /// <summary>
         /// Gets or sets the current visual style.
@@ -102,6 +104,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             InitializeComponent();
             this.Loaded += OnLoaded;
 
+            __operating_history = new OperatingHistory(__settings.PreferenceProperty.RecordOperatingUndoQueueDepth);
+            __main_model.UndoOperatingRecords = __operating_history.UndoOperatingRecords;
+            __main_model.RedoOperatingRecords = __operating_history.RedoOperatingRecords;
             DataContext = __main_model;
         }
         /// <summary>
@@ -178,10 +183,12 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
 
         private void __reset_layout()
         {
-            __variables_viewer = new VariablesViewer(__variable_dictionary, __data_type_catalogue);
-            __controller_configuration_viewer = new ControllerConfigurationViewer(__controller_configuration, __controller_model_catalogue);
+            __operating_history.Clear();
+
+            __variables_viewer = new VariablesViewer(__variable_dictionary, __data_type_catalogue, __operating_history);
+            __controller_configuration_viewer = new ControllerConfigurationViewer(__controller_configuration, __controller_model_catalogue, __operating_history);
             __objects_viewer = new ObjectsViewer(__object_dictionary, __variable_dictionary, __controller_configuration,
-                __tx_diagnotic_area, __tx_bit_area, __tx_block_area, __rx_control_area, __rx_bit_area, __rx_block_area, __interlock_area);
+                __tx_diagnotic_area, __tx_bit_area, __tx_block_area, __rx_control_area, __rx_bit_area, __rx_block_area, __interlock_area, __operating_history);
             __miscellaneous_viewer = new MiscellaneousViewer(__misc_info);
 
             (__variables_viewer.DataContext as VariablesModel).SubscriberObjects = __objects_viewer.DataContext as ObjectsModel;
@@ -218,6 +225,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             Miscellaneous.Content = __miscellaneous_viewer;
 
             __collapse_all_viewers();
+            __operating_history.Clear();
         }
 
         public string? __update_binding_source()
@@ -735,6 +743,60 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             e.CanExecute = !__main_model.IsOffline && !__main_model.IsBusy;
         }
 
+        private void RecordUndoCommand_Executed(object sender, System.Windows.Input.ExecutedRoutedEventArgs e)
+        {
+            OperatingRecord rd;
+            if (e.Parameter == null)
+            {
+                rd = __operating_history.Undo();
+                rd.Host.Undo(rd);
+            }
+            else
+            {
+                do
+                {
+                    rd = __operating_history.Undo();
+                    rd.Host.Undo(rd);
+                }
+                while (rd != e.Parameter);
+            }
+            CommandManager.InvalidateRequerySuggested();
+        }
+
+        private void RecordUndoCommand_CanExecuted(object sender, System.Windows.Input.CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = __main_model.IsOffline && __main_model.IsOpened && __operating_history.CanUndo;
+        }
+
+        private void RecordRedoCommand_Executed(object sender, System.Windows.Input.ExecutedRoutedEventArgs e)
+        {
+            OperatingRecord rd;
+            if (e.Parameter == null)
+            {
+                rd = __operating_history.Redo();
+                rd.Host.Redo(rd);
+            }
+            else
+            {
+                //__main_model.IsBusy = true;
+                //BusyDialog diag = new BusyDialog(__data_synchronizer.Stop());
+                //diag.ShowDialog();
+                //__main_model.IsBusy = false;
+                do
+                {
+                    rd = __operating_history.Redo();
+                    rd.Host.Redo(rd);
+                }
+                while (rd != e.Parameter);
+            }
+            CommandManager.InvalidateRequerySuggested();
+        }
+
+        private void RecordRedoCommand_CanExecuted(object sender, System.Windows.Input.CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = __main_model.IsOffline && __main_model.IsOpened && __operating_history.CanRedo;
+        }
+
         private void MainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             if (__main_model.IsOffline == false)
@@ -750,6 +812,14 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             }
         }
 
-        
+        private void UndoMenuItemAdv_Click(object sender, RoutedEventArgs e)
+        {
+            UndoButton.IsDropDownOpen = false;
+        }
+
+        private void RedoMenuItemAdv_Click(object sender, RoutedEventArgs e)
+        {
+            RedoButton.IsDropDownOpen = false;
+        }
     }
 }

@@ -18,10 +18,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         private ProcessDataImageAccess __process_data_access;
         private ProcessDataImageLayout __process_data_layout;
         private ObjectsModel __objects_model;
-        public ProcessDataImageViewer(ProcessDataImage pdi, ObjectDictionary od, SfDataGrid source, ObjectsModel objects)
+        public ProcessDataImageViewer(ProcessDataImage pdi, ObjectDictionary od, SfDataGrid source, ObjectsModel objects, OperatingHistory history)
         {
             InitializeComponent();
-            DataContext = new ProcessDataImageModel(pdi, od, source.DataContext as ObjectsModel);
+            DataContext = new ProcessDataImageModel(pdi, od, source.DataContext as ObjectsModel, history);
             __process_data_access = pdi.Access;
             __process_data_layout = pdi.Layout;
             __object_source = source;
@@ -52,11 +52,23 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                 ProcessDataModel targetData = dataImage.ProcessDataModels[(int)e.TargetRecord];
 
                 ProcessDataImageGrid.BeginInit();
-                dataImage.Remove(draggingRecords[0] as ProcessDataModel, true);
+                int dragIndex = dataImage.IndexOf(draggingRecords[0] as ProcessDataModel);
+                dataImage.Remove(draggingRecords[0] as ProcessDataModel, true, false);
                 int targetIndex = dataImage.IndexOf(targetData);
                 int insertionIndex = e.DropPosition == DropPosition.DropAbove ? targetIndex : targetIndex + 1;
-                dataImage.Insert(insertionIndex, draggingRecords[0] as ProcessDataModel);
+                dataImage.Insert(insertionIndex, draggingRecords[0] as ProcessDataModel, false);
                 ProcessDataImageGrid.EndInit();
+                dataImage.OperatingHistory?.PushOperatingRecord(
+                    new OperatingRecord()
+                    {
+                        Host = dataImage,
+                        Operation = Operation.Move,
+                        OriginaPos = dragIndex,
+                        NewPos = insertionIndex,
+                        OriginalValue = draggingRecords[0] as ProcessDataModel,
+                        NewValue = draggingRecords[0] as ProcessDataModel
+                    });
+                CommandManager.InvalidateRequerySuggested();
             }
         }
 
