@@ -72,11 +72,11 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             set { SetProperty(ref __is_offline, value); }
         }
 
-        private bool __is_monitorring = false;
-        public bool IsMonitorring
+        private bool __is_monitoring = false;
+        public bool IsMonitoring
         {
-            get { return __is_monitorring; }
-            set { SetProperty(ref __is_monitorring, value); }
+            get { return __is_monitoring; }
+            set { SetProperty(ref __is_monitoring, value); }
         }
 
         private bool __is_busy = false;

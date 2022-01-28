@@ -358,11 +358,11 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             if (values[0] is Boolean && values[1] is Boolean && targetType == typeof(string))
             {
                 bool isoffline = (bool)values[0];
-                bool ismonitorring  = (bool)values[1];
+                bool ismonitoring  = (bool)values[1];
                 if (isoffline == true)
                     return "Offline";
-                else if (ismonitorring == true)
-                    return "Monitorring";
+                else if (ismonitoring == true)
+                    return "Monitoring";
                 return "Debugging";
 
             }

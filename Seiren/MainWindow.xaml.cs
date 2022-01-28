@@ -325,7 +325,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             }
 
             __main_model.IsOffline = false;
-            __main_model.IsMonitorring = monitoring;
+            __main_model.IsMonitoring = monitoring;
             __main_model.DebuggerExceptionMessage = "N/A";
             __main_model.DebuggerState =  DataSynchronizerState.Ready;
             __main_model.DebuggerPollingInterval = 0;
