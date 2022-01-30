@@ -43,11 +43,35 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Debugger
         private DataSynchronizerState __sync_state = DataSynchronizerState.Ready;
         private uint __heartbeat_counter = 0;
 
-        public DataSynchronizer(IEnumerable<(uint start, ushort size, DataSyncMode access)> datas)
+        public ushort NumberOfDevicePoints { get; } = 960;
+
+        public DataSynchronizer(IEnumerable<(uint start, uint size, IEnumerable<(uint bitpos, uint bitsize)> layout, DataSyncMode access)> datas)
         {
-            __process_data = new List<(uint start, ushort size, DataSyncMode access, ushort[] data)>(
-                    datas.Select(i => (i.start, i.size, i.access, new ushort[i.size])));
-            __internal_process_data = new List<ushort[]>(datas.Select(i => new ushort[i.size]));
+            __process_data = new List<(uint start, ushort size, DataSyncMode access, ushort[] data)>();
+            foreach (var data in datas)
+            {
+                uint start = 0;
+                uint lastpos = 0;
+                uint lastsize = 0;
+                ushort size = 0;
+                foreach (var layout in data.layout)
+                {
+                    Debug.Assert(layout.bitsize < NumberOfDevicePoints * 16 && lastpos + lastsize <= layout.bitpos);
+                    if (layout.bitpos >= (NumberOfDevicePoints + start) * 16 || layout.bitpos + layout.bitsize >= (NumberOfDevicePoints + start) * 16)
+                    {
+                        size = (ushort)((lastpos + lastsize) / 16 + ((lastpos + lastsize) % 16 == 0 ? 0 : 1) - start);
+                        __process_data.Add(new(data.start + start, size, data.access, new ushort[size]));
+                        start = (ushort)(layout.bitpos / 16);
+                    }
+                    lastpos = layout.bitpos;
+                    lastsize = layout.bitsize;
+                }
+                size = (ushort)((lastpos + lastsize) / 16 + ((lastpos + lastsize) % 16 == 0 ? 0 : 1) - start);
+                Debug.Assert(data.size >= size);
+                __process_data.Add(new(data.start + start, size, data.access, new ushort[size]));
+            }
+            //datas.Select(i => (i.start, i.size, i.access, new ushort[i.size])));
+            __internal_process_data = new List<ushort[]>(__process_data.Select(i => new ushort[i.size]));
             __process_data_end = 0;
             __internal_process_data_end = 0;
         }
@@ -99,7 +123,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Debugger
                     reads = __process_data.Where(d => d.access == DataSyncMode.Readback);
                     totalDeive = reads.Sum(d => d.size);
                     totalBlock = reads.Count();
-                    if (totalDeive <= 960 && ((totalBlock <= 60 && target.R_DedicatedMessageFormat == true) || (totalBlock <= 120 && target.R_DedicatedMessageFormat == false)))
+                    if (totalDeive <= NumberOfDevicePoints && ((totalBlock <= 60 && target.R_DedicatedMessageFormat == true) || (totalBlock <= 120 && target.R_DedicatedMessageFormat == false)))
                         deviceReadbackMode = DeviceAccessMode.Inconsecutive;
                     else
                         deviceReadbackMode = DeviceAccessMode.Consecutive;
@@ -115,7 +139,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Debugger
                     int totalDeive = writes.Sum(d => d.size);
                     int totalBlock = writes.Count();
                     int extraDevice = totalBlock * (target.R_DedicatedMessageFormat == true ? 9 : 4);
-                    if (totalDeive + extraDevice <= 960 && ((totalBlock <= 60 && target.R_DedicatedMessageFormat == true) || (totalBlock <= 120 && target.R_DedicatedMessageFormat == false)))
+                    if (totalDeive + extraDevice <= NumberOfDevicePoints && ((totalBlock <= 60 && target.R_DedicatedMessageFormat == true) || (totalBlock <= 120 && target.R_DedicatedMessageFormat == false)))
                         deviceWriteMode = DeviceAccessMode.Inconsecutive;
                     else
                         deviceWriteMode = DeviceAccessMode.Consecutive;

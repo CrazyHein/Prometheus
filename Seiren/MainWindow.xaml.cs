@@ -282,14 +282,14 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             };
             __area_data_end = 0;
 
-            var areas = new List<(uint, ushort, DataSyncMode)>()
+            var areas = new List<(uint, uint, IEnumerable<(uint bitpos, uint bitsize)>, DataSyncMode)>()
             {
-                (__tx_diagnotic_area.OffsetInWord, (ushort)(__tx_diagnotic_area.ActualSizeInWord), DataSyncMode.Read),
-                (__tx_bit_area.OffsetInWord, (ushort)(__tx_bit_area.ActualSizeInWord), DataSyncMode.Read),
-                (__tx_block_area.OffsetInWord, (ushort)(__tx_block_area.ActualSizeInWord), DataSyncMode.Read),
-                (__rx_control_area.OffsetInWord, (ushort)(__rx_control_area.ActualSizeInWord), monitoring?DataSyncMode.Readback:DataSyncMode.Write),
-                (__rx_bit_area.OffsetInWord, (ushort)(__rx_bit_area.ActualSizeInWord), monitoring?DataSyncMode.Readback:DataSyncMode.Write),
-                (__rx_block_area.OffsetInWord, (ushort)(__rx_block_area.ActualSizeInWord), monitoring?DataSyncMode.Readback:DataSyncMode.Write)
+                (__tx_diagnotic_area.OffsetInWord, (__tx_diagnotic_area.ActualSizeInWord), __tx_diagnotic_area.ProcessDatas.Select(p => new ValueTuple<uint, uint>(p.BitPos, p.ProcessObject.Variable.Type.BitSize)), DataSyncMode.Read),
+                (__tx_bit_area.OffsetInWord, (__tx_bit_area.ActualSizeInWord),  __tx_bit_area.ProcessDatas.Select(p => new ValueTuple<uint, uint>(p.BitPos, p.ProcessObject.Variable.Type.BitSize)), DataSyncMode.Read),
+                (__tx_block_area.OffsetInWord, (__tx_block_area.ActualSizeInWord),  __tx_block_area.ProcessDatas.Select(p => new ValueTuple<uint, uint>(p.BitPos, p.ProcessObject.Variable.Type.BitSize)), DataSyncMode.Read),
+                (__rx_control_area.OffsetInWord, (__rx_control_area.ActualSizeInWord),  __rx_control_area.ProcessDatas.Select(p => new ValueTuple<uint, uint>(p.BitPos, p.ProcessObject.Variable.Type.BitSize)), monitoring?DataSyncMode.Readback:DataSyncMode.Write),
+                (__rx_bit_area.OffsetInWord, (__rx_bit_area.ActualSizeInWord),  __rx_bit_area.ProcessDatas.Select(p => new ValueTuple<uint, uint>(p.BitPos, p.ProcessObject.Variable.Type.BitSize)), monitoring?DataSyncMode.Readback:DataSyncMode.Write),
+                (__rx_block_area.OffsetInWord, (__rx_block_area.ActualSizeInWord),  __rx_block_area.ProcessDatas.Select(p => new ValueTuple<uint, uint>(p.BitPos, p.ProcessObject.Variable.Type.BitSize)), monitoring?DataSyncMode.Readback:DataSyncMode.Write)
             };
 
             __data_synchronizer = new DataSynchronizer(areas);
