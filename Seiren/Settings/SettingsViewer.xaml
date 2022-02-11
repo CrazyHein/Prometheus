@@ -166,6 +166,31 @@
                             <TextBox FontStyle="Normal" Text="{Binding RecordOperatingUndoQueueDepth, ValidatesOnExceptions=True, NotifyOnValidationError=True}"/>
                         </sync:SfTextInputLayout>
                     </GroupBox>
+                    <GroupBox Header="Data Synchronization Mode of Debugging" Padding="3,0,3,0" Margin="0,4,0,0" Grid.Row="1">
+                        <Grid>
+                            <Grid.Resources>
+                                <ObjectDataProvider ObjectType="{x:Type sys:Enum}" MethodName="GetValues" x:Key="datasyncmode">
+                                    <ObjectDataProvider.MethodParameters>
+                                        <x:Type TypeName="debugger:DataSyncMode" />
+                                    </ObjectDataProvider.MethodParameters>
+                                </ObjectDataProvider>
+                            </Grid.Resources>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="auto" />
+                                <RowDefinition Height="auto" />
+                                <RowDefinition Height="auto" />
+                            </Grid.RowDefinitions>
+                            <sync:SfTextInputLayout Grid.Row="0" Hint="Rx Bit Area"  FontSize="12" FontStyle="Italic" ContainerType="Filled" Margin="4">
+                                <ComboBox FontStyle="Normal" ItemsSource="{Binding Source={StaticResource datasyncmode}}" SelectedItem="{Binding RxBitAreaSyncMode}" />
+                            </sync:SfTextInputLayout>
+                            <sync:SfTextInputLayout Grid.Row="1" Hint="Rx Block Area"  FontSize="12" FontStyle="Italic" ContainerType="Filled" Margin="4">
+                                <ComboBox FontStyle="Normal" ItemsSource="{Binding Source={StaticResource datasyncmode}}" SelectedItem="{Binding RxBlockAreaSyncMode}" />
+                            </sync:SfTextInputLayout>
+                            <sync:SfTextInputLayout Grid.Row="2" Hint="Rx Control Area"  FontSize="12" FontStyle="Italic" ContainerType="Filled" Margin="4">
+                                <ComboBox FontStyle="Normal" ItemsSource="{Binding Source={StaticResource datasyncmode}}" SelectedItem="{Binding RxControlAreaSyncMode}" />
+                            </sync:SfTextInputLayout>
+                        </Grid>
+                    </GroupBox>
                 </Grid>
             </TabItem>
         </TabControl>

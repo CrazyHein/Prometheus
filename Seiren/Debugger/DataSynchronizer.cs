@@ -24,7 +24,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Debugger
     {
         Read,
         Write,
-        Readback,
+        //Readback,
     }
 
     public class DataSynchronizer
@@ -109,29 +109,20 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Debugger
 
                 DeviceAccessMaster master = new DeviceAccessMaster(target.FrameType, target.DataCode, target.R_DedicatedMessageFormat, __io,
                                                                     ref destination, target.SendBufferSize, target.ReceiveBufferSize);
-                DeviceAccessMode deviceReadMode, deviceWriteMode, deviceReadbackMode;
+                DeviceAccessMode deviceReadMode, deviceWriteMode;
                 if (target.DeviceReadMode == DeviceAccessMode.Auto)
                 {
                     var reads = __process_data.Where(d => d.access == DataSyncMode.Read);
                     int totalDeive = reads.Sum(d => d.size);
                     int totalBlock = reads.Count();
-                    if (totalDeive <= 960 && ((totalBlock <= 60 && target.R_DedicatedMessageFormat == true) || (totalBlock <= 120 && target.R_DedicatedMessageFormat == false)))
+                    if (totalDeive <= NumberOfDevicePoints && ((totalBlock <= 60 && target.R_DedicatedMessageFormat == true) || (totalBlock <= 120 && target.R_DedicatedMessageFormat == false)))
                         deviceReadMode = DeviceAccessMode.Inconsecutive;
                     else
                         deviceReadMode = DeviceAccessMode.Consecutive;
-
-                    reads = __process_data.Where(d => d.access == DataSyncMode.Readback);
-                    totalDeive = reads.Sum(d => d.size);
-                    totalBlock = reads.Count();
-                    if (totalDeive <= NumberOfDevicePoints && ((totalBlock <= 60 && target.R_DedicatedMessageFormat == true) || (totalBlock <= 120 && target.R_DedicatedMessageFormat == false)))
-                        deviceReadbackMode = DeviceAccessMode.Inconsecutive;
-                    else
-                        deviceReadbackMode = DeviceAccessMode.Consecutive;
                 }
                 else
                 {
                     deviceReadMode = target.DeviceReadMode;
-                    deviceReadbackMode = target.DeviceReadMode;
                 }
                 if (target.DeviceWriteMode == DeviceAccessMode.Auto)
                 {
@@ -172,7 +163,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Debugger
                 __heartbeat_counter = 0;
                 __data_sync_thread = new Thread(new ParameterizedThreadStart(__data_sync_routine));
                 //__data_sync_thread = new Thread(new ParameterizedThreadStart(__data_sync_delay));
-                __data_sync_thread.Start(Tuple.Create(master, (ushort)(target.MonitoringTimer / 250), target.PollingInterval, deviceReadMode, deviceWriteMode, deviceReadbackMode));
+                __data_sync_thread.Start(Tuple.Create(master, (ushort)(target.MonitoringTimer / 250), target.PollingInterval, deviceReadMode, deviceWriteMode));
                 return State;
             }
             catch (Exception ex)
@@ -230,7 +221,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Debugger
             {
                 for (int i = 0; i < __process_data.Count; ++i)
                 {
-                    if (__process_data[i].access == DataSyncMode.Read || __process_data[i].access == DataSyncMode.Readback)
+                    if (__process_data[i].access == DataSyncMode.Read)
                         __internal_process_data[i].CopyTo(datas[i], 0);
                     else
                         datas[i].CopyTo(__internal_process_data[i], 0);
@@ -294,26 +285,19 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Debugger
 
         private void __data_sync_routine(object param)
         {
-            (DeviceAccessMaster master, ushort monitoring, int interval, DeviceAccessMode read, DeviceAccessMode write, DeviceAccessMode readback) =
-                (Tuple<DeviceAccessMaster, ushort, int, DeviceAccessMode, DeviceAccessMode, DeviceAccessMode>)param;
+            (DeviceAccessMaster master, ushort monitoring, int interval, DeviceAccessMode read, DeviceAccessMode write) =
+                (Tuple<DeviceAccessMaster, ushort, int, DeviceAccessMode, DeviceAccessMode>)param;
             uint counter = 0;
             ushort end = 0;
             Stopwatch sw = new Stopwatch();
 
             IEnumerable<(string, uint, ushort)> readIndex = null;
-            IEnumerable<(string, uint, ushort)> readbackIndex = null;
             IEnumerable<(string, uint, ushort, ReadOnlyMemory<ushort>)> writeIndex = null;
             Memory<ushort>[] readArray = null;
-            Memory<ushort>[] readbackArray = null;
             if (read == DeviceAccessMode.Inconsecutive)
             {
                 readIndex = __process_data.Where(d => d.access == DataSyncMode.Read && d.size > 0).Select(d => new ValueTuple<string, uint, ushort>("D", d.start, d.size));
                 readArray = (__process_data.Where(d => d.access == DataSyncMode.Read && d.size > 0).Select(d => d.data.AsMemory<ushort>())).ToArray();
-            }
-            if (readback == DeviceAccessMode.Inconsecutive)
-            {
-                readbackIndex = __process_data.Where(d => d.access == DataSyncMode.Readback && d.size > 0).Select(d => new ValueTuple<string, uint, ushort>("D", d.start, d.size));
-                readbackArray = (__process_data.Where(d => d.access == DataSyncMode.Readback && d.size > 0).Select(d => d.data.AsMemory<ushort>())).ToArray();
             }
             if (write == DeviceAccessMode.Inconsecutive)
             {
@@ -352,40 +336,6 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Debugger
                         if (readArray.Length != 0)
                         {
                             master.ReadLocalDeviceInWord(monitoring, readIndex, null, out end, readArray, null);
-                            __process_data_end = end;
-                            if (end != 0)
-                            {
-                                ExceptionMessage = $"End Code : {end:X04}";
-                                Counter = 0;
-                                State = DataSynchronizerState.Exception;
-                                return;
-                            }
-                        }
-                    }
-
-                    if (readback == DeviceAccessMode.Consecutive)
-                    {
-                        for (int i = 0; i < __process_data.Count; ++i)
-                        {
-                            if (__process_data[i].access == DataSyncMode.Readback && __process_data[i].size > 0)
-                            {
-                                master.ReadLocalDeviceInWord(monitoring, "D", __process_data[i].start, __process_data[i].size, out end, __process_data[i].data);
-                                __process_data_end = end;
-                                if (end != 0)
-                                {
-                                    ExceptionMessage = $"End Code : {end:X04}";
-                                    Counter = 0;
-                                    State = DataSynchronizerState.Exception;
-                                    return;
-                                }
-                            }
-                        }
-                    }
-                    else
-                    {
-                        if (readbackArray.Length != 0)
-                        {
-                            master.ReadLocalDeviceInWord(monitoring, readbackIndex, null, out end, readbackArray, null);
                             __process_data_end = end;
                             if (end != 0)
                             {
@@ -444,7 +394,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Debugger
                 {
                     for (int i = 0; i < __process_data.Count; ++i)
                     {
-                        if (__process_data[i].access == DataSyncMode.Read || __process_data[i].access == DataSyncMode.Readback)
+                        if (__process_data[i].access == DataSyncMode.Read)
                             __process_data[i].data.CopyTo(__internal_process_data[i], 0);
                         else
                             __internal_process_data[i].CopyTo(__process_data[i].data, 0);
@@ -487,7 +437,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Debugger
                 {
                     for (int i = 0; i < __process_data.Count; ++i)
                     {
-                        if (__process_data[i].access == DataSyncMode.Read || __process_data[i].access == DataSyncMode.Readback)
+                        if (__process_data[i].access == DataSyncMode.Read)
                             __process_data[i].data.CopyTo(__internal_process_data[i], 0);
                         else
                             __internal_process_data[i].CopyTo(__process_data[i].data, 0);

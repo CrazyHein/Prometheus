@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
@@ -112,9 +113,14 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             }
         }
 
+        public DataSyncMode RxBitAreaSyncMode { get; set; } = DataSyncMode.Read;
+        public DataSyncMode RxBlockAreaSyncMode { get; set; } = DataSyncMode.Read;
+        public DataSyncMode RxControlAreaSyncMode { get; set; } = DataSyncMode.Write;
+
         private static JsonSerializerOptions __JSON_OPTION = new JsonSerializerOptions
         {
             WriteIndented = true,
+            Converters = { new JsonStringEnumConverter(null, false) }
         };
         public void Save(Utf8JsonWriter writer)
         {

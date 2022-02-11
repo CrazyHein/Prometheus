@@ -258,7 +258,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             (__miscellaneous_viewer.DataContext as MiscellaneousModel).CommitChanges();
         }
 
-        private void __startup_debugger(bool monitoring)
+        private void __startup_debugger(DataSyncMode rxbit, DataSyncMode rxblock, DataSyncMode rxcotrol)
         {
             (__objects_viewer.DataContext as ObjectsModel).TxDiagnosticObjects.ResetProcessDataValue();
             (__objects_viewer.DataContext as ObjectsModel).TxBitObjects.ResetProcessDataValue();
@@ -287,9 +287,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                 (__tx_diagnotic_area.OffsetInWord, (__tx_diagnotic_area.ActualSizeInWord), __tx_diagnotic_area.ProcessDatas.Select(p => new ValueTuple<uint, uint>(p.BitPos, p.ProcessObject.Variable.Type.BitSize)), DataSyncMode.Read),
                 (__tx_bit_area.OffsetInWord, (__tx_bit_area.ActualSizeInWord),  __tx_bit_area.ProcessDatas.Select(p => new ValueTuple<uint, uint>(p.BitPos, p.ProcessObject.Variable.Type.BitSize)), DataSyncMode.Read),
                 (__tx_block_area.OffsetInWord, (__tx_block_area.ActualSizeInWord),  __tx_block_area.ProcessDatas.Select(p => new ValueTuple<uint, uint>(p.BitPos, p.ProcessObject.Variable.Type.BitSize)), DataSyncMode.Read),
-                (__rx_control_area.OffsetInWord, (__rx_control_area.ActualSizeInWord),  __rx_control_area.ProcessDatas.Select(p => new ValueTuple<uint, uint>(p.BitPos, p.ProcessObject.Variable.Type.BitSize)), monitoring?DataSyncMode.Readback:DataSyncMode.Write),
-                (__rx_bit_area.OffsetInWord, (__rx_bit_area.ActualSizeInWord),  __rx_bit_area.ProcessDatas.Select(p => new ValueTuple<uint, uint>(p.BitPos, p.ProcessObject.Variable.Type.BitSize)), monitoring?DataSyncMode.Readback:DataSyncMode.Write),
-                (__rx_block_area.OffsetInWord, (__rx_block_area.ActualSizeInWord),  __rx_block_area.ProcessDatas.Select(p => new ValueTuple<uint, uint>(p.BitPos, p.ProcessObject.Variable.Type.BitSize)), monitoring?DataSyncMode.Readback:DataSyncMode.Write)
+                (__rx_control_area.OffsetInWord, (__rx_control_area.ActualSizeInWord),  __rx_control_area.ProcessDatas.Select(p => new ValueTuple<uint, uint>(p.BitPos, p.ProcessObject.Variable.Type.BitSize)), rxcotrol),
+                (__rx_bit_area.OffsetInWord, (__rx_bit_area.ActualSizeInWord),  __rx_bit_area.ProcessDatas.Select(p => new ValueTuple<uint, uint>(p.BitPos, p.ProcessObject.Variable.Type.BitSize)), rxbit),
+                (__rx_block_area.OffsetInWord, (__rx_block_area.ActualSizeInWord),  __rx_block_area.ProcessDatas.Select(p => new ValueTuple<uint, uint>(p.BitPos, p.ProcessObject.Variable.Type.BitSize)), rxblock)
             };
 
             __data_synchronizer = new DataSynchronizer(areas);
@@ -307,14 +307,14 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             (__objects_viewer.DataContext as ObjectsModel).RxBlockObjects.IsOffline = false;
             (__objects_viewer.DataContext as ObjectsModel).InterlockLogics.IsOffline = false;
 
-            (__objects_viewer.DataContext as ObjectsModel).TxDiagnosticObjects.IsMonitoring = monitoring;
-            (__objects_viewer.DataContext as ObjectsModel).TxBitObjects.IsMonitoring = monitoring;
-            (__objects_viewer.DataContext as ObjectsModel).TxBlockObjects.IsMonitoring = monitoring;
-            (__objects_viewer.DataContext as ObjectsModel).RxControlObjects.IsMonitoring = monitoring;
-            (__objects_viewer.DataContext as ObjectsModel).RxBitObjects.IsMonitoring = monitoring;
-            (__objects_viewer.DataContext as ObjectsModel).RxBlockObjects.IsMonitoring = monitoring;
+            (__objects_viewer.DataContext as ObjectsModel).TxDiagnosticObjects.IsMonitoring = true;
+            (__objects_viewer.DataContext as ObjectsModel).TxBitObjects.IsMonitoring = true;
+            (__objects_viewer.DataContext as ObjectsModel).TxBlockObjects.IsMonitoring = true;
+            (__objects_viewer.DataContext as ObjectsModel).RxControlObjects.IsMonitoring = rxcotrol == DataSyncMode.Write ? false : true;
+            (__objects_viewer.DataContext as ObjectsModel).RxBitObjects.IsMonitoring = rxbit == DataSyncMode.Write ? false : true;
+            (__objects_viewer.DataContext as ObjectsModel).RxBlockObjects.IsMonitoring = rxblock == DataSyncMode.Write ? false : true;
 
-            if (monitoring == false)
+            //if (monitoring == false)
             {
                 (__objects_viewer.DataContext as ObjectsModel).TxDiagnosticObjects.InitProcessDataValue(__tx_diagnotic_area_data);
                 (__objects_viewer.DataContext as ObjectsModel).TxBitObjects.InitProcessDataValue(__tx_bit_area_data);
@@ -325,7 +325,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             }
 
             __main_model.IsOffline = false;
-            __main_model.IsMonitoring = monitoring;
+            __main_model.IsMonitoring = rxcotrol != DataSyncMode.Write && rxbit != DataSyncMode.Write && rxblock != DataSyncMode.Write;
             __main_model.DebuggerExceptionMessage = "N/A";
             __main_model.DebuggerState =  DataSynchronizerState.Ready;
             __main_model.DebuggerPollingInterval = 0;
@@ -720,12 +720,22 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
 
         private void StartMonitoringCommand_Executed(object sender, System.Windows.Input.ExecutedRoutedEventArgs e)
         {
-            __startup_debugger(true);
+            __startup_debugger(DataSyncMode.Read, DataSyncMode.Read, DataSyncMode.Read);
         }
 
         private void StartDebuggingCommand_Executed(object sender, System.Windows.Input.ExecutedRoutedEventArgs e)
         {
-            __startup_debugger(false);
+            if(__settings.PreferenceProperty.RxBitAreaSyncMode == DataSyncMode.Write || 
+                __settings.PreferenceProperty.RxBlockAreaSyncMode == DataSyncMode.Write)
+            {
+                var res = MessageBox.Show("Debugging RxBitArea/TxBlockArea in WRITING_MODE (May conflict with AMEC GUI) ?", "Question", MessageBoxButton.YesNo, MessageBoxImage.Question);
+                if (res == MessageBoxResult.No)
+                    return;
+            }
+
+            __startup_debugger(__settings.PreferenceProperty.RxBitAreaSyncMode, 
+                __settings.PreferenceProperty.RxBlockAreaSyncMode, 
+                __settings.PreferenceProperty.RxControlAreaSyncMode);
         }
 
         private void StartDebuggingCommand_CanExecuted(object sender, System.Windows.Input.CanExecuteRoutedEventArgs e)
@@ -800,7 +810,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         private void MainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             if (__main_model.IsOffline == false)
+            {
+                MessageBox.Show("Please stop debugging/monitoring first .", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
                 e.Cancel = true;
+            }
             else
             {
                 if ((__main_model.IsNonTemporaryFile && __data_model_has_changes()) || __main_model.IsTemporaryFile)
