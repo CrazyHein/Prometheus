@@ -53,6 +53,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         public static RoutedUICommand StartMonitoring { get; private set; }
         public static RoutedUICommand StartDebugging { get; private set; }
         public static RoutedUICommand StopDebugging { get; private set; }
+        public static RoutedUICommand MoveUpRecord { get; private set; }
+        public static RoutedUICommand MoveDownRecord { get; private set; }
 
 
         static ConsoleControl()
@@ -190,7 +192,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             {
                 new KeyGesture(Key.F6, ModifierKeys.Control|ModifierKeys.Shift, "Ctrl+Shift+F6")
             };
-            StopDebugging = new RoutedUICommand("Stop Monitoring/Debugging", "Stop Monitoring/Debugging", typeof(ConsoleControl), gestureStopDebugging);        
+            StopDebugging = new RoutedUICommand("Stop Monitoring/Debugging", "Stop Monitoring/Debugging", typeof(ConsoleControl), gestureStopDebugging);
+
+            MoveUpRecord = new RoutedUICommand("Move Up", "Move Up ", typeof(ConsoleControl));
+            MoveDownRecord = new RoutedUICommand("Move Down", "Move Down ", typeof(ConsoleControl));
         }
     }
 

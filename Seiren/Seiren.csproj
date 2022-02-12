@@ -7,7 +7,7 @@
     <UseWindowsForms>true</UseWindowsForms>
     <RootNamespace>AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren</RootNamespace>
     <Nullable>annotations</Nullable>
-    <Version>0.5.0</Version>
+    <Version>0.6.0</Version>
     <Authors>CrazyHein</Authors>
     <Company>AMEC</Company>
     <ApplicationIcon>imgs\logo.ico</ApplicationIcon>
@@ -40,6 +40,8 @@
     <None Remove="imgs\meta.png" />
     <None Remove="imgs\metadata.png" />
     <None Remove="imgs\miscellaneous.png" />
+    <None Remove="imgs\move_down.png" />
+    <None Remove="imgs\move_up.png" />
     <None Remove="imgs\navigation.png" />
     <None Remove="imgs\new.png" />
     <None Remove="imgs\open.png" />
@@ -82,6 +84,8 @@
     <Resource Include="imgs\insert.png" />
     <Resource Include="imgs\logo.png" />
     <Resource Include="imgs\miscellaneous.png" />
+    <Resource Include="imgs\move_down.png" />
+    <Resource Include="imgs\move_up.png" />
     <Resource Include="imgs\paste.png" />
     <Resource Include="imgs\redo.png" />
     <Resource Include="imgs\startmonitoring.png" />

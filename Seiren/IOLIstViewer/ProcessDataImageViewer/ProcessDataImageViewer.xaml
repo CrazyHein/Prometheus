@@ -12,7 +12,10 @@
             <DockPanel.CommandBindings>
                 <CommandBinding Command="local:ConsoleControl.AddRecord" Executed="AddRecordCommand_Executed" CanExecute="AddRecordCommand_CanExecute"/>
                 <CommandBinding Command="local:ConsoleControl.InsertRecord" Executed="InsertRecordCommand_Executed" CanExecute="InsertRecordCommand_CanExecute"/>
+                <CommandBinding Command="local:ConsoleControl.EditRecord" Executed="EditRecordCommand_Executed" CanExecute="EditRecordCommand_CanExecute"/>
                 <CommandBinding Command="local:ConsoleControl.RemoveRecord" Executed="RemoveRecordCommand_Executed" CanExecute="RemoveRecordCommand_CanExecute"/>
+                <CommandBinding Command="local:ConsoleControl.MoveUpRecord" Executed="MoveUpRecordCommand_Executed" CanExecute="MoveUpRecordCommand_CanExecute"/>
+                <CommandBinding Command="local:ConsoleControl.MoveDownRecord" Executed="MoveDownRecordCommand_Executed" CanExecute="MoveDownRecordCommand_CanExecute"/>
             </DockPanel.CommandBindings>
             <DockPanel.Resources>
                 <local:InvertBooleanValue x:Key="InvertBoolean"/>
@@ -26,9 +29,24 @@
                             <Image Source="/imgs/insert.png" Height="20" Margin="4"/>
                         </MenuItem.Icon>
                     </MenuItem>
+                    <MenuItem Command="local:ConsoleControl.EditRecord">
+                        <MenuItem.Icon>
+                            <Image Source="/imgs/edit.png" Height="20" Margin="4"/>
+                        </MenuItem.Icon>
+                    </MenuItem>
                     <MenuItem Command="local:ConsoleControl.RemoveRecord">
                         <MenuItem.Icon>
                             <Image Source="/imgs/remove.png" Height="20" Margin="4"/>
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem Command="local:ConsoleControl.MoveUpRecord">
+                        <MenuItem.Icon>
+                            <Image Source="/imgs/move_up.png" Height="20" Margin="4"/>
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem Command="local:ConsoleControl.MoveDownRecord">
+                        <MenuItem.Icon>
+                            <Image Source="/imgs/move_down.png" Height="20" Margin="4"/>
                         </MenuItem.Icon>
                     </MenuItem>
                 </ContextMenu>
@@ -91,9 +109,24 @@
                                 <BitmapImage  UriSource="/imgs/insert.png"/>
                             </sync:ButtonAdv.SmallIcon>
                         </sync:ButtonAdv>
+                        <sync:ButtonAdv Label="Edit" VerticalAlignment="Center" Height="30" Width="128" Command="local:ConsoleControl.EditRecord" Margin="4">
+                            <sync:ButtonAdv.SmallIcon>
+                                <BitmapImage  UriSource="/imgs/edit.png"/>
+                            </sync:ButtonAdv.SmallIcon>
+                        </sync:ButtonAdv>
                         <sync:ButtonAdv Label="Remove" VerticalAlignment="Center" Height="30" Width="128" Command="local:ConsoleControl.RemoveRecord" Margin="4">
                             <sync:ButtonAdv.SmallIcon>
                                 <BitmapImage  UriSource="/imgs/remove.png"/>
+                            </sync:ButtonAdv.SmallIcon>
+                        </sync:ButtonAdv>
+                        <sync:ButtonAdv Label="Up" VerticalAlignment="Center" Height="30" Width="128" Command="local:ConsoleControl.MoveUpRecord" Margin="4">
+                            <sync:ButtonAdv.SmallIcon>
+                                <BitmapImage  UriSource="/imgs/move_up.png"/>
+                            </sync:ButtonAdv.SmallIcon>
+                        </sync:ButtonAdv>
+                        <sync:ButtonAdv Label="Down" VerticalAlignment="Center" Height="30" Width="128" Command="local:ConsoleControl.MoveDownRecord" Margin="4">
+                            <sync:ButtonAdv.SmallIcon>
+                                <BitmapImage  UriSource="/imgs/move_down.png"/>
                             </sync:ButtonAdv.SmallIcon>
                         </sync:ButtonAdv>
                     </StackPanel>
@@ -105,7 +138,9 @@
                          ShowSortNumbers="True" ShowRowHeader="True" 
                          LiveDataUpdateMode="AllowDataShaping" ScrollMode="Async"
                          AllowDrop="True" AllowDraggingRows="True"
-                         RecordContextMenu="{StaticResource GridContextMenu}" RowDragDropTemplate="{StaticResource RecordDragDropTemplate}" d:DataContext="{d:DesignInstance Type=local:ProcessDataModel}">
+                         RecordContextMenu="{StaticResource GridContextMenu}" RowDragDropTemplate="{StaticResource RecordDragDropTemplate}" d:DataContext="{d:DesignInstance Type=local:ProcessDataModel}"
+                             CellDoubleTapped="ProcessDataImageGrid_CellDoubleTapped" SelectionMode="Extended"
+                             >
                 <sync:SfDataGrid.Resources>
                     <local:HideBooleanValueColumn x:Key="HideBooleanValueColumn"/>
                     <local:HideStringValueColumn x:Key="HideStringValueColumn"/>

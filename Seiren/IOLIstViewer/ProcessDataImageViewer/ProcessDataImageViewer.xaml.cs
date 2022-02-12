@@ -89,7 +89,12 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                 }
                 else
                     o = __object_source.SelectedItem as ObjectModel;
-                (DataContext as ProcessDataImageModel).Add(new ProcessDataModel(__object_dictionary.ProcessObjects[o.Index], __process_data_access, __process_data_layout));
+                ProcessDataModel p = new ProcessDataModel(__object_dictionary.ProcessObjects[o.Index], __process_data_access, __process_data_layout);
+                (DataContext as ProcessDataImageModel).Add(p);
+                ProcessDataImageGrid.SelectedItem = p;
+                ProcessDataImageGrid.ScrollInView(new Syncfusion.UI.Xaml.ScrollAxis.RowColumnIndex(
+                                 ProcessDataImageGrid.ResolveToRowIndex(ProcessDataImageGrid.SelectedItem),
+                                 ProcessDataImageGrid.ResolveToStartColumnIndex()));
             }
             catch (LombardiaException ex)
             {
@@ -119,7 +124,12 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                 }
                 else
                     o = __object_source.SelectedItem as ObjectModel;
-                (DataContext as ProcessDataImageModel).Insert(ProcessDataImageGrid.SelectedIndex, new ProcessDataModel(__object_dictionary.ProcessObjects[o.Index], __process_data_access, __process_data_layout));
+                ProcessDataModel p = new ProcessDataModel(__object_dictionary.ProcessObjects[o.Index], __process_data_access, __process_data_layout);
+                (DataContext as ProcessDataImageModel).Insert(ProcessDataImageGrid.SelectedIndex, p);
+                ProcessDataImageGrid.SelectedItem = p;
+                ProcessDataImageGrid.ScrollInView(new Syncfusion.UI.Xaml.ScrollAxis.RowColumnIndex(
+                                 ProcessDataImageGrid.ResolveToRowIndex(ProcessDataImageGrid.SelectedItem),
+                                 ProcessDataImageGrid.ResolveToStartColumnIndex()));
             }
             catch (LombardiaException ex)
             {
@@ -129,31 +139,133 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
 
         private void InsertRecordCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = (DataContext != null) && ((DataContext as ProcessDataImageModel).DirectModeOperation || __object_source?.SelectedItem != null) && ProcessDataImageGrid?.SelectedItem != null && (DataContext as ProcessDataImageModel).IsOffline == true;
+            e.CanExecute = (DataContext != null) && ((DataContext as ProcessDataImageModel).DirectModeOperation || __object_source?.SelectedItem != null) && ProcessDataImageGrid?.SelectedItems.Count == 1 && (DataContext as ProcessDataImageModel).IsOffline == true;
+        }
+
+        private void EditRecordCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            ObjectModel o = __objects_model.Objects.Single(m => m.Index == (ProcessDataImageGrid.SelectedItem as ProcessDataModel).Index);
+            ObjectViewer wnd = new ObjectViewer(__objects_model, o, InputDialogDisplayMode.Edit);
+            wnd.WindowStartupLocation = WindowStartupLocation.CenterScreen;
+            wnd.ShowDialog();
+        }
+
+        private void EditRecordCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = DataContext != null && (DataContext as ProcessDataImageModel).DirectModeOperation && ProcessDataImageGrid?.SelectedItems.Count == 1 && (DataContext as ProcessDataImageModel).IsOffline == true;
         }
 
         private void RemoveRecordCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            string record = ProcessDataImageGrid.SelectedItem.ToString();
-            if (MessageBox.Show("Are you sure you want to remove the record :\n" + record, "Question", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+            string record = string.Empty;
+            if (ProcessDataImageGrid.SelectedItems.Count == 1)
+                record = ProcessDataImageGrid.SelectedItem.ToString();
+            else
             {
-                try
+                int i = 0;
+                ProcessDataModel m;
+                for (i = 0; i < ProcessDataImageGrid.SelectedItems.Count; ++i)
                 {
-                    uint index = (ProcessDataImageGrid.SelectedItem as ProcessDataModel).Index;
-                    (DataContext as ProcessDataImageModel).Remove(ProcessDataImageGrid.SelectedItem as ProcessDataModel);
-                    if((DataContext as ProcessDataImageModel).DirectModeOperation)
-                        __objects_model.Remove(index);    
+                    if (i >= 15)
+                        break;
+                    m = ProcessDataImageGrid.SelectedItems[i] as ProcessDataModel;
+                    record += m.Index.ToString("X08") + " : " + m.VariableName + "\n";
                 }
-                catch (LombardiaException ex)
+                if (i != ProcessDataImageGrid.SelectedItems.Count)
                 {
-                    MessageBox.Show("At least one exception has occurred during the operation :\n" + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    record += "...\n";
+                    m = ProcessDataImageGrid.SelectedItems[ProcessDataImageGrid.SelectedItems.Count - 1] as ProcessDataModel;
+                    record += m.Index.ToString("X08") + " : " + m.VariableName + "\n";
                 }
+            }
+            if (MessageBox.Show("Are you sure you want to remove the record(s) :\n" + record, "Question", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.No)
+                return;
+
+            var indexes = ProcessDataImageGrid.SelectedItems.Select(r => r as ProcessDataModel).ToList();
+            try
+            {
+                foreach (var i in indexes)
+                {
+                    (DataContext as ProcessDataImageModel).Remove(i);
+                    if ((DataContext as ProcessDataImageModel).DirectModeOperation)
+                        __objects_model.Remove(i.Index);
+                }
+            }
+            catch (LombardiaException ex)
+            {
+                MessageBox.Show("At least one exception has occurred during the operation :\n" + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
         private void RemoveRecordCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
             e.CanExecute = ProcessDataImageGrid?.SelectedItem != null && (DataContext as ProcessDataImageModel).IsOffline == true;
+        }
+
+        private void MoveUpRecordCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            ProcessDataImageGrid.BeginInit();
+            var dataImage = DataContext as ProcessDataImageModel;
+            int sourceIndex = ProcessDataImageGrid.SelectedIndex;
+            int targetIndex = sourceIndex - 1;
+            ProcessDataModel sourceData = ProcessDataImageGrid.SelectedItem as ProcessDataModel;
+            dataImage.Remove(sourceData, true, false);
+            dataImage.Insert(targetIndex, sourceData, false);
+            ProcessDataImageGrid.SelectedItem = sourceData;
+            ProcessDataImageGrid.ScrollInView(new Syncfusion.UI.Xaml.ScrollAxis.RowColumnIndex(
+                 ProcessDataImageGrid.ResolveToRowIndex(ProcessDataImageGrid.SelectedItem), 
+                 ProcessDataImageGrid.ResolveToStartColumnIndex()));
+            ProcessDataImageGrid.EndInit();
+            dataImage.OperatingHistory?.PushOperatingRecord(
+                new OperatingRecord()
+                {
+                    Host = dataImage,
+                    Operation = Operation.Move,
+                    OriginaPos = sourceIndex,
+                    NewPos = targetIndex,
+                    OriginalValue = sourceData,
+                    NewValue = sourceData
+                });
+            CommandManager.InvalidateRequerySuggested();
+        }
+
+        private void MoveUpRecordCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = DataContext != null && ProcessDataImageGrid?.SelectedItems.Count == 1 && ProcessDataImageGrid ?.SelectedIndex != 0 && (DataContext as ProcessDataImageModel).IsOffline == true;
+        }
+
+        private void MoveDownRecordCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            ProcessDataImageGrid.BeginInit();
+            var dataImage = DataContext as ProcessDataImageModel;
+            int sourceIndex = ProcessDataImageGrid.SelectedIndex;
+            int targetIndex = sourceIndex + 1;
+            ProcessDataModel sourceData = ProcessDataImageGrid.SelectedItem as ProcessDataModel;
+            dataImage.Remove(sourceData, true, false);
+            dataImage.Insert(targetIndex, sourceData, false);
+            ProcessDataImageGrid.SelectedItem = sourceData;
+            ProcessDataImageGrid.ScrollInView(new Syncfusion.UI.Xaml.ScrollAxis.RowColumnIndex(
+                 ProcessDataImageGrid.ResolveToRowIndex(ProcessDataImageGrid.SelectedItem),
+                 ProcessDataImageGrid.ResolveToStartColumnIndex()));
+            ProcessDataImageGrid.EndInit();
+            dataImage.OperatingHistory?.PushOperatingRecord(
+                new OperatingRecord()
+                {
+                    Host = dataImage,
+                    Operation = Operation.Move,
+                    OriginaPos = sourceIndex,
+                    NewPos = targetIndex,
+                    OriginalValue = sourceData,
+                    NewValue = sourceData
+                });
+            CommandManager.InvalidateRequerySuggested();
+        }
+
+        private void MoveDownRecordCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = DataContext != null && ProcessDataImageGrid?.SelectedItems.Count == 1 && 
+                ProcessDataImageGrid?.SelectedIndex != (DataContext as ProcessDataImageModel).ProcessDataModels.Count - 1 && 
+                (DataContext as ProcessDataImageModel).IsOffline == true;
         }
 
         public void UpdateBindingSource()
@@ -182,6 +294,17 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             {
                 var binding = (e.OriginalSource as TextBox).GetBindingExpression(TextBox.TextProperty);
                 binding.UpdateSource();
+            }
+        }
+
+        private void ProcessDataImageGrid_CellDoubleTapped(object sender, GridCellDoubleTappedEventArgs e)
+        {
+            if(DataContext != null && (DataContext as ProcessDataImageModel).DirectModeOperation && (DataContext as ProcessDataImageModel).IsOffline == true)
+            {
+                ObjectModel o = __objects_model.Objects.Single(m => m.Index == (e.Record as ProcessDataModel).Index);
+                ObjectViewer wnd = new ObjectViewer(__objects_model, o, InputDialogDisplayMode.Edit);
+                wnd.WindowStartupLocation = WindowStartupLocation.CenterScreen;
+                wnd.ShowDialog();
             }
         }
     }

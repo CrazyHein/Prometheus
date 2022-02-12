@@ -111,6 +111,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
 
         private void ConfirmCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
+            int index = InterlockLogicList.SelectedIndex;
             try
             {
                 switch (__display_mode)
@@ -121,12 +122,15 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                         break;
                     case InputDialogDisplayMode.Add:
                         (DataContext as InterlockCollectionModel).Add(InputInterlockLogicName.Text, InputInterlockLogicTargets.Text, InputInterlockLogicStatement.Text);
+                        index = (DataContext as InterlockCollectionModel).InterlockLogicModels.Count - 1;
                         break;
                     case InputDialogDisplayMode.Insert:
                         (DataContext as InterlockCollectionModel).Insert(InterlockLogicList.SelectedIndex,
                             InputInterlockLogicName.Text, InputInterlockLogicTargets.Text, InputInterlockLogicStatement.Text);
                         break;
                 }
+                InterlockLogicList.SelectedIndex = index;
+                InterlockLogicList.ScrollIntoView((DataContext as InterlockCollectionModel).InterlockLogicModels[index]);
                 InterlockLogicContainer.IsEnabled = true;
                 InputArea.IsEnabled = false;
             }
