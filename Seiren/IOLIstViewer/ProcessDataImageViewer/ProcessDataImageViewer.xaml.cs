@@ -206,65 +206,77 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         {
             ProcessDataImageGrid.BeginInit();
             var dataImage = DataContext as ProcessDataImageModel;
-            int sourceIndex = ProcessDataImageGrid.SelectedIndex;
-            int targetIndex = sourceIndex - 1;
-            ProcessDataModel sourceData = ProcessDataImageGrid.SelectedItem as ProcessDataModel;
-            dataImage.Remove(sourceData, true, false);
-            dataImage.Insert(targetIndex, sourceData, false);
-            ProcessDataImageGrid.SelectedItem = sourceData;
-            ProcessDataImageGrid.ScrollInView(new Syncfusion.UI.Xaml.ScrollAxis.RowColumnIndex(
-                 ProcessDataImageGrid.ResolveToRowIndex(ProcessDataImageGrid.SelectedItem), 
-                 ProcessDataImageGrid.ResolveToStartColumnIndex()));
-            ProcessDataImageGrid.EndInit();
-            dataImage.OperatingHistory?.PushOperatingRecord(
+
+            var indexes = ProcessDataImageGrid.SelectedItems.Select(r => r as ProcessDataModel).OrderBy(r => dataImage.IndexOf(r)).ToList();
+            foreach(var i in indexes)
+            {
+                int sourceIndex = dataImage.IndexOf(i);
+                int targetIndex = sourceIndex - 1;
+                dataImage.Remove(i, true, false);
+                dataImage.Insert(targetIndex, i, false);
+
+                dataImage.OperatingHistory?.PushOperatingRecord(
                 new OperatingRecord()
                 {
                     Host = dataImage,
                     Operation = Operation.Move,
                     OriginaPos = sourceIndex,
                     NewPos = targetIndex,
-                    OriginalValue = sourceData,
-                    NewValue = sourceData
+                    OriginalValue = i,
+                    NewValue = i
                 });
+            }
+            ProcessDataImageGrid.SelectedItems = new ObservableCollection<object>(indexes);
+            ProcessDataImageGrid.ScrollInView(new Syncfusion.UI.Xaml.ScrollAxis.RowColumnIndex(
+                 ProcessDataImageGrid.ResolveToRowIndex(indexes[0]),
+                 ProcessDataImageGrid.ResolveToStartColumnIndex()));
+            ProcessDataImageGrid.EndInit();
             CommandManager.InvalidateRequerySuggested();
         }
 
         private void MoveUpRecordCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = DataContext != null && ProcessDataImageGrid?.SelectedItems.Count == 1 && ProcessDataImageGrid ?.SelectedIndex != 0 && (DataContext as ProcessDataImageModel).IsOffline == true;
+            e.CanExecute = DataContext != null &&
+                (ProcessDataImageGrid.SelectedItems.Count > 0 && ProcessDataImageGrid.SelectedItems.Min(i => (DataContext as ProcessDataImageModel).IndexOf(i as ProcessDataModel)) != 0) && 
+                (DataContext as ProcessDataImageModel).IsOffline == true;
         }
 
         private void MoveDownRecordCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             ProcessDataImageGrid.BeginInit();
             var dataImage = DataContext as ProcessDataImageModel;
-            int sourceIndex = ProcessDataImageGrid.SelectedIndex;
-            int targetIndex = sourceIndex + 1;
-            ProcessDataModel sourceData = ProcessDataImageGrid.SelectedItem as ProcessDataModel;
-            dataImage.Remove(sourceData, true, false);
-            dataImage.Insert(targetIndex, sourceData, false);
-            ProcessDataImageGrid.SelectedItem = sourceData;
-            ProcessDataImageGrid.ScrollInView(new Syncfusion.UI.Xaml.ScrollAxis.RowColumnIndex(
-                 ProcessDataImageGrid.ResolveToRowIndex(ProcessDataImageGrid.SelectedItem),
-                 ProcessDataImageGrid.ResolveToStartColumnIndex()));
-            ProcessDataImageGrid.EndInit();
-            dataImage.OperatingHistory?.PushOperatingRecord(
+
+            var indexes = ProcessDataImageGrid.SelectedItems.Select(r => r as ProcessDataModel).OrderByDescending(r => dataImage.IndexOf(r)).ToList();
+            foreach (var i in indexes)
+            {
+                int sourceIndex = dataImage.IndexOf(i);
+                int targetIndex = sourceIndex + 1;
+                dataImage.Remove(i, true, false);
+                dataImage.Insert(targetIndex, i, false);
+
+                dataImage.OperatingHistory?.PushOperatingRecord(
                 new OperatingRecord()
                 {
                     Host = dataImage,
                     Operation = Operation.Move,
                     OriginaPos = sourceIndex,
                     NewPos = targetIndex,
-                    OriginalValue = sourceData,
-                    NewValue = sourceData
+                    OriginalValue = i,
+                    NewValue = i
                 });
+            }
+            ProcessDataImageGrid.SelectedItems = new ObservableCollection<object>(indexes);
+            ProcessDataImageGrid.ScrollInView(new Syncfusion.UI.Xaml.ScrollAxis.RowColumnIndex(
+                 ProcessDataImageGrid.ResolveToRowIndex(indexes[indexes.Count - 1]),
+                 ProcessDataImageGrid.ResolveToStartColumnIndex()));
+            ProcessDataImageGrid.EndInit();
             CommandManager.InvalidateRequerySuggested();
         }
 
         private void MoveDownRecordCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = DataContext != null && ProcessDataImageGrid?.SelectedItems.Count == 1 && 
-                ProcessDataImageGrid?.SelectedIndex != (DataContext as ProcessDataImageModel).ProcessDataModels.Count - 1 && 
+            e.CanExecute = DataContext != null &&
+                (ProcessDataImageGrid.SelectedItems.Count > 0 && ProcessDataImageGrid.SelectedItems.Max(i => (DataContext as ProcessDataImageModel).IndexOf(i as ProcessDataModel)) != (DataContext as ProcessDataImageModel).ProcessDataModels.Count - 1) &&
                 (DataContext as ProcessDataImageModel).IsOffline == true;
         }
 
