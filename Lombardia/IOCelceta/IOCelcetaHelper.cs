@@ -15,7 +15,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
 
         public static VariableDictionary Import(string variableDictionary, DataTypeCatalogue dataTypes, out byte[] md5code)
         {
-            XmlDocument xmlDoc = new XmlDocument();
+            //XmlDocument xmlDoc = new XmlDocument();
             return new VariableDictionary(dataTypes, variableDictionary, out md5code);
         }
 
@@ -56,7 +56,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
 
         public static VariableDictionary Import(Stream variableDictionary, DataTypeCatalogue dataTypes)
         {
-            XmlDocument xmlDoc = new XmlDocument();
+            //XmlDocument xmlDoc = new XmlDocument();
             return new VariableDictionary(dataTypes, variableDictionary);
         }
 

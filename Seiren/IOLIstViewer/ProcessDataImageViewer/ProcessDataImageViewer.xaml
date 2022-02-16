@@ -85,7 +85,7 @@
                 </DataTemplate>
             </DockPanel.Resources>
             <DockPanel DockPanel.Dock="Bottom" HorizontalAlignment="Stretch">
-                <StackPanel Orientation="Horizontal" DockPanel.Dock="Left" Validation.Error="Input_Error" KeyDown="Input_KeyDown" IsEnabled="{Binding IsOffline}">
+                <StackPanel Orientation="Horizontal" DockPanel.Dock="Left" Validation.Error="Input_Error" KeyDown="Input_KeyDown" IsEnabled="{Binding IsOffline}" VerticalAlignment="Center">
                     <sync:SfTextInputLayout Hint="Offset (Words)" HelperText="Input area offset(words) here" ContainerType="Filled" FontStyle="Italic" FontSize="12" Margin="4,8,4,8" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}">
                         <TextBox Name="InputOffsetInWord" Text="{Binding OffsetInWord, ValidatesOnExceptions=True, NotifyOnValidationError=True}" FontStyle="Normal"/>
                     </sync:SfTextInputLayout>
@@ -96,9 +96,11 @@
                         <TextBox Text="{Binding ActualSizeInWord}" FontStyle="Normal" IsReadOnly="True"/>
                     </sync:SfTextInputLayout>
                 </StackPanel>
-                <StackPanel DockPanel.Dock="Right" HorizontalAlignment="Right" VerticalAlignment="Bottom">
-                    <CheckBox VerticalAlignment="Center" IsChecked="{Binding DirectModeOperation, Mode=OneWayToSource}" Margin="4" Content="Direct Mode Operation"/>
-                    <StackPanel Orientation="Horizontal">
+                <GroupBox DockPanel.Dock="Right" HorizontalAlignment="Right" Padding="2" Margin="4,8,0,0">
+                    <GroupBox.Header>
+                        <CheckBox VerticalAlignment="Center" IsChecked="{Binding DirectModeOperation, Mode=OneWayToSource}" Content="Direct Mode Operation"/>
+                    </GroupBox.Header>
+                    <UniformGrid Rows="2" Columns="4">
                         <sync:ButtonAdv Label="Add" VerticalAlignment="Center" Height="30" Width="128" Command="local:ConsoleControl.AddRecord" Margin="4">
                             <sync:ButtonAdv.SmallIcon>
                                 <BitmapImage  UriSource="/imgs/add.png"/>
@@ -129,8 +131,8 @@
                                 <BitmapImage  UriSource="/imgs/move_down.png"/>
                             </sync:ButtonAdv.SmallIcon>
                         </sync:ButtonAdv>
-                    </StackPanel>
-                </StackPanel>
+                    </UniformGrid>
+                </GroupBox>
             </DockPanel>
             <sync:SfDataGrid Name="ProcessDataImageGrid" ItemsSource="{Binding ProcessDataModels}" AutoGenerateColumns="False"
                              ColumnSizer="Auto"

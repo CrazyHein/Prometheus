@@ -320,6 +320,7 @@
 				<NetLP>1</NetLP>
 				<NetMLP>1</NetMLP>
 				<NetEVT>1</NetEVT>
+				<NodeInfo>10000</NodeInfo>
 				<Raw>17552</Raw>
 				<BitArea>140416</BitArea>
 				<BitIndex>4294967295</BitIndex>
@@ -343,6 +344,7 @@
 				<NetLP>1</NetLP>
 				<NetMLP>1</NetMLP>
 				<NetEVT>1</NetEVT>
+				<NodeInfo>10000</NodeInfo>
 				<Raw>28664</Raw>
 				<BitArea>229312</BitArea>
 				<BitIndex>4294967295</BitIndex>
@@ -366,6 +368,7 @@
 				<NetLP>1</NetLP>
 				<NetMLP>1</NetMLP>
 				<NetEVT>1</NetEVT>
+				<NodeInfo>10000</NodeInfo>
 				<Raw>28664</Raw>
 				<BitArea>229312</BitArea>
 				<BitIndex>4294967295</BitIndex>

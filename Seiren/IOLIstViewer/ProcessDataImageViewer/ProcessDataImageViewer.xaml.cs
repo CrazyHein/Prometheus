@@ -267,7 +267,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             }
             ProcessDataImageGrid.SelectedItems = new ObservableCollection<object>(indexes);
             ProcessDataImageGrid.ScrollInView(new Syncfusion.UI.Xaml.ScrollAxis.RowColumnIndex(
-                 ProcessDataImageGrid.ResolveToRowIndex(indexes[indexes.Count - 1]),
+                 ProcessDataImageGrid.ResolveToRowIndex(indexes[0]),
                  ProcessDataImageGrid.ResolveToStartColumnIndex()));
             ProcessDataImageGrid.EndInit();
             CommandManager.InvalidateRequerySuggested();
