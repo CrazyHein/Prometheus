@@ -5,6 +5,7 @@ using Syncfusion.SfSkinManager;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -29,7 +30,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         private VariableDictionary __variable_dictionary;
         private ControllerConfiguration __controller_configuration;
         private ObjectDictionary __object_dictionary;
-        private ProcessDataImage __tx_diagnotic_area;
+        private ProcessDataImage __tx_diagnostic_area;
         private ProcessDataImage __tx_bit_area;
         private ProcessDataImage __tx_block_area;
         private ProcessDataImage __rx_control_area;
@@ -51,7 +52,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
 
         private DataSynchronizer __data_synchronizer;
         private UserInterfaceSynchronizer __user_interface_synchronizer;
-        private ushort[] __tx_diagnotic_area_data;
+        private ushort[] __tx_diagnostic_area_data;
         private ushort[] __tx_bit_area_data;
         private ushort[] __tx_block_area_data;
         private ushort[] __rx_control_area_data;
@@ -188,7 +189,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             __variables_viewer = new VariablesViewer(__variable_dictionary, __data_type_catalogue, __operating_history);
             __controller_configuration_viewer = new ControllerConfigurationViewer(__controller_configuration, __controller_model_catalogue, __operating_history);
             __objects_viewer = new ObjectsViewer(__object_dictionary, __variable_dictionary, __controller_configuration,
-                __tx_diagnotic_area, __tx_bit_area, __tx_block_area, __rx_control_area, __rx_bit_area, __rx_block_area, __interlock_area, __operating_history);
+                __tx_diagnostic_area, __tx_bit_area, __tx_block_area, __rx_control_area, __rx_bit_area, __rx_block_area, __interlock_area, __operating_history);
             __miscellaneous_viewer = new MiscellaneousViewer(__misc_info);
 
             (__variables_viewer.DataContext as VariablesModel).SubscriberObjects = __objects_viewer.DataContext as ObjectsModel;
@@ -238,7 +239,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                 return "At least one user input is invalid.(ObjectDictionary)";
             bool res = IOCelcetaHelper.OVERLAP_DETECTOR(new List<(uint, uint)>()
             {
-                (__tx_diagnotic_area.OffsetInWord, __tx_diagnotic_area.SizeInWord),
+                (__tx_diagnostic_area.OffsetInWord, __tx_diagnostic_area.SizeInWord),
                 (__tx_bit_area.OffsetInWord, __tx_bit_area.SizeInWord),
                 (__tx_block_area.OffsetInWord, __tx_block_area.SizeInWord),
                 (__rx_control_area.OffsetInWord, __rx_control_area.SizeInWord),
@@ -268,7 +269,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             (__objects_viewer.DataContext as ObjectsModel).RxBlockObjects.ResetProcessDataValue();
             (__objects_viewer.DataContext as ObjectsModel).InterlockLogics.ResetProcessDataValue();
 
-            __tx_diagnotic_area_data = new ushort[__tx_diagnotic_area.ActualSizeInWord];
+            __tx_diagnostic_area_data = new ushort[__tx_diagnostic_area.ActualSizeInWord];
             __tx_bit_area_data = new ushort[__tx_bit_area.ActualSizeInWord];
             __tx_block_area_data = new ushort[__tx_block_area.ActualSizeInWord];
             __rx_control_area_data = new ushort[__rx_control_area.ActualSizeInWord];
@@ -277,14 +278,14 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
 
             __area_data_array = new List<ushort[]>()
             {
-                __tx_diagnotic_area_data, __tx_bit_area_data, __tx_block_area_data,
+                __tx_diagnostic_area_data, __tx_bit_area_data, __tx_block_area_data,
                 __rx_control_area_data, __rx_bit_area_data, __rx_block_area_data
             };
             __area_data_end = 0;
 
             var areas = new List<(uint, uint, IEnumerable<(uint bitpos, uint bitsize)>, DataSyncMode)>()
             {
-                (__tx_diagnotic_area.OffsetInWord, (__tx_diagnotic_area.ActualSizeInWord), __tx_diagnotic_area.ProcessDatas.Select(p => new ValueTuple<uint, uint>(p.BitPos, p.ProcessObject.Variable.Type.BitSize)), DataSyncMode.Read),
+                (__tx_diagnostic_area.OffsetInWord, (__tx_diagnostic_area.ActualSizeInWord), __tx_diagnostic_area.ProcessDatas.Select(p => new ValueTuple<uint, uint>(p.BitPos, p.ProcessObject.Variable.Type.BitSize)), DataSyncMode.Read),
                 (__tx_bit_area.OffsetInWord, (__tx_bit_area.ActualSizeInWord),  __tx_bit_area.ProcessDatas.Select(p => new ValueTuple<uint, uint>(p.BitPos, p.ProcessObject.Variable.Type.BitSize)), DataSyncMode.Read),
                 (__tx_block_area.OffsetInWord, (__tx_block_area.ActualSizeInWord),  __tx_block_area.ProcessDatas.Select(p => new ValueTuple<uint, uint>(p.BitPos, p.ProcessObject.Variable.Type.BitSize)), DataSyncMode.Read),
                 (__rx_control_area.OffsetInWord, (__rx_control_area.ActualSizeInWord),  __rx_control_area.ProcessDatas.Select(p => new ValueTuple<uint, uint>(p.BitPos, p.ProcessObject.Variable.Type.BitSize)), rxcotrol),
@@ -316,7 +317,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
 
             //if (monitoring == false)
             {
-                (__objects_viewer.DataContext as ObjectsModel).TxDiagnosticObjects.InitProcessDataValue(__tx_diagnotic_area_data);
+                (__objects_viewer.DataContext as ObjectsModel).TxDiagnosticObjects.InitProcessDataValue(__tx_diagnostic_area_data);
                 (__objects_viewer.DataContext as ObjectsModel).TxBitObjects.InitProcessDataValue(__tx_bit_area_data);
                 (__objects_viewer.DataContext as ObjectsModel).TxBlockObjects.InitProcessDataValue(__tx_block_area_data);
                 (__objects_viewer.DataContext as ObjectsModel).RxControlObjects.InitProcessDataValue(__rx_control_area_data);
@@ -353,7 +354,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             (__objects_viewer.DataContext as ObjectsModel).RxBlockObjects.IsOffline = true;
             (__objects_viewer.DataContext as ObjectsModel).InterlockLogics.IsOffline = true;
 
-            __tx_diagnotic_area_data = null;
+            __tx_diagnostic_area_data = null;
             __tx_bit_area_data = null;
             __tx_block_area_data = null;
             __rx_control_area_data = null;
@@ -382,7 +383,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             if(__main_model.DebuggerState == DataSynchronizerState.Connected)
             {
                 __data_synchronizer.Exchange(__area_data_array, out __area_data_end);
-                (__objects_viewer.DataContext as ObjectsModel).TxDiagnosticObjects.ProcessDataValueChanged(__tx_diagnotic_area_data);
+                (__objects_viewer.DataContext as ObjectsModel).TxDiagnosticObjects.ProcessDataValueChanged(__tx_diagnostic_area_data);
                 (__objects_viewer.DataContext as ObjectsModel).TxBitObjects.ProcessDataValueChanged(__tx_bit_area_data);
                 (__objects_viewer.DataContext as ObjectsModel).TxBlockObjects.ProcessDataValueChanged(__tx_block_area_data);
                 (__objects_viewer.DataContext as ObjectsModel).RxControlObjects.ProcessDataValueChanged(__rx_control_area_data);
@@ -452,7 +453,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                         __variable_dictionary, (__variables_viewer.DataContext as VariablesModel).VariableNames,
                         __controller_configuration, (__controller_configuration_viewer.DataContext as ControllerConfigurationModel).ReferenceNames,
                         __object_dictionary, (__objects_viewer.DataContext as ObjectsModel).ObjectIndexes,
-                        __tx_diagnotic_area, __tx_bit_area, __tx_block_area,
+                        __tx_diagnostic_area, __tx_bit_area, __tx_block_area,
                         __rx_control_area, __rx_bit_area, __rx_block_area,
                         __interlock_area, __misc_info);
                     __main_model.CurrentlyOpenFile = save.FileName;
@@ -484,7 +485,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                     __variable_dictionary, (__variables_viewer.DataContext as VariablesModel).VariableNames,
                     __controller_configuration, (__controller_configuration_viewer.DataContext as ControllerConfigurationModel).ReferenceNames,
                     __object_dictionary, (__objects_viewer.DataContext as ObjectsModel).ObjectIndexes,
-                    __tx_diagnotic_area, __tx_bit_area, __tx_block_area,
+                    __tx_diagnostic_area, __tx_bit_area, __tx_block_area,
                     __rx_control_area, __rx_bit_area, __rx_block_area,
                     __interlock_area, __misc_info);
                 __commit_changes();
@@ -517,7 +518,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                 try
                 {
                     (__variable_dictionary, __controller_configuration, __object_dictionary,
-                        __tx_diagnotic_area, __tx_bit_area, __tx_block_area,
+                        __tx_diagnostic_area, __tx_bit_area, __tx_block_area,
                         __rx_control_area, __rx_bit_area, __rx_block_area, 
                         __interlock_area, __misc_info) = IOCelcetaHelper.Load(open.FileName, __data_type_catalogue, __controller_model_catalogue, out _);
                     __main_model.CurrentlyOpenFile = open.FileName;
@@ -548,7 +549,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                     __variable_dictionary, (__variables_viewer.DataContext as VariablesModel).VariableNames,
                     __controller_configuration, (__controller_configuration_viewer.DataContext as ControllerConfigurationModel).ReferenceNames,
                     __object_dictionary, (__objects_viewer.DataContext as ObjectsModel).ObjectIndexes,
-                    __tx_diagnotic_area, __tx_bit_area, __tx_block_area,
+                    __tx_diagnostic_area, __tx_bit_area, __tx_block_area,
                     __rx_control_area, __rx_bit_area, __rx_block_area,
                     __interlock_area, __misc_info, __data_type_catalogue, __controller_model_catalogue);
             wnd.ShowDialog();
@@ -572,13 +573,13 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                     __variable_dictionary, null,
                     __controller_configuration, null,
                     __object_dictionary, null,
-                    __tx_diagnotic_area, __tx_bit_area, __tx_block_area,
+                    __tx_diagnostic_area, __tx_bit_area, __tx_block_area,
                     __rx_control_area, __rx_bit_area, __rx_block_area, 
                     __interlock_area, __misc_info, __data_type_catalogue, __controller_model_catalogue);
             if(wnd.ShowDialog() == true)
             {
                 (__variable_dictionary, __controller_configuration, __object_dictionary,
-                        __tx_diagnotic_area, __tx_bit_area, __tx_block_area,
+                        __tx_diagnostic_area, __tx_bit_area, __tx_block_area,
                         __rx_control_area, __rx_bit_area, __rx_block_area,
                         __interlock_area, __misc_info) = wnd.ImportResult;
                 __main_model.CurrentlyOpenFile = String.Empty;
@@ -603,7 +604,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             try
             {
                 (__variable_dictionary, __controller_configuration, __object_dictionary,
-                    __tx_diagnotic_area, __tx_bit_area, __tx_block_area,
+                    __tx_diagnostic_area, __tx_bit_area, __tx_block_area,
                     __rx_control_area, __rx_bit_area, __rx_block_area,
                     __interlock_area, __misc_info) = IOCelcetaHelper.Default(__data_type_catalogue, __controller_model_catalogue);
                 __main_model.CurrentlyOpenFile = String.Empty;
@@ -639,7 +640,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                    __variable_dictionary, (__variables_viewer.DataContext as VariablesModel).VariableNames,
                    __controller_configuration, (__controller_configuration_viewer.DataContext as ControllerConfigurationModel).ReferenceNames,
                    __object_dictionary, (__objects_viewer.DataContext as ObjectsModel).ObjectIndexes,
-                   __tx_diagnotic_area, __tx_bit_area, __tx_block_area,
+                   __tx_diagnostic_area, __tx_bit_area, __tx_block_area,
                    __rx_control_area, __rx_bit_area, __rx_block_area,
                    __interlock_area, __misc_info, __data_type_catalogue, __controller_model_catalogue);
             wnd.ShowDialog();
@@ -663,13 +664,13 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                     __variable_dictionary, null,
                     __controller_configuration, null,
                     __object_dictionary, null,
-                    __tx_diagnotic_area, __tx_bit_area, __tx_block_area,
+                    __tx_diagnostic_area, __tx_bit_area, __tx_block_area,
                     __rx_control_area, __rx_bit_area, __rx_block_area,
                     __interlock_area, __misc_info, __data_type_catalogue, __controller_model_catalogue);
             if (wnd.ShowDialog() == true)
             {
                 (__variable_dictionary, __controller_configuration, __object_dictionary,
-                        __tx_diagnotic_area, __tx_bit_area, __tx_block_area,
+                        __tx_diagnostic_area, __tx_bit_area, __tx_block_area,
                         __rx_control_area, __rx_bit_area, __rx_block_area,
                         __interlock_area, __misc_info) = wnd.UploadResult;
                 __main_model.CurrentlyOpenFile = String.Empty;
@@ -700,7 +701,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             __variable_dictionary = null;
             __controller_configuration = null;
             __object_dictionary = null;
-            __tx_diagnotic_area = null;
+            __tx_diagnostic_area = null;
             __tx_bit_area = null;
             __tx_block_area = null;
             __rx_control_area = null;
@@ -805,6 +806,154 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         private void RecordRedoCommand_CanExecuted(object sender, System.Windows.Input.CanExecuteRoutedEventArgs e)
         {
             e.CanExecute = __main_model.IsOffline && __main_model.IsOpened && __operating_history.CanRedo;
+        }
+
+        private void OpenCompareCommand_Executed(object sender, System.Windows.Input.ExecutedRoutedEventArgs e)
+        {
+            string? error = __update_binding_source();
+            if (error != null)
+            {
+                MessageBox.Show(error, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            System.Windows.Forms.OpenFileDialog open = new System.Windows.Forms.OpenFileDialog();
+            open.Filter = "Foliage Ocean List File(*.folst)|*.folst";
+            open.Multiselect = false;
+            if (open.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                try
+                {
+                    MessageBox.Show(__compare_result(IOCelcetaHelper.Load(open.FileName, __data_type_catalogue, __controller_model_catalogue, out _), true), "Comparison Result", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+                catch (LombardiaException ex)
+                {
+                    MessageBox.Show("At least one exception has occurred during the operation :\n" + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+        }
+
+        private void ImportCompareCommand_Executed(object sender, System.Windows.Input.ExecutedRoutedEventArgs e)
+        {
+            string? error = __update_binding_source();
+            if (error != null)
+            {
+                MessageBox.Show(error, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            var wnd = new ImportExport(ImportExportMode.Compare,
+                    __variable_dictionary, null,
+                    __controller_configuration, null,
+                    __object_dictionary, null,
+                    __tx_diagnostic_area, __tx_bit_area, __tx_block_area,
+                    __rx_control_area, __rx_bit_area, __rx_block_area,
+                    __interlock_area, __misc_info, __data_type_catalogue, __controller_model_catalogue);
+            if (wnd.ShowDialog() == true)
+                MessageBox.Show(__compare_result(wnd.ImportResult, (wnd.DataContext as ImportExportModel).XMLIO), "Comparison Result", MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+
+        private void UploadCompareCommand_Executed(object sender, System.Windows.Input.ExecutedRoutedEventArgs e)
+        {
+            string? error = __update_binding_source();
+            if (error != null)
+            {
+                MessageBox.Show(error, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            var wnd = new FTPUtility(FTPMode.Compare,
+                    __variable_dictionary, null,
+                    __controller_configuration, null,
+                    __object_dictionary, null,
+                    __tx_diagnostic_area, __tx_bit_area, __tx_block_area,
+                    __rx_control_area, __rx_bit_area, __rx_block_area,
+                    __interlock_area, __misc_info, __data_type_catalogue, __controller_model_catalogue);
+            if (wnd.ShowDialog() == true)
+                MessageBox.Show(__compare_result(wnd.UploadResult, (wnd.DataContext as FTPUtilityModel).IO), "Comparison Result", MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+
+        private void CompareCommand_CanExecuted(object sender, System.Windows.Input.CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = __main_model.IsOpened;
+        }
+
+        private string __compare_result((VariableDictionary vd, ControllerConfiguration cc, ObjectDictionary od,
+                    ProcessDataImage txdiag, ProcessDataImage txbit, ProcessDataImage txblk,
+                    ProcessDataImage rxctl, ProcessDataImage rxbit, ProcessDataImage rxblk, InterlockCollection intlk,
+                    Miscellaneous misc) target, bool io)
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.Append("Variable Dictionary");
+            if (__variable_dictionary.Equals(target.vd))
+                sb.Append("\t\t✔\n");
+            else
+                sb.Append("\t\t✖\n");
+            if (io)
+            {
+                sb.Append("Controller Configuration");
+                if (__controller_configuration.Equals(target.cc))
+                    sb.Append("\t✔\n");
+                else
+                    sb.Append("\t✖\n");
+
+                sb.Append("Object Dictionary");
+                if (__object_dictionary.Equals(target.od))
+                    sb.Append("\t\t✔\n");
+                else
+                    sb.Append("\t\t✖\n");
+
+                sb.Append("Tx Diagnostic Area");
+                if (__tx_diagnostic_area.Equals(target.txdiag))
+                    sb.Append("\t\t✔\n");
+                else
+                    sb.Append("\t\t✖\n");
+
+                sb.Append("Tx Bit Area");
+                if (__tx_bit_area.Equals(target.txbit))
+                    sb.Append("\t\t✔\n");
+                else
+                    sb.Append("\t\t✖\n");
+
+                sb.Append("Tx Block Area");
+                if (__tx_block_area.Equals(target.txblk))
+                    sb.Append("\t\t✔\n");
+                else
+                    sb.Append("\t\t✖\n");
+
+                sb.Append("Rx Control Area");
+                if (__rx_control_area.Equals(target.rxctl))
+                    sb.Append("\t\t✔\n");
+                else
+                    sb.Append("\t\t✖\n");
+
+                sb.Append("Rx Bit Area");
+                if (__rx_bit_area.Equals(target.rxbit))
+                    sb.Append("\t\t✔\n");
+                else
+                    sb.Append("\t\t✖\n");
+
+                sb.Append("Rx Block Area");
+                if (__rx_block_area.Equals(target.rxblk))
+                    sb.Append("\t\t✔\n");
+                else
+                    sb.Append("\t\t✖\n");
+
+                sb.Append("Interlock Area");
+                if (__interlock_area.Equals(target.intlk))
+                    sb.Append("\t\t✔\n");
+                else
+                    sb.Append("\t\t✖\n");
+
+                sb.Append("miscellaneous");
+                if (__misc_info.Equals(target.misc))
+                    sb.Append("\t\t✔\n");
+                else
+                    sb.Append("\t\t✖\n");
+            }
+            else
+                sb.Append("IO List File \t\tNot Implemented\n");
+            return sb.ToString();
         }
 
         private void MainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)

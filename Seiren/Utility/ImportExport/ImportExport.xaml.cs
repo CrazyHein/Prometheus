@@ -36,7 +36,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility
                 od, objectIndexes,
                 txdiag, txbit, txblk, rxctl, rxbit, rxblk, intlk, misc,
                 dataTypes, models);
-            if (mode == ImportExportMode.Import)
+            if (mode == ImportExportMode.Import || mode == ImportExportMode.Compare)
             {
                 CheckboxXLS.IsChecked = false;
                 CheckboxXLS.IsEnabled = false;
@@ -48,10 +48,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility
             }
         }
 
-        public (VariableDictionary, ControllerConfiguration, ObjectDictionary,
-                    ProcessDataImage, ProcessDataImage, ProcessDataImage,
-                    ProcessDataImage, ProcessDataImage, ProcessDataImage, InterlockCollection,
-                    Miscellaneous) ImportResult
+        public (VariableDictionary vd, ControllerConfiguration cc, ObjectDictionary od,
+                    ProcessDataImage txdiag, ProcessDataImage txbit, ProcessDataImage txblk,
+                    ProcessDataImage rxctl, ProcessDataImage rxbit, ProcessDataImage rxblk, InterlockCollection intlk,
+                    Miscellaneous misc) ImportResult
         {
             get; private set;
         }
@@ -108,6 +108,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility
                     model.IsBusy = false;
                     break;
                 case ImportExportMode.Import:
+                case ImportExportMode.Compare:
                     model.IsBusy = true;
                     try
                     {
@@ -139,6 +140,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility
                         model.VariableDictionaryPath = save.FileName;
                     break;
                 case ImportExportMode.Import:
+                case ImportExportMode.Compare:
                     System.Windows.Forms.OpenFileDialog open = new System.Windows.Forms.OpenFileDialog() { Multiselect = false};
                     open.InitialDirectory = System.IO.Path.GetDirectoryName(model.VariableDictionaryPath);
                     open.Filter = "Extensible Markup Language(*.xml)|*.xml";
@@ -162,6 +164,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility
                         model.IOListPath = save.FileName;
                     break;
                 case ImportExportMode.Import:
+                case ImportExportMode.Compare:
                     System.Windows.Forms.OpenFileDialog open = new System.Windows.Forms.OpenFileDialog() { Multiselect = false };
                     open.InitialDirectory = System.IO.Path.GetDirectoryName(model.IOListPath);
                     open.Filter = "Extensible Markup Language(*.xml)|*.xml";

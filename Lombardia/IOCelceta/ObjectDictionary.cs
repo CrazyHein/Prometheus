@@ -7,7 +7,7 @@ using System.Xml;
 
 namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
 {
-    public class ObjectDictionary : Publisher<ProcessObject>
+    public class ObjectDictionary : Publisher<ProcessObject>, IEquatable<ObjectDictionary>
     {
         public IReadOnlyDictionary<uint, ProcessObject> ProcessObjects { get; private set; }
         private Dictionary<uint, ProcessObject> __process_objects = new Dictionary<uint, ProcessObject>();
@@ -391,9 +391,17 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
                 throw new LombardiaException(ex);
             }
         }
+
+        public bool Equals(ObjectDictionary? other)
+        {
+            bool res = false;
+            if (other != null && other.ProcessObjects.Count == this.ProcessObjects.Count)
+                res = this.ProcessObjects.All(p => other.ProcessObjects.ContainsKey(p.Key) && other.ProcessObjects[p.Key].Equals(this.ProcessObjects[p.Key]));
+            return res;
+        }
     }
     
-    public class ProcessObject : ISubscriber<Variable>, ISubscriber<DeviceConfiguration>
+    public class ProcessObject : ISubscriber<Variable>, ISubscriber<DeviceConfiguration>, IEquatable<ProcessObject>
     {
         public ISubscriber<Variable>? DependencyChanged(Variable origin, Variable newcome)
         {
@@ -417,6 +425,14 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
                 this.Range, this.Converter,
                 ReplaceMode.Half);
             return n;
+        }
+
+        public bool Equals(ProcessObject? other)
+        {
+            return other != null && other.Index == Index && other.Variable.Equals(Variable) && 
+                ((other.Binding == null && Binding == null) || (other.Binding != null && other.Binding == Binding)) &&
+                ((other.Range == null && Range == null) || (other.Range != null && other.Range == Range)) &&
+                ((other.Converter == null && Converter == null) || (other.Converter != null && other.Converter == Converter));
         }
 
         public uint Index { get; init; }

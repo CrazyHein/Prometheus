@@ -134,7 +134,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility
                     ProcessDataImage, ProcessDataImage, ProcessDataImage, InterlockCollection,
                     Miscellaneous) Import()
         {
-            Debug.Assert(Mode == ImportExportMode.Import);
+            Debug.Assert(Mode == ImportExportMode.Import || Mode == ImportExportMode.Compare);
             Debug.Assert(XML == true && XLS == false);
             if (XML)
             {
@@ -165,5 +165,6 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility
     {
         Import,
         Export,
+        Compare
     }
 }

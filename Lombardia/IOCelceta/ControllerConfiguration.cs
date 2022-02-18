@@ -1,11 +1,12 @@
 ﻿using Spire.Xls;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Xml;
 
 namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
 {
-    public class ControllerConfiguration : Publisher<DeviceConfiguration>
+    public class ControllerConfiguration : Publisher<DeviceConfiguration>, IEquatable<ControllerConfiguration>
     {
         public IReadOnlyDictionary<string, DeviceConfiguration> Configurations { get; private set; }
         private Dictionary<string, DeviceConfiguration> __configurations = new Dictionary<string, DeviceConfiguration>();
@@ -71,7 +72,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
                     }
                     else if (configuration.DeviceModel is RemoteEthernetModel)
                     {
-                        XmlElement ethernet = doc.CreateElement("EthernetModules");
+                        XmlElement ethernet = doc.CreateElement("EthernetModule");
 
                         XmlElement sub = doc.CreateElement("ID");
                         sub.AppendChild(doc.CreateTextNode($"0x{configuration.DeviceModel.ID:X4}"));
@@ -318,9 +319,17 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
             ranges.TrimExcess();
             return Helper.OVERLAP_DETECTOR(ranges);
         }
+
+        public bool Equals(ControllerConfiguration? other)
+        {
+            bool res = false;
+            if (other != null && other.Configurations.Count == this.Configurations.Count)
+                res = this.Configurations.All(p => other.Configurations.ContainsKey(p.Key) && other.Configurations[p.Key].Equals(this.Configurations[p.Key]));
+            return res;
+        }
     }
 
-    public class DeviceConfiguration
+    public class DeviceConfiguration: IEquatable<DeviceConfiguration>
     {
         public DeviceModel DeviceModel { get; init; } = new LocalExtensionModel();
         public uint Switch { get; init; }
@@ -349,5 +358,12 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
             init { if (Helper.VALID_IPV4_ADDRESS.IsMatch(value) == false) throw new LombardiaException(LOMBARDIA_ERROR_CODE_T.INVALID_MODULE_IPV4_ADDRESS); else __ipv4_address = value; }
         }
         public ushort Port { get; init; }
+
+        public bool Equals(DeviceConfiguration? other)
+        {
+            return other != null && DeviceModel == other.DeviceModel && Switch == other.Switch &&
+                ((DeviceModel is LocalExtensionModel && LocalAddress == other.LocalAddress) || ((DeviceModel is RemoteEthernetModel && IPv4 == other.IPv4 && Port == other.Port)) &&
+                ReferenceName == other.ReferenceName);
+        }
     }
 }

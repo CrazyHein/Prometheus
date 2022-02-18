@@ -9,7 +9,7 @@ using System.Xml;
 
 namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
 {
-    public class InterlockCollection
+    public class InterlockCollection : IEquatable<InterlockCollection>
     {
         private ProcessDataImage __tx_process_data_image;
         private ProcessDataImage __rx_process_data_image;
@@ -315,15 +315,37 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
                 throw new LombardiaException(e);
             }
         }
+
+        public bool Equals(InterlockCollection? other)
+        {
+            return other != null && other.Logics.Count == Logics.Count && other.Logics.Select((l, i) => l.Equals(Logics[i])).All(r => r == true);
+        }
     }
 
-    public abstract class LogicElement
+    public abstract class LogicElement : IEquatable<LogicElement>
     {
         public LogicElementType Type { get; private set; }
         public LogicExpression? Root { get; private set; }
         public int Layer { get; private set; }
 
         public abstract string Serialize(ProcessData? origin = null, ProcessData? replace = null);
+
+        public bool Equals(LogicElement? other)
+        {
+            if(other == null || other.Type != Type)
+                return false;
+            else if (Type == LogicElementType.OPERAND)
+                return (other as LogicOperand).Operand.Equals((this as LogicOperand).Operand);
+            else
+            {
+                LogicExpression ori  = this as LogicExpression;
+                LogicExpression oth = other as LogicExpression;
+                if(ori.Layer == oth.Layer && ori.Operator == oth.Operator && ori.Elements.Count == oth.Elements.Count)
+                    return oth.Elements.Select((t, i) => ori.Elements[i].Equals(t)).All(r => r == true);
+                else
+                    return false;
+            }
+        }
 
         public LogicElement(LogicElementType type, LogicExpression root)
         {
@@ -379,7 +401,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
         }
     }
 
-    public class InterlockLogic : ISubscriber<ProcessData>
+    public class InterlockLogic : ISubscriber<ProcessData>, IEquatable<InterlockLogic>
     {
         public string Name { get; private set; }
         public List<ProcessData> Targets { get; private set; }
@@ -606,6 +628,14 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
             }
             else
                 return null;
+        }
+
+        public bool Equals(InterlockLogic? other)
+        {
+            if(other == null || other.Name != Name || other.Targets.Count != Targets.Count || other.Statement.Equals(Statement) == false)
+                return false;
+            else
+                return other.Targets.Select((t, i) => Targets[i].Equals(t)).All(r => r == true);
         }
 
         public static InterlockCollection? Publisher { get; set; }

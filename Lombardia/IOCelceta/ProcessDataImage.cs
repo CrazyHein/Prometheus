@@ -7,7 +7,7 @@ using System.Xml;
 
 namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
 {
-    public class ProcessDataImage : Publisher<ProcessData>
+    public class ProcessDataImage : Publisher<ProcessData> , IEquatable<ProcessDataImage>
     {
         public IReadOnlyList<ProcessData> ProcessDatas { get; private set; }
         public uint OffsetInWord { get; set; } = 0;
@@ -391,9 +391,18 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
             }
             return startbit;
         }
+
+        public bool Equals(ProcessDataImage? other)
+        {
+            if (other != null && other.Access == Access && other.Layout == Layout &&
+                other.OffsetInWord == OffsetInWord && other.SizeInWord == SizeInWord && other.ActualSizeInWord == ActualSizeInWord &&
+                other.ProcessDatas.Count == ProcessDatas.Count)
+                return other.ProcessDatas.Select((t, i) => ProcessDatas[i].Equals(t)).All(r => r == true);
+            return false;
+        }
     }
 
-    public class ProcessData : ISubscriber<ProcessObject>
+    public class ProcessData : ISubscriber<ProcessObject> , IEquatable<ProcessData>
     {
         public ISubscriber<ProcessObject>? DependencyChanged(ProcessObject origin, ProcessObject newcome)
         {
@@ -439,6 +448,11 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
                 default:
                     return "N/A";
             }
+        }
+
+        public bool Equals(ProcessData? other)
+        {
+            return other != null && other.BitPos == BitPos && other.ProcessObject.Equals(ProcessObject) && other.Access == Access;
         }
     }
 }

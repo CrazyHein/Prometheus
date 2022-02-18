@@ -13,6 +13,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility
     {
         Upload,
         Download,
+        Compare
     }
     class FTPUtilityModel : INotifyPropertyChanged
     {

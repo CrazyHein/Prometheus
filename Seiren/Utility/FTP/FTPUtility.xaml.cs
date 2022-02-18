@@ -37,17 +37,17 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility
                 od, objectIndexes,
                 txdiag, txbit, txblk, rxctl, rxbit, rxblk, intlk, misc,
                 dataTypes, models);
-            if(mode == FTPMode.Upload)
+            if(mode == FTPMode.Upload || mode == FTPMode.Compare)
             {
                 CheckboxVAR.IsChecked = true;
                 CheckboxVAR.IsEnabled = false;
             }
         }
 
-        public (VariableDictionary, ControllerConfiguration, ObjectDictionary,
-                    ProcessDataImage, ProcessDataImage, ProcessDataImage,
-                    ProcessDataImage, ProcessDataImage, ProcessDataImage, InterlockCollection,
-                    Miscellaneous) UploadResult
+        public (VariableDictionary vd, ControllerConfiguration cc, ObjectDictionary od,
+                    ProcessDataImage txdiag, ProcessDataImage txbit, ProcessDataImage txblk,
+                    ProcessDataImage rxctl, ProcessDataImage rxbit, ProcessDataImage rxblk, InterlockCollection intlk,
+                    Miscellaneous misc) UploadResult
         {
             get; private set;
         }
@@ -72,6 +72,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility
             switch (model.Mode)
             {
                 case FTPMode.Upload:
+                case FTPMode.Compare:
                     model.IsBusy = true;
                     try
                     {

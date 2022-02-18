@@ -1,4 +1,5 @@
-﻿using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia;
+﻿using AMEC.PCSoftware.CommunicationProtocol.CrazyHein.SLMP.Master;
+using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia;
 using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Debugger;
 using System;
 using System.Collections.Generic;
@@ -31,6 +32,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         public uint SupporedFileFormatVersion { get; init; } = IOCelcetaHelper.SupportedFileFormatVersion;
         public uint SupportedVariableFileFormatVersion { get; init; } = IOCelcetaHelper.SupportedVariableFileFormatVersion;
         public uint SupportedIOFileFormatVersion { get; init; } = IOCelcetaHelper.SupportedIOFileFormatVersion;
+        public string GagharvVersion { get; init; } = System.Reflection.Assembly.GetAssembly(typeof(RemoteOperationMaster)).GetName().Version.ToString();
 
         public SlmpTargetProperty SlmpTargetProperty { get; private set; }
         public PreferenceProperty PreferenceProperty { get; private set; }

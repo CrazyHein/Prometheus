@@ -4,10 +4,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Security.Cryptography;
 using System.Xml;
+using System.Linq;
 
 namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
 {
-    public class VariableDictionary : Publisher<Variable>
+    public class VariableDictionary : Publisher<Variable>, IEquatable<VariableDictionary>
     {
         public IReadOnlyDictionary<string, Variable> Variables { get; private set; }
         private Dictionary<string, Variable> __variables = new Dictionary<string, Variable>();
@@ -358,9 +359,17 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
                 throw new LombardiaException(e);
             }
         }
+
+        public bool Equals(VariableDictionary? other)
+        {
+            bool res = false;
+            if(other!= null && other.Variables.Count == this.Variables.Count)
+                res = this.Variables.All(p => other.Variables.ContainsKey(p.Key) && other.Variables[p.Key].Equals(this.Variables[p.Key]));
+            return res;
+        }
     }
 
-    public class Variable
+    public class Variable : IEquatable<Variable>
     {
         private string __name = "unnamed";
         public string Name
@@ -396,6 +405,12 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
                 if (value == null) value = String.Empty;
                 __comment = value;
             }
+        }
+
+        public bool Equals(Variable? other)
+        {
+            return other != null && Name == other.Name && Type == other.Type &&
+                Unit == other.Unit && Comment == other.Comment;
         }
     }
 }

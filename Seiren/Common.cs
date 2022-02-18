@@ -55,6 +55,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         public static RoutedUICommand StopDebugging { get; private set; }
         public static RoutedUICommand MoveUpRecord { get; private set; }
         public static RoutedUICommand MoveDownRecord { get; private set; }
+        public static RoutedUICommand UploadCompare { get; private set; }
+        public static RoutedUICommand ImportCompare { get; private set; }
+        public static RoutedUICommand OpenCompare { get; private set; }
 
 
         static ConsoleControl()
@@ -70,6 +73,11 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                 new KeyGesture(Key.O, ModifierKeys.Control, "Ctrl+O")
             };
             Open = new RoutedUICommand("Open", "Open Existing File", typeof(ConsoleControl), gestureOpen);
+            InputGestureCollection gestureOpenCompare = new InputGestureCollection
+            {
+                new KeyGesture(Key.O, ModifierKeys.Control | ModifierKeys.Shift, "Ctrl+Shift+O")
+            };
+            OpenCompare = new RoutedUICommand("Compare", "Compare via Open", typeof(ConsoleControl), gestureOpenCompare);
 
             InputGestureCollection gestureSave = new InputGestureCollection
             {
@@ -101,6 +109,11 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                 new KeyGesture(Key.F3, ModifierKeys.Control, "Ctrl+F3")
             };
             Export = new RoutedUICommand("Export", "Export XML/XLS", typeof(ConsoleControl), gestureExport);
+            InputGestureCollection gestureImportCompare = new InputGestureCollection
+            {
+                new KeyGesture(Key.F2, ModifierKeys.Control | ModifierKeys.Shift, "Ctrl+Shift+F2")
+            };
+            ImportCompare = new RoutedUICommand("Compare", "Compare via Import", typeof(ConsoleControl), gestureImportCompare);
 
             InputGestureCollection gestureUploadviaFTP = new InputGestureCollection
             {
@@ -113,6 +126,12 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                 new KeyGesture(Key.F5, ModifierKeys.Control, "Ctrl+F5")
             };
             DownloadviaFTP = new RoutedUICommand("Download", "Download via FTP", typeof(ConsoleControl), gestureDownloadviaFTP);
+
+            InputGestureCollection gestureUploadCompare = new InputGestureCollection
+            {
+                new KeyGesture(Key.F4, ModifierKeys.Control | ModifierKeys.Shift, "Ctrl+Shift+F4")
+            };
+            UploadCompare = new RoutedUICommand("Compare", "Compare via FTP", typeof(ConsoleControl), gestureUploadCompare);
 
             InputGestureCollection gestureAddRecord = new InputGestureCollection
             {

@@ -55,6 +55,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
 
         private void OK_Click(object sender, RoutedEventArgs e)
         {
+            __update_variable_info();
             __result_object_model.VariableName = __result_object_model.VariableName.Trim();
             foreach (var u in InputsGrid.Children)
             {

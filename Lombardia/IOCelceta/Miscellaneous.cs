@@ -8,7 +8,7 @@ using System.Xml;
 
 namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
 {
-    public class Miscellaneous
+    public class Miscellaneous : IEquatable<Miscellaneous>
     {
         public Miscellaneous()
         {
@@ -23,7 +23,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
                 {
                     IOListName = infoNode.SelectSingleNode("Name").FirstChild?.Value;
                     Description = infoNode.SelectSingleNode("Description").FirstChild?.Value;
-                    VariableDictionary = infoNode.SelectSingleNode("VaribaleDictionary")?.FirstChild.Value;
+                    VariableDictionary = infoNode.SelectSingleNode("VariableDictionary")?.FirstChild?.Value;
                 }
                 else
                     throw new LombardiaException(LOMBARDIA_ERROR_CODE_T.INVALID_BASIC_INFO_ELEMENT_NODE);
@@ -163,6 +163,14 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
             {
                 throw new LombardiaException(ex);
             }
+        }
+
+        public bool Equals(Miscellaneous? other)
+        {
+            return other != null && other.Description == Description && 
+                other.IOListName == IOListName && 
+                other.MCServerIPv4 == MCServerIPv4 && other.MCServerPort == MCServerPort &&
+                other.VariableDictionary == VariableDictionary;
         }
     }
 }

@@ -7,7 +7,7 @@
         xmlns:syncfusionskin ="clr-namespace:Syncfusion.SfSkinManager;assembly=Syncfusion.SfSkinManager.WPF"
         xmlns:sync="http://schemas.syncfusion.com/wpf"
         mc:Ignorable="d" WindowStyle="None"
-        Title="About" Height="280" Width="700" Mouse.MouseDown="Windows_MouseDown" WindowStartupLocation="CenterScreen">
+        Title="About" Height="290" Width="700" Mouse.MouseDown="Windows_MouseDown" WindowStartupLocation="CenterScreen">
     <Grid>
         <Grid.Resources>
             <local:ByteArrayString x:Key="ByteArrayString"/>
@@ -18,6 +18,7 @@
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="*"/>
@@ -40,6 +41,7 @@
         <TextBlock Text="Suppored File Format Version : " Grid.Column="1" Grid.Row="7" Margin="4" VerticalAlignment="Center"/>
         <TextBlock Text="Supported Variable File Format Version : " Grid.Column="1" Grid.Row="8" Margin="4" VerticalAlignment="Center"/>
         <TextBlock Text="Supported IO File Format Version : " Grid.Column="1" Grid.Row="9" Margin="4" VerticalAlignment="Center"/>
+        <TextBlock Text="Gagharv Version : " Grid.Column="1" Grid.Row="10" Margin="4" VerticalAlignment="Center"/>
 
         <TextBlock Text="{Binding Description}" Grid.Column="2" Grid.Row="0" Margin="4" VerticalAlignment="Center"/>
         <TextBlock Text="{Binding DataTypeCataloguePath}" Grid.Column="2" Grid.Row="1" Margin="4" VerticalAlignment="Center"/>
@@ -51,5 +53,6 @@
         <TextBlock Text="{Binding SupporedFileFormatVersion}" Grid.Column="2" Grid.Row="7" Margin="4" VerticalAlignment="Center"/>
         <TextBlock Text="{Binding SupportedVariableFileFormatVersion}" Grid.Column="2" Grid.Row="8" Margin="4" VerticalAlignment="Center"/>
         <TextBlock Text="{Binding SupportedIOFileFormatVersion}" Grid.Column="2" Grid.Row="9" Margin="4" VerticalAlignment="Center"/>
+        <TextBlock Text="{Binding GagharvVersion}" Grid.Column="2" Grid.Row="10" Margin="4" VerticalAlignment="Center"/>
     </Grid>
 </Window>

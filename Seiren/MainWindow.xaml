@@ -22,6 +22,9 @@
         <CommandBinding Command="local:ConsoleControl.StopDebugging" Executed="StopDebuggingCommand_Executed" CanExecute="StopDebuggingCommand_CanExecuted"/>
         <CommandBinding Command="local:ConsoleControl.RecordUndo" Executed="RecordUndoCommand_Executed" CanExecute="RecordUndoCommand_CanExecuted"/>
         <CommandBinding Command="local:ConsoleControl.RecordRedo" Executed="RecordRedoCommand_Executed" CanExecute="RecordRedoCommand_CanExecuted"/>
+        <CommandBinding Command="local:ConsoleControl.OpenCompare" Executed="OpenCompareCommand_Executed" CanExecute="CompareCommand_CanExecuted"/>
+        <CommandBinding Command="local:ConsoleControl.ImportCompare" Executed="ImportCompareCommand_Executed" CanExecute="CompareCommand_CanExecuted"/>
+        <CommandBinding Command="local:ConsoleControl.UploadCompare" Executed="UploadCompareCommand_Executed" CanExecute="CompareCommand_CanExecuted"/>
     </Window.CommandBindings>
     <Window.Resources>
         <local:InvertBooleanValue x:Key="InvertBoolean"/>
@@ -169,6 +172,12 @@
                     </sync:MenuItemAdv.Icon>
                 </sync:MenuItemAdv>
                 <sync:MenuItemSeparator/>
+                <sync:MenuItemAdv Command="local:ConsoleControl.OpenCompare" ToolTip="Compare opened file with another one">
+                    <sync:MenuItemAdv.Icon>
+                        <Image Source="imgs/compare.png" Height="28" Width="28"/>
+                    </sync:MenuItemAdv.Icon>
+                </sync:MenuItemAdv>
+                <sync:MenuItemSeparator/>
                 <sync:MenuItemAdv Command="local:ConsoleControl.Save">
                     <sync:MenuItemAdv.Icon>
                         <Image Source="imgs/save.png" Height="28" Width="28"/>
@@ -216,26 +225,46 @@
                 </sync:MenuItemAdv>
             </sync:MenuItemAdv>
             <sync:MenuItemAdv  Header="_Utility" Margin="2">
-                <sync:MenuItemAdv Command="local:ConsoleControl.Import" ToolTip="Import XML">
+                <sync:MenuItemAdv Header="Local Tools">
                     <sync:MenuItemAdv.Icon>
-                        <Image Source="imgs/import.png" Height="28" Width="28"/>
+                        <Image Source="imgs/local_io.png" Height="28" Width="28"/>
                     </sync:MenuItemAdv.Icon>
-                </sync:MenuItemAdv>
-                <sync:MenuItemAdv Command="local:ConsoleControl.Export" ToolTip="Export XML/XLS">
-                    <sync:MenuItemAdv.Icon>
-                        <Image Source="imgs/export.png" Height="28" Width="28"/>
-                    </sync:MenuItemAdv.Icon>
+                    <sync:MenuItemAdv Command="local:ConsoleControl.Import" ToolTip="Import XML">
+                        <sync:MenuItemAdv.Icon>
+                            <Image Source="imgs/import.png" Height="28" Width="28"/>
+                        </sync:MenuItemAdv.Icon>
+                    </sync:MenuItemAdv>
+                    <sync:MenuItemAdv Command="local:ConsoleControl.Export" ToolTip="Export XML/XLS">
+                        <sync:MenuItemAdv.Icon>
+                            <Image Source="imgs/export.png" Height="28" Width="28"/>
+                        </sync:MenuItemAdv.Icon>
+                    </sync:MenuItemAdv>
+                    <sync:MenuItemAdv Command="local:ConsoleControl.ImportCompare" ToolTip="Compare via Import">
+                        <sync:MenuItemAdv.Icon>
+                            <Image Source="imgs/compare.png" Height="28" Width="28"/>
+                        </sync:MenuItemAdv.Icon>
+                    </sync:MenuItemAdv>
                 </sync:MenuItemAdv>
                 <sync:MenuItemSeparator/>
-                <sync:MenuItemAdv Command="local:ConsoleControl.UploadviaFTP" ToolTip="Upload via FTP">
+                <sync:MenuItemAdv Header="FTP Tools">
                     <sync:MenuItemAdv.Icon>
-                        <Image Source="imgs/ftpu.png" Height="28" Width="28"/>
+                        <Image Source="imgs/ftp.png" Height="28" Width="28"/>
                     </sync:MenuItemAdv.Icon>
-                </sync:MenuItemAdv>
-                <sync:MenuItemAdv Command="local:ConsoleControl.DownloadviaFTP" ToolTip="Download via FTP">
-                    <sync:MenuItemAdv.Icon>
-                        <Image Source="imgs/ftpd.png" Height="28" Width="28"/>
-                    </sync:MenuItemAdv.Icon>
+                    <sync:MenuItemAdv Command="local:ConsoleControl.UploadviaFTP" ToolTip="Upload via FTP">
+                        <sync:MenuItemAdv.Icon>
+                            <Image Source="imgs/ftpu.png" Height="28" Width="28"/>
+                        </sync:MenuItemAdv.Icon>
+                    </sync:MenuItemAdv>
+                    <sync:MenuItemAdv Command="local:ConsoleControl.DownloadviaFTP" ToolTip="Download via FTP">
+                        <sync:MenuItemAdv.Icon>
+                            <Image Source="imgs/ftpd.png" Height="28" Width="28"/>
+                        </sync:MenuItemAdv.Icon>
+                    </sync:MenuItemAdv>
+                    <sync:MenuItemAdv Command="local:ConsoleControl.UploadCompare" ToolTip="Compare via FTP">
+                        <sync:MenuItemAdv.Icon>
+                            <Image Source="imgs/compare.png" Height="28" Width="28"/>
+                        </sync:MenuItemAdv.Icon>
+                    </sync:MenuItemAdv>
                 </sync:MenuItemAdv>
             </sync:MenuItemAdv>
             <sync:MenuItemAdv  Header="_Help" Margin="2">
