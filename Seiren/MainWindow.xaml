@@ -25,6 +25,7 @@
         <CommandBinding Command="local:ConsoleControl.OpenCompare" Executed="OpenCompareCommand_Executed" CanExecute="CompareCommand_CanExecuted"/>
         <CommandBinding Command="local:ConsoleControl.ImportCompare" Executed="ImportCompareCommand_Executed" CanExecute="CompareCommand_CanExecuted"/>
         <CommandBinding Command="local:ConsoleControl.UploadCompare" Executed="UploadCompareCommand_Executed" CanExecute="CompareCommand_CanExecuted"/>
+        <CommandBinding Command="local:ConsoleControl.SaveLayoutState" Executed="SaveLayoutStateCommand_Executed" CanExecute="SaveLayoutStateCommand_CanExecuted"/>
     </Window.CommandBindings>
     <Window.Resources>
         <local:InvertBooleanValue x:Key="InvertBoolean"/>
@@ -188,6 +189,11 @@
                         <Image Source="imgs/saveas.png" Height="28" Width="28"/>
                     </sync:MenuItemAdv.Icon>
                 </sync:MenuItemAdv>
+                <sync:MenuItemAdv Command="local:ConsoleControl.SaveLayoutState">
+                    <sync:MenuItemAdv.Icon>
+                        <Image Source="imgs/layout.png" Height="28" Width="28"/>
+                    </sync:MenuItemAdv.Icon>
+                </sync:MenuItemAdv>
                 <sync:MenuItemSeparator/>
                 <sync:MenuItemAdv Command="local:ConsoleControl.Quit">
                     <sync:MenuItemAdv.Icon>
@@ -331,7 +337,7 @@
                     <sync:NavigationItem.Header>
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="PDO Dictionary &amp; INTLK"/>
-                            <TextBlock Text=" *" Foreground="Red" FontWeight="Bold" Visibility="{Binding Modified, Converter={StaticResource ModifiedConverter}}"/>
+                            <TextBlock Text=" *" Foreground="Red" FontWeight="Bold" Visibility="{Binding ContentModified, Converter={StaticResource ModifiedConverter}}"/>
                         </StackPanel>
                     </sync:NavigationItem.Header>
                     <sync:NavigationItem.Icon>

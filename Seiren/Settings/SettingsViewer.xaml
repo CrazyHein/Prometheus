@@ -159,6 +159,7 @@
                     <Grid.RowDefinitions>
                         <RowDefinition Height="auto" />
                         <RowDefinition Height="auto" />
+                        <RowDefinition Height="auto" />
                     </Grid.RowDefinitions>
                     <GroupBox Header="Undo Queue of Record Operating" Padding="3,0,3,0" Margin="0,4,0,0">
                         <sync:SfTextInputLayout Hint="Depth"  FontSize="12" FontStyle="Italic" ContainerType="Filled" Margin="4" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}"
@@ -190,6 +191,9 @@
                                 <ComboBox FontStyle="Normal" ItemsSource="{Binding Source={StaticResource datasyncmode}}" SelectedItem="{Binding RxControlAreaSyncMode}" />
                             </sync:SfTextInputLayout>
                         </Grid>
+                    </GroupBox>
+                    <GroupBox Header="Layout State of PDO Dictionary &amp; INTLK" Padding="3,8,3,8" Margin="0,4,0,0" Grid.Row="2">
+                        <CheckBox Content="Save the Layout State Automatically" Margin="4" IsChecked="{Binding SaveLayoutState}" IsEnabled="False"/>
                     </GroupBox>
                 </Grid>
             </TabItem>

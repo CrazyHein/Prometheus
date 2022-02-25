@@ -170,7 +170,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                 return false;
             return (__variables_viewer.DataContext as VariablesModel).Modified ||
                     (__controller_configuration_viewer.DataContext as ControllerConfigurationModel).Modified ||
-                    (__objects_viewer.DataContext as ObjectsModel).Modified ||
+                    (__objects_viewer.DataContext as ObjectsModel).ContentModified ||
                     (__miscellaneous_viewer.DataContext as MiscellaneousModel).Modified;
         }
 
@@ -184,6 +184,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
 
         private void __reset_layout()
         {
+            __close_layout();
             __operating_history.Clear();
 
             __variables_viewer = new VariablesViewer(__variable_dictionary, __data_type_catalogue, __operating_history);
@@ -876,6 +877,16 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         private void CompareCommand_CanExecuted(object sender, System.Windows.Input.CanExecuteRoutedEventArgs e)
         {
             e.CanExecute = __main_model.IsOpened;
+        }
+
+        private void SaveLayoutStateCommand_Executed(object sender, System.Windows.Input.ExecutedRoutedEventArgs e)
+        {
+            __objects_viewer.SaveLayoutState(null);
+        }
+
+        private void SaveLayoutStateCommand_CanExecuted(object sender, System.Windows.Input.CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = __main_model.IsOpened && __objects_viewer.LayoutFinished && false;
         }
 
         private string __compare_result((VariableDictionary vd, ControllerConfiguration cc, ObjectDictionary od,

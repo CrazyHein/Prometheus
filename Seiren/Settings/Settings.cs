@@ -118,6 +118,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         public DataSyncMode RxBitAreaSyncMode { get; set; } = DataSyncMode.Read;
         public DataSyncMode RxBlockAreaSyncMode { get; set; } = DataSyncMode.Read;
         public DataSyncMode RxControlAreaSyncMode { get; set; } = DataSyncMode.Write;
+        public bool SaveLayoutState { get; set; } = false;
 
         private static JsonSerializerOptions __JSON_OPTION = new JsonSerializerOptions
         {

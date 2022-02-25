@@ -7,7 +7,8 @@
              xmlns:linq="clr-namespace:Syncfusion.Data;assembly=Syncfusion.Data.WPF"
              xmlns:sync="http://schemas.syncfusion.com/wpf"
              mc:Ignorable="d" 
-             d:DesignHeight="1000" d:DesignWidth="1000">
+             d:DesignHeight="1000" d:DesignWidth="1000"
+             Loaded="UserControl_Loaded" IsVisibleChanged="UserControl_IsVisibleChanged">
     <UserControl.CommandBindings>
         <CommandBinding Command="local:ConsoleControl.AddRecord" Executed="AddRecordCommand_Executed" CanExecute="AddRecordCommand_CanExecute"/>
         <CommandBinding Command="local:ConsoleControl.InsertRecord" Executed="InsertRecordCommand_Executed" CanExecute="InsertRecordCommand_CanExecute"/>

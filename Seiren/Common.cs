@@ -58,8 +58,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         public static RoutedUICommand UploadCompare { get; private set; }
         public static RoutedUICommand ImportCompare { get; private set; }
         public static RoutedUICommand OpenCompare { get; private set; }
-
-
+        public static RoutedUICommand SaveLayoutState { get; private set; }
+        public static RoutedUICommand LoadLayoutState { get; private set; }
         static ConsoleControl()
         {
             InputGestureCollection gestureNew = new InputGestureCollection
@@ -213,8 +213,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             };
             StopDebugging = new RoutedUICommand("Stop Monitoring/Debugging", "Stop Monitoring/Debugging", typeof(ConsoleControl), gestureStopDebugging);
 
-            MoveUpRecord = new RoutedUICommand("Move Up", "Move Up ", typeof(ConsoleControl));
-            MoveDownRecord = new RoutedUICommand("Move Down", "Move Down ", typeof(ConsoleControl));
+            MoveUpRecord = new RoutedUICommand("Move Up", "Move Up", typeof(ConsoleControl));
+            MoveDownRecord = new RoutedUICommand("Move Down", "Move Down", typeof(ConsoleControl));
+            SaveLayoutState = new RoutedUICommand("Save Layout", "Save Layout", typeof(ConsoleControl));
+            LoadLayoutState = new RoutedUICommand("Load Layout", "Load Layout", typeof(ConsoleControl));
         }
     }
 
@@ -239,14 +241,17 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
     {
         static SolidColorBrush red = new SolidColorBrush(Color.FromArgb(255, 255, 0, 0));
         static SolidColorBrush black = new SolidColorBrush(Color.FromArgb(255,0,0,0));
+
+        public SolidColorBrush Unchanged { get; set; } = null;
+        public SolidColorBrush Changed { get; set; } = null;
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             
             bool res = (bool)value;
             if (res)
-                return red;
+                return Changed??red;
             else
-                return black;
+                return Unchanged??black;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

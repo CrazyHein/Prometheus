@@ -187,7 +187,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility
             {
                 case ImportExportMode.Export:
                     System.Windows.Forms.SaveFileDialog save = new System.Windows.Forms.SaveFileDialog() { DefaultExt = "xlsx", AddExtension = true };
-                    save.InitialDirectory = System.IO.Path.GetDirectoryName(model.IOListPath);
+                    save.InitialDirectory = System.IO.Path.GetDirectoryName(model.XlsArchivesPath);
                     save.Filter = "Microsoft Office Excel 2007+ (*.xlsx)|*.xlsx";
                     if (save.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                         model.XlsArchivesPath = save.FileName;

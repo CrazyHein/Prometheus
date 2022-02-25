@@ -1,0 +1,15 @@
+﻿<Window x:Class="AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.LoadingIndicator"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren"
+        mc:Ignorable="d"
+        Title="Loading" Topmost="True"
+        Height="100" Width="300" WindowStyle="None" WindowStartupLocation="CenterScreen" AllowsTransparency="True" Opacity="1" Background="Transparent">
+    <TextBlock Text="Loading..." VerticalAlignment="Center" HorizontalAlignment="Center" FontStyle="Italic" FontWeight="Bold" FontSize="20">
+        <TextBlock.Effect>
+            <DropShadowEffect Opacity="0.8"/>
+        </TextBlock.Effect>
+    </TextBlock>
+</Window>

@@ -64,5 +64,24 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                 binding.UpdateSource();
             }
         }
+
+        private LoadingIndicator __loading_dialog;
+        private void UserControl_Loaded(object sender, RoutedEventArgs e)
+        {
+            if (__loading_dialog != null)
+            {
+                __loading_dialog.CloseIndicator(null, null);
+                __loading_dialog = null;
+            }
+        }
+
+        private void UserControl_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            if ((bool)e.NewValue == true && __loading_dialog == null && IsLoaded == false)
+            {
+                __loading_dialog = new LoadingIndicator();
+                __loading_dialog.ShowIndicator();
+            }
+        }
     }
 }

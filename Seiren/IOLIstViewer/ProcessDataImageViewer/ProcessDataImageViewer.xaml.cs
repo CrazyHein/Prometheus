@@ -34,7 +34,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
 
         private void OnMainViewer_DragStart(object sender, GridRowDragStartEventArgs e)
         {
-            if((DataContext as ProcessDataImageModel).IsOffline == false)
+            if ((DataContext as ProcessDataImageModel).IsOffline == false || ProcessDataImageGrid.SelectedItems.Count != 1)
                 e.Handled = true;
         }
 

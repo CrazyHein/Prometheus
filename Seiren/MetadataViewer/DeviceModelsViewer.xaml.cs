@@ -45,6 +45,25 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                 }
             }
         }
+
+        private LoadingIndicator __loading_dialog;
+        private void UserControl_Loaded(object sender, System.Windows.RoutedEventArgs e)
+        {
+            if (__loading_dialog != null)
+            {
+                __loading_dialog.CloseIndicator(null, null);
+                __loading_dialog = null;
+            }
+        }
+
+        private void UserControl_IsVisibleChanged(object sender, System.Windows.DependencyPropertyChangedEventArgs e)
+        {
+            if ((bool)e.NewValue == true && __loading_dialog == null && IsLoaded == false)
+            {
+                __loading_dialog = new LoadingIndicator();
+                __loading_dialog.ShowIndicator();
+            }
+        }
     }
 
     class RxTxVariablesText : IValueConverter

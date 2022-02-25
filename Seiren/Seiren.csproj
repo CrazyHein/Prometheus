@@ -7,7 +7,7 @@
     <UseWindowsForms>true</UseWindowsForms>
     <RootNamespace>AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren</RootNamespace>
     <Nullable>annotations</Nullable>
-    <Version>0.9.0</Version>
+    <Version>0.10.0</Version>
     <Authors>CrazyHein</Authors>
     <Company>AMEC</Company>
     <ApplicationIcon>imgs\logo.ico</ApplicationIcon>
@@ -36,6 +36,7 @@
     <None Remove="imgs\import.png" />
     <None Remove="imgs\import_p.png" />
     <None Remove="imgs\insert.png" />
+    <None Remove="imgs\layout.png" />
     <None Remove="imgs\list.png" />
     <None Remove="imgs\local_io.png" />
     <None Remove="imgs\logo.png" />
@@ -63,6 +64,7 @@
     <None Remove="imgs\stopdebugging.png" />
     <None Remove="imgs\undo.png" />
     <None Remove="imgs\variables.png" />
+    <None Remove="LayoutProfile\pdo_default_layout_state.xml" />
     <None Remove="splash.jpg" />
   </ItemGroup>
 
@@ -85,6 +87,7 @@
     <Resource Include="imgs\import.png" />
     <Resource Include="imgs\import_p.png" />
     <Resource Include="imgs\insert.png" />
+    <Resource Include="imgs\layout.png" />
     <Resource Include="imgs\local_io.png" />
     <Resource Include="imgs\logo.png" />
     <Resource Include="imgs\miscellaneous.png" />
@@ -174,6 +177,7 @@
     <Resource Include="imgs\meta.png" />
     <Resource Include="imgs\navigation.png" />
     <Resource Include="imgs\setting.png" />
+    <Resource Include="LayoutProfile\pdo_default_layout_state.xml" />
   </ItemGroup>
 
   

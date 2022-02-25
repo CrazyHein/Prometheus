@@ -7,134 +7,133 @@
              xmlns:sync="http://schemas.syncfusion.com/wpf" d:DataContext="{d:DesignInstance Type=local:ProcessDataImageModel}"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="1800">
-    <GroupBox Header="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=sync:TabItemExt}, Path=Header}" Padding="0,8,0,0">
-        <DockPanel>
-            <DockPanel.CommandBindings>
-                <CommandBinding Command="local:ConsoleControl.AddRecord" Executed="AddRecordCommand_Executed" CanExecute="AddRecordCommand_CanExecute"/>
-                <CommandBinding Command="local:ConsoleControl.InsertRecord" Executed="InsertRecordCommand_Executed" CanExecute="InsertRecordCommand_CanExecute"/>
-                <CommandBinding Command="local:ConsoleControl.EditRecord" Executed="EditRecordCommand_Executed" CanExecute="EditRecordCommand_CanExecute"/>
-                <CommandBinding Command="local:ConsoleControl.RemoveRecord" Executed="RemoveRecordCommand_Executed" CanExecute="RemoveRecordCommand_CanExecute"/>
-                <CommandBinding Command="local:ConsoleControl.MoveUpRecord" Executed="MoveUpRecordCommand_Executed" CanExecute="MoveUpRecordCommand_CanExecute"/>
-                <CommandBinding Command="local:ConsoleControl.MoveDownRecord" Executed="MoveDownRecordCommand_Executed" CanExecute="MoveDownRecordCommand_CanExecute"/>
-            </DockPanel.CommandBindings>
-            <DockPanel.Resources>
-                <local:InvertBooleanValue x:Key="InvertBoolean"/>
-                <local:ProcessDataImageAllowEditing x:Key="AllowEditing"/>
-                <DataTemplate x:Key="RecordToolTipTemplate">
-                    <TextBlock Text="{Binding VariableComment}"/>
-                </DataTemplate>
-                <ContextMenu x:Key="GridContextMenu">
-                    <MenuItem Command="local:ConsoleControl.InsertRecord">
-                        <MenuItem.Icon>
-                            <Image Source="/imgs/insert.png" Height="20" Margin="4"/>
-                        </MenuItem.Icon>
-                    </MenuItem>
-                    <MenuItem Command="local:ConsoleControl.EditRecord">
-                        <MenuItem.Icon>
-                            <Image Source="/imgs/edit.png" Height="20" Margin="4"/>
-                        </MenuItem.Icon>
-                    </MenuItem>
-                    <MenuItem Command="local:ConsoleControl.RemoveRecord">
-                        <MenuItem.Icon>
-                            <Image Source="/imgs/remove.png" Height="20" Margin="4"/>
-                        </MenuItem.Icon>
-                    </MenuItem>
-                    <MenuItem Command="local:ConsoleControl.MoveUpRecord">
-                        <MenuItem.Icon>
-                            <Image Source="/imgs/move_up.png" Height="20" Margin="4"/>
-                        </MenuItem.Icon>
-                    </MenuItem>
-                    <MenuItem Command="local:ConsoleControl.MoveDownRecord">
-                        <MenuItem.Icon>
-                            <Image Source="/imgs/move_down.png" Height="20" Margin="4"/>
-                        </MenuItem.Icon>
-                    </MenuItem>
-                </ContextMenu>
-                <DataTemplate x:Key="RecordDragDropTemplate">
-                    <Border Padding="4" Background="#ececec" BorderBrush="#c8c8c8" BorderThickness="1.2">
-                        <Grid VerticalAlignment="Center" HorizontalAlignment="Left">
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                            </Grid.RowDefinitions>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="Auto"/>
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Text="Index : " Grid.Row="0" Grid.Column="0" FontWeight="Bold"/>
-                            <TextBlock Text="{Binding DraggingRecords[0].Index, StringFormat='0x{0:X08}'}" Grid.Row="0" Grid.Column="1"/>
-                            <TextBlock Text="Name : " Grid.Row="1" Grid.Column="0" FontWeight="Bold"/>
-                            <TextBlock Text="{Binding DraggingRecords[0].VariableName}" Grid.Row="1" Grid.Column="1"/>
-                            <TextBlock Text="Data Type : " Grid.Row="2" Grid.Column="0" FontWeight="Bold"/>
-                            <TextBlock Text="{Binding DraggingRecords[0].VariableDataType}" Grid.Row="2" Grid.Column="1"/>
-                            <TextBlock Text="Unit : " Grid.Row="3" Grid.Column="0" FontWeight="Bold"/>
-                            <TextBlock Text="{Binding DraggingRecords[0].VariableUnit}" Grid.Row="3" Grid.Column="1"/>
-                            <TextBlock Text="Binding : " Grid.Row="4" Grid.Column="0" FontWeight="Bold"/>
-                            <TextBlock Text="{Binding DraggingRecords[0].DeviceBindingInfo}" Grid.Row="4" Grid.Column="1"/>
-                            <TextBlock Text="Range : " Grid.Row="5" Grid.Column="0" FontWeight="Bold"/>
-                            <TextBlock Text="{Binding DraggingRecords[0].ValueRangeInfo}" Grid.Row="5" Grid.Column="1"/>
-                            <TextBlock Text="Converter : " Grid.Row="6" Grid.Column="0" FontWeight="Bold"/>
-                            <TextBlock Text="{Binding DraggingRecords[0].ValueConverterInfo}" Grid.Row="6" Grid.Column="1"/>
-                        </Grid>
-                    </Border>
-                </DataTemplate>
-            </DockPanel.Resources>
-            <DockPanel DockPanel.Dock="Bottom" HorizontalAlignment="Stretch">
-                <StackPanel Orientation="Horizontal" DockPanel.Dock="Left" Validation.Error="Input_Error" KeyDown="Input_KeyDown" IsEnabled="{Binding IsOffline}" VerticalAlignment="Center">
-                    <sync:SfTextInputLayout Hint="Offset (Words)" HelperText="Input area offset(words) here" ContainerType="Filled" FontStyle="Italic" FontSize="12" Margin="4,8,4,8" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}">
-                        <TextBox Name="InputOffsetInWord" Text="{Binding OffsetInWord, ValidatesOnExceptions=True, NotifyOnValidationError=True}" FontStyle="Normal"/>
-                    </sync:SfTextInputLayout>
-                    <sync:SfTextInputLayout Hint="Size (Words)" HelperText="Input area size(words) here" ContainerType="Filled" FontStyle="Italic" FontSize="12" Margin="4,8,4,8" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}">
-                        <TextBox Name="InputSizeInWord" Text="{Binding SizeInWord, ValidatesOnExceptions=True, NotifyOnValidationError=True}" FontStyle="Normal"/>
-                    </sync:SfTextInputLayout>
-                    <sync:SfTextInputLayout Hint="Actual Size (Words)" HelperText="Indicate the area actual size(words)" ContainerType="Filled" FontStyle="Italic" FontSize="12" Margin="4,8,4,8">
-                        <TextBox Text="{Binding ActualSizeInWord}" FontStyle="Normal" IsReadOnly="True"/>
-                    </sync:SfTextInputLayout>
-                </StackPanel>
-                <GroupBox DockPanel.Dock="Right" HorizontalAlignment="Right" Padding="2" Margin="4,8,0,0">
-                    <GroupBox.Header>
-                        <CheckBox VerticalAlignment="Center" IsChecked="{Binding DirectModeOperation, Mode=OneWayToSource}" Content="Direct Mode Operation"/>
-                    </GroupBox.Header>
-                    <UniformGrid Rows="2" Columns="4">
-                        <sync:ButtonAdv Label="Add" VerticalAlignment="Center" Height="30" Width="128" Command="local:ConsoleControl.AddRecord" Margin="4">
-                            <sync:ButtonAdv.SmallIcon>
-                                <BitmapImage  UriSource="/imgs/add.png"/>
-                            </sync:ButtonAdv.SmallIcon>
-                        </sync:ButtonAdv>
-                        <sync:ButtonAdv Label="Insert" VerticalAlignment="Center" Height="30" Width="128" Command="local:ConsoleControl.InsertRecord" Margin="4">
-                            <sync:ButtonAdv.SmallIcon>
-                                <BitmapImage  UriSource="/imgs/insert.png"/>
-                            </sync:ButtonAdv.SmallIcon>
-                        </sync:ButtonAdv>
-                        <sync:ButtonAdv Label="Edit" VerticalAlignment="Center" Height="30" Width="128" Command="local:ConsoleControl.EditRecord" Margin="4">
-                            <sync:ButtonAdv.SmallIcon>
-                                <BitmapImage  UriSource="/imgs/edit.png"/>
-                            </sync:ButtonAdv.SmallIcon>
-                        </sync:ButtonAdv>
-                        <sync:ButtonAdv Label="Remove" VerticalAlignment="Center" Height="30" Width="128" Command="local:ConsoleControl.RemoveRecord" Margin="4">
-                            <sync:ButtonAdv.SmallIcon>
-                                <BitmapImage  UriSource="/imgs/remove.png"/>
-                            </sync:ButtonAdv.SmallIcon>
-                        </sync:ButtonAdv>
-                        <sync:ButtonAdv Label="Up" VerticalAlignment="Center" Height="30" Width="128" Command="local:ConsoleControl.MoveUpRecord" Margin="4">
-                            <sync:ButtonAdv.SmallIcon>
-                                <BitmapImage  UriSource="/imgs/move_up.png"/>
-                            </sync:ButtonAdv.SmallIcon>
-                        </sync:ButtonAdv>
-                        <sync:ButtonAdv Label="Down" VerticalAlignment="Center" Height="30" Width="128" Command="local:ConsoleControl.MoveDownRecord" Margin="4">
-                            <sync:ButtonAdv.SmallIcon>
-                                <BitmapImage  UriSource="/imgs/move_down.png"/>
-                            </sync:ButtonAdv.SmallIcon>
-                        </sync:ButtonAdv>
-                    </UniformGrid>
-                </GroupBox>
-            </DockPanel>
-            <sync:SfDataGrid Name="ProcessDataImageGrid" ItemsSource="{Binding ProcessDataModels}" AutoGenerateColumns="False"
+    <DockPanel>
+        <DockPanel.CommandBindings>
+            <CommandBinding Command="local:ConsoleControl.AddRecord" Executed="AddRecordCommand_Executed" CanExecute="AddRecordCommand_CanExecute"/>
+            <CommandBinding Command="local:ConsoleControl.InsertRecord" Executed="InsertRecordCommand_Executed" CanExecute="InsertRecordCommand_CanExecute"/>
+            <CommandBinding Command="local:ConsoleControl.EditRecord" Executed="EditRecordCommand_Executed" CanExecute="EditRecordCommand_CanExecute"/>
+            <CommandBinding Command="local:ConsoleControl.RemoveRecord" Executed="RemoveRecordCommand_Executed" CanExecute="RemoveRecordCommand_CanExecute"/>
+            <CommandBinding Command="local:ConsoleControl.MoveUpRecord" Executed="MoveUpRecordCommand_Executed" CanExecute="MoveUpRecordCommand_CanExecute"/>
+            <CommandBinding Command="local:ConsoleControl.MoveDownRecord" Executed="MoveDownRecordCommand_Executed" CanExecute="MoveDownRecordCommand_CanExecute"/>
+        </DockPanel.CommandBindings>
+        <DockPanel.Resources>
+            <local:InvertBooleanValue x:Key="InvertBoolean"/>
+            <local:ProcessDataImageAllowEditing x:Key="AllowEditing"/>
+            <DataTemplate x:Key="RecordToolTipTemplate">
+                <TextBlock Text="{Binding VariableComment}"/>
+            </DataTemplate>
+            <ContextMenu x:Key="GridContextMenu">
+                <MenuItem Command="local:ConsoleControl.InsertRecord">
+                    <MenuItem.Icon>
+                        <Image Source="/imgs/insert.png" Height="20" Margin="4"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Command="local:ConsoleControl.EditRecord">
+                    <MenuItem.Icon>
+                        <Image Source="/imgs/edit.png" Height="20" Margin="4"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Command="local:ConsoleControl.RemoveRecord">
+                    <MenuItem.Icon>
+                        <Image Source="/imgs/remove.png" Height="20" Margin="4"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Command="local:ConsoleControl.MoveUpRecord">
+                    <MenuItem.Icon>
+                        <Image Source="/imgs/move_up.png" Height="20" Margin="4"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Command="local:ConsoleControl.MoveDownRecord">
+                    <MenuItem.Icon>
+                        <Image Source="/imgs/move_down.png" Height="20" Margin="4"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+            </ContextMenu>
+            <DataTemplate x:Key="RecordDragDropTemplate">
+                <Border Padding="4" Background="#ececec" BorderBrush="#c8c8c8" BorderThickness="1.2">
+                    <Grid VerticalAlignment="Center" HorizontalAlignment="Left">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Index : " Grid.Row="0" Grid.Column="0" FontWeight="Bold"/>
+                        <TextBlock Text="{Binding DraggingRecords[0].Index, StringFormat='0x{0:X08}'}" Grid.Row="0" Grid.Column="1"/>
+                        <TextBlock Text="Name : " Grid.Row="1" Grid.Column="0" FontWeight="Bold"/>
+                        <TextBlock Text="{Binding DraggingRecords[0].VariableName}" Grid.Row="1" Grid.Column="1"/>
+                        <TextBlock Text="Data Type : " Grid.Row="2" Grid.Column="0" FontWeight="Bold"/>
+                        <TextBlock Text="{Binding DraggingRecords[0].VariableDataType}" Grid.Row="2" Grid.Column="1"/>
+                        <TextBlock Text="Unit : " Grid.Row="3" Grid.Column="0" FontWeight="Bold"/>
+                        <TextBlock Text="{Binding DraggingRecords[0].VariableUnit}" Grid.Row="3" Grid.Column="1"/>
+                        <TextBlock Text="Binding : " Grid.Row="4" Grid.Column="0" FontWeight="Bold"/>
+                        <TextBlock Text="{Binding DraggingRecords[0].DeviceBindingInfo}" Grid.Row="4" Grid.Column="1"/>
+                        <TextBlock Text="Range : " Grid.Row="5" Grid.Column="0" FontWeight="Bold"/>
+                        <TextBlock Text="{Binding DraggingRecords[0].ValueRangeInfo}" Grid.Row="5" Grid.Column="1"/>
+                        <TextBlock Text="Converter : " Grid.Row="6" Grid.Column="0" FontWeight="Bold"/>
+                        <TextBlock Text="{Binding DraggingRecords[0].ValueConverterInfo}" Grid.Row="6" Grid.Column="1"/>
+                    </Grid>
+                </Border>
+            </DataTemplate>
+        </DockPanel.Resources>
+        <DockPanel DockPanel.Dock="Bottom" HorizontalAlignment="Stretch">
+            <StackPanel Orientation="Horizontal" DockPanel.Dock="Left" Validation.Error="Input_Error" KeyDown="Input_KeyDown" IsEnabled="{Binding IsOffline}" VerticalAlignment="Center">
+                <sync:SfTextInputLayout Hint="Offset (Words)" HelperText="Input area offset(words) here" ContainerType="Filled" FontStyle="Italic" FontSize="12" Margin="4,8,4,8" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}">
+                    <TextBox Name="InputOffsetInWord" Text="{Binding OffsetInWord, ValidatesOnExceptions=True, NotifyOnValidationError=True}" FontStyle="Normal"/>
+                </sync:SfTextInputLayout>
+                <sync:SfTextInputLayout Hint="Size (Words)" HelperText="Input area size(words) here" ContainerType="Filled" FontStyle="Italic" FontSize="12" Margin="4,8,4,8" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}">
+                    <TextBox Name="InputSizeInWord" Text="{Binding SizeInWord, ValidatesOnExceptions=True, NotifyOnValidationError=True}" FontStyle="Normal"/>
+                </sync:SfTextInputLayout>
+                <sync:SfTextInputLayout Hint="Actual Size (Words)" HelperText="Indicate the area actual size(words)" ContainerType="Filled" FontStyle="Italic" FontSize="12" Margin="4,8,4,8">
+                    <TextBox Text="{Binding ActualSizeInWord}" FontStyle="Normal" IsReadOnly="True"/>
+                </sync:SfTextInputLayout>
+            </StackPanel>
+            <GroupBox DockPanel.Dock="Right" HorizontalAlignment="Right" Padding="2" Margin="4,8,0,0">
+                <GroupBox.Header>
+                    <CheckBox VerticalAlignment="Center" IsChecked="{Binding DirectModeOperation, Mode=OneWayToSource}" Content="Direct Mode Operation"/>
+                </GroupBox.Header>
+                <UniformGrid Rows="2" Columns="4">
+                    <sync:ButtonAdv Label="Add" VerticalAlignment="Center" Height="30" Width="128" Command="local:ConsoleControl.AddRecord" Margin="4">
+                        <sync:ButtonAdv.SmallIcon>
+                            <BitmapImage  UriSource="/imgs/add.png"/>
+                        </sync:ButtonAdv.SmallIcon>
+                    </sync:ButtonAdv>
+                    <sync:ButtonAdv Label="Insert" VerticalAlignment="Center" Height="30" Width="128" Command="local:ConsoleControl.InsertRecord" Margin="4">
+                        <sync:ButtonAdv.SmallIcon>
+                            <BitmapImage  UriSource="/imgs/insert.png"/>
+                        </sync:ButtonAdv.SmallIcon>
+                    </sync:ButtonAdv>
+                    <sync:ButtonAdv Label="Edit" VerticalAlignment="Center" Height="30" Width="128" Command="local:ConsoleControl.EditRecord" Margin="4">
+                        <sync:ButtonAdv.SmallIcon>
+                            <BitmapImage  UriSource="/imgs/edit.png"/>
+                        </sync:ButtonAdv.SmallIcon>
+                    </sync:ButtonAdv>
+                    <sync:ButtonAdv Label="Remove" VerticalAlignment="Center" Height="30" Width="128" Command="local:ConsoleControl.RemoveRecord" Margin="4">
+                        <sync:ButtonAdv.SmallIcon>
+                            <BitmapImage  UriSource="/imgs/remove.png"/>
+                        </sync:ButtonAdv.SmallIcon>
+                    </sync:ButtonAdv>
+                    <sync:ButtonAdv Label="Up" VerticalAlignment="Center" Height="30" Width="128" Command="local:ConsoleControl.MoveUpRecord" Margin="4">
+                        <sync:ButtonAdv.SmallIcon>
+                            <BitmapImage  UriSource="/imgs/move_up.png"/>
+                        </sync:ButtonAdv.SmallIcon>
+                    </sync:ButtonAdv>
+                    <sync:ButtonAdv Label="Down" VerticalAlignment="Center" Height="30" Width="128" Command="local:ConsoleControl.MoveDownRecord" Margin="4">
+                        <sync:ButtonAdv.SmallIcon>
+                            <BitmapImage  UriSource="/imgs/move_down.png"/>
+                        </sync:ButtonAdv.SmallIcon>
+                    </sync:ButtonAdv>
+                </UniformGrid>
+            </GroupBox>
+        </DockPanel>
+        <sync:SfDataGrid Name="ProcessDataImageGrid" ItemsSource="{Binding ProcessDataModels}" AutoGenerateColumns="False"
                              ColumnSizer="Auto"
                          AllowGrouping="False" AllowFiltering="False" AllowSorting="False" AllowResizingColumns="True"
                          ShowSortNumbers="True" ShowRowHeader="True" 
@@ -143,58 +142,57 @@
                          RecordContextMenu="{StaticResource GridContextMenu}" RowDragDropTemplate="{StaticResource RecordDragDropTemplate}" d:DataContext="{d:DesignInstance Type=local:ProcessDataModel}"
                              CellDoubleTapped="ProcessDataImageGrid_CellDoubleTapped" SelectionMode="Extended"
                              >
-                <sync:SfDataGrid.Resources>
-                    <local:HideBooleanValueColumn x:Key="HideBooleanValueColumn"/>
-                    <local:HideStringValueColumn x:Key="HideStringValueColumn"/>
-                </sync:SfDataGrid.Resources>
-                <sync:SfDataGrid.Columns>
-                    <sync:GridTextColumn DisplayBinding="{Binding Bit}" HeaderText="Bit" MinimumWidth="60"/>
-                    <sync:GridTextColumn DisplayBinding="{Binding Byte}" HeaderText="Byte" MinimumWidth="60"/>
-                    <sync:GridTextColumn DisplayBinding="{Binding Index, StringFormat='0x{0:X08}'}" HeaderText="Index"/>
-                    <sync:GridTextColumn DisplayBinding="{Binding VariableName}" HeaderText="Name" ToolTipTemplate="{StaticResource RecordToolTipTemplate}" ShowToolTip="True"/>
-                    <sync:GridTextColumn DisplayBinding="{Binding VariableDataType}" HeaderText="Data Type"/>
-                    <sync:GridTextColumn DisplayBinding="{Binding VariableUnit}" HeaderText="Unit"/>
-                    <sync:GridTextColumn DisplayBinding="{Binding DeviceBindingInfo}" HeaderText="Binding"/>
-                    <sync:GridTextColumn DisplayBinding="{Binding ValueRangeInfo}" HeaderText="Range"/>
-                    <sync:GridTextColumn DisplayBinding="{Binding ValueConverterInfo}" HeaderText="Converter"/>
-                    <sync:GridTextColumn MappingName="DataStringValue" HeaderText="Value" Width="200">
-                        <sync:GridTextColumn.AllowEditing>
-                            <MultiBinding Converter="{StaticResource AllowEditing}">
-                                <Binding RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=UserControl}" Path="DataContext.Access"/>
-                                <Binding RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=UserControl}" Path="DataContext.IsMonitoring"/>
-                                <Binding Path="DataContext.IsOffline" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=UserControl}"/>
-                            </MultiBinding>
-                        </sync:GridTextColumn.AllowEditing>
-                        <sync:GridTextColumn.IsHidden>
-                            <MultiBinding Converter="{StaticResource HideStringValueColumn}">
-                                <Binding Path="DataContext.IsOffline" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=UserControl}"/>
-                                <Binding Path="DataContext.Layout" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=UserControl}"/>
-                            </MultiBinding>
-                        </sync:GridTextColumn.IsHidden>
-                    </sync:GridTextColumn>
+            <sync:SfDataGrid.Resources>
+                <local:HideBooleanValueColumn x:Key="HideBooleanValueColumn"/>
+                <local:HideStringValueColumn x:Key="HideStringValueColumn"/>
+            </sync:SfDataGrid.Resources>
+            <sync:SfDataGrid.Columns>
+                <sync:GridTextColumn DisplayBinding="{Binding Bit}" HeaderText="Bit" MinimumWidth="60"/>
+                <sync:GridTextColumn DisplayBinding="{Binding Byte}" HeaderText="Byte" MinimumWidth="60"/>
+                <sync:GridTextColumn DisplayBinding="{Binding Index, StringFormat='0x{0:X08}'}" HeaderText="Index"/>
+                <sync:GridTextColumn DisplayBinding="{Binding VariableName}" HeaderText="Name" ToolTipTemplate="{StaticResource RecordToolTipTemplate}" ShowToolTip="True"/>
+                <sync:GridTextColumn DisplayBinding="{Binding VariableDataType}" HeaderText="Data Type"/>
+                <sync:GridTextColumn DisplayBinding="{Binding VariableUnit}" HeaderText="Unit"/>
+                <sync:GridTextColumn DisplayBinding="{Binding DeviceBindingInfo}" HeaderText="Binding"/>
+                <sync:GridTextColumn DisplayBinding="{Binding ValueRangeInfo}" HeaderText="Range"/>
+                <sync:GridTextColumn DisplayBinding="{Binding ValueConverterInfo}" HeaderText="Converter"/>
+                <sync:GridTextColumn MappingName="DataStringValue" HeaderText="Value" Width="200">
+                    <sync:GridTextColumn.AllowEditing>
+                        <MultiBinding Converter="{StaticResource AllowEditing}">
+                            <Binding RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=UserControl}" Path="DataContext.Access"/>
+                            <Binding RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=UserControl}" Path="DataContext.IsMonitoring"/>
+                            <Binding Path="DataContext.IsOffline" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=UserControl}"/>
+                        </MultiBinding>
+                    </sync:GridTextColumn.AllowEditing>
+                    <sync:GridTextColumn.IsHidden>
+                        <MultiBinding Converter="{StaticResource HideStringValueColumn}">
+                            <Binding Path="DataContext.IsOffline" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=UserControl}"/>
+                            <Binding Path="DataContext.Layout" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=UserControl}"/>
+                        </MultiBinding>
+                    </sync:GridTextColumn.IsHidden>
+                </sync:GridTextColumn>
 
-                    <sync:GridCheckBoxColumn MappingName="DataBooleanValue" HeaderText="Value" Width="80">
-                        <sync:GridCheckBoxColumn.AllowEditing>
-                            <MultiBinding Converter="{StaticResource AllowEditing}">
-                                <Binding RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=UserControl}" Path="DataContext.Access"/>
-                                <Binding RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=UserControl}" Path="DataContext.IsMonitoring"/>
-                                <Binding Path="DataContext.IsOffline" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=UserControl}"/>
-                            </MultiBinding>
-                        </sync:GridCheckBoxColumn.AllowEditing>
-                        <sync:GridCheckBoxColumn.IsHidden>
-                            <MultiBinding Converter="{StaticResource HideBooleanValueColumn}">
-                                <Binding Path="DataContext.IsOffline" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=UserControl}"/>
-                                <Binding Path="DataContext.Layout" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=UserControl}"/>
-                            </MultiBinding>
-                        </sync:GridCheckBoxColumn.IsHidden>
-                        <!--sync:GridTextColumn.CellStyle>
+                <sync:GridCheckBoxColumn MappingName="DataBooleanValue" HeaderText="Value" Width="80">
+                    <sync:GridCheckBoxColumn.AllowEditing>
+                        <MultiBinding Converter="{StaticResource AllowEditing}">
+                            <Binding RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=UserControl}" Path="DataContext.Access"/>
+                            <Binding RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=UserControl}" Path="DataContext.IsMonitoring"/>
+                            <Binding Path="DataContext.IsOffline" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=UserControl}"/>
+                        </MultiBinding>
+                    </sync:GridCheckBoxColumn.AllowEditing>
+                    <sync:GridCheckBoxColumn.IsHidden>
+                        <MultiBinding Converter="{StaticResource HideBooleanValueColumn}">
+                            <Binding Path="DataContext.IsOffline" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=UserControl}"/>
+                            <Binding Path="DataContext.Layout" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=UserControl}"/>
+                        </MultiBinding>
+                    </sync:GridCheckBoxColumn.IsHidden>
+                    <!--sync:GridTextColumn.CellStyle>
                             <Style TargetType="sync:GridCell">
                                 <Setter Property="IsEnabled" Value="{Binding BooleanValue}" />
                             </Style>
                         </sync:GridTextColumn.CellStyle-->
-                    </sync:GridCheckBoxColumn>
-                </sync:SfDataGrid.Columns>
-            </sync:SfDataGrid>
-        </DockPanel>
-    </GroupBox>
+                </sync:GridCheckBoxColumn>
+            </sync:SfDataGrid.Columns>
+        </sync:SfDataGrid>
+    </DockPanel>
 </UserControl>

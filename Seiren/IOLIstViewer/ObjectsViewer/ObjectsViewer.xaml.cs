@@ -1,10 +1,14 @@
 ﻿using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia;
 using Syncfusion.UI.Xaml.Grid;
+using Syncfusion.Windows.Shared;
+using Syncfusion.Windows.Tools.Controls;
+using System;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Xml;
 
 namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
 {
@@ -207,5 +211,67 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         }
 
         public bool HasError { get { return __tx_diagnostic_area_viewer.HasError || __tx_bit_area_viewer.HasError || __tx_block_area_viewer.HasError || __rx_control_area_viewer.HasError || __rx_bit_area_viewer.HasError || __rx_block_area_viewer.HasError; } }
+
+        public bool SaveLayoutState(string path)
+        {
+            if (DockingManager.IsLoaded)
+            {
+                System.Runtime.Serialization.Formatters.Binary.BinaryFormatter formatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
+                DockingManager.SaveDockState(formatter, StorageFormat.Xml, path ?? "pdo_default_layout_state.xml");
+                return true;
+            }
+            return false;
+        }
+
+        protected bool LoadLayoutState(string path)
+        {
+            if (DockingManager.IsLoaded == false)
+                return false;
+            System.Runtime.Serialization.Formatters.Binary.BinaryFormatter formatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
+            var res = DockingManager.LoadDockState(formatter, StorageFormat.Xml, path ?? "pdo_default_layout_state.xml");
+            if (res == false)
+                DockingManager.ResetState();
+            return res;
+        }
+
+        protected bool InitializeLayoutState()
+        {
+            if (LoadLayoutState(null))
+                return true;
+            else
+            {
+                Uri path = new Uri("/LayoutProfile/pdo_default_layout_state.xml", UriKind.Relative);
+                var profile = Application.GetResourceStream(path).Stream;
+                XmlReader reader = XmlReader.Create(profile);
+                bool res = DockingManager.LoadDockState(reader);
+                return res;
+            }
+        }
+
+        private LoadingIndicator __loading_dialog;
+        public bool LayoutFinished { get; private set; } = false;
+        private void DockingManager_Loaded(object sender, RoutedEventArgs e)
+        {
+            if (__loading_dialog != null)
+            {
+                __loading_dialog.CloseIndicator(new Action<object>(__initialize_layout_state), null);
+                __loading_dialog = null;
+            }
+        }
+
+        private void __initialize_layout_state(object parameter)
+        {
+            InitializeLayoutState();
+            LayoutFinished = true;
+        }
+
+        private void DockingManager_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            if ((bool)e.NewValue == true && __loading_dialog == null && DockingManager.IsLoaded == false)
+            {
+                __loading_dialog = new LoadingIndicator();
+                __loading_dialog.ShowIndicator();
+            }
+        }
     }
 }

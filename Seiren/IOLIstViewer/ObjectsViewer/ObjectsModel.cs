@@ -24,8 +24,25 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         public ProcessDataImageModel? RxBlockObjects { get; set; }
         public InterlockCollectionModel? InterlockLogics { get; set; }
 
+        private bool __subs_modified = false;
+        public bool SubsModified 
+        { 
+            get => __subs_modified;
+            set 
+            {
+                __subs_modified = value;
+                OnPropertyChanged("SubsModified");
+                OnPropertyChanged("ContentModified");
+            } 
+        }
 
-        public bool SubsModified { set { Modified = value; } }
+        public new bool Modified
+        {
+            get { return base.Modified; }
+            set { base.Modified = value; OnPropertyChanged("ContentModified"); }
+        }
+
+        public bool ContentModified { get { return Modified || SubsModified; } }
 
         public override void CommitChanges()
         {
@@ -38,6 +55,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             RxBlockObjects?.CommitChanges();
             RxBlockObjects?.CommitChanges();
             InterlockLogics?.CommitChanges();
+            SubsModified = false;
         }
         public ObjectsModel(ObjectDictionary od, VariableDictionary vd, ControllerConfiguration cmc, OperatingHistory history)
         {
