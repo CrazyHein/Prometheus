@@ -156,7 +156,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
                         target.Append("\r\n");
                     }
                     sheet.Range[2 + counter * 4, 2].Text = target.ToString();
-                    sheet.Range[3 + counter * 4, 2].Text = i.Statement.Serialize();
+                    sheet.Range[3 + counter * 4, 2].Text = i.Statement.ToString();
 
                     counter++;
                 }
@@ -376,6 +376,14 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
             else
                 return tabs.Append("0x").Append(Operand.ProcessObject.Index.ToString("X08")).Append("\r\n").ToString();
         }
+
+        public override string ToString()
+        {
+            StringBuilder tabs = new StringBuilder();
+            for (int i = 0; i < Layer; i++)
+                tabs.Append("    ");
+            return tabs.Append("0x").Append(Operand.ToString()).Append("\r\n").ToString();
+        }
     }
 
     public class LogicExpression : LogicElement
@@ -397,6 +405,18 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
             str.Append(tabs).Append(Operator).Append("\r\n");
             foreach (var e in Elements)
                 str.Append(e.Serialize(origin, replace));
+            return str.ToString();
+        }
+
+        public override string ToString()
+        {
+            StringBuilder tabs = new StringBuilder();
+            for (int i = 0; i < Layer; i++)
+                tabs.Append("    ");
+            StringBuilder str = new StringBuilder();
+            str.Append(tabs).Append(Operator).Append("\r\n");
+            foreach (var e in Elements)
+                str.Append(e.ToString());
             return str.ToString();
         }
     }
