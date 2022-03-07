@@ -186,4 +186,15 @@
     <SplashScreen Include="splash.jpg" />
   </ItemGroup>
 
+  
+  
+  <ItemGroup>
+    <None Update="Metadata\controller_model_catalogue.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Metadata\data_type_catalogue.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
