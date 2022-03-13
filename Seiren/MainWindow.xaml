@@ -4,7 +4,8 @@
         xmlns:sync="http://schemas.syncfusion.com/wpf"
         xmlns:syncfusionskin ="clr-namespace:Syncfusion.SfSkinManager;assembly=Syncfusion.SfSkinManager.WPF"
         xmlns:local="clr-namespace:AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren"
-        Title="MainWindow" Height="1080" Width="1920" WindowState="Maximized" Closing="MainWindow_Closing">
+        Title="MainWindow" Height="1080" Width="1920" WindowState="Maximized" Closing="MainWindow_Closing" Closed="Window_Closed" 
+        AllowDrop="True" Drop="Window_Drop" PreviewDragOver="Window_PreviewDragOver" PreviewDragEnter="Window_PreviewDragOver">
     <Window.CommandBindings>
         <CommandBinding Command="local:ConsoleControl.New" Executed="NewCommand_Executed" CanExecute="NewCommand_CanExecuted"/>
         <CommandBinding Command="local:ConsoleControl.Open" Executed="OpenCommand_Executed" CanExecute="OpenCommand_CanExecuted"/>
@@ -29,6 +30,7 @@
     </Window.CommandBindings>
     <Window.Resources>
         <local:InvertBooleanValue x:Key="InvertBoolean"/>
+        <local:CanOpenOrNew x:Key="CanOpenOrNew"/>
     </Window.Resources>
     <Grid syncfusionskin:SfSkinManager.Theme="{syncfusionskin:SkinManagerExtension ThemeName=FluentLight}">
         <Grid.Resources>
@@ -152,7 +154,7 @@
                 </TextBlock.Text>
             </TextBlock>
             <Separator/>
-            <TextBlock Margin="8,2" Text="{Binding CurrentlyOpenFile}"/>
+            <TextBlock Margin="8,2" Text="{Binding CurrentlyOpenFile}" Name="CurrentlyOpenedFile"/>
         </StatusBar>
         <sync:MenuAdv Grid.Row="0" Margin="2" PopUpAnimationType="Scroll">
             <sync:MenuItemAdv  Header="_File" Margin="2">
@@ -165,6 +167,32 @@
                     <sync:MenuItemAdv.Icon>
                         <Image Source="imgs/open.png" Height="28" Width="28"/>
                     </sync:MenuItemAdv.Icon>
+                </sync:MenuItemAdv>
+                <sync:MenuItemSeparator/>
+                <sync:MenuItemAdv Header="_Recent" ItemsSource="{Binding RecentlyOpened}" sync:MenuItemAdv.Click="RecentlyOpened_Click" Name="RecentlyOpenedMenu">
+                    <sync:MenuItemAdv.Icon>
+                        <Image Source="imgs/recent.png" Height="28" Width="28"/>
+                    </sync:MenuItemAdv.Icon>
+                    <sync:MenuItemAdv.IsEnabled>
+                        <MultiBinding Converter="{StaticResource CanOpenOrNew}">
+                            <Binding Path="IsOffline"/>
+                            <Binding Path="IsBusy"/>
+                        </MultiBinding>
+                    </sync:MenuItemAdv.IsEnabled>
+                    <sync:MenuItemAdv.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal">
+                                <Image Source="imgs/file.png" Height="28" Margin="0,0,4,0"/>
+                                <TextBlock Text="{Binding}" VerticalAlignment="Center" FontStyle="Italic"/>
+                            </StackPanel>
+                            
+                            <!--MenuItem Command="local:ConsoleControl.OpenRecent" Header="{Binding}" CommandParameter="{Binding}" ToolTip="{Binding}">
+                                <MenuItem.Icon>
+                                    <Image Source="imgs/file.png" Height="28"/>
+                                </MenuItem.Icon>
+                            </MenuItem-->
+                        </DataTemplate>
+                    </sync:MenuItemAdv.ItemTemplate>
                 </sync:MenuItemAdv>
                 <sync:MenuItemSeparator/>
                 <sync:MenuItemAdv Command="local:ConsoleControl.Close">

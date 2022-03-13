@@ -18,6 +18,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             InitializeComponent();
             DataContext = new ControllerConfigurationModel(cc, cmc, history);
             MainViewer.RowDragDropController.Dropped += OnMainViewer_Dropped;
+            MainViewer.RowDragDropController.DragOver += OnMainViewer_DragOver;
         }
 
         private void OnMainViewer_Dropped(object sender, Syncfusion.UI.Xaml.Grid.GridRowDroppedEventArgs e)
@@ -46,6 +47,15 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                         NewValue = draggingRecords[0] as DeviceConfigurationModel
                     });
                 CommandManager.InvalidateRequerySuggested();
+            }
+        }
+
+        private void OnMainViewer_DragOver(object sender, GridRowDragOverEventArgs e)
+        {
+            if (e.IsFromOutSideSource)
+            {
+                //e.Handled = true;
+                e.ShowDragUI = false;
             }
         }
 

@@ -129,5 +129,12 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
 
         public bool CanUndo { get { return __undo_operating_records.Count != 0; } }
         public bool CanRedo { get { return __redo_operating_records.Count != 0; } }
+
+        private IReadOnlyList<string> __recently_opened;
+        public IReadOnlyList<string> RecentlyOpened
+        {
+            get { return __recently_opened; }
+            set { SetProperty(ref __recently_opened, value); }
+        }
     }
 }

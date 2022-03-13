@@ -114,7 +114,20 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                     __record_operating_undo_queue_depth = value;
             }
         }
-
+        private int __recently_opened_file_collection_capacity = 16;
+        public int RecentlyOpenedFileCollectionCapacity
+        {
+            get { return __recently_opened_file_collection_capacity; }
+            set
+            {
+                if (value < 2)
+                    throw new ArgumentOutOfRangeException("The capacity value should be greater than or equal to 2.");
+                else if (value > 32)
+                    throw new ArgumentOutOfRangeException("The capacity value should be less than or equal to 32.");
+                else
+                    __recently_opened_file_collection_capacity = value;
+            }
+        }
         public DataSyncMode RxBitAreaSyncMode { get; set; } = DataSyncMode.Read;
         public DataSyncMode RxBlockAreaSyncMode { get; set; } = DataSyncMode.Read;
         public DataSyncMode RxControlAreaSyncMode { get; set; } = DataSyncMode.Write;

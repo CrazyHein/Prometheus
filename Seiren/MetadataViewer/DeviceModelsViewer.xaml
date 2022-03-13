@@ -21,7 +21,7 @@
         
         <DockPanel Grid.Row="0">
             <TextBlock DockPanel.Dock="Top" Text="Local Extension Models : " FontSize="20"/>
-            <sync:SfDataGrid Name="LocalExtensionModelsViewer" AutoGenerateColumns="False" ColumnSizer="Auto" AllowResizingColumns="True" AllowSorting="False" QueryRowHeight="LocalExtensionModelsViewer_QueryRowHeight" ScrollMode="Async">
+            <sync:SfDataGrid Name="LocalExtensionModelsViewer" AutoGenerateColumns="False" ColumnSizer="Auto" AllowResizingColumns="True" AllowSorting="False" QueryRowHeight="LocalExtensionModelsViewer_QueryRowHeight" ScrollMode="Async" AllowDrop="False">
                 <sync:SfDataGrid.Columns>
                     <sync:GridTextColumn HeaderText="ID" DisplayBinding="{Binding Path=ID, StringFormat='0x{0:X04}'}" MinimumWidth="80"/>
                     <sync:GridTextColumn HeaderText="Name" DisplayBinding="{Binding Path=Name}" MinimumWidth="200"/>
@@ -33,7 +33,7 @@
         </DockPanel>
         <DockPanel Grid.Row="2">
             <TextBlock DockPanel.Dock="Top" Text="Remote Ethernet Models : " FontSize="20"/>
-            <sync:SfDataGrid Name="RemoteEthernetModelsViewer" AutoGenerateColumns="False" ColumnSizer="Auto" AllowResizingColumns="True" AllowSorting="False" QueryRowHeight="RemoteEthernetModelsViewer_QueryRowHeight" ScrollMode="Async">
+            <sync:SfDataGrid Name="RemoteEthernetModelsViewer" AutoGenerateColumns="False" ColumnSizer="Auto" AllowResizingColumns="True" AllowSorting="False" QueryRowHeight="RemoteEthernetModelsViewer_QueryRowHeight" ScrollMode="Async" AllowDrop="False">
                 <sync:SfDataGrid.Columns>
                     <sync:GridTextColumn HeaderText="ID" DisplayBinding="{Binding Path=ID, StringFormat='0x{0:X04}'}" MinimumWidth="80"/>
                     <sync:GridTextColumn HeaderText="Name" DisplayBinding="{Binding Path=Name}" MinimumWidth="200"/>

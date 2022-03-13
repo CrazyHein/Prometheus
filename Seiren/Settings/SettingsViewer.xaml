@@ -160,6 +160,7 @@
                         <RowDefinition Height="auto" />
                         <RowDefinition Height="auto" />
                         <RowDefinition Height="auto" />
+                        <RowDefinition Height="auto" />
                     </Grid.RowDefinitions>
                     <GroupBox Header="Undo Queue of Record Operating" Padding="3,0,3,0" Margin="0,4,0,0">
                         <sync:SfTextInputLayout Hint="Depth"  FontSize="12" FontStyle="Italic" ContainerType="Filled" Margin="4" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}"
@@ -167,7 +168,13 @@
                             <TextBox FontStyle="Normal" Text="{Binding RecordOperatingUndoQueueDepth, ValidatesOnExceptions=True, NotifyOnValidationError=True}"/>
                         </sync:SfTextInputLayout>
                     </GroupBox>
-                    <GroupBox Header="Data Synchronization Mode of Debugging" Padding="3,0,3,0" Margin="0,4,0,0" Grid.Row="1">
+                    <GroupBox Header="Recently Opened File Collection Capacity" Padding="3,0,3,0" Margin="0,4,0,0" Grid.Row="1">
+                        <sync:SfTextInputLayout Hint="Capacity"  FontSize="12" FontStyle="Italic" ContainerType="Filled" Margin="4" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}"
+                                                HelperText="Restarting the application to put the change in effect.">
+                            <TextBox FontStyle="Normal" Text="{Binding RecentlyOpenedFileCollectionCapacity, ValidatesOnExceptions=True, NotifyOnValidationError=True}"/>
+                        </sync:SfTextInputLayout>
+                    </GroupBox>
+                    <GroupBox Header="Data Synchronization Mode of Debugging" Padding="3,0,3,0" Margin="0,4,0,0" Grid.Row="2">
                         <Grid>
                             <Grid.Resources>
                                 <ObjectDataProvider ObjectType="{x:Type sys:Enum}" MethodName="GetValues" x:Key="datasyncmode">
@@ -192,7 +199,7 @@
                             </sync:SfTextInputLayout>
                         </Grid>
                     </GroupBox>
-                    <GroupBox Header="Layout State of PDO Dictionary &amp; INTLK" Padding="3,8,3,8" Margin="0,4,0,0" Grid.Row="2">
+                    <GroupBox Header="Layout State of PDO Dictionary &amp; INTLK" Padding="3,8,3,8" Margin="0,4,0,0" Grid.Row="3">
                         <CheckBox Content="Save the Layout State Automatically" Margin="4" IsChecked="{Binding SaveLayoutState}" IsEnabled="False"/>
                     </GroupBox>
                 </Grid>

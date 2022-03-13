@@ -4,6 +4,7 @@ using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility;
 using Syncfusion.SfSkinManager;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -62,6 +63,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         private ushort __area_data_end;
 
         private OperatingHistory __operating_history;
+        private RecentlyOpened __recently_opened;
 
         #region Properties
         /// <summary>
@@ -108,6 +110,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             __operating_history = new OperatingHistory(__settings.PreferenceProperty.RecordOperatingUndoQueueDepth);
             __main_model.UndoOperatingRecords = __operating_history.UndoOperatingRecords;
             __main_model.RedoOperatingRecords = __operating_history.RedoOperatingRecords;
+            __recently_opened = new RecentlyOpened(__settings.PreferenceProperty.RecentlyOpenedFileCollectionCapacity);
+            __main_model.RecentlyOpened = __recently_opened.PathCollection;
             DataContext = __main_model;
         }
         /// <summary>
@@ -459,6 +463,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                         __interlock_area, __misc_info);
                     __main_model.CurrentlyOpenFile = save.FileName;
                     __commit_changes();
+                    __recently_opened.Add(save.FileName);
                 }
                 catch(LombardiaException ex)
                 {
@@ -523,6 +528,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                         __rx_control_area, __rx_bit_area, __rx_block_area, 
                         __interlock_area, __misc_info) = IOCelcetaHelper.Load(open.FileName, __data_type_catalogue, __controller_model_catalogue, out _);
                     __main_model.CurrentlyOpenFile = open.FileName;
+                    __recently_opened.Add(open.FileName);
                     __reset_layout();
                 }
                 catch (LombardiaException ex)
@@ -993,6 +999,85 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         private void RedoMenuItemAdv_Click(object sender, RoutedEventArgs e)
         {
             RedoButton.IsDropDownOpen = false;
+        }
+
+        private void Window_Closed(object sender, EventArgs e)
+        {
+            __recently_opened.Flush(); 
+        }
+
+        private void RecentlyOpened_Click(object sender, RoutedEventArgs e)
+        {
+            Syncfusion.Windows.Shared.MenuItemAdv menu = e.OriginalSource as Syncfusion.Windows.Shared.MenuItemAdv;
+            if (RecentlyOpenedMenu == e.OriginalSource || __recently_opened.PathCollection.Count == 0 || __main_model.IsOffline == false || __main_model.IsBusy == true)
+                return;
+           
+            if ((__main_model.IsNonTemporaryFile && __data_model_has_changes()) || __main_model.IsTemporaryFile)
+            {
+                var res = MessageBox.Show("Discard the changes you have made ?", "Question", MessageBoxButton.YesNo, MessageBoxImage.Question);
+                if (res == MessageBoxResult.No)
+                    return;
+            }
+            string path = menu.Header.ToString();
+            try
+            {
+                (__variable_dictionary, __controller_configuration, __object_dictionary,
+                    __tx_diagnostic_area, __tx_bit_area, __tx_block_area,
+                    __rx_control_area, __rx_bit_area, __rx_block_area,
+                    __interlock_area, __misc_info) = IOCelcetaHelper.Load(path, __data_type_catalogue, __controller_model_catalogue, out _);
+                __main_model.CurrentlyOpenFile = path;
+                __recently_opened.Add(path);
+                __reset_layout();
+            }
+            catch (LombardiaException ex)
+            {
+                MessageBox.Show("At least one exception has occurred during the operation :\n" + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void Window_Drop(object sender, DragEventArgs e)
+        {
+            if (e.Source != CurrentlyOpenedFile)
+                return;
+
+            string path = (e.Data.GetData(DataFormats.FileDrop) as string[])[0];
+
+            if ((__main_model.IsNonTemporaryFile && __data_model_has_changes()) || __main_model.IsTemporaryFile)
+            {
+                var res = MessageBox.Show("Discard the changes you have made ?", "Question", MessageBoxButton.YesNo, MessageBoxImage.Question);
+                if (res == MessageBoxResult.No)
+                    return;
+            }
+     
+            try
+            {
+                (__variable_dictionary, __controller_configuration, __object_dictionary,
+                    __tx_diagnostic_area, __tx_bit_area, __tx_block_area,
+                    __rx_control_area, __rx_bit_area, __rx_block_area,
+                    __interlock_area, __misc_info) = IOCelcetaHelper.Load(path, __data_type_catalogue, __controller_model_catalogue, out _);
+                __main_model.CurrentlyOpenFile = path;
+                __recently_opened.Add(path);
+                __reset_layout();
+            }
+            catch (LombardiaException ex)
+            {
+                MessageBox.Show("At least one exception has occurred during the operation :\n" + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void Window_PreviewDragOver(object sender, DragEventArgs e)
+        {
+            if (e.Source == CurrentlyOpenedFile)
+            {
+                var p = e.Data.GetData(DataFormats.FileDrop) as string[];
+                if (__main_model.IsOffline == false || __main_model.IsBusy == true || p == null || p.Length != 1 || File.Exists(p[0]) == false || p[0].EndsWith(".folst") == false)
+                {
+                    e.Handled = true;
+                    e.Effects = DragDropEffects.None;
+                }
+                else
+                    e.Effects = DragDropEffects.Copy;
+            }
         }
     }
 }

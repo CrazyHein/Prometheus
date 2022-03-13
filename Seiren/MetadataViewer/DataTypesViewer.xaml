@@ -8,7 +8,7 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800" Loaded="UserControl_Loaded" IsVisibleChanged="UserControl_IsVisibleChanged">
     <sync:SfTreeGrid ItemsSource="{Binding}" 
-                     ColumnSizer="FillColumn" ChildPropertyName="SubItems" AutoGenerateColumns="False" AllowResizingColumns="True" AllowSorting="False">
+                     ColumnSizer="FillColumn" ChildPropertyName="SubItems" AutoGenerateColumns="False" AllowResizingColumns="True" AllowSorting="False" AllowDrop="False">
         <sync:SfTreeGrid.Columns>
             <sync:TreeGridTextColumn HeaderText="Name" MappingName="Name" MinimumWidth="160"/>
             <sync:TreeGridNumericColumn HeaderText="Size (Bit)" MappingName="BitSize" NumberDecimalDigits="0" MinimumWidth="100"/>

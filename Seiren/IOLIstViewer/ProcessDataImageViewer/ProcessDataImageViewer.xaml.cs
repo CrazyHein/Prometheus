@@ -40,7 +40,11 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
 
         private void OnMainViewer_DragOver(object sender, GridRowDragOverEventArgs e)
         {
-            
+            if (e.IsFromOutSideSource)
+            {
+                //e.Handled = true;
+                e.ShowDragUI = false;
+            }
         }
 
         private void OnMainViewer_Dropped(object sender, Syncfusion.UI.Xaml.Grid.GridRowDroppedEventArgs e)
@@ -79,7 +83,11 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                 ObjectModel o;
                 if((DataContext as ProcessDataImageModel).DirectModeOperation)
                 {
-                    uint mindex = __objects_model.Objects.Count == 0 ? 0 : __objects_model.Objects.AsParallel().Max(o => o.Index) + 1;
+                    uint mindex = 0;
+                    if (__process_data_access == ProcessDataImageAccess.TX)
+                        mindex = __objects_model.Objects.AsParallel().Select(o => o.Index).Where(i => (i & 0x80000000) != 0).DefaultIfEmpty<uint>(0x7FFFFFFF).Max(i => i) + 1;
+                    else
+                        mindex = __objects_model.Objects.AsParallel().Select(o => o.Index).Where(i => (i & 0x80000000) == 0).DefaultIfEmpty<uint>(0xFFFFFFFF).Max(i => i) + 1;
                     ObjectViewer wnd = new ObjectViewer(__objects_model, new ObjectModel() { Index = mindex }, InputDialogDisplayMode.Add);
                     wnd.WindowStartupLocation = WindowStartupLocation.CenterScreen;
                     if (wnd.ShowDialog() == true)
@@ -114,7 +122,11 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                 ObjectModel o;
                 if ((DataContext as ProcessDataImageModel).DirectModeOperation)
                 {
-                    uint mindex = __objects_model.Objects.Count == 0 ? 0 : __objects_model.Objects.AsParallel().Max(o => o.Index) + 1;
+                    uint mindex = 0;
+                    if (__process_data_access == ProcessDataImageAccess.TX)
+                        mindex = __objects_model.Objects.AsParallel().Select(o => o.Index).Where(i => (i & 0x80000000) != 0).DefaultIfEmpty<uint>(0x7FFFFFFF).Max(i => i) + 1;
+                    else
+                        mindex = __objects_model.Objects.AsParallel().Select(o => o.Index).Where(i => (i & 0x80000000) == 0).DefaultIfEmpty<uint>(0xFFFFFFFF).Max(i => i) + 1;
                     ObjectViewer wnd = new ObjectViewer(__objects_model, new ObjectModel() { Index = mindex }, InputDialogDisplayMode.Add);
                     wnd.WindowStartupLocation = WindowStartupLocation.CenterScreen;
                     if (wnd.ShowDialog() == true)
@@ -178,7 +190,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                     record += m.Index.ToString("X08") + " : " + m.VariableName + "\n";
                 }
             }
-            if (MessageBox.Show("Are you sure you want to remove the record(s) :\n" + record, "Question", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.No)
+            if (MessageBox.Show("Are you sure you want to remove the record(s) " +
+                (((DataContext as ProcessDataImageModel).DirectModeOperation) ? "(DIRECT MODE) ":"" )+
+                ":\n" + record, "Question", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.No)
                 return;
 
             var indexes = ProcessDataImageGrid.SelectedItems.Select(r => r as ProcessDataModel).ToList();

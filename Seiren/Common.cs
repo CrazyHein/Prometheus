@@ -593,4 +593,25 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             throw new NotImplementedException();
         }
     }
+
+    public class CanOpenOrNew : IMultiValueConverter
+    {
+        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (values != null && values.Length == 2 && values[0] is bool && values[1] is bool && targetType == typeof(bool))
+            {
+                //__main_model.IsOffline && !__main_model.IsBusy && 
+                bool offline = (bool)values[0];
+                bool busy = (bool)values[1];
+                return offline && !busy;
+            }
+            else
+                return false;
+        }
+
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
 }

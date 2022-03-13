@@ -20,6 +20,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             DataContext = new VariablesModel(dic, dtc, history);
             MainViewer.RowDragDropController.DragStart += OnMainViewer_DragStart;
             MainViewer.RowDragDropController.Dropped += OnMainViewer_Dropped;
+            MainViewer.RowDragDropController.DragOver += OnMainViewer_DragOver;
         }
 
         private bool __raw_viewer()
@@ -56,6 +57,14 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         {
             if (__raw_viewer() == false)
                 e.Handled = true;
+        }
+        private void OnMainViewer_DragOver(object sender, Syncfusion.UI.Xaml.Grid.GridRowDragOverEventArgs e)
+        {
+            if(e.IsFromOutSideSource)
+            {
+                //e.Handled = true;
+                e.ShowDragUI = false;
+            }
         }
 
         private void AddRecordCommand_Executed(object sender, ExecutedRoutedEventArgs e)

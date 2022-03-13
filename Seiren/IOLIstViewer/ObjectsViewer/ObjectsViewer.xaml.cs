@@ -85,7 +85,11 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
 
         private void OnMainViewer_DragOver(object sender, GridRowDragOverEventArgs e)
         {
-
+            if (e.IsFromOutSideSource)
+            {
+                //e.Handled = true;
+                e.ShowDragUI = false;
+            }
         }
 
         private void OnMainViewer_Drop(object? sender, GridRowDropEventArgs e)
