@@ -320,6 +320,15 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         }
     }
 
+    public enum ProcessDataDisplayFormat : int
+    {
+        DEC = 10,
+        HEX = 16,
+        BIN = 2,
+        OCT = 8,
+        BOOL = 1
+    }
+
     public class ProcessDataModel : ObjectModel
     {
         public ProcessDataModel(ProcessObject o, ProcessDataImageAccess access, ProcessDataImageLayout layout) : base(o)
@@ -328,10 +337,19 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             Layout = layout;
             __data_type = o.Variable.Type;
             //__data_size_in_byte = (int)__data_type.BitSize / 8;
-            if(__data_type.BitSize == 1)
+            if (__data_type.BitSize == 1)
+            {
                 __data_storage = new byte[2];
+                __dispaly_format = ProcessDataDisplayFormat.BOOL;
+            }
             else
+            {
                 __data_storage = new byte[__data_type.BitSize / 8];
+                if (__data_type.Name == "FINGERPRINT")
+                    __dispaly_format = ProcessDataDisplayFormat.HEX;
+                else
+                    __dispaly_format = ProcessDataDisplayFormat.DEC;
+            }
         }
 
         private DataType __data_type;
@@ -355,6 +373,44 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         private byte[] __data_storage;
         //private byte[] __unsupported_data_type;
         private bool __rx_pending = false;
+
+        private ProcessDataDisplayFormat __dispaly_format = ProcessDataDisplayFormat.DEC;
+        public ProcessDataDisplayFormat DisplayFormat
+        {
+            get { return __dispaly_format; }
+            set
+            {
+                switch(__data_type.Name)
+                {
+                    case "BYTE":
+                    case "SBYTE":
+                    case "USHORT":
+                    case "SHORT":
+                    case "UINT":
+                    case "INT":
+                    case "DINT":
+                        if(value != ProcessDataDisplayFormat.BOOL)
+                        {
+                            __dispaly_format = value;
+                            _notify_property_changed("DataStringValue");
+                            _notify_property_changed();
+                        }    
+                        break;
+                    case "UDINT":
+                    case "DUINT":
+                        if (value == ProcessDataDisplayFormat.DEC || value == ProcessDataDisplayFormat.HEX)
+                        {
+                            __dispaly_format = value;
+                            _notify_property_changed("DataStringValue");
+                            _notify_property_changed();
+                        }
+                        break;
+                    default:
+                        break;
+
+                }
+            }
+        }
 
         public void ResetDataStorage()
         {
@@ -414,29 +470,32 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                 switch (__data_type.Name)
                 {
                     case "BYTE":
-                        res = MemoryMarshal.Read<byte>(__data_storage).ToString();
+                        res = Convert.ToString(MemoryMarshal.Read<byte>(__data_storage), (int)__dispaly_format);
                         break;
                     case "SBYTE":
-                        res = MemoryMarshal.Read<sbyte>(__data_storage).ToString();
+                        res = Convert.ToString(MemoryMarshal.Read<sbyte>(__data_storage), (int)__dispaly_format);
                         break;
                     case "USHORT":
-                        res = MemoryMarshal.Read<ushort>(__data_storage).ToString();
+                        res = Convert.ToString(MemoryMarshal.Read<ushort>(__data_storage), (int)__dispaly_format);
                         break;
                     case "SHORT":
-                        res = MemoryMarshal.Read<short>(__data_storage).ToString();
+                        res = Convert.ToString(MemoryMarshal.Read<short>(__data_storage), (int)__dispaly_format);
                         break;
                     case "UINT":
-                        res = MemoryMarshal.Read<uint>(__data_storage).ToString();
+                        res = Convert.ToString(MemoryMarshal.Read<uint>(__data_storage), (int)__dispaly_format);
                         break;
                     case "INT":
-                        res = MemoryMarshal.Read<int>(__data_storage).ToString();
+                        res = Convert.ToString(MemoryMarshal.Read<int>(__data_storage), (int)__dispaly_format);
                         break;
                     case "UDINT":
                     case "DUINT":
-                        res = MemoryMarshal.Read<ulong>(__data_storage).ToString();
+                        if(__dispaly_format == ProcessDataDisplayFormat.HEX)
+                            res = MemoryMarshal.Read<ulong>(__data_storage).ToString("X");
+                        else 
+                            res = MemoryMarshal.Read<ulong>(__data_storage).ToString();
                         break;
                     case "DINT":
-                        res = MemoryMarshal.Read<long>(__data_storage).ToString();
+                        res = Convert.ToString(MemoryMarshal.Read<long>(__data_storage), (int)__dispaly_format);
                         break;
                     case "FLOAT":
                         res = MemoryMarshal.Read<float>(__data_storage).ToString("G9");
@@ -462,7 +521,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                     case "FINGERPRINT":
                         StringBuilder sb = new StringBuilder(__data_storage.Length * 2);
                         for (int i = 0; i < __data_storage.Length; ++i)
-                            sb.Append(__data_storage[i].ToString("X2"));
+                            sb.Append(__data_storage[i].ToString("x2"));
                         res = sb.ToString();
                         break;
                     default:
@@ -480,45 +539,101 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                     switch (__data_type.Name)
                     {
                         case "BYTE":
-                            res = byte.TryParse(value, out storage.byteData);
-                            if (res)
+                            try
+                            {
+                                storage.byteData = Convert.ToByte(value, (int)__dispaly_format);
                                 MemoryMarshal.Write<byte>(__data_storage, ref storage.byteData);
+                                res = true;
+                            }
+                            catch
+                            {
+                                res = false;
+                            }
                             break;
                         case "SBYTE":
-                            res = sbyte.TryParse(value, out storage.sbyteData);
-                            if(res)
+                            try
+                            {
+                                storage.sbyteData = Convert.ToSByte(value, (int)__dispaly_format);
                                 MemoryMarshal.Write<sbyte>(__data_storage, ref storage.sbyteData);
+                                res = true;
+                            }
+                            catch
+                            {
+                                res = false;
+                            }
                             break;
                         case "USHORT":
-                            res = ushort.TryParse(value, out storage.ushortData);
-                            if(res)
+                            try
+                            {
+                                storage.ushortData = Convert.ToUInt16(value, (int)__dispaly_format);
                                 MemoryMarshal.Write<ushort>(__data_storage, ref storage.ushortData);
+                                res = true;
+                            }
+                            catch
+                            {
+                                res = false;
+                            }
                             break;
                         case "SHORT":
-                            res = short.TryParse(value, out storage.shortData);
-                            if(res)
+                            try
+                            {
+                                storage.shortData = Convert.ToInt16(value, (int)__dispaly_format);
                                 MemoryMarshal.Write<short>(__data_storage, ref storage.shortData);
+                                res = true;
+                            }
+                            catch
+                            {
+                                res = false;
+                            }
                             break;
                         case "UINT":
-                            res = uint.TryParse(value, out storage.uintData);
-                            if(res)
+                            try
+                            {
+                                storage.uintData = Convert.ToUInt32(value, (int)__dispaly_format);
                                 MemoryMarshal.Write<uint>(__data_storage, ref storage.uintData);
+                                res = true;
+                            }
+                            catch
+                            {
+                                res = false;
+                            }
                             break;
                         case "INT":
-                            res = int.TryParse(value, out storage.intData);
-                            if (res)
+                            try
+                            {
+                                storage.intData = Convert.ToInt32(value, (int)__dispaly_format);
                                 MemoryMarshal.Write<int>(__data_storage, ref storage.intData);
+                                res = true;
+                            }
+                            catch
+                            {
+                                res = false;
+                            }
                             break;
                         case "UDINT":
                         case "DUINT":
-                            res = ulong.TryParse(value, out storage.ulongData);
-                            if (res)
+                            try
+                            {
+                                storage.ulongData = Convert.ToUInt64(value, (int)__dispaly_format);
                                 MemoryMarshal.Write<ulong>(__data_storage, ref storage.ulongData);
+                                res = true;
+                            }
+                            catch
+                            {
+                                res = false;
+                            }
                             break;
                         case "DINT":
-                            res = long.TryParse(value, out storage.longData);
-                            if (res)
+                            try
+                            {
+                                storage.longData = Convert.ToInt64(value, (int)__dispaly_format);
                                 MemoryMarshal.Write<long>(__data_storage, ref storage.longData);
+                                res = true;
+                            }
+                            catch
+                            {
+                                res = false;
+                            }
                             break;
                         case "FLOAT":
                             res = float.TryParse(value, out storage.floatData);

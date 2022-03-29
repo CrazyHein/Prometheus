@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren"
              xmlns:sync="http://schemas.syncfusion.com/wpf" d:DataContext="{d:DesignInstance Type=local:ProcessDataImageModel}"
+             xmlns:sys="clr-namespace:System;assembly=mscorlib"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="1800">
     <DockPanel>
@@ -82,6 +83,11 @@
                     </Grid>
                 </Border>
             </DataTemplate>
+            <ObjectDataProvider x:Key="Format" MethodName="GetValues" ObjectType="{x:Type sys:Enum}">
+                <ObjectDataProvider.MethodParameters>
+                    <x:Type TypeName="local:ProcessDataDisplayFormat" />
+                </ObjectDataProvider.MethodParameters>
+            </ObjectDataProvider>
         </DockPanel.Resources>
         <DockPanel DockPanel.Dock="Bottom" HorizontalAlignment="Stretch">
             <StackPanel Orientation="Horizontal" DockPanel.Dock="Left" Validation.Error="Input_Error" KeyDown="Input_KeyDown" IsEnabled="{Binding IsOffline}" VerticalAlignment="Center">
@@ -156,6 +162,8 @@
                 <sync:GridTextColumn DisplayBinding="{Binding DeviceBindingInfo}" HeaderText="Binding"/>
                 <sync:GridTextColumn DisplayBinding="{Binding ValueRangeInfo}" HeaderText="Range"/>
                 <sync:GridTextColumn DisplayBinding="{Binding ValueConverterInfo}" HeaderText="Converter"/>
+                <sync:GridComboBoxColumn MappingName="DisplayFormat" HeaderText="F" ItemsSource="{Binding Source={StaticResource Format}}" AllowEditing="True" Width="80">
+                </sync:GridComboBoxColumn>
                 <sync:GridTextColumn MappingName="DataStringValue" HeaderText="Value" Width="200">
                     <sync:GridTextColumn.AllowEditing>
                         <MultiBinding Converter="{StaticResource AllowEditing}">
