@@ -30,22 +30,15 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                 DeviceConfigurationModel targetDeviceConfiguration = controllerConfiguration.DeviceConfigurations[(int)e.TargetRecord];
 
                 MainViewer.BeginInit();
-                int dragIndex = controllerConfiguration.IndexOf(draggingRecords[0] as DeviceConfigurationModel);
-                controllerConfiguration.Remove(draggingRecords[0] as DeviceConfigurationModel, true);
+                int dragIndex = controllerConfiguration.IndexOf(draggingRecords[0] as DeviceConfigurationModel);       
                 int targetIndex = controllerConfiguration.IndexOf(targetDeviceConfiguration);
-                int insertionIndex = e.DropPosition == DropPosition.DropAbove ? targetIndex : targetIndex + 1;
-                controllerConfiguration.Insert(insertionIndex, draggingRecords[0] as DeviceConfigurationModel);
+                int insertionIndex = 0;
+                if (dragIndex > targetIndex)
+                    insertionIndex = e.DropPosition == DropPosition.DropAbove ? targetIndex : targetIndex + 1;
+                else
+                    insertionIndex = e.DropPosition == DropPosition.DropAbove ? targetIndex - 1 : targetIndex;
+                controllerConfiguration.Move(dragIndex, insertionIndex);
                 MainViewer.EndInit();
-                controllerConfiguration.OperatingHistory?.PushOperatingRecord(
-                    new OperatingRecord()
-                    {
-                        Host = controllerConfiguration,
-                        Operation = Operation.Move,
-                        OriginaPos = dragIndex,
-                        NewPos = insertionIndex,
-                        OriginalValue = draggingRecords[0] as DeviceConfigurationModel,
-                        NewValue = draggingRecords[0] as DeviceConfigurationModel
-                    });
                 CommandManager.InvalidateRequerySuggested();
             }
         }

@@ -7,7 +7,7 @@ using System.Xml;
 
 namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
 {
-    public class ProcessDataImage : Publisher<ProcessData> , IEquatable<ProcessDataImage>
+    public class ProcessDataImage : Publisher<ProcessData> , IComparable<ProcessDataImage>
     {
         public IReadOnlyList<ProcessData> ProcessDatas { get; private set; }
         public uint OffsetInWord { get; set; } = 0;
@@ -235,9 +235,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
             return d;
         }
 
-        public void Remove(ProcessData d, bool force = false)
+        public void Remove(ProcessData d)
         {
-            if (!force && _subscribers.ContainsKey(d))
+            if (_subscribers.ContainsKey(d))
                 throw new LombardiaException(LOMBARDIA_ERROR_CODE_T.PROCESS_DATA_BE_SUBSCRIBED);
 
             int pos = __process_datas.IndexOf(d);
@@ -256,11 +256,11 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
             return (pd, po);
         }
 
-        public ProcessData Remove(ProcessObject reference, bool force = false)
+        public ProcessData Remove(ProcessObject reference)
         {
             if (__process_object_hash.TryGetValue(reference, out var d) == false)
                 throw new LombardiaException(LOMBARDIA_ERROR_CODE_T.PROCESS_DATA_UNFOUND);
-            Remove(d, force);
+            Remove(d);
             return d;
         }
 
@@ -283,6 +283,16 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
             __process_object_hash.Add(d.ProcessObject, d);
             __object_dictionary.AddSubscriber(d.ProcessObject, d);
             return d;
+        }
+
+        public void Move(int srcIndex, int dstIndex)
+        {
+            if (srcIndex > __process_datas.Count || dstIndex > __process_datas.Count || srcIndex < 0 || dstIndex < 0)
+                throw new ArgumentOutOfRangeException();
+            var temp = __process_datas[srcIndex];
+            __process_datas.RemoveAt(srcIndex);
+            __process_datas.Insert(dstIndex, temp);
+            __actual_size_in_bit = __rebuild_process_data_bit_pos(Math.Min(srcIndex, dstIndex));
         }
 
         protected void Replace(ProcessData origin, ProcessData d, ReplaceMode mode = ReplaceMode.Full)
@@ -392,17 +402,31 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
             return startbit;
         }
 
-        public bool Equals(ProcessDataImage? other)
+        public bool IsEquivalent(ProcessDataImage? other)
         {
             if (other != null && other.Access == Access && other.Layout == Layout &&
                 other.OffsetInWord == OffsetInWord && other.SizeInWord == SizeInWord && other.ActualSizeInWord == ActualSizeInWord &&
                 other.ProcessDatas.Count == ProcessDatas.Count)
-                return other.ProcessDatas.Select((t, i) => ProcessDatas[i].Equals(t)).All(r => r == true);
+                return other.ProcessDatas.Select((t, i) => ProcessDatas[i].IsEquivalent(t)).All(r => r == true);
             return false;
+        }
+
+        public int Find(uint index)
+        {
+            int res = -1;
+            for(int pos = 0; pos < __process_datas.Count; ++pos)
+            {
+                if (__process_datas[pos].ProcessObject.Index == index)
+                {
+                    res = pos;
+                    break;
+                }
+            }
+            return res;
         }
     }
 
-    public class ProcessData : ISubscriber<ProcessObject> , IEquatable<ProcessData>
+    public class ProcessData : ISubscriber<ProcessObject> , IComparable<ProcessData>
     {
         public ISubscriber<ProcessObject>? DependencyChanged(ProcessObject origin, ProcessObject newcome)
         {
@@ -450,9 +474,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
             }
         }
 
-        public bool Equals(ProcessData? other)
+        public bool IsEquivalent(ProcessData? other)
         {
-            return other != null && other.BitPos == BitPos && other.ProcessObject.Equals(ProcessObject) && other.Access == Access;
+            return other != null && other.BitPos == BitPos && other.ProcessObject.IsEquivalent(ProcessObject) && other.Access == Access;
         }
     }
 }

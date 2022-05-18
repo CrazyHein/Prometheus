@@ -9,12 +9,14 @@ using System.Xml;
 
 namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
 {
-    public class InterlockCollection : IEquatable<InterlockCollection>
+    public class InterlockCollection : IComparable<InterlockCollection>
     {
         private ProcessDataImage __tx_process_data_image;
         private ProcessDataImage __rx_process_data_image;
         private ObjectDictionary __object_dictionary;
         private List<InterlockLogic> __logics;
+        private int __reference_find_pos = 0;
+        private uint? __reference_found = null;
         public IReadOnlyList<InterlockLogic> Logics;
         public InterlockCollection(ObjectDictionary od, ProcessDataImage tx, ProcessDataImage rx)
         {
@@ -316,13 +318,37 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
             }
         }
 
-        public bool Equals(InterlockCollection? other)
+        public bool IsEquivalent(InterlockCollection? other)
         {
-            return other != null && other.Logics.Count == Logics.Count && other.Logics.Select((l, i) => l.Equals(Logics[i])).All(r => r == true);
+            return other != null && other.Logics.Count == Logics.Count && other.Logics.Select((l, i) => l.IsEquivalent(Logics[i])).All(r => r == true);
+        }
+
+        public int FindNext(uint index)
+        {
+            int res = -1;
+            if (__logics.Count == 0)
+                return -1;
+
+            if (__reference_found == null || __reference_found != index)
+                __reference_find_pos = 0;
+
+            int pos = __reference_find_pos;
+            do
+            {
+                if (__logics[__reference_find_pos].FindInTargets(index) || 
+                    __logics[__reference_find_pos].FindInStatement(index))
+                {
+                    res = __reference_find_pos;
+                    __reference_found = index;
+                }
+                __reference_find_pos = (++__reference_find_pos) % __logics.Count;
+            } while (pos != __reference_find_pos && res == -1);
+
+            return res;
         }
     }
 
-    public abstract class LogicElement : IEquatable<LogicElement>
+    public abstract class LogicElement : IComparable<LogicElement>
     {
         public LogicElementType Type { get; private set; }
         public LogicExpression? Root { get; private set; }
@@ -330,18 +356,18 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
 
         public abstract string Serialize(ProcessData? origin = null, ProcessData? replace = null);
 
-        public bool Equals(LogicElement? other)
+        public bool IsEquivalent(LogicElement? other)
         {
             if(other == null || other.Type != Type)
                 return false;
             else if (Type == LogicElementType.OPERAND)
-                return (other as LogicOperand).Operand.Equals((this as LogicOperand).Operand);
+                return (other as LogicOperand).Operand.IsEquivalent((this as LogicOperand).Operand);
             else
             {
                 LogicExpression ori  = this as LogicExpression;
                 LogicExpression oth = other as LogicExpression;
                 if(ori.Layer == oth.Layer && ori.Operator == oth.Operator && ori.Elements.Count == oth.Elements.Count)
-                    return oth.Elements.Select((t, i) => ori.Elements[i].Equals(t)).All(r => r == true);
+                    return oth.Elements.Select((t, i) => ori.Elements[i].IsEquivalent(t)).All(r => r == true);
                 else
                     return false;
             }
@@ -355,6 +381,14 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
                 Layer = 0;
             else
                 Layer = root.Layer + 1;
+        }
+
+        public bool Find(uint index)
+        {
+            if (Type == LogicElementType.OPERAND)
+                return (this as LogicOperand).Operand.ProcessObject.Index == index;
+            else
+                return (this as LogicExpression).Elements.Any(r => r.Find(index));
         }
     }
 
@@ -421,7 +455,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
         }
     }
 
-    public class InterlockLogic : ISubscriber<ProcessData>, IEquatable<InterlockLogic>
+    public class InterlockLogic : ISubscriber<ProcessData>, IComparable<InterlockLogic>
     {
         public string Name { get; private set; }
         public List<ProcessData> Targets { get; private set; }
@@ -650,12 +684,22 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
                 return null;
         }
 
-        public bool Equals(InterlockLogic? other)
+        public bool IsEquivalent(InterlockLogic? other)
         {
-            if(other == null || other.Name != Name || other.Targets.Count != Targets.Count || other.Statement.Equals(Statement) == false)
+            if(other == null || other.Name != Name || other.Targets.Count != Targets.Count || other.Statement.IsEquivalent(Statement) == false)
                 return false;
             else
-                return other.Targets.Select((t, i) => Targets[i].Equals(t)).All(r => r == true);
+                return other.Targets.Select((t, i) => Targets[i].IsEquivalent(t)).All(r => r == true);
+        }
+
+        public bool FindInTargets(uint index)
+        {
+            return Targets.Any(r => r.ProcessObject.Index == index);
+        }
+
+        public bool FindInStatement(uint index)
+        {
+            return Statement.Find(index);
         }
 
         public static InterlockCollection? Publisher { get; set; }

@@ -8,7 +8,7 @@ using System.Linq;
 
 namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
 {
-    public class VariableDictionary : Publisher<Variable>, IEquatable<VariableDictionary>
+    public class VariableDictionary : Publisher<Variable>, IComparable<VariableDictionary>
     {
         public IReadOnlyDictionary<string, Variable> Variables { get; private set; }
         private Dictionary<string, Variable> __variables = new Dictionary<string, Variable>();
@@ -186,20 +186,20 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
             }
         }
 
-        protected void Remove(Variable variable, bool force = false)
+        protected void Remove(Variable variable)
         {
-            if (!force && _subscribers.ContainsKey(variable))
+            if (_subscribers.ContainsKey(variable))
                 throw new LombardiaException(LOMBARDIA_ERROR_CODE_T.VARIABLE_BE_SUBSCRIBED);
 
             if (__variables.Remove(variable.Name) == false)
                 throw new LombardiaException(LOMBARDIA_ERROR_CODE_T.VARIABLE_UNFOUND);
         }
 
-        public Variable Remove(string name, bool force = false)
+        public Variable Remove(string name)
         {
             if (__variables.TryGetValue(name, out var variable) == false)
                 throw new LombardiaException(LOMBARDIA_ERROR_CODE_T.VARIABLE_UNFOUND);
-            Remove(variable, force);
+            Remove(variable);
             return variable;
         }
 
@@ -360,16 +360,16 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
             }
         }
 
-        public bool Equals(VariableDictionary? other)
+        public bool IsEquivalent(VariableDictionary? other)
         {
             bool res = false;
             if(other!= null && other.Variables.Count == this.Variables.Count)
-                res = this.Variables.All(p => other.Variables.ContainsKey(p.Key) && other.Variables[p.Key].Equals(this.Variables[p.Key]));
+                res = this.Variables.All(p => other.Variables.ContainsKey(p.Key) && other.Variables[p.Key].IsEquivalent(this.Variables[p.Key]));
             return res;
         }
     }
 
-    public class Variable : IEquatable<Variable>
+    public class Variable : IComparable<Variable>
     {
         private string __name = "unnamed";
         public string Name
@@ -407,7 +407,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
             }
         }
 
-        public bool Equals(Variable? other)
+        public bool IsEquivalent(Variable? other)
         {
             return other != null && Name == other.Name && Type == other.Type &&
                 Unit == other.Unit && Comment == other.Comment;

@@ -7,7 +7,7 @@ using System.Xml;
 
 namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
 {
-    public class ObjectDictionary : Publisher<ProcessObject>, IEquatable<ObjectDictionary>
+    public class ObjectDictionary : Publisher<ProcessObject>, IComparable<ObjectDictionary>
     {
         public IReadOnlyDictionary<uint, ProcessObject> ProcessObjects { get; private set; }
         private Dictionary<uint, ProcessObject> __process_objects = new Dictionary<uint, ProcessObject>();
@@ -204,9 +204,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
             return o;
         }
 
-        public void Remove(ProcessObject o, bool force = false)
+        public void Remove(ProcessObject o)
         {
-            if (!force && _subscribers.ContainsKey(o))
+            if (_subscribers.ContainsKey(o))
                 throw new LombardiaException(LOMBARDIA_ERROR_CODE_T.OBJECT_BE_SUBSCRIBED);
 
             if (__process_objects.Remove(o.Index) == false)
@@ -259,11 +259,11 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
             }
         }
 
-        public ProcessObject Remove(uint index, bool force = false)
+        public ProcessObject Remove(uint index)
         {
             if (__process_objects.TryGetValue(index, out var o) == false)
                 throw new LombardiaException(LOMBARDIA_ERROR_CODE_T.OBJECT_UNFOUND);
-            Remove(o, force);
+            Remove(o);
             return o;
         }
 
@@ -392,16 +392,16 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
             }
         }
 
-        public bool Equals(ObjectDictionary? other)
+        public bool IsEquivalent(ObjectDictionary? other)
         {
             bool res = false;
             if (other != null && other.ProcessObjects.Count == this.ProcessObjects.Count)
-                res = this.ProcessObjects.All(p => other.ProcessObjects.ContainsKey(p.Key) && other.ProcessObjects[p.Key].Equals(this.ProcessObjects[p.Key]));
+                res = this.ProcessObjects.All(p => other.ProcessObjects.ContainsKey(p.Key) && other.ProcessObjects[p.Key].IsEquivalent(this.ProcessObjects[p.Key]));
             return res;
         }
     }
     
-    public class ProcessObject : ISubscriber<Variable>, ISubscriber<DeviceConfiguration>, IEquatable<ProcessObject>
+    public class ProcessObject : ISubscriber<Variable>, ISubscriber<DeviceConfiguration>, IComparable<ProcessObject>
     {
         public ISubscriber<Variable>? DependencyChanged(Variable origin, Variable newcome)
         {
@@ -427,9 +427,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
             return n;
         }
 
-        public bool Equals(ProcessObject? other)
+        public bool IsEquivalent(ProcessObject? other)
         {
-            return other != null && other.Index == Index && other.Variable.Equals(Variable) && 
+            return other != null && other.Index == Index && other.Variable.IsEquivalent(Variable) && 
                 ((other.Binding == null && Binding == null) || (other.Binding != null && other.Binding == Binding)) &&
                 ((other.Range == null && Range == null) || (other.Range != null && other.Range == Range)) &&
                 ((other.Converter == null && Converter == null) || (other.Converter != null && other.Converter == Converter));
@@ -446,6 +446,19 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
 
     public record DeviceBinding(DeviceConfiguration Device, string ChannelName, uint ChannelIndex)
     {
+        public virtual bool Equals(DeviceBinding? other)
+        {
+            if (other == null)
+                return false;
+            else
+                return Device.IsEquivalent(other.Device) && ChannelName == other.ChannelName && ChannelIndex == other.ChannelIndex;
+        }
+
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
+        }
+
         public override string ToString()
         {
             return $"{Device.ReferenceName} -- [{ChannelName} : {ChannelIndex}]";

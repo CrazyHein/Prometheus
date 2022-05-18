@@ -8,7 +8,7 @@ using System.Xml;
 
 namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
 {
-    public class Miscellaneous : IEquatable<Miscellaneous>
+    public class Miscellaneous : IComparable<Miscellaneous>
     {
         public Miscellaneous()
         {
@@ -165,7 +165,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
             }
         }
 
-        public bool Equals(Miscellaneous? other)
+        public bool IsEquivalent(Miscellaneous? other)
         {
             return other != null && other.Description == Description && 
                 other.IOListName == IOListName && 

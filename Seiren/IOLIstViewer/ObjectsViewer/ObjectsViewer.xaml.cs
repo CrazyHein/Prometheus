@@ -24,6 +24,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         private ProcessDataImageViewer __rx_bit_area_viewer;
         private ProcessDataImageViewer __rx_block_area_viewer;
         private InterlockCollectionViewer __interlock_viewer;
+        private UserControl[] __process_data_image_controls;
 
         public ObjectsViewer(ObjectDictionary od, VariableDictionary vd, ControllerConfiguration cmc,
             ProcessDataImage txdiagnostic, ProcessDataImage txbit, ProcessDataImage txblock,
@@ -70,6 +71,16 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
 
             (__tx_bit_area_viewer.DataContext as ProcessDataImageModel).InterlockModels = __interlock_viewer.DataContext as InterlockCollectionModel;
             (__rx_bit_area_viewer.DataContext as ProcessDataImageModel).InterlockModels = __interlock_viewer.DataContext as InterlockCollectionModel;
+
+            __process_data_image_controls = new UserControl[] 
+            {
+                TxDiagnosticArea,
+                TxBitArea,
+                TxBlockArea,
+                RxControlArea,
+                RxBitArea,
+                RxBlockArea
+            };
         }
 
         private bool __raw_viewer()
@@ -108,21 +119,14 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
 
                 MainViewer.BeginInit();
                 int dragIndex = objects.IndexOf(draggingRecords[0] as ObjectModel);
-                objects.Remove(draggingRecords[0] as ObjectModel, true, false);
                 int targetIndex = objects.IndexOf(targetObject);
-                int insertionIndex = e.DropPosition == DropPosition.DropAbove ? targetIndex : targetIndex + 1;
-                objects.Insert(insertionIndex, draggingRecords[0] as ObjectModel, false);
+                int insertionIndex = 0;
+                if (dragIndex > targetIndex)
+                    insertionIndex = e.DropPosition == DropPosition.DropAbove ? targetIndex : targetIndex + 1;
+                else
+                    insertionIndex = e.DropPosition == DropPosition.DropAbove ? targetIndex - 1 : targetIndex;
+                objects.Move(dragIndex, insertionIndex);
                 MainViewer.EndInit();
-                objects.OperatingHistory?.PushOperatingRecord(
-                    new OperatingRecord()
-                    {
-                        Host = objects,
-                        Operation = Operation.Move,
-                        OriginaPos = dragIndex,
-                        NewPos = insertionIndex,
-                        OriginalValue = draggingRecords[0] as ObjectModel,
-                        NewValue = draggingRecords[0] as ObjectModel
-                    });
                 CommandManager.InvalidateRequerySuggested();
             }
         }
@@ -276,6 +280,65 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                 __loading_dialog = new LoadingIndicator();
                 __loading_dialog.ShowIndicator();
             }
+        }
+
+        private void FindInInterlockCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            uint index;
+            int pos;
+            if (e.Parameter is ProcessDataModel)
+                index = (e.Parameter as ProcessDataModel).Index;
+            else if (e.Parameter is ObjectModel)
+                index = (e.Parameter as ObjectModel).Index;
+            else
+                return;
+            pos = (DataContext as ObjectsModel).InterlockLogics.FindNext(index);
+            if (pos == -1)
+            {
+                string record = e.Parameter is ProcessDataModel ? (e.Parameter as ProcessDataModel).ToString() : (e.Parameter as ObjectModel).ToString();
+                MessageBox.Show("<Interlock Area> does not reference the selected record :\n" + record, "Information", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            else
+            {
+                var o = (DataContext as ObjectsModel).InterlockLogics.InterlockLogicModels[pos];
+                __interlock_viewer.InterlockLogicList.ScrollIntoView(o);
+                __interlock_viewer.InterlockLogicList.SelectedIndex = pos;
+            }
+        }
+
+        private void FindInInterlockCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            if (e.Parameter is ProcessDataModel)
+                e.CanExecute = __interlock_viewer.InterlockLogicList.IsEnabled == true;
+            else if (e.Parameter is ObjectModel)
+                e.CanExecute = MainViewer.SelectedItems.Count == 1 && __interlock_viewer.InterlockLogicList.IsEnabled == true;
+        }
+
+        private void FindInProcessDataImageCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            uint index = (e.Parameter as ObjectModel).Index;
+            int pos;
+
+            foreach(var w in __process_data_image_controls)
+            {
+                pos = (w.DataContext as ProcessDataImageModel).Find(index);
+                if(pos != -1)
+                {
+                    DockingManager.ActiveWindow = w;
+                    ProcessDataImageViewer viewer = w.Content as ProcessDataImageViewer;
+                    viewer.ProcessDataImageGrid.SelectedIndex = pos;
+                    viewer.ProcessDataImageGrid.ScrollInView(new Syncfusion.UI.Xaml.ScrollAxis.RowColumnIndex(
+                            viewer.ProcessDataImageGrid.ResolveToRowIndex(viewer.ProcessDataImageGrid.SelectedItem), viewer.ProcessDataImageGrid.ResolveToStartColumnIndex()));
+                    return;
+                }
+            }
+            string record = (e.Parameter as ObjectModel).ToString();
+            MessageBox.Show("<Process Data Image Area> does not reference the selected record :\n" + record, "Information", MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+
+        private void FindInProcessDataImageCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = MainViewer.SelectedItems.Count == 1;
         }
     }
 }

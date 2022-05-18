@@ -105,10 +105,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                 OperatingHistory.PushOperatingRecord(new OperatingRecord() { Host = this, Operation = Operation.Add, OriginaPos = -1, NewPos = __objects.Count - 1, OriginalValue = null, NewValue = model });
         }
 
-        public ObjectModel RemoveAt(int index, bool force = false, bool log = true)
+        public ObjectModel RemoveAt(int index, bool log = true)
         {
             ObjectModel model = __objects[index];
-            __object_dictionary.Remove(model.Index, force);
+            __object_dictionary.Remove(model.Index);
             __objects.RemoveAt(index);
             Modified = true;
             if (log && OperatingHistory != null)
@@ -116,20 +116,21 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             return model;
         }
 
-        public ObjectModel Remove(uint index, bool force = false, bool log = true)
+        public ObjectModel Remove(uint index, bool log = true)
         {
-            __object_dictionary.Remove(index, force);
+            __object_dictionary.Remove(index);
             var o = __objects.First(o => o.Index == index);
             int i = __objects.IndexOf(o);
             __objects.Remove(o);
+            Modified = true;
             if (log && OperatingHistory != null)
                 OperatingHistory.PushOperatingRecord(new OperatingRecord() { Host = this, Operation = Operation.Remove, OriginaPos = i, NewPos = -1, OriginalValue = o, NewValue = null });
             return o;
         }
 
-        public void Remove(ObjectModel model, bool force = false, bool log = true)
+        public void Remove(ObjectModel model, bool log = true)
         {
-            __object_dictionary.Remove(model.Index, force);
+            __object_dictionary.Remove(model.Index);
             int index = __objects.IndexOf(model);
             __objects.Remove(model);
             Modified = true;
@@ -151,6 +152,18 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             Modified = true;
             if (log && OperatingHistory != null)
                 OperatingHistory.PushOperatingRecord(new OperatingRecord() { Host = this, Operation = Operation.Insert, OriginaPos = -1, NewPos = index, OriginalValue = null, NewValue = model });
+        }
+
+        public void Move(int srcIndex, int dstIndex, bool log = true)
+        {
+            if (srcIndex > __objects.Count || dstIndex > __objects.Count || srcIndex < 0 || dstIndex < 0)
+                throw new ArgumentOutOfRangeException();
+            var temp = __objects[srcIndex];
+            __objects.RemoveAt(srcIndex);
+            __objects.Insert(dstIndex, temp);
+            Modified = true;
+            if (log && OperatingHistory != null)
+                OperatingHistory.PushOperatingRecord(new OperatingRecord() { Host = this, Operation = Operation.Move, OriginaPos = srcIndex, NewPos = dstIndex, OriginalValue = temp, NewValue = temp });
         }
 
         public int IndexOf(ObjectModel model)
@@ -291,11 +304,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             switch (r.Operation)
             {
                 case Operation.Add:
-                    Remove(r.NewValue as ObjectModel, false, false);
+                    Remove(r.NewValue as ObjectModel, false);
                     break;
                 case Operation.Move:
-                    Remove(r.NewValue as ObjectModel, true, false);
-                    Insert(r.OriginaPos, r.OriginalValue as ObjectModel, false);
+                    Move(r.NewPos, r.OriginaPos, false);
                     break;
                 case Operation.Remove:
                     if (r.OriginaPos == __objects.Count)
@@ -304,7 +316,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                         Insert(r.OriginaPos, r.OriginalValue as ObjectModel, false);
                     break;
                 case Operation.Insert:
-                    Remove(r.NewValue as ObjectModel, false, false);
+                    Remove(r.NewValue as ObjectModel, false);
                     break;
                 case Operation.Replace:
                     Replace(r.NewValue as ObjectModel, r.OriginalValue as ObjectModel, false);
@@ -320,11 +332,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                     Add(r.NewValue as ObjectModel, false);
                     break;
                 case Operation.Move:
-                    Remove(r.OriginalValue as ObjectModel, true, false);
-                    Insert(r.NewPos, r.NewValue as ObjectModel, false);
+                    Move(r.OriginaPos, r.NewPos, false);
                     break;
                 case Operation.Remove:
-                    Remove(r.OriginalValue as ObjectModel, false, false);
+                    Remove(r.OriginalValue as ObjectModel, false);
                     break;
                 case Operation.Insert:
                     Insert(r.NewPos, r.NewValue as ObjectModel, false);

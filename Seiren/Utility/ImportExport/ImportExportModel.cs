@@ -41,7 +41,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility
             ProcessDataImage txdiag, ProcessDataImage txbit, ProcessDataImage txblk,
             ProcessDataImage rxctl, ProcessDataImage rxbit, ProcessDataImage rxblk,
             InterlockCollection intlk, Miscellaneous misc, 
-            DataTypeCatalogue dataTypes, ControllerModelCatalogue models)
+            DataTypeCatalogue dataTypes, ControllerModelCatalogue models, 
+            string? currentlyOpenedFile)
         {
             Mode = mode;
             __variable_dictionary = vd;
@@ -60,6 +61,21 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility
             __object_indexes = objectIndexes;
             __data_type_catalogue = dataTypes;
             __controller_model_catalogue = models;
+
+            if (currentlyOpenedFile == null || currentlyOpenedFile.Length == 0)
+            {
+                __variable_dictionary_path = System.IO.Path.Combine(System.Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "variable_catalogue.xml");
+                __io_list_path = System.IO.Path.Combine(System.Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "io_list.xml");
+                __xls_archives_path = System.IO.Path.Combine(System.Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "io_list.xlsx");
+            }
+            else
+            {
+                string path = System.IO.Path.GetDirectoryName(currentlyOpenedFile);
+                string file = System.IO.Path.GetFileNameWithoutExtension(currentlyOpenedFile);
+                __variable_dictionary_path = System.IO.Path.Combine(path, "variable_catalogue.xml");
+                __io_list_path = System.IO.Path.Combine(path, file + ".xml");
+                __xls_archives_path = System.IO.Path.Combine(path, file + ".xlsx");
+            }
         }
 
         public string Title
@@ -67,19 +83,19 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility
             get; private set;
         }
 
-        private string __variable_dictionary_path = System.IO.Path.Combine(System.Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "variable_catalogue.xml");
+        private string __variable_dictionary_path;// = System.IO.Path.Combine(System.Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "variable_catalogue.xml");
         public string VariableDictionaryPath
         {
             get { return __variable_dictionary_path; }
             set { __variable_dictionary_path = value; OnPropertyChanged("VariableDictionaryPath"); }
         }
-        private string __io_list_path = System.IO.Path.Combine(System.Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "io_list.xml");
+        private string __io_list_path;// = System.IO.Path.Combine(System.Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "io_list.xml");
         public string IOListPath
         {
             get { return __io_list_path; }
             set { __io_list_path = value; OnPropertyChanged("IOListPath"); }
         }
-        private string __xls_archives_path = System.IO.Path.Combine(System.Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "io_list.xlsx");
+        private string __xls_archives_path;// = System.IO.Path.Combine(System.Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "io_list.xlsx");
         public string XlsArchivesPath
         {
             get { return __xls_archives_path; }

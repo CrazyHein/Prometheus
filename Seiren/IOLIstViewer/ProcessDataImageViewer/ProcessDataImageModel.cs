@@ -184,10 +184,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                 OperatingHistory.PushOperatingRecord(new OperatingRecord() { Host = this, Operation = Operation.Add, OriginaPos = -1, NewPos = __process_data_models.Count - 1, OriginalValue = null, NewValue = model });
         }
 
-        public ObjectModel RemoveAt(int index, bool force = false, bool log = true)
+        public ObjectModel RemoveAt(int index, bool log = true)
         {
             ProcessDataModel model = __process_data_models[index];
-            __process_data_image.Remove(ObjectDictionary.ProcessObjects[model.Index], force);
+            __process_data_image.Remove(ObjectDictionary.ProcessObjects[model.Index]);
             __process_data_models.RemoveAt(index);
             __copy_bitpos(__process_data_image.ProcessDatas, __process_data_models, index);
             ActualSizeInWord = __process_data_image.ActualSizeInWord;
@@ -198,9 +198,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             return model;
         }
 
-        public void Remove(ProcessDataModel model, bool force = false, bool log = true)
+        public void Remove(ProcessDataModel model, bool log = true)
         {
-            __process_data_image.Remove(ObjectDictionary.ProcessObjects[model.Index], force);
+            __process_data_image.Remove(ObjectDictionary.ProcessObjects[model.Index]);
             int index = __process_data_models.IndexOf(model);
             __process_data_models.Remove(model);
             __copy_bitpos(__process_data_image.ProcessDatas, __process_data_models, index);
@@ -224,6 +224,22 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             __objects_source.SubsModified = true;
             if (log && OperatingHistory != null)
                 OperatingHistory.PushOperatingRecord(new OperatingRecord() { Host = this, Operation = Operation.Insert, OriginaPos = -1, NewPos = index, OriginalValue = null, NewValue = model });
+        }
+
+        public void Move(int srcIndex, int dstIndex, bool log = true)
+        {
+            if (srcIndex > __process_data_models.Count || dstIndex > __process_data_models.Count || srcIndex < 0 || dstIndex < 0)
+                throw new ArgumentOutOfRangeException();
+            __process_data_image.Move(srcIndex, dstIndex);
+            var temp = __process_data_models[srcIndex];
+            __process_data_models.RemoveAt(srcIndex);
+            __process_data_models.Insert(dstIndex, temp);
+            __copy_bitpos(__process_data_image.ProcessDatas, __process_data_models, Math.Min(srcIndex, dstIndex));
+            ActualSizeInWord = __process_data_image.ActualSizeInWord;
+            Modified = true;
+            __objects_source.SubsModified = true;
+            if (log && OperatingHistory != null)
+                OperatingHistory.PushOperatingRecord(new OperatingRecord() { Host = this, Operation = Operation.Move, OriginaPos = srcIndex, NewPos = dstIndex, OriginalValue = temp, NewValue = temp });
         }
 
         public int IndexOf(ProcessDataModel model)
@@ -270,11 +286,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             switch (r.Operation)
             {
                 case Operation.Add:
-                    Remove(r.NewValue as ProcessDataModel, false, false);
+                    Remove(r.NewValue as ProcessDataModel, false);
                     break;
                 case Operation.Move:
-                    Remove(r.NewValue as ProcessDataModel, true, false);
-                    Insert(r.OriginaPos, r.OriginalValue as ProcessDataModel, false);
+                    Move(r.NewPos, r.OriginaPos, false);
                     break;
                 case Operation.Remove:
                     if (r.OriginaPos == __process_data_models.Count)
@@ -283,7 +298,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                         Insert(r.OriginaPos, r.OriginalValue as ProcessDataModel, false);
                     break;
                 case Operation.Insert:
-                    Remove(r.NewValue as ProcessDataModel, false, false);
+                    Remove(r.NewValue as ProcessDataModel, false);
                     break;
                 case Operation.Replace:
                     throw new NotImplementedException();
@@ -298,11 +313,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                     Add(r.NewValue as ProcessDataModel, false);
                     break;
                 case Operation.Move:
-                    Remove(r.OriginalValue as ProcessDataModel, true, false);
-                    Insert(r.NewPos, r.NewValue as ProcessDataModel, false);
+                    Move(r.OriginaPos, r.NewPos, false);
                     break;
                 case Operation.Remove:
-                    Remove(r.OriginalValue as ProcessDataModel, false, false);
+                    Remove(r.OriginalValue as ProcessDataModel, false);
                     break;
                 case Operation.Insert:
                     Insert(r.NewPos, r.NewValue as ProcessDataModel, false);
@@ -318,6 +332,11 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             get { return __process_data_image.ActualSizeInWord; }
             set { SetProperty(ref __actual_size_in_word, value); }
         }
+
+        public int Find(uint index)
+        {
+            return __process_data_image.Find(index);
+        }
     }
 
     public enum ProcessDataDisplayFormat : int
@@ -329,7 +348,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         BOOL = 1
     }
 
-    public class ProcessDataModel : ObjectModel
+    public class ProcessDataModel : ObjectModel, IEquatable<ProcessDataModel>
     {
         public ProcessDataModel(ProcessObject o, ProcessDataImageAccess access, ProcessDataImageLayout layout) : base(o)
         {
@@ -810,6 +829,11 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                     __rx_pending = false;
                 }
             }
+        }
+
+        public bool Equals(ProcessDataModel? other)
+        {
+            return base.Equals(other) && Access == other.Access && Layout == other.Layout && Bit == other.Bit;
         }
     }
 

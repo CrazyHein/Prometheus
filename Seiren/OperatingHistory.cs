@@ -36,6 +36,17 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         {
             get { return this.ToString(); }
         }
+
+        public string DetailedDescription
+        {
+            get 
+            {
+                if (Host != null)
+                    return $"{Host.Name} - {Operation}\n[{OriginaPos}]\n{OriginalValue}\n->\n[{NewPos}]\n{NewValue}";
+                else
+                    return $"Unnamed Container - {Operation}\n[{OriginaPos}]\n{OriginalValue}\n->\n[{NewPos}]\n{NewValue}";
+            }
+        }
     }
     public class OperatingHistory
     {

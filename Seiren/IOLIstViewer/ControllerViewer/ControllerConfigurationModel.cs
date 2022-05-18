@@ -43,10 +43,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                 OperatingHistory.PushOperatingRecord(new OperatingRecord() { Host = this, Operation = Operation.Add, OriginaPos = -1, NewPos = __device_configurations.Count - 1, OriginalValue = null, NewValue = model });
         }
 
-        public DeviceConfigurationModel RemoveAt(int index, bool force = false, bool log = true)
+        public DeviceConfigurationModel RemoveAt(int index, bool log = true)
         {
             DeviceConfigurationModel model = __device_configurations[index];
-            __controller_configuration_collection.Remove(model.ReferenceName, force);
+            __controller_configuration_collection.Remove(model.ReferenceName);
             __device_configurations.RemoveAt(index);
             Modified = true;
             if (log && OperatingHistory != null)
@@ -54,9 +54,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             return model;
         }
 
-        public void Remove(DeviceConfigurationModel model, bool force = false, bool log = true)
+        public void Remove(DeviceConfigurationModel model, bool log = true)
         {
-            __controller_configuration_collection.Remove(model.ReferenceName, force);
+            __controller_configuration_collection.Remove(model.ReferenceName);
             int index = __device_configurations.IndexOf(model);
             __device_configurations.Remove(model);
             Modified = true;
@@ -73,6 +73,18 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             Modified = true;
             if (log && OperatingHistory != null)
                 OperatingHistory.PushOperatingRecord(new OperatingRecord() { Host = this, Operation = Operation.Insert, OriginaPos = -1, NewPos = index, OriginalValue = null, NewValue = model });
+        }
+
+        public void Move(int srcIndex, int dstIndex, bool log = true)
+        {
+            if (srcIndex > __device_configurations.Count || dstIndex > __device_configurations.Count || srcIndex < 0 || dstIndex < 0)
+                throw new ArgumentOutOfRangeException();
+            var temp = __device_configurations[srcIndex];
+            __device_configurations.RemoveAt(srcIndex);
+            __device_configurations.Insert(dstIndex, temp);
+            Modified = true;
+            if (log && OperatingHistory != null)
+                OperatingHistory.PushOperatingRecord(new OperatingRecord() { Host = this, Operation = Operation.Move, OriginaPos = srcIndex, NewPos = dstIndex, OriginalValue = temp, NewValue = temp });
         }
 
         public int IndexOf(DeviceConfigurationModel model)
@@ -171,11 +183,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             switch (r.Operation)
             {
                 case Operation.Add:
-                    Remove(r.NewValue as DeviceConfigurationModel, false, false);
+                    Remove(r.NewValue as DeviceConfigurationModel, false);
                     break;
                 case Operation.Move:
-                    Remove(r.NewValue as DeviceConfigurationModel, true, false);
-                    Insert(r.OriginaPos, r.OriginalValue as DeviceConfigurationModel, false);
+                    Move(r.NewPos, r.OriginaPos, false);
                     break;
                 case Operation.Remove:
                     if (r.OriginaPos == __device_configurations.Count)
@@ -184,7 +195,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                         Insert(r.OriginaPos, r.OriginalValue as DeviceConfigurationModel, false);
                     break;
                 case Operation.Insert:
-                    Remove(r.NewValue as DeviceConfigurationModel, false, false);
+                    Remove(r.NewValue as DeviceConfigurationModel, false);
                     break;
                 case Operation.Replace:
                     Replace(r.NewValue as DeviceConfigurationModel, r.OriginalValue as DeviceConfigurationModel, false);
@@ -200,11 +211,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                     Add(r.NewValue as DeviceConfigurationModel, false);
                     break;
                 case Operation.Move:
-                    Remove(r.OriginalValue as DeviceConfigurationModel, true, false);
-                    Insert(r.NewPos, r.NewValue as DeviceConfigurationModel, false);
+                    Move(r.OriginaPos, r.NewPos, false);
                     break;
                 case Operation.Remove:
-                    Remove(r.OriginalValue as DeviceConfigurationModel, false, false);
+                    Remove(r.OriginalValue as DeviceConfigurationModel, false);
                     break;
                 case Operation.Insert:
                     Insert(r.NewPos, r.NewValue as DeviceConfigurationModel, false);

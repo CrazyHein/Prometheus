@@ -70,7 +70,10 @@
                 <sync:DropDownMenuGroup ItemsSource="{Binding UndoOperatingRecords}" ScrollBarVisibility="Auto">
                     <sync:DropDownMenuGroup.ItemTemplate>
                         <DataTemplate>
-                            <sync:MenuItemAdv Command="local:ConsoleControl.RecordUndo" Header="{Binding Info}" Margin="2" CommandParameter="{Binding}" Click="UndoMenuItemAdv_Click">
+                            <sync:MenuItemAdv Command="local:ConsoleControl.RecordUndo" Header="{Binding Info}" Margin="2" CommandParameter="{Binding}" Click="UndoMenuItemAdv_Click" ToolTipService.ShowDuration="300000">
+                                <sync:MenuItemAdv.ToolTip>
+                                    <TextBlock Text="{Binding DetailedDescription}" FontSize="14" FontStyle="Italic"/>
+                                </sync:MenuItemAdv.ToolTip>
                                 <sync:MenuItemAdv.Icon>
                                     <Image Source="imgs/undo.png" Height="20"/>
                                 </sync:MenuItemAdv.Icon>
@@ -83,7 +86,10 @@
                 <sync:DropDownMenuGroup ItemsSource="{Binding RedoOperatingRecords}" ScrollBarVisibility="Auto">
                     <sync:DropDownMenuGroup.ItemTemplate>
                         <DataTemplate>
-                            <sync:MenuItemAdv Command="local:ConsoleControl.RecordRedo" Header="{Binding Info}" Margin="2" CommandParameter="{Binding}" Click="RedoMenuItemAdv_Click">
+                            <sync:MenuItemAdv Command="local:ConsoleControl.RecordRedo" Header="{Binding Info}" Margin="2" CommandParameter="{Binding}" Click="RedoMenuItemAdv_Click" ToolTipService.ShowDuration="300000">
+                                <sync:MenuItemAdv.ToolTip>
+                                    <TextBlock Text="{Binding DetailedDescription}" FontSize="14" FontStyle="Italic"/>
+                                </sync:MenuItemAdv.ToolTip>
                                 <sync:MenuItemAdv.Icon>
                                     <Image Source="imgs/undo.png" Height="20"/>
                                 </sync:MenuItemAdv.Icon>

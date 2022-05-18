@@ -65,6 +65,11 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                     return;
                 }
             }
+            if(__result_object_model.EnableBinding == true && __result_object_model.BindingDeviceName == null)
+            {
+                MessageBox.Show("At least one user input is invalid.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
             try
             {
                 switch (__input_mode)

@@ -16,6 +16,7 @@
             <CommandBinding Command="local:ConsoleControl.RemoveRecord" Executed="RemoveRecordCommand_Executed" CanExecute="RemoveRecordCommand_CanExecute"/>
             <CommandBinding Command="local:ConsoleControl.MoveUpRecord" Executed="MoveUpRecordCommand_Executed" CanExecute="MoveUpRecordCommand_CanExecute"/>
             <CommandBinding Command="local:ConsoleControl.MoveDownRecord" Executed="MoveDownRecordCommand_Executed" CanExecute="MoveDownRecordCommand_CanExecute"/>
+            <CommandBinding Command="local:ConsoleControl.FindInInterlock" CanExecute="FindInInterlockCommand_CanExecute"/>
         </DockPanel.CommandBindings>
         <DockPanel.Resources>
             <local:InvertBooleanValue x:Key="InvertBoolean"/>
@@ -47,6 +48,12 @@
                 <MenuItem Command="local:ConsoleControl.MoveDownRecord">
                     <MenuItem.Icon>
                         <Image Source="/imgs/move_down.png" Height="20" Margin="4"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Command="local:ConsoleControl.FindInInterlock" CommandParameter="{Binding Source={x:Reference Name=ProcessDataImageGrid}, Path=SelectedItem}" 
+                          ToolTip="Try to find if &lt;Interlock Area&gt; references the selected record">
+                    <MenuItem.Icon>
+                        <Image Source="/imgs/find.png" Height="20" Margin="4"/>
                     </MenuItem.Icon>
                 </MenuItem>
             </ContextMenu>

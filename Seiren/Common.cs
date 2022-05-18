@@ -60,6 +60,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         public static RoutedUICommand OpenCompare { get; private set; }
         public static RoutedUICommand SaveLayoutState { get; private set; }
         public static RoutedUICommand LoadLayoutState { get; private set; }
+        public static RoutedUICommand FindInInterlock { get; private set; }
+        public static RoutedUICommand FindInProcessDataImage { get; private set; }
         static ConsoleControl()
         {
             InputGestureCollection gestureNew = new InputGestureCollection
@@ -217,6 +219,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             MoveDownRecord = new RoutedUICommand("Move Down", "Move Down", typeof(ConsoleControl));
             SaveLayoutState = new RoutedUICommand("Save Layout", "Save Layout", typeof(ConsoleControl));
             LoadLayoutState = new RoutedUICommand("Load Layout", "Load Layout", typeof(ConsoleControl));
+
+            FindInInterlock = new RoutedUICommand("Find In <Interlock Area>", "Find In <Interlock Area>", typeof(ConsoleControl));
+            FindInProcessDataImage = new RoutedUICommand("Find In <Process Data Image Area>", "Find In <Process Data Image Area>", typeof(ConsoleControl));
         }
     }
 

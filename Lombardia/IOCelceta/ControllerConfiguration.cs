@@ -6,7 +6,7 @@ using System.Xml;
 
 namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
 {
-    public class ControllerConfiguration : Publisher<DeviceConfiguration>, IEquatable<ControllerConfiguration>
+    public class ControllerConfiguration : Publisher<DeviceConfiguration>, IComparable<ControllerConfiguration>
     {
         public IReadOnlyDictionary<string, DeviceConfiguration> Configurations { get; private set; }
         private Dictionary<string, DeviceConfiguration> __configurations = new Dictionary<string, DeviceConfiguration>();
@@ -154,20 +154,20 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
             return c;
         }
 
-        protected void Remove(DeviceConfiguration configuration, bool force = false)
+        protected void Remove(DeviceConfiguration configuration)
         {
-            if (!force && _subscribers.ContainsKey(configuration))
+            if (_subscribers.ContainsKey(configuration))
                 throw new LombardiaException(LOMBARDIA_ERROR_CODE_T.CONTROLLER_MODULE_BE_SUBSCRIBED);
 
             if (__configurations.Remove(configuration.ReferenceName) == false)
                 throw new LombardiaException(LOMBARDIA_ERROR_CODE_T.CONTROLLER_MODULE_UNFOUND);
         }
 
-        public DeviceConfiguration Remove(string name, bool force = false)
+        public DeviceConfiguration Remove(string name)
         {
             if (__configurations.TryGetValue(name, out var configuration) == false)
                 throw new LombardiaException(LOMBARDIA_ERROR_CODE_T.CONTROLLER_MODULE_UNFOUND);
-            Remove(configuration, force);
+            Remove(configuration);
             return configuration;
         }
 
@@ -320,16 +320,16 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
             return Helper.OVERLAP_DETECTOR(ranges);
         }
 
-        public bool Equals(ControllerConfiguration? other)
+        public bool IsEquivalent(ControllerConfiguration? other)
         {
             bool res = false;
             if (other != null && other.Configurations.Count == this.Configurations.Count)
-                res = this.Configurations.All(p => other.Configurations.ContainsKey(p.Key) && other.Configurations[p.Key].Equals(this.Configurations[p.Key]));
+                res = this.Configurations.All(p => other.Configurations.ContainsKey(p.Key) && other.Configurations[p.Key].IsEquivalent(this.Configurations[p.Key]));
             return res;
         }
     }
 
-    public class DeviceConfiguration: IEquatable<DeviceConfiguration>
+    public class DeviceConfiguration: IComparable<DeviceConfiguration>
     {
         public DeviceModel DeviceModel { get; init; } = new LocalExtensionModel();
         public uint Switch { get; init; }
@@ -359,7 +359,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
         }
         public ushort Port { get; init; }
 
-        public bool Equals(DeviceConfiguration? other)
+        public bool IsEquivalent(DeviceConfiguration? other)
         {
             return other != null && DeviceModel == other.DeviceModel && Switch == other.Switch &&
                 ((DeviceModel is LocalExtensionModel && LocalAddress == other.LocalAddress) || ((DeviceModel is RemoteEthernetModel && IPv4 == other.IPv4 && Port == other.Port)) &&

@@ -27,7 +27,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility
             ProcessDataImage txdiag, ProcessDataImage txbit, ProcessDataImage txblk,
             ProcessDataImage rxctl, ProcessDataImage rxbit, ProcessDataImage rxblk,
             InterlockCollection intlk, Miscellaneous misc,
-            DataTypeCatalogue dataTypes, ControllerModelCatalogue models)
+            DataTypeCatalogue dataTypes, ControllerModelCatalogue models,
+            string? currentlyOpenedFile)
         {
             InitializeComponent();
             DataContext = new ImportExportModel(mode, 
@@ -35,7 +36,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility
                 cc, configurationNames,
                 od, objectIndexes,
                 txdiag, txbit, txblk, rxctl, rxbit, rxblk, intlk, misc,
-                dataTypes, models);
+                dataTypes, models,
+                currentlyOpenedFile);
             if (mode == ImportExportMode.Import || mode == ImportExportMode.Compare)
             {
                 CheckboxXLS.IsChecked = false;
@@ -136,6 +138,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility
                     System.Windows.Forms.SaveFileDialog save = new System.Windows.Forms.SaveFileDialog() { DefaultExt = "xml", AddExtension = true};
                     save.InitialDirectory = System.IO.Path.GetDirectoryName(model.VariableDictionaryPath);
                     save.Filter = "Extensible Markup Language(*.xml)|*.xml";
+                    save.FileName = System.IO.Path.GetFileName(model.VariableDictionaryPath);
                     if (save.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                         model.VariableDictionaryPath = save.FileName;
                     break;
@@ -144,6 +147,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility
                     System.Windows.Forms.OpenFileDialog open = new System.Windows.Forms.OpenFileDialog() { Multiselect = false};
                     open.InitialDirectory = System.IO.Path.GetDirectoryName(model.VariableDictionaryPath);
                     open.Filter = "Extensible Markup Language(*.xml)|*.xml";
+                    open.FileName = System.IO.Path.GetFileName(model.VariableDictionaryPath);
                     if (open.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                         model.VariableDictionaryPath = open.FileName;
                     break;
@@ -160,6 +164,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility
                     System.Windows.Forms.SaveFileDialog save = new System.Windows.Forms.SaveFileDialog() { DefaultExt = "xml", AddExtension = true };
                     save.InitialDirectory = System.IO.Path.GetDirectoryName(model.IOListPath);
                     save.Filter = "Extensible Markup Language(*.xml)|*.xml";
+                    save.FileName = System.IO.Path.GetFileName(model.IOListPath);
                     if (save.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                         model.IOListPath = save.FileName;
                     break;
@@ -168,6 +173,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility
                     System.Windows.Forms.OpenFileDialog open = new System.Windows.Forms.OpenFileDialog() { Multiselect = false };
                     open.InitialDirectory = System.IO.Path.GetDirectoryName(model.IOListPath);
                     open.Filter = "Extensible Markup Language(*.xml)|*.xml";
+                    open.FileName = System.IO.Path.GetFileName(model.IOListPath);
                     if (open.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                         model.IOListPath = open.FileName;
                     break;
@@ -189,6 +195,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility
                     System.Windows.Forms.SaveFileDialog save = new System.Windows.Forms.SaveFileDialog() { DefaultExt = "xlsx", AddExtension = true };
                     save.InitialDirectory = System.IO.Path.GetDirectoryName(model.XlsArchivesPath);
                     save.Filter = "Microsoft Office Excel 2007+ (*.xlsx)|*.xlsx";
+                    save.FileName = System.IO.Path.GetFileName(model.XlsArchivesPath);
                     if (save.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                         model.XlsArchivesPath = save.FileName;
                     break;

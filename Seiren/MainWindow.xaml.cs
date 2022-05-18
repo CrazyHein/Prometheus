@@ -172,6 +172,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         {
             if (__variables_viewer == null)
                 return false;
+            __update_binding_source();
             return (__variables_viewer.DataContext as VariablesModel).Modified ||
                     (__controller_configuration_viewer.DataContext as ControllerConfigurationModel).Modified ||
                     (__objects_viewer.DataContext as ObjectsModel).ContentModified ||
@@ -449,6 +450,16 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             save.Filter = "Foliage Ocean List File(*.folst)|*.folst";
             save.AddExtension = true;
             save.DefaultExt = "folst";
+            if (__main_model.IsNonTemporaryFile)
+            {
+                save.FileName = System.IO.Path.GetFileName(__main_model.CurrentlyOpenFile);
+                save.InitialDirectory = System.IO.Path.GetDirectoryName(__main_model.CurrentlyOpenFile);
+            }
+            else
+            {
+                save.FileName = "io_list.folst";
+                save.InitialDirectory = System.Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            }
 
             if (save.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
@@ -558,7 +569,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                     __object_dictionary, (__objects_viewer.DataContext as ObjectsModel).ObjectIndexes,
                     __tx_diagnostic_area, __tx_bit_area, __tx_block_area,
                     __rx_control_area, __rx_bit_area, __rx_block_area,
-                    __interlock_area, __misc_info, __data_type_catalogue, __controller_model_catalogue);
+                    __interlock_area, __misc_info, __data_type_catalogue, __controller_model_catalogue,
+                    __main_model.IsNonTemporaryFile ? __main_model.CurrentlyOpenFile : null);
             wnd.ShowDialog();
         }
 
@@ -582,7 +594,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                     __object_dictionary, null,
                     __tx_diagnostic_area, __tx_bit_area, __tx_block_area,
                     __rx_control_area, __rx_bit_area, __rx_block_area, 
-                    __interlock_area, __misc_info, __data_type_catalogue, __controller_model_catalogue);
+                    __interlock_area, __misc_info, __data_type_catalogue, __controller_model_catalogue, 
+                    __main_model.IsNonTemporaryFile ? __main_model.CurrentlyOpenFile : null);
             if(wnd.ShowDialog() == true)
             {
                 (__variable_dictionary, __controller_configuration, __object_dictionary,
@@ -855,7 +868,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                     __object_dictionary, null,
                     __tx_diagnostic_area, __tx_bit_area, __tx_block_area,
                     __rx_control_area, __rx_bit_area, __rx_block_area,
-                    __interlock_area, __misc_info, __data_type_catalogue, __controller_model_catalogue);
+                    __interlock_area, __misc_info, __data_type_catalogue, __controller_model_catalogue,
+                    __main_model.IsNonTemporaryFile ? __main_model.CurrentlyOpenFile : null);
             if (wnd.ShowDialog() == true)
                 MessageBox.Show(__compare_result(wnd.ImportResult, (wnd.DataContext as ImportExportModel).XMLIO), "Comparison Result", MessageBoxButton.OK, MessageBoxImage.Information);
         }
@@ -902,68 +916,68 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         {
             StringBuilder sb = new StringBuilder();
             sb.Append("Variable Dictionary");
-            if (__variable_dictionary.Equals(target.vd))
+            if (__variable_dictionary.IsEquivalent(target.vd))
                 sb.Append("\t\t✔\n");
             else
                 sb.Append("\t\t✖\n");
             if (io)
             {
                 sb.Append("Controller Configuration");
-                if (__controller_configuration.Equals(target.cc))
+                if (__controller_configuration.IsEquivalent(target.cc))
                     sb.Append("\t✔\n");
                 else
                     sb.Append("\t✖\n");
 
                 sb.Append("Object Dictionary");
-                if (__object_dictionary.Equals(target.od))
+                if (__object_dictionary.IsEquivalent(target.od))
                     sb.Append("\t\t✔\n");
                 else
                     sb.Append("\t\t✖\n");
 
                 sb.Append("Tx Diagnostic Area");
-                if (__tx_diagnostic_area.Equals(target.txdiag))
+                if (__tx_diagnostic_area.IsEquivalent(target.txdiag))
                     sb.Append("\t\t✔\n");
                 else
                     sb.Append("\t\t✖\n");
 
                 sb.Append("Tx Bit Area");
-                if (__tx_bit_area.Equals(target.txbit))
+                if (__tx_bit_area.IsEquivalent(target.txbit))
                     sb.Append("\t\t✔\n");
                 else
                     sb.Append("\t\t✖\n");
 
                 sb.Append("Tx Block Area");
-                if (__tx_block_area.Equals(target.txblk))
+                if (__tx_block_area.IsEquivalent(target.txblk))
                     sb.Append("\t\t✔\n");
                 else
                     sb.Append("\t\t✖\n");
 
                 sb.Append("Rx Control Area");
-                if (__rx_control_area.Equals(target.rxctl))
+                if (__rx_control_area.IsEquivalent(target.rxctl))
                     sb.Append("\t\t✔\n");
                 else
                     sb.Append("\t\t✖\n");
 
                 sb.Append("Rx Bit Area");
-                if (__rx_bit_area.Equals(target.rxbit))
+                if (__rx_bit_area.IsEquivalent(target.rxbit))
                     sb.Append("\t\t✔\n");
                 else
                     sb.Append("\t\t✖\n");
 
                 sb.Append("Rx Block Area");
-                if (__rx_block_area.Equals(target.rxblk))
+                if (__rx_block_area.IsEquivalent(target.rxblk))
                     sb.Append("\t\t✔\n");
                 else
                     sb.Append("\t\t✖\n");
 
                 sb.Append("Interlock Area");
-                if (__interlock_area.Equals(target.intlk))
+                if (__interlock_area.IsEquivalent(target.intlk))
                     sb.Append("\t\t✔\n");
                 else
                     sb.Append("\t\t✖\n");
 
                 sb.Append("miscellaneous");
-                if (__misc_info.Equals(target.misc))
+                if (__misc_info.IsEquivalent(target.misc))
                     sb.Append("\t\t✔\n");
                 else
                     sb.Append("\t\t✖\n");

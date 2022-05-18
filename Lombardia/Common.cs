@@ -4,6 +4,10 @@ using System.Text.RegularExpressions;
 
 namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
 {
+    public interface IComparable<T>
+    {
+        bool IsEquivalent(T? other);
+    }
     public interface ISubscriber<T> where T : notnull
     {
         public ISubscriber<T>? DependencyChanged(T origin, T newcome);

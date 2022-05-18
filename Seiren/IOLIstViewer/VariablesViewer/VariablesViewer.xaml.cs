@@ -38,17 +38,14 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
 
                 MainViewer.BeginInit();
                 int dragIndex = variablesModel.IndexOf(draggingRecords[0] as VariableModel);
-                variablesModel.Remove(draggingRecords[0] as VariableModel, true, false);
                 int targetIndex = variablesModel.IndexOf(targetVariable);
-                int insertionIndex = e.DropPosition == DropPosition.DropAbove ? targetIndex : targetIndex + 1;
-                variablesModel.Insert(insertionIndex, draggingRecords[0] as VariableModel, false);
+                int insertionIndex = 0;
+                if(dragIndex > targetIndex)
+                    insertionIndex = e.DropPosition == DropPosition.DropAbove ? targetIndex : targetIndex + 1;
+                else
+                    insertionIndex = e.DropPosition == DropPosition.DropAbove ? targetIndex - 1 : targetIndex;
+                variablesModel.Move(dragIndex, insertionIndex);
                 MainViewer.EndInit();
-                variablesModel.OperatingHistory?.PushOperatingRecord(
-                    new OperatingRecord() { 
-                        Host = variablesModel, 
-                        Operation = Operation.Move, 
-                        OriginaPos = dragIndex, NewPos = insertionIndex, 
-                        OriginalValue = draggingRecords[0] as VariableModel, NewValue = draggingRecords[0] as VariableModel });
                 CommandManager.InvalidateRequerySuggested();
             }
         }

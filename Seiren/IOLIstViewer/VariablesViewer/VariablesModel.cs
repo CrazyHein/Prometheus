@@ -33,10 +33,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                 OperatingHistory.PushOperatingRecord(new OperatingRecord(){ Host = this, Operation= Operation.Add, OriginaPos = -1, NewPos = __variables.Count - 1, OriginalValue = null, NewValue = model});
         }
 
-        public VariableModel RemoveAt(int index, bool force = false, bool log = true)
+        public VariableModel RemoveAt(int index, bool log = true)
         {
             VariableModel model = __variables[index];
-            __variable_dictionary.Remove(model.Name, force);
+            __variable_dictionary.Remove(model.Name);
             __variables.RemoveAt(index);
             Modified = true;
             if (log && OperatingHistory != null)
@@ -44,9 +44,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             return model;
         }
 
-        public void Remove(VariableModel model, bool force = false, bool log = true)
+        public void Remove(VariableModel model, bool log = true)
         {
-            __variable_dictionary.Remove(model.Name, force);
+            __variable_dictionary.Remove(model.Name);
             int index = __variables.IndexOf(model);
             __variables.Remove(model);
             Modified = true;
@@ -64,6 +64,20 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             if (log && OperatingHistory != null)
                 OperatingHistory.PushOperatingRecord(new OperatingRecord(){ Host = this, Operation = Operation.Insert, OriginaPos = -1, NewPos = index, OriginalValue = null, NewValue = model });
         }
+
+        public void Move(int srcIndex, int dstIndex, bool log = true)
+        {
+            if (srcIndex > __variables.Count || dstIndex > __variables.Count || srcIndex < 0 || dstIndex < 0)
+                throw new ArgumentOutOfRangeException();
+            var temp = __variables[srcIndex];
+            __variables.RemoveAt(srcIndex);
+            __variables.Insert(dstIndex, temp);
+            Modified = true;
+            if (log && OperatingHistory != null)
+                OperatingHistory.PushOperatingRecord(new OperatingRecord() { Host = this, Operation = Operation.Move, OriginaPos = srcIndex, NewPos = dstIndex, OriginalValue = temp, NewValue = temp });
+        }
+
+
 
         public int IndexOf(VariableModel model)
         {
@@ -120,11 +134,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             switch(r.Operation)
             {
                 case Operation.Add:
-                    Remove(r.NewValue as VariableModel, false, false);
+                    Remove(r.NewValue as VariableModel, false);
                     break;
                 case Operation.Move:
-                    Remove(r.NewValue as VariableModel, true, false);
-                    Insert(r.OriginaPos, r.OriginalValue as VariableModel, false);
+                    Move(r.NewPos, r.OriginaPos, false);
                     break;
                 case Operation.Remove:
                     if (r.OriginaPos == __variables.Count)
@@ -133,7 +146,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                         Insert(r.OriginaPos, r.OriginalValue as VariableModel, false);
                     break;
                 case Operation.Insert:
-                    Remove(r.NewValue as VariableModel, false, false);
+                    Remove(r.NewValue as VariableModel, false);
                     break;
                 case Operation.Replace:
                     Replace(r.NewValue as VariableModel, r.OriginalValue as VariableModel, false);
@@ -149,11 +162,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                     Add(r.NewValue as VariableModel, false);
                     break;
                 case Operation.Move:
-                    Remove(r.OriginalValue as VariableModel, true, false);
-                    Insert(r.NewPos, r.NewValue as VariableModel, false);
+                    Move(r.OriginaPos, r.NewPos, false);
                     break;
                 case Operation.Remove:
-                    Remove(r.OriginalValue as VariableModel, false, false);
+                    Remove(r.OriginalValue as VariableModel, false);
                     break;
                 case Operation.Insert:
                     Insert(r.NewPos, r.NewValue as VariableModel, false);

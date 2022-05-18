@@ -57,21 +57,14 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
 
                 ProcessDataImageGrid.BeginInit();
                 int dragIndex = dataImage.IndexOf(draggingRecords[0] as ProcessDataModel);
-                dataImage.Remove(draggingRecords[0] as ProcessDataModel, true, false);
                 int targetIndex = dataImage.IndexOf(targetData);
-                int insertionIndex = e.DropPosition == DropPosition.DropAbove ? targetIndex : targetIndex + 1;
-                dataImage.Insert(insertionIndex, draggingRecords[0] as ProcessDataModel, false);
+                int insertionIndex = 0;
+                if (dragIndex > targetIndex)
+                    insertionIndex = e.DropPosition == DropPosition.DropAbove ? targetIndex : targetIndex + 1;
+                else
+                    insertionIndex = e.DropPosition == DropPosition.DropAbove ? targetIndex - 1 : targetIndex;
+                dataImage.Move(dragIndex, insertionIndex);
                 ProcessDataImageGrid.EndInit();
-                dataImage.OperatingHistory?.PushOperatingRecord(
-                    new OperatingRecord()
-                    {
-                        Host = dataImage,
-                        Operation = Operation.Move,
-                        OriginaPos = dragIndex,
-                        NewPos = insertionIndex,
-                        OriginalValue = draggingRecords[0] as ProcessDataModel,
-                        NewValue = draggingRecords[0] as ProcessDataModel
-                    });
                 CommandManager.InvalidateRequerySuggested();
             }
         }
@@ -226,19 +219,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             {
                 int sourceIndex = dataImage.IndexOf(i);
                 int targetIndex = sourceIndex - 1;
-                dataImage.Remove(i, true, false);
-                dataImage.Insert(targetIndex, i, false);
-
-                dataImage.OperatingHistory?.PushOperatingRecord(
-                new OperatingRecord()
-                {
-                    Host = dataImage,
-                    Operation = Operation.Move,
-                    OriginaPos = sourceIndex,
-                    NewPos = targetIndex,
-                    OriginalValue = i,
-                    NewValue = i
-                });
+                dataImage.Move(sourceIndex, targetIndex);
             }
             ProcessDataImageGrid.SelectedItems = new ObservableCollection<object>(indexes);
             ProcessDataImageGrid.ScrollInView(new Syncfusion.UI.Xaml.ScrollAxis.RowColumnIndex(
@@ -265,19 +246,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             {
                 int sourceIndex = dataImage.IndexOf(i);
                 int targetIndex = sourceIndex + 1;
-                dataImage.Remove(i, true, false);
-                dataImage.Insert(targetIndex, i, false);
-
-                dataImage.OperatingHistory?.PushOperatingRecord(
-                new OperatingRecord()
-                {
-                    Host = dataImage,
-                    Operation = Operation.Move,
-                    OriginaPos = sourceIndex,
-                    NewPos = targetIndex,
-                    OriginalValue = i,
-                    NewValue = i
-                });
+                dataImage.Move(sourceIndex, targetIndex);
             }
             ProcessDataImageGrid.SelectedItems = new ObservableCollection<object>(indexes);
             ProcessDataImageGrid.ScrollInView(new Syncfusion.UI.Xaml.ScrollAxis.RowColumnIndex(
@@ -292,6 +261,19 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             e.CanExecute = DataContext != null &&
                 (ProcessDataImageGrid.SelectedItems.Count > 0 && ProcessDataImageGrid.SelectedItems.Max(i => (DataContext as ProcessDataImageModel).IndexOf(i as ProcessDataModel)) != (DataContext as ProcessDataImageModel).ProcessDataModels.Count - 1) &&
                 (DataContext as ProcessDataImageModel).IsOffline == true;
+        }
+
+        private void FindInInterlockCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            if(ProcessDataImageGrid?.SelectedItems.Count == 1)
+            {
+                e.Handled = false;
+            }
+            else
+            {
+                e.CanExecute = false;
+                e.Handled = true;
+            }
         }
 
         public void UpdateBindingSource()

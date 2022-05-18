@@ -194,6 +194,11 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                     throw new NotImplementedException();
             }
         }
+
+        public int FindNext(uint index)
+        {
+            return __interlock_collection.FindNext(index);
+        }
     }
 
     public abstract class LogicElementModel: INotifyPropertyChanged

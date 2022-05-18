@@ -7,6 +7,9 @@
              xmlns:sync="http://schemas.syncfusion.com/wpf"
              mc:Ignorable="d" 
              d:DesignHeight="1080" d:DesignWidth="1500">
+    <UserControl.CommandBindings>
+        <CommandBinding Command="local:ConsoleControl.FindInInterlock" Executed="FindInInterlockCommand_Executed" CanExecute="FindInInterlockCommand_CanExecute"/>
+    </UserControl.CommandBindings>
     <sync:DockingManager x:Name="DockingManager" UseDocumentContainer="True" EnableDocumentToFloatOnDoubleClick="True" Loaded="DockingManager_Loaded" IsVisibleChanged="DockingManager_IsVisibleChanged">
         <sync:DockingManager.Resources>
             <local:ModifiedIndicatorToColor x:Key="ModifiedConverter" Unchanged="Transparent"/>
@@ -78,6 +81,7 @@
                     <CommandBinding Command="local:ConsoleControl.InsertRecord" Executed="InsertRecordCommand_Executed" CanExecute="InsertRecordCommand_CanExecute"/>
                     <CommandBinding Command="local:ConsoleControl.EditRecord" Executed="EditRecordCommand_Executed" CanExecute="EditRecordCommand_CanExecute"/>
                     <CommandBinding Command="local:ConsoleControl.RemoveRecord" Executed="RemoveRecordCommand_Executed" CanExecute="EditRecordCommand_CanExecute"/>
+                    <CommandBinding Command="local:ConsoleControl.FindInProcessDataImage" Executed="FindInProcessDataImageCommand_Executed" CanExecute="FindInProcessDataImageCommand_CanExecute"/>
                 </DockPanel.CommandBindings>
                 <DockPanel.Resources>
                     <ContextMenu x:Key="GridContextMenu">
@@ -95,6 +99,19 @@
                             <MenuItem.Icon>
                                 <Image Source="/imgs/remove.png" Height="20" Margin="4"/>
                             </MenuItem.Icon>
+                        </MenuItem>
+                        <MenuItem Header="Find In ...">
+                            <MenuItem.Icon>
+                                <Image Source="/imgs/find.png" Height="20" Margin="4"/>
+                            </MenuItem.Icon>
+                            <MenuItem Command="local:ConsoleControl.FindInProcessDataImage" CommandParameter="{Binding Source={x:Reference Name=MainViewer}, Path=SelectedItem}"
+                                      ToolTip="Try to find if &lt;Process Data Image Area&gt; references the selected record">
+                                
+                            </MenuItem>
+                            <MenuItem Command="local:ConsoleControl.FindInInterlock" CommandParameter="{Binding Source={x:Reference Name=MainViewer}, Path=SelectedItem}"
+                                      ToolTip="Try to find if &lt;Interlock Area&gt; references the selected record">
+                                
+                            </MenuItem>
                         </MenuItem>
                     </ContextMenu>
                     <DataTemplate x:Key="RecordDragDropTemplate">
