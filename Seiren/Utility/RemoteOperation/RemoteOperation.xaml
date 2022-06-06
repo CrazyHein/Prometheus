@@ -1,0 +1,56 @@
+﻿<Window x:Class="AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility.RemoteOperation"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren"
+        xmlns:sync="http://schemas.syncfusion.com/wpf"
+        xmlns:syncfusionskin ="clr-namespace:Syncfusion.SfSkinManager;assembly=Syncfusion.SfSkinManager.WPF"
+        xmlns:slmp="clr-namespace:AMEC.PCSoftware.CommunicationProtocol.CrazyHein.SLMP.Command;assembly=Gagharv"
+        xmlns:sys="clr-namespace:System;assembly=mscorlib"
+        mc:Ignorable="d"
+        Title="Remote Operation" Height="350" Width="300" WindowStartupLocation="CenterScreen" ResizeMode="NoResize" Closing="Window_Closing">
+    <DockPanel syncfusionskin:SfSkinManager.Theme="{syncfusionskin:SkinManagerExtension ThemeName=FluentLight}" LastChildFill="True" Margin="8,4,8,4">
+        <DockPanel.Resources>
+            <ObjectDataProvider ObjectType="{x:Type sys:Enum}" MethodName="GetValues" x:Key="remoteoperation">
+                <ObjectDataProvider.MethodParameters>
+                    <x:Type TypeName="local:REMOTE_OPERATION_T"/>
+                </ObjectDataProvider.MethodParameters>
+            </ObjectDataProvider>
+            <ObjectDataProvider ObjectType="{x:Type sys:Enum}" MethodName="GetValues" x:Key="remotecontrolmode">
+                <ObjectDataProvider.MethodParameters>
+                    <x:Type TypeName="slmp:REMOTE_CONTROL_MODE_T" />
+                </ObjectDataProvider.MethodParameters>
+            </ObjectDataProvider>
+            <ObjectDataProvider ObjectType="{x:Type sys:Enum}" MethodName="GetValues" x:Key="remoteclearmode">
+                <ObjectDataProvider.MethodParameters>
+                    <x:Type TypeName="slmp:REMOTE_CLEAR_MODE_T" />
+                </ObjectDataProvider.MethodParameters>
+            </ObjectDataProvider>
+            <local:InvertBooleanValue x:Key="InvertBoolean"/>
+            <local:RemoteOperationImage x:Key="RemoteOperationImage"/>
+            <local:RemoteControlModeAvailable x:Key="RemoteControlModeAvailable"/>
+            <local:RemoteClearModeAvailable x:Key="RemoteClearModeAvailable"/>
+        </DockPanel.Resources>
+        <sync:ButtonAdv Label="{Binding RemoteOperation}" IsEnabled="{Binding IsBusy, Converter={StaticResource InvertBoolean}}" Margin="0,0,0,4" Height="30" DockPanel.Dock="Bottom" 
+                        SmallIcon="{Binding RemoteOperation, Converter={StaticResource RemoteOperationImage}}"
+                        Click="RemoteOperation_Click"/>
+        <Grid DockPanel.Dock="Top">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
+            </Grid.RowDefinitions>
+            <sync:SfBusyIndicator IsBusy="{Binding IsBusy}" Grid.RowSpan="4"/>
+            <sync:SfTextInputLayout Hint="Remote Control Mode"  FontSize="12" FontStyle="Italic" ContainerType="Filled" Margin="4" IsEnabled="{Binding IsBusy, Converter={StaticResource InvertBoolean}}">
+                <ComboBox FontStyle="Normal" ItemsSource="{Binding Source={StaticResource remoteoperation}}" SelectedItem="{Binding RemoteOperation}"/>
+            </sync:SfTextInputLayout>
+            <sync:SfTextInputLayout Hint="Remote Control Mode"  FontSize="12" FontStyle="Italic" ContainerType="Filled" Margin="4" Grid.Row="1" Visibility="{Binding RemoteOperation, Converter={StaticResource RemoteControlModeAvailable}}" IsEnabled="{Binding IsBusy, Converter={StaticResource InvertBoolean}}">
+                <ComboBox FontStyle="Normal" ItemsSource="{Binding Source={StaticResource remotecontrolmode}}" SelectedItem="{Binding RemoteControlMode}"/>
+            </sync:SfTextInputLayout>
+            <sync:SfTextInputLayout Hint="Remote Clear Mode"  FontSize="12" FontStyle="Italic" ContainerType="Filled" Margin="4" Grid.Row="2" Visibility="{Binding RemoteOperation, Converter={StaticResource RemoteClearModeAvailable}}" IsEnabled="{Binding IsBusy, Converter={StaticResource InvertBoolean}}">
+                <ComboBox FontStyle="Normal" ItemsSource="{Binding Source={StaticResource remoteclearmode}}" SelectedItem="{Binding RemoteClearMode}"/>
+            </sync:SfTextInputLayout>
+        </Grid>
+    </DockPanel>
+</Window>

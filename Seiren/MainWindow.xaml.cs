@@ -908,6 +908,16 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         {
             e.CanExecute = __main_model.IsOpened && __objects_viewer.LayoutFinished && false;
         }
+        private void RemoteOperationCommand_Executed(object sender, System.Windows.Input.ExecutedRoutedEventArgs e)
+        {
+            RemoteOperation remote = new RemoteOperation(__settings.SlmpTargetProperty);
+            remote.ShowDialog();
+        }
+
+        private void RemoteOperationCommand_CanExecuted(object sender, System.Windows.Input.CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = __main_model.IsOffline;
+        }
 
         private string __compare_result((VariableDictionary vd, ControllerConfiguration cc, ObjectDictionary od,
                     ProcessDataImage txdiag, ProcessDataImage txbit, ProcessDataImage txblk,

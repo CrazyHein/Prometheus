@@ -62,6 +62,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         public static RoutedUICommand LoadLayoutState { get; private set; }
         public static RoutedUICommand FindInInterlock { get; private set; }
         public static RoutedUICommand FindInProcessDataImage { get; private set; }
+        public static RoutedUICommand ControllerRemoteOperation { get; private set; }
+
         static ConsoleControl()
         {
             InputGestureCollection gestureNew = new InputGestureCollection
@@ -222,6 +224,12 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
 
             FindInInterlock = new RoutedUICommand("Find In <Interlock Area>", "Find In <Interlock Area>", typeof(ConsoleControl));
             FindInProcessDataImage = new RoutedUICommand("Find In <Process Data Image Area>", "Find In <Process Data Image Area>", typeof(ConsoleControl));
+
+            InputGestureCollection gestureControllerRemoteOperation = new InputGestureCollection
+            {
+                new KeyGesture(Key.F8, ModifierKeys.Control, "Ctrl+F8")
+            };
+            ControllerRemoteOperation = new RoutedUICommand("Remote Operation", "Remote Operation", typeof(ConsoleControl), gestureControllerRemoteOperation);
         }
     }
 
@@ -615,6 +623,124 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         }
 
         public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    internal enum REMOTE_OPERATION_T
+    {
+        RUN,
+        STOP,
+        RESET,
+        PAUSE,
+        LATCH_CLEAR,
+        READ_TYPE
+    }
+
+    public class RemoteOperationImage : IValueConverter
+    {
+        static System.Windows.Media.Imaging.BitmapImage RUN = new System.Windows.Media.Imaging.BitmapImage(new Uri("/imgs/startdebugging.png", UriKind.Relative));
+        static System.Windows.Media.Imaging.BitmapImage STOP = new System.Windows.Media.Imaging.BitmapImage(new Uri("/imgs/stop.png", UriKind.Relative));
+        static System.Windows.Media.Imaging.BitmapImage RESET = new System.Windows.Media.Imaging.BitmapImage(new Uri("/imgs/reset.png", UriKind.Relative));
+        static System.Windows.Media.Imaging.BitmapImage PAUSE = new System.Windows.Media.Imaging.BitmapImage(new Uri("/imgs/stopdebugging.png", UriKind.Relative));
+        static System.Windows.Media.Imaging.BitmapImage LATCH_CLEAR = new System.Windows.Media.Imaging.BitmapImage(new Uri("/imgs/clear.png", UriKind.Relative));
+        static System.Windows.Media.Imaging.BitmapImage READ_TYPE = new System.Windows.Media.Imaging.BitmapImage(new Uri("/imgs/type.png", UriKind.Relative));
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value is REMOTE_OPERATION_T && targetType == typeof(System.Windows.Media.ImageSource))
+            {
+                switch((REMOTE_OPERATION_T)value)
+                {
+                    case REMOTE_OPERATION_T.RUN:
+                        return RUN;
+                    case REMOTE_OPERATION_T.STOP:
+                        return STOP;
+                    case REMOTE_OPERATION_T.RESET:
+                        return RESET;
+                    case REMOTE_OPERATION_T.PAUSE:
+                        return PAUSE;
+                    case REMOTE_OPERATION_T.LATCH_CLEAR:
+                        return LATCH_CLEAR;
+                    case REMOTE_OPERATION_T.READ_TYPE:
+                        return READ_TYPE;
+                    default:
+                        return null;
+                }
+            }
+            else
+                throw new ArgumentException();
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class RemoteControlModeAvailable : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value is REMOTE_OPERATION_T && targetType == typeof(Visibility))
+            {
+                switch ((REMOTE_OPERATION_T)value)
+                {
+                    case REMOTE_OPERATION_T.RUN:
+                        return Visibility.Visible;
+                    case REMOTE_OPERATION_T.STOP:
+                        return Visibility.Hidden;
+                    case REMOTE_OPERATION_T.RESET:
+                        return Visibility.Hidden;
+                    case REMOTE_OPERATION_T.PAUSE:
+                        return Visibility.Visible;
+                    case REMOTE_OPERATION_T.LATCH_CLEAR:
+                        return Visibility.Hidden;
+                    case REMOTE_OPERATION_T.READ_TYPE:
+                        return Visibility.Hidden;
+                    default:
+                        return Visibility.Hidden;
+                }
+            }
+            else
+                throw new ArgumentException();
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class RemoteClearModeAvailable : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value is REMOTE_OPERATION_T && targetType == typeof(Visibility))
+            {
+                switch ((REMOTE_OPERATION_T)value)
+                {
+                    case REMOTE_OPERATION_T.RUN:
+                        return Visibility.Visible;
+                    case REMOTE_OPERATION_T.STOP:
+                        return Visibility.Hidden;
+                    case REMOTE_OPERATION_T.RESET:
+                        return Visibility.Hidden;
+                    case REMOTE_OPERATION_T.PAUSE:
+                        return Visibility.Hidden;
+                    case REMOTE_OPERATION_T.LATCH_CLEAR:
+                        return Visibility.Hidden;
+                    case REMOTE_OPERATION_T.READ_TYPE:
+                        return Visibility.Hidden;
+                    default:
+                        return Visibility.Hidden;
+                }
+            }
+            else
+                throw new ArgumentException();
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
             throw new NotImplementedException();
         }

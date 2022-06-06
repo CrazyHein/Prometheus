@@ -7,7 +7,7 @@
     <UseWindowsForms>true</UseWindowsForms>
     <RootNamespace>AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren</RootNamespace>
     <Nullable>annotations</Nullable>
-    <Version>0.13.0</Version>
+    <Version>0.14.0</Version>
     <Authors>CrazyHein</Authors>
     <Company>AMEC</Company>
     <ApplicationIcon>imgs\logo.ico</ApplicationIcon>
@@ -19,6 +19,7 @@
     <None Remove="imgs\about.png" />
     <None Remove="imgs\add.png" />
     <None Remove="imgs\cancel.png" />
+    <None Remove="imgs\clear.png" />
     <None Remove="imgs\close.png" />
     <None Remove="imgs\compare.png" />
     <None Remove="imgs\configuration.png" />
@@ -51,11 +52,15 @@
     <None Remove="imgs\new.png" />
     <None Remove="imgs\open.png" />
     <None Remove="imgs\paste.png" />
+    <None Remove="imgs\pause.png" />
     <None Remove="imgs\process.png" />
     <None Remove="imgs\quit.png" />
     <None Remove="imgs\recent.png" />
     <None Remove="imgs\redo.png" />
+    <None Remove="imgs\remote.png" />
     <None Remove="imgs\remove.png" />
+    <None Remove="imgs\reset.png" />
+    <None Remove="imgs\run.png" />
     <None Remove="imgs\save.png" />
     <None Remove="imgs\saveas.png" />
     <None Remove="imgs\save_as.png" />
@@ -64,7 +69,9 @@
     <None Remove="imgs\slash.jpg" />
     <None Remove="imgs\startdebugging.png" />
     <None Remove="imgs\startmonitoring.png" />
+    <None Remove="imgs\stop.png" />
     <None Remove="imgs\stopdebugging.png" />
+    <None Remove="imgs\type.png" />
     <None Remove="imgs\undo.png" />
     <None Remove="imgs\variables.png" />
     <None Remove="LayoutProfile\pdo_default_layout_state.xml" />
@@ -75,6 +82,7 @@
     <Resource Include="imgs\about.png" />
     <Resource Include="imgs\add.png" />
     <Resource Include="imgs\cancel.png" />
+    <Resource Include="imgs\clear.png" />
     <Resource Include="imgs\close.png" />
     <Resource Include="imgs\compare.png" />
     <Resource Include="imgs\configuration.png" />
@@ -101,6 +109,8 @@
     <Resource Include="imgs\paste.png" />
     <Resource Include="imgs\recent.png" />
     <Resource Include="imgs\redo.png" />
+    <Resource Include="imgs\remote.png" />
+    <Resource Include="imgs\reset.png" />
     <Resource Include="imgs\startmonitoring.png" />
     <Resource Include="imgs\new.png" />
     <Resource Include="imgs\open.png" />
@@ -110,7 +120,9 @@
     <Resource Include="imgs\save.png" />
     <Resource Include="imgs\saveas.png" />
     <Resource Include="imgs\startdebugging.png" />
+    <Resource Include="imgs\stop.png" />
     <Resource Include="imgs\stopdebugging.png" />
+    <Resource Include="imgs\type.png" />
     <Resource Include="imgs\undo.png" />
     <Resource Include="imgs\variables.png" />
   </ItemGroup>
