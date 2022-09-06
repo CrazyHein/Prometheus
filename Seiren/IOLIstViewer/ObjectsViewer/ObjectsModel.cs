@@ -12,6 +12,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
     public class ObjectsModel : RecordContainerModel
     {
         private ObjectDictionary __object_dictionary;
+        private VariablesModel __varialble_model_source;
+        private ControllerConfigurationModel __controller_configuration_model_source;
         public VariableDictionary Variables { get; private set; }
         public ControllerConfiguration ControllerConfiguration { get; private set; }
         private ObservableCollection<ObjectModel> __objects;
@@ -57,12 +59,14 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             InterlockLogics?.CommitChanges();
             SubsModified = false;
         }
-        public ObjectsModel(ObjectDictionary od, VariableDictionary vd, ControllerConfiguration cmc, OperatingHistory history)
+        public ObjectsModel(ObjectDictionary od, VariableDictionary vd, ControllerConfiguration cmc, VariablesModel vmodels, ControllerConfigurationModel cmodels, OperatingHistory history)
         {
             __object_dictionary = od;
             Variables = vd;
             ControllerConfiguration = cmc;
-            __objects = new ObservableCollection<ObjectModel>(od.ProcessObjects.Values.Select(o => new ObjectModel(o)));
+            __varialble_model_source = vmodels;
+            __controller_configuration_model_source = cmodels;
+            __objects = new ObservableCollection<ObjectModel>(od.ProcessObjects.Values.Select(o => new ObjectModel(o, od.IsUnused(o.Index))));
             Objects = __objects;
             Modified = false;
             OperatingHistory = history;
@@ -103,6 +107,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             Modified = true;
             if (log && OperatingHistory != null)
                 OperatingHistory.PushOperatingRecord(new OperatingRecord() { Host = this, Operation = Operation.Add, OriginaPos = -1, NewPos = __objects.Count - 1, OriginalValue = null, NewValue = model });
+            __varialble_model_source.ReEvaluate(model.VariableName);
+            if (model.EnableBinding)
+                __controller_configuration_model_source.ReEvaluate(model.BindingDeviceName);
         }
 
         public ObjectModel RemoveAt(int index, bool log = true)
@@ -113,6 +120,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             Modified = true;
             if (log && OperatingHistory != null)
                 OperatingHistory.PushOperatingRecord(new OperatingRecord() { Host = this, Operation = Operation.Remove, OriginaPos = index, NewPos = -1, OriginalValue = model, NewValue = null });
+            __varialble_model_source.ReEvaluate(model.VariableName);
+            if (model.EnableBinding)
+                __controller_configuration_model_source.ReEvaluate(model.BindingDeviceName);
             return model;
         }
 
@@ -125,6 +135,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             Modified = true;
             if (log && OperatingHistory != null)
                 OperatingHistory.PushOperatingRecord(new OperatingRecord() { Host = this, Operation = Operation.Remove, OriginaPos = i, NewPos = -1, OriginalValue = o, NewValue = null });
+            __varialble_model_source.ReEvaluate(o.VariableName);
+            if (o.EnableBinding)
+                __controller_configuration_model_source.ReEvaluate(o.BindingDeviceName);
             return o;
         }
 
@@ -136,6 +149,19 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             Modified = true;
             if (log && OperatingHistory != null)
                 OperatingHistory.PushOperatingRecord(new OperatingRecord() { Host = this, Operation = Operation.Remove, OriginaPos = index, NewPos = -1, OriginalValue = model, NewValue = null });
+            __varialble_model_source.ReEvaluate(model.VariableName);
+            if (model.EnableBinding)
+                __controller_configuration_model_source.ReEvaluate(model.BindingDeviceName);
+        }
+
+        public bool IsUnused(uint index)
+        {
+            return __object_dictionary.IsUnused(index);
+        }
+
+        public void ReEvaluate(uint index)
+        {
+            __objects.First(o => o.Index == index).Unused = __object_dictionary.IsUnused(index);
         }
 
         public void Insert(int index, ObjectModel model, bool log = true)
@@ -152,6 +178,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             Modified = true;
             if (log && OperatingHistory != null)
                 OperatingHistory.PushOperatingRecord(new OperatingRecord() { Host = this, Operation = Operation.Insert, OriginaPos = -1, NewPos = index, OriginalValue = null, NewValue = model });
+            __varialble_model_source.ReEvaluate(model.VariableName);
+            if(model.EnableBinding)
+                __controller_configuration_model_source.ReEvaluate(model.BindingDeviceName);
         }
 
         public void Move(int srcIndex, int dstIndex, bool log = true)
@@ -193,6 +222,13 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             Modified = true;
             if (log && OperatingHistory != null)
                 OperatingHistory?.PushOperatingRecord(new OperatingRecord() { Host = this, Operation = Operation.Replace, OriginaPos = index, NewPos = index, OriginalValue = original, NewValue = newModel });
+            
+            __varialble_model_source.ReEvaluate(original.VariableName);
+            if (original.EnableBinding)
+                __controller_configuration_model_source.ReEvaluate(original.BindingDeviceName);
+            __varialble_model_source.ReEvaluate(newModel.VariableName);
+            if (newModel.EnableBinding)
+                __controller_configuration_model_source.ReEvaluate(newModel.BindingDeviceName);
             //Notify others here
             if (original.VariableDataType == "BIT")
             {
@@ -226,6 +262,13 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             Modified = true;
             if (log && OperatingHistory != null)
                 OperatingHistory?.PushOperatingRecord(new OperatingRecord() { Host = this, Operation = Operation.Replace, OriginaPos = index, NewPos = index, OriginalValue = originalModel, NewValue = newModel });
+            
+            __varialble_model_source.ReEvaluate(originalModel.VariableName);
+            if (originalModel.EnableBinding)
+                __controller_configuration_model_source.ReEvaluate(originalModel.BindingDeviceName);
+            __varialble_model_source.ReEvaluate(newModel.VariableName);
+            if (newModel.EnableBinding)
+                __controller_configuration_model_source.ReEvaluate(newModel.BindingDeviceName);
             //Notify others here
             //TxDiagnosticObjects?.UpdateProcessData(originalModel.Index, newModel.Index);
             //TxBitObjects?.UpdateProcessData(originalModel.Index, newModel.Index);
@@ -269,7 +312,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             {
                 if (__objects[i].VariableName == origin)
                 {
-                    __objects[i] = new ObjectModel(__object_dictionary.ProcessObjects[__objects[i].Index]);
+                    __objects[i] = new ObjectModel(__object_dictionary.ProcessObjects[__objects[i].Index], __objects[i].Unused);
                     Modified = true;
                 }
             }
@@ -287,7 +330,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             {
                 if (__objects[i].EnableBinding && __objects[i].BindingDeviceName == origin)
                 {
-                    __objects[i] = new ObjectModel(__object_dictionary.ProcessObjects[__objects[i].Index]);
+                    __objects[i] = new ObjectModel(__object_dictionary.ProcessObjects[__objects[i].Index], __objects[i].Unused);
                     Modified = true;
                 }
             }
@@ -359,6 +402,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         {
             return new ObjectModel()
             {
+                Unused = this.Unused,
                 Index = this.Index,
                 VariableName = this.VariableName,
                 VariableDataType = this.VariableDataType,
@@ -378,8 +422,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             };
         }
 
-        public ObjectModel(ProcessObject o)
+        public ObjectModel(ProcessObject o, bool unused)
         {
+            __unused = unused;
             __index = o.Index;
             __variable_name = o.Variable.Name;
             __variable_data_type = o.Variable.Type.Name;
@@ -408,6 +453,13 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
 
         public ObjectModel()
         { }
+
+        private bool __unused = true;
+        public bool Unused
+        {
+            get { return __unused; }
+            set { __unused = value; _notify_property_changed(); }
+        }
 
         private uint __index;
         public uint Index 

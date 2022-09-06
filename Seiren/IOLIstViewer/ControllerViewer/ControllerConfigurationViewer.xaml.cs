@@ -1,5 +1,6 @@
 ﻿using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia;
 using Syncfusion.UI.Xaml.Grid;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
@@ -164,6 +165,87 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             {
                 __loading_dialog = new LoadingIndicator();
                 __loading_dialog.ShowIndicator();
+            }
+        }
+
+        private void RemoveUnusedCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            var m = DataContext as ControllerConfigurationModel;
+            List<DeviceConfigurationModel> unused = new List<DeviceConfigurationModel>();
+            foreach (var d in m.DeviceConfigurations)
+            {
+                if (m.IsUnused(d.ReferenceName))
+                    unused.Add(d);
+            }
+            if (unused.Count == 0)
+            {
+                MessageBox.Show("There's no record that fits the criteria.", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+            foreach (var d in unused)
+            {
+                var res = MessageBox.Show("Are you sure you want to remove the record :\n" + d.ToString(), "Question", MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
+                if (res == MessageBoxResult.Yes)
+                {
+                    try
+                    {
+                        (DataContext as ControllerConfigurationModel).Remove(d);
+                    }
+                    catch (LombardiaException ex)
+                    {
+                        MessageBox.Show("At least one exception has occurred during the operation :\n" + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                }
+                else if (res == MessageBoxResult.Cancel)
+                    break;
+            }
+        }
+
+        private void RemoveAllUnusedCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            var m = DataContext as ControllerConfigurationModel;
+            string record = string.Empty;
+            List<DeviceConfigurationModel> unused = new List<DeviceConfigurationModel>();
+            foreach (var d in m.DeviceConfigurations)
+            {
+                if (m.IsUnused(d.ReferenceName))
+                    unused.Add(d);
+            }
+            if (unused.Count == 0)
+            {
+                MessageBox.Show("There's no record that fits the criteria.", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+            else if (unused.Count == 1)
+                record = unused[0].ToString();
+            else
+            {
+                int i = 0;
+                for (i = 0; i < unused.Count; ++i)
+                {
+                    if (i >= 5)
+                        break;
+                    record += unused[i].ToString() + "\n";
+                }
+                if (i != unused.Count)
+                {
+                    record += "...\n";
+                    record += unused[unused.Count - 1].ToString() + "\n";
+                }
+            }
+            if (MessageBox.Show("Are you sure you want to remove the " + unused.Count.ToString() + " record(s) :\n" + record, "Question", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.No)
+                return;
+            foreach (var d in unused)
+            {
+                try
+                {
+                    (DataContext as ControllerConfigurationModel).Remove(d);
+                }
+                catch (LombardiaException ex)
+                {
+                    MessageBox.Show("At least one exception has occurred during the operation :\n" + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    break;
+                }
             }
         }
     }

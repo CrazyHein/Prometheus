@@ -28,8 +28,12 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
 
     public enum ReplaceMode
     {
-        Full, 
-        Half
+        Full,
+        //Half,
+        DeviceConfiguration,
+        Variable,
+        ProcessObject,
+        ProcessData
     }
 
     public enum LogicOperator

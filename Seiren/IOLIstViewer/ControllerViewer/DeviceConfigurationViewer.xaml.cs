@@ -29,7 +29,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                 LocalAddress = model.LocalAddress,
                 IPv4 = model.IPv4,
                 Port = model.Port,
-                ReferenceName = model.ReferenceName
+                ReferenceName = model.ReferenceName,
+                Unused = model.Unused
             };
             __input_mode = mode;
             __insert_index = insertIndex;

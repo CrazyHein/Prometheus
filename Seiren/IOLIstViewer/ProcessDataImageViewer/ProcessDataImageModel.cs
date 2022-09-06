@@ -182,6 +182,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             __objects_source.SubsModified = true;
             if (log && OperatingHistory != null)
                 OperatingHistory.PushOperatingRecord(new OperatingRecord() { Host = this, Operation = Operation.Add, OriginaPos = -1, NewPos = __process_data_models.Count - 1, OriginalValue = null, NewValue = model });
+            __objects_source.ReEvaluate(model.Index);
         }
 
         public ObjectModel RemoveAt(int index, bool log = true)
@@ -195,6 +196,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             __objects_source.SubsModified = true;
             if (log && OperatingHistory != null)
                 OperatingHistory.PushOperatingRecord(new OperatingRecord() { Host = this, Operation = Operation.Remove, OriginaPos = index, NewPos = -1, OriginalValue = model, NewValue = null });
+            __objects_source.ReEvaluate(model.Index);
             return model;
         }
 
@@ -209,6 +211,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             __objects_source.SubsModified = true;
             if (log && OperatingHistory != null)
                 OperatingHistory.PushOperatingRecord(new OperatingRecord() { Host = this, Operation = Operation.Remove, OriginaPos = index, NewPos = -1, OriginalValue = model, NewValue = null });
+            __objects_source.ReEvaluate(model.Index);
         }
 
         public void Insert(int index, ProcessDataModel model, bool log = true)
@@ -224,6 +227,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             __objects_source.SubsModified = true;
             if (log && OperatingHistory != null)
                 OperatingHistory.PushOperatingRecord(new OperatingRecord() { Host = this, Operation = Operation.Insert, OriginaPos = -1, NewPos = index, OriginalValue = null, NewValue = model });
+            __objects_source.ReEvaluate(model.Index);
         }
 
         public void Move(int srcIndex, int dstIndex, bool log = true)
@@ -350,7 +354,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
 
     public class ProcessDataModel : ObjectModel, IEquatable<ProcessDataModel>
     {
-        public ProcessDataModel(ProcessObject o, ProcessDataImageAccess access, ProcessDataImageLayout layout) : base(o)
+        public ProcessDataModel(ProcessObject o, ProcessDataImageAccess access, ProcessDataImageLayout layout) : base(o, true)
         {
             Access = access;
             Layout = layout;

@@ -488,5 +488,23 @@
 				<BitArea>16384</BitArea>
 			</RX>
 		</EthernetModel>
+		<EthernetModel>
+			<ID>0x2002</ID>
+			<Name>MOXA_SERIAL_PORT_SERVER</Name>
+			<TX>
+				<Raw>65535</Raw>
+				<BitArea>524280</BitArea>
+				<NodeInfo>10000</NodeInfo>
+				<ServerInfo>1</ServerInfo>
+				<ByteIndex>4294967295</ByteIndex>
+				<BitIndex>4294967295</BitIndex>
+			</TX>
+			<RX>
+				<Raw>65535</Raw>
+				<BitArea>524280</BitArea>
+				<ByteIndex>4294967295</ByteIndex>
+				<BitIndex>4294967295</BitIndex>
+			</RX>
+		</EthernetModel>
 	</EthernetModels>
 </AMECControllerModels>

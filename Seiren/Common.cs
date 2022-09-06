@@ -62,6 +62,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         public static RoutedUICommand LoadLayoutState { get; private set; }
         public static RoutedUICommand FindInInterlock { get; private set; }
         public static RoutedUICommand FindInProcessDataImage { get; private set; }
+        public static RoutedUICommand RemoveUnused { get; private set; }
+        public static RoutedUICommand RemoveAllUnused { get; private set; }
         public static RoutedUICommand ControllerRemoteOperation { get; private set; }
 
         static ConsoleControl()
@@ -224,6 +226,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
 
             FindInInterlock = new RoutedUICommand("Find In <Interlock Area>", "Find In <Interlock Area>", typeof(ConsoleControl));
             FindInProcessDataImage = new RoutedUICommand("Find In <Process Data Image Area>", "Find In <Process Data Image Area>", typeof(ConsoleControl));
+            RemoveUnused = new RoutedUICommand("Remove Unused", "Remove Unused", typeof(ConsoleControl));
+            RemoveAllUnused = new RoutedUICommand("Remove All Unused", "Remove All Unused", typeof(ConsoleControl));
 
             InputGestureCollection gestureControllerRemoteOperation = new InputGestureCollection
             {

@@ -194,7 +194,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
 
             __variables_viewer = new VariablesViewer(__variable_dictionary, __data_type_catalogue, __operating_history);
             __controller_configuration_viewer = new ControllerConfigurationViewer(__controller_configuration, __controller_model_catalogue, __operating_history);
-            __objects_viewer = new ObjectsViewer(__object_dictionary, __variable_dictionary, __controller_configuration,
+            __objects_viewer = new ObjectsViewer(__object_dictionary, __variable_dictionary, __controller_configuration, __variables_viewer.DataContext as VariablesModel, __controller_configuration_viewer.DataContext as ControllerConfigurationModel,
                 __tx_diagnostic_area, __tx_bit_area, __tx_block_area, __rx_control_area, __rx_bit_area, __rx_block_area, __interlock_area, __operating_history);
             __miscellaneous_viewer = new MiscellaneousViewer(__misc_info);
 

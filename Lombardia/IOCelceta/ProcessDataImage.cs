@@ -432,7 +432,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
         {
             Debug.Assert(this.ProcessObject == origin);
             Debug.Assert(this.ProcessObject.Variable.Type == newcome.Variable.Type);
-            var n =(Publisher as ProcessDataImage)?.Replace(this.ProcessObject, newcome.Index, ReplaceMode.Half);
+            var n =(Publisher as ProcessDataImage)?.Replace(this.ProcessObject, newcome.Index, ReplaceMode.ProcessObject);
             return n;
         }
 

@@ -249,8 +249,17 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
                 _subscribers.Remove(origin);
                 _subscribers[o] = subs;
             }
-            
-            if (mode == ReplaceMode.Full)
+            if(mode == ReplaceMode.Variable)
+            {
+                if (origin.Binding != null) __controller_configuration.RemoveSubscriber(origin.Binding.Device, origin);
+                if (o.Binding != null) __controller_configuration.AddSubscriber(o.Binding.Device, o);
+            }
+            else if(mode == ReplaceMode.DeviceConfiguration)
+            {
+                __variable_dictionary.RemoveSubscriber(origin.Variable, origin);
+                __variable_dictionary.AddSubscriber(o.Variable, o);
+            }
+            else if (mode == ReplaceMode.Full)
             {
                 __variable_dictionary.RemoveSubscriber(origin.Variable, origin);
                 __variable_dictionary.AddSubscriber(o.Variable, o);
@@ -265,6 +274,11 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
                 throw new LombardiaException(LOMBARDIA_ERROR_CODE_T.OBJECT_UNFOUND);
             Remove(o);
             return o;
+        }
+
+        public bool IsUnused(uint index)
+        {
+            return __process_objects.TryGetValue(index, out var o) == false ? true : _subscribers.ContainsKey(o) == false;
         }
 
         protected void Replace(uint index, ProcessObject o, ReplaceMode mode = ReplaceMode.Full)
@@ -411,7 +425,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
                 this.Index, newcome.Name,
                 this.Binding?.Device.ReferenceName, this.Binding?.ChannelName, this.Binding == null ? 0 : this.Binding.ChannelIndex,
                 this.Range, this.Converter,
-                ReplaceMode.Half);
+                ReplaceMode.Variable);
             return n;
         }
 
@@ -423,7 +437,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
                 this.Index, this.Variable.Name,
                 newcome.ReferenceName, this.Binding?.ChannelName, this.Binding == null ? 0 : this.Binding.ChannelIndex,
                 this.Range, this.Converter,
-                ReplaceMode.Half);
+                ReplaceMode.DeviceConfiguration);
             return n;
         }
 

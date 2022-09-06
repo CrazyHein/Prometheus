@@ -203,6 +203,11 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
             return variable;
         }
 
+        public bool IsUnused(string name)
+        {
+            return __variables.TryGetValue(name, out var variable) == false ? true :_subscribers.ContainsKey(variable) == false;
+        }
+
         protected void Add(Variable v)
         {
             if (__variables.TryAdd(v.Name, v) == false)

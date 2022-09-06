@@ -678,7 +678,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
                         targets.Append("0x").Append(t.ProcessObject.Index.ToString("X08"));
                     targets.Append("\r\n");
                 }
-                return Publisher.Replace(pos, this.Name, targets.ToString().TrimEnd(), Statement.Serialize(origin, newcome), ReplaceMode.Half);
+                return Publisher.Replace(pos, this.Name, targets.ToString().TrimEnd(), Statement.Serialize(origin, newcome), ReplaceMode.ProcessData);
             }
             else
                 return null;

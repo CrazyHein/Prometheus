@@ -2,7 +2,9 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Xml;
 
 namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
@@ -26,7 +28,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                     LocalAddress = c.LocalAddress,
                     IPv4 = c.IPv4,
                     Port = c.Port,
-                    ReferenceName = c.ReferenceName
+                    ReferenceName = c.ReferenceName,
+                    Unused = cc.IsUnused(c.ReferenceName)
                 }));
             DeviceConfigurations = __device_configurations;
             Modified = false;
@@ -62,6 +65,16 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             Modified = true;
             if (log && OperatingHistory != null)
                 OperatingHistory.PushOperatingRecord(new OperatingRecord() { Host = this, Operation = Operation.Remove, OriginaPos = index, NewPos = -1, OriginalValue = model, NewValue = null });
+        }
+
+        public bool IsUnused(string name)
+        {
+            return __controller_configuration_collection.IsUnused(name);
+        }
+
+        public void ReEvaluate(string name)
+        {
+            __device_configurations.First(o => o.ReferenceName == name).Unused = __controller_configuration_collection.IsUnused(name);
         }
 
         public void Insert(int index, DeviceConfigurationModel model, bool log = true)
@@ -226,8 +239,21 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         }
     }
 
-    public class DeviceConfigurationModel : IEquatable<DeviceConfigurationModel>
+    public class DeviceConfigurationModel : IEquatable<DeviceConfigurationModel>, INotifyPropertyChanged
     {
+        public event PropertyChangedEventHandler? PropertyChanged;
+        protected void _notify_property_changed([CallerMemberName] String propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        private bool __unused = true;
+        public bool Unused
+        {
+            get { return __unused; }
+            set { __unused = value; _notify_property_changed(); }
+        }
+
         public DeviceModel DeviceModel { get; set; } = new LocalExtensionModel();
         public ushort ID { get { return DeviceModel.ID; } }
         public string Name { get { return DeviceModel.Name; } }

@@ -2,7 +2,9 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 
 namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
 {
@@ -17,7 +19,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         {
             __variable_dictionary = dic;
             DataTypeCatalogue = dtc;
-            __variables = new ObservableCollection<VariableModel>(dic.Variables.Values.Select(v => new VariableModel { Name = v.Name, DataType = v.Type, Unit = v.Unit, Comment = v.Comment }));
+            __variables = new ObservableCollection<VariableModel>(dic.Variables.Values.Select(v => new VariableModel { Name = v.Name, DataType = v.Type, Unit = v.Unit, Comment = v.Comment, Unused = dic.IsUnused(v.Name) }));
             Variables = __variables;
             Modified = false;
             OperatingHistory = history;
@@ -52,6 +54,16 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             Modified = true;
             if (log && OperatingHistory != null)
                 OperatingHistory.PushOperatingRecord(new OperatingRecord(){ Host = this, Operation = Operation.Remove, OriginaPos = index, NewPos = -1, OriginalValue = model, NewValue = null });
+        }
+
+        public bool IsUnused(string name)
+        {
+            return __variable_dictionary.IsUnused(name);
+        }
+
+        public void ReEvaluate(string name)
+        {
+            __variables.First(o => o.Name == name).Unused = __variable_dictionary.IsUnused(name);
         }
 
         public void Insert(int index, VariableModel model, bool log = true)
@@ -177,8 +189,22 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         }
     }
 
-    public class VariableModel : IEquatable<VariableModel>
+    public class VariableModel : IEquatable<VariableModel>, INotifyPropertyChanged
     {
+        public event PropertyChangedEventHandler? PropertyChanged;
+        protected void _notify_property_changed([CallerMemberName] String propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+
+        private bool __unused = true;
+        public bool Unused
+        {
+            get { return __unused; }
+            set { __unused = value; _notify_property_changed(); }
+        }
+
         public string Name { get; set; } = "unnamed";
         public DataType DataType { get; set; } = new DataType();
         public string Unit { get; set; } = "N/A";

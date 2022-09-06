@@ -18,7 +18,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         {
             InitializeComponent();
             __variable_collection = models;
-            __result_variable_model = new VariableModel() { Name = model.Name, DataType = model.DataType, Unit = model.Unit, Comment = model.Comment };
+            __result_variable_model = new VariableModel() {Unused = model.Unused, Name = model.Name, DataType = model.DataType, Unit = model.Unit, Comment = model.Comment };
             __original_variable_model = model;
             __input_mode = mode;
             __insert_index = insertIndex;

@@ -3,6 +3,7 @@ using Syncfusion.UI.Xaml.Grid;
 using Syncfusion.Windows.Shared;
 using Syncfusion.Windows.Tools.Controls;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
@@ -26,13 +27,13 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         private InterlockCollectionViewer __interlock_viewer;
         private UserControl[] __process_data_image_controls;
 
-        public ObjectsViewer(ObjectDictionary od, VariableDictionary vd, ControllerConfiguration cmc,
+        public ObjectsViewer(ObjectDictionary od, VariableDictionary vd, ControllerConfiguration cmc, VariablesModel vmodels, ControllerConfigurationModel cmodels,
             ProcessDataImage txdiagnostic, ProcessDataImage txbit, ProcessDataImage txblock,
             ProcessDataImage rxcontrol, ProcessDataImage rxbit, ProcessDataImage rxblock,
             InterlockCollection interlock, OperatingHistory history = null)
         {
             InitializeComponent();
-            DataContext = new ObjectsModel(od, vd, cmc, history);
+            DataContext = new ObjectsModel(od, vd, cmc, vmodels, cmodels, history);
             MainViewer.RowDragDropController.DragStart += OnMainViewer_DragStart;
             MainViewer.RowDragDropController.DragOver += OnMainViewer_DragOver;
             MainViewer.RowDragDropController.Drop += OnMainViewer_Drop;
@@ -339,6 +340,87 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         private void FindInProcessDataImageCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
             e.CanExecute = MainViewer.SelectedItems.Count == 1;
+        }
+
+        private void RemoveUnusedCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            var m = DataContext as ObjectsModel;
+            List<ObjectModel> unused = new List<ObjectModel>();
+            foreach(var o in m.Objects)
+            {
+                if(m.IsUnused(o.Index))
+                    unused.Add(o);
+            }
+            if (unused.Count == 0)
+            {
+                MessageBox.Show("There's no record that fits the criteria.", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+            foreach (var o in unused)
+            {
+                var res = MessageBox.Show("Are you sure you want to remove the record :\n" + o.ToString(), "Question", MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
+                if (res == MessageBoxResult.Yes)
+                {
+                    try
+                    {
+                        (DataContext as ObjectsModel).Remove(o);
+                    }
+                    catch (LombardiaException ex)
+                    {
+                        MessageBox.Show("At least one exception has occurred during the operation :\n" + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                }
+                else if (res == MessageBoxResult.Cancel)
+                    break;
+            }
+        }
+
+        private void RemoveAllUnusedCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            var m = DataContext as ObjectsModel;
+            string record = string.Empty;
+            List<ObjectModel> unused = new List<ObjectModel>();
+            foreach (var o in m.Objects)
+            {
+                if (m.IsUnused(o.Index))
+                    unused.Add(o);
+            }
+            if (unused.Count == 0)
+            {
+                MessageBox.Show("There's no record that fits the criteria.", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+            else if (unused.Count == 1)
+                record = unused[0].ToString();
+            else
+            {
+                int i = 0;
+                for (i = 0; i < unused.Count; ++i)
+                {
+                    if (i >= 5)
+                        break;
+                    record += unused[i].ToString() + "\n";
+                }
+                if (i != unused.Count)
+                {
+                    record += "...\n";
+                    record += unused[unused.Count - 1].ToString() + "\n";
+                }
+            }
+            if (MessageBox.Show("Are you sure you want to remove the " + unused.Count.ToString() + " record(s) :\n" + record, "Question", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.No)
+                return;
+            foreach (var o in unused)
+            {
+                try
+                {
+                    (DataContext as ObjectsModel).Remove(o);
+                }
+                catch (LombardiaException ex)
+                {
+                    MessageBox.Show("At least one exception has occurred during the operation :\n" + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    break;
+                }
+            }  
         }
     }
 }

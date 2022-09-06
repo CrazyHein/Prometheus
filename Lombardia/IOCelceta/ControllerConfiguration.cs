@@ -181,6 +181,11 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
             return res;
         }
 
+        public bool IsUnused(string name)
+        {
+            return __configurations.TryGetValue(name, out var variable) == false ? true : _subscribers.ContainsKey(variable) == false;
+        }
+
         protected void Replace(DeviceConfiguration origin, DeviceConfiguration c)
         {
             if (_subscribers.ContainsKey(origin) && origin.DeviceModel != c.DeviceModel)

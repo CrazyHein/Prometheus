@@ -13,6 +13,8 @@
         <CommandBinding Command="local:ConsoleControl.InsertRecord" Executed="InsertRecordCommand_Executed" CanExecute="InsertRecordCommand_CanExecute"/>
         <CommandBinding Command="local:ConsoleControl.EditRecord" Executed="EditRecordCommand_Executed" CanExecute="EditRecordCommand_CanExecute"/>
         <CommandBinding Command="local:ConsoleControl.RemoveRecord" Executed="RemoveRecordCommand_Executed" CanExecute="EditRecordCommand_CanExecute"/>
+        <CommandBinding Command="local:ConsoleControl.RemoveUnused" Executed="RemoveUnusedCommand_Executed"/>
+        <CommandBinding Command="local:ConsoleControl.RemoveAllUnused" Executed="RemoveAllUnusedCommand_Executed"/>
     </UserControl.CommandBindings>
     <UserControl.Resources>
         <ContextMenu x:Key="GridContextMenu">
@@ -31,6 +33,8 @@
                     <Image Source="/imgs/remove.png" Height="20" Margin="4"/>
                 </MenuItem.Icon>
             </MenuItem>
+            <MenuItem Command="local:ConsoleControl.RemoveUnused" ToolTip="Remove device configuration which is not used in &lt;Object Dictionary Area&gt;"/>
+            <MenuItem Command="local:ConsoleControl.RemoveAllUnused" ToolTip="Remove all device configurations which are not used in &lt;Object Dictionary Area&gt;"/>
         </ContextMenu>
         <DataTemplate x:Key="RecordDragDropTemplate">
             <Border Padding="4" Background="#ececec" BorderBrush="#c8c8c8" BorderThickness="1.2">
@@ -101,6 +105,12 @@
                          LiveDataUpdateMode="AllowDataShaping"
                          CellDoubleTapped="MainViewer_CellDoubleTapped" 
                          RecordContextMenu="{StaticResource GridContextMenu}">
+            <sync:SfDataGrid.Resources>
+                <local:BooleanValueIndicator False="Transparent" True="LightGoldenrodYellow" x:Key="converter"/>
+                <Style TargetType="sync:VirtualizingCellsControl">
+                    <Setter Property="Background" Value="{Binding Path=Unused, Converter={StaticResource converter}}" />
+                </Style>
+            </sync:SfDataGrid.Resources>
             <sync:SfDataGrid.Columns>
                 <sync:GridTextColumn DisplayBinding="{Binding ID, StringFormat='0x{0:X04}'}" HeaderText="ID"/>
                 <sync:GridTextColumn DisplayBinding="{Binding Name}" HeaderText="Name"/>
@@ -109,6 +119,7 @@
                 <sync:GridTextColumn DisplayBinding="{Binding IPv4}" HeaderText="Remote IPv4"/>
                 <sync:GridTextColumn DisplayBinding="{Binding Port}" HeaderText="Remote Port"/>
                 <sync:GridTextColumn DisplayBinding="{Binding ReferenceName}" HeaderText="Reference Name"/>
+                <sync:GridCheckBoxColumn ValueBinding="{Binding Unused}" AllowEditing="False" HeaderText="Unused"/>
             </sync:SfDataGrid.Columns>
         </sync:SfDataGrid>
     </DockPanel>
