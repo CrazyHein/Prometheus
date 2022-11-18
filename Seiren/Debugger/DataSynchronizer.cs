@@ -279,6 +279,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Debugger
                 if (__process_data[i].access == DataSyncMode.Write)
                 {
                     __process_data[i].data.CopyTo(datas[i], 0);
+                    __process_data[i].data.CopyTo(__internal_process_data[i], 0);
                 }
             }
         }

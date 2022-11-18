@@ -133,7 +133,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
 
         private void DefaultRecordCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            __default_variable_model = MainViewer.SelectedItem as VariableModel;
+            var model = MainViewer.SelectedItem as VariableModel;
+            __default_variable_model = new VariableModel() { Unused = true, Name = model.Name, DataType = model.DataType, Unit = model.Unit, Comment = model.Comment };
         }
 
         private void MainViewer_CellDoubleTapped(object sender, GridCellDoubleTappedEventArgs e)

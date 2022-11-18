@@ -19,7 +19,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
             ProcessObjects = __process_objects;
             __variable_dictionary = variableDictionary;
             __controller_configuration = controllerConfiguration;
-            ProcessObject.Publisher = this;
+            //ProcessObject.Publisher = this;
         }
 
         public ObjectDictionary(VariableDictionary variableDictionary, ControllerConfiguration controllerConfiguration, XmlNode objectsNode)
@@ -27,7 +27,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
             __variable_dictionary = variableDictionary;
             __controller_configuration = controllerConfiguration;
             ProcessObjects = __load_objects(objectsNode);
-            ProcessObject.Publisher = this;
+            //ProcessObject.Publisher = this;
         }
 
         public ProcessObject InspectProcessObject(uint index, string name, string? deviceName, string? channelName, uint channelIndex, ValueRange? vr, ValueConverter? vc)
@@ -38,7 +38,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
             DeviceBinding b = null;
             if (deviceName != null)
                 b = InspectDeviceBinding(deviceName, channelName, channelIndex);
-            return new ProcessObject() { Index = index, Variable = v, Binding = b, Range = vr, Converter = vc };
+            return new ProcessObject() { Index = index, Variable = v, Binding = b, Range = vr, Converter = vc, Publisher = this };
         }
 
         public Variable InspectVariable(string? name)
@@ -79,7 +79,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
 
                         if (__process_objects.ContainsKey(index))
                             throw new LombardiaException(LOMBARDIA_ERROR_CODE_T.DUPLICATED_OBJECT_INDEX);
-                        __process_objects[index] = new ProcessObject{ Index = index, Variable = variable, Binding = binding, Range = range, Converter = converter };
+                        __process_objects[index] = new ProcessObject{ Index = index, Variable = variable, Binding = binding, Range = range, Converter = converter, Publisher = this };
                         __variable_dictionary.AddSubscriber(variable, __process_objects[index]);
                         if (binding != null)
                             __controller_configuration.AddSubscriber(binding.Device, __process_objects[index]);
@@ -296,7 +296,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
             DeviceBinding b = null;
             if (deviceName != null)
                 b = InspectDeviceBinding(deviceName, channelName, channelIndex);
-            ProcessObject o = new ProcessObject() { Index = index, Variable = v, Binding = b, Range = vr, Converter = vc };
+            ProcessObject o = new ProcessObject() { Index = index, Variable = v, Binding = b, Range = vr, Converter = vc, Publisher = this };
             Replace(origin, o, mode);
             return o;
         }
@@ -455,7 +455,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
         public ValueRange? Range { get; init; }
         public ValueConverter? Converter { get; init; }
 
-        public static Publisher<ProcessObject>? Publisher { get; set; }
+        public Publisher<ProcessObject>? Publisher { get; set; }
     }
 
     public record DeviceBinding(DeviceConfiguration Device, string ChannelName, uint ChannelIndex)

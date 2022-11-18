@@ -73,21 +73,6 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             Name = "Object Dictionary";
         }
 
-        protected ProcessObject _create_process_object(ObjectModel model)
-        {
-            Variable v = __object_dictionary.InspectVariable(model.VariableName);
-            DeviceBinding b = null;
-            if (model.EnableBinding)
-                b = __object_dictionary.InspectDeviceBinding(model.BindingDeviceName, model.BindingChannelName, model.BindingChannelIndex);
-            ValueRange r = null;
-            if (model.EnableValueRange)
-                r = new ValueRange(model.ValueRangeUp, model.ValueRangeDown);
-            ValueConverter c = null;
-            if (model.EnableValueConverter)
-                c = new ValueConverter(model.ValueConverterUp, model.ValueConverterDown);
-            return new ProcessObject{ Index = model.Index, Variable = v, Binding = b, Range = r, Converter = c };
-        }
-
         protected (uint Index, string VariableName, string BindingDeviceName, string BindingChannelName, uint BindingChannelIndex, 
             ValueRange Range, ValueConverter Converter) _process_object_property(ObjectModel model)
         {

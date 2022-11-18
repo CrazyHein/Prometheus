@@ -416,7 +416,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
             StringBuilder tabs = new StringBuilder();
             for (int i = 0; i < Layer; i++)
                 tabs.Append("    ");
-            return tabs.Append("0x").Append(Operand.ToString()).Append("\r\n").ToString();
+            return tabs.Append("∟").Append(Operand.ToString()).Append("\r\n").ToString();
         }
     }
 

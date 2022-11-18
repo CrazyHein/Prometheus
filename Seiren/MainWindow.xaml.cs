@@ -986,7 +986,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                 else
                     sb.Append("\t\t✖\n");
 
-                sb.Append("miscellaneous");
+                sb.Append("Miscellaneous");
                 if (__misc_info.IsEquivalent(target.misc))
                     sb.Append("\t\t✔\n");
                 else
