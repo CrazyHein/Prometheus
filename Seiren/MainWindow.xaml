@@ -249,7 +249,7 @@
                 </sync:MenuItemAdv>
             </sync:MenuItemAdv>
             <sync:MenuItemAdv  Header="_Run" Margin="2">
-                <sync:MenuItemAdv Command="local:ConsoleControl.StartDebugging" ToolTip="Start Monitoring">
+                <sync:MenuItemAdv Command="local:ConsoleControl.StartMonitoring" ToolTip="Start Monitoring">
                     <sync:MenuItemAdv.Icon>
                         <Image Source="imgs/startmonitoring.png" Height="28" Width="28"/>
                     </sync:MenuItemAdv.Icon>

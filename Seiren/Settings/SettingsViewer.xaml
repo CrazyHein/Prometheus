@@ -132,7 +132,7 @@
                             <sync:SfTextInputLayout Hint="Receive Timeout (ms)"  FontSize="12" FontStyle="Italic" ContainerType="Filled" Margin="4" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}">
                                 <TextBox FontStyle="Normal" Text="{Binding ReceiveTimeoutValue, ValidatesOnExceptions=True, NotifyOnValidationError=True}" />
                             </sync:SfTextInputLayout>
-                            <sync:SfTextInputLayout Hint="Send Buffer (bytes)"  FontSize="12" FontStyle="Italic" ContainerType="Filled" Margin="4" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}">
+                            <sync:SfTextInputLayout Hint="Send Buffer (byte)"  FontSize="12" FontStyle="Italic" ContainerType="Filled" Margin="4" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}">
                                 <TextBox FontStyle="Normal" Text="{Binding SendBufferSize, ValidatesOnExceptions=True, NotifyOnValidationError=True}" />
                             </sync:SfTextInputLayout>
                             <sync:SfTextInputLayout Hint="Receive Buffer (byte)"  FontSize="12" FontStyle="Italic" ContainerType="Filled" Margin="4" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}">
