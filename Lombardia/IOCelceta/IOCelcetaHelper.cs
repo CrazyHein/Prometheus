@@ -149,6 +149,27 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
             return (variables, cc, od, txdiag, txbit, txblk, rxctl, rxbit, rxblk, intlk, misc);
         }
 
+        public static (ControllerConfiguration, ObjectDictionary,
+            ProcessDataImage, ProcessDataImage, ProcessDataImage,
+            ProcessDataImage, ProcessDataImage, ProcessDataImage, InterlockCollection,
+            Miscellaneous) Default(DataTypeCatalogue dataTypes, ControllerModelCatalogue models, VariableDictionary variables)
+        {
+            Miscellaneous misc = new Miscellaneous();
+            ControllerConfiguration cc = new ControllerConfiguration(models);
+            ObjectDictionary od = new ObjectDictionary(variables, cc);
+            Dictionary<ProcessObject, ProcessData> hash = new Dictionary<ProcessObject, ProcessData>();
+            ProcessDataImage txdiag = new ProcessDataImage(od, hash, ProcessDataImageLayout.System, ProcessDataImageAccess.TX);
+            ProcessDataImage txbit = new ProcessDataImage(od, hash, ProcessDataImageLayout.Bit, ProcessDataImageAccess.TX);
+            ProcessDataImage txblk = new ProcessDataImage(od, hash, ProcessDataImageLayout.Block, ProcessDataImageAccess.TX);
+            ProcessDataImage rxctl = new ProcessDataImage(od, hash, ProcessDataImageLayout.System, ProcessDataImageAccess.RX);
+            ProcessDataImage rxbit = new ProcessDataImage(od, hash, ProcessDataImageLayout.Bit, ProcessDataImageAccess.RX);
+            ProcessDataImage rxblk = new ProcessDataImage(od, hash, ProcessDataImageLayout.Block, ProcessDataImageAccess.RX);
+            InterlockCollection intlk = new InterlockCollection(od, txbit, rxbit);
+            txbit.Associated = rxbit;
+            rxbit.Associated = txbit;
+            return (cc, od, txdiag, txbit, txblk, rxctl, rxbit, rxblk, intlk, misc);
+        }
+
         public static byte[] Save(string path,
             VariableDictionary variables, IEnumerable<string> variableNames,
             ControllerConfiguration cc, IEnumerable<string> configurationNames,

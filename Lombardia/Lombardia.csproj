@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
@@ -6,7 +6,7 @@
     <RootNamespace>AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia</RootNamespace>
     <Authors>CrazyHein</Authors>
     <Company>AMEC</Company>
-    <Version>0.8.0</Version>
+    <Version>0.9.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
