@@ -1,4 +1,5 @@
 ﻿using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia;
+using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility;
 using Syncfusion.UI.Xaml.Grid;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -259,6 +260,63 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                     MessageBox.Show("At least one exception has occurred during the operation :\n" + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                     break;
                 }
+            }
+        }
+
+        public void AddEtherCATVariable(EtherCATVariableInfo info, EtherCATVaribleDataTypeConverter types)
+        {
+            DataType dt;
+            if (types.DataTypeDictionary.ContainsKey(info.VariableDataType))
+                dt = types.DataTypeDictionary[info.VariableDataType];
+            else
+            {
+                MessageBox.Show("Unable to infer data type of the EtherCAT variable.\nThe default data type will be applied.", "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
+                dt = types.DefaultLombardiaDataType;
+            }
+            string comment = $"$ECATVAR${info.SlaveAddr:D04}${info.VariableBitSize:D04}${info.VariableLocalBitOffset:D04}$\n{info.SlaveFullName}.{info.PDOFullName}.{info.VariableName})";
+            VariableViewer wnd = new VariableViewer(DataContext as VariablesModel, new VariableModel() { DataType = dt, Name = info.VariableName.Trim(), Comment = comment}, InputDialogDisplayMode.Add);
+            wnd.WindowStartupLocation = WindowStartupLocation.CenterScreen;
+            if (wnd.ShowDialog() == true)
+            {
+                MainViewer.SelectedItem = wnd.Result;
+                var line = MainViewer.ResolveToRowIndex(MainViewer.SelectedItem);
+                if (line != -1)
+                    MainViewer.ScrollInView(new Syncfusion.UI.Xaml.ScrollAxis.RowColumnIndex(line, MainViewer.ResolveToStartColumnIndex()));
+            }
+        }
+
+        public void AddEtherCATVariables(IEnumerable<EtherCATVariableInfo> infos, EtherCATVaribleDataTypeConverter types, bool rename)
+        {
+            DataType dt;
+            string originalName;
+            string revisedName;
+            int i = 0;
+            try
+            {
+                foreach (var info in infos)
+                {
+                    originalName = info.VariableName.Trim();
+                    revisedName = originalName;
+                    i = 0;
+                    while (rename && (DataContext as VariablesModel).Contains(revisedName))
+                    {
+                        revisedName = originalName + $"({i})";
+                        i++;
+                    }
+                    if (types.DataTypeDictionary.ContainsKey(info.VariableDataType))
+                        dt = types.DataTypeDictionary[info.VariableDataType];
+                    else
+                        dt = types.DefaultLombardiaDataType;
+
+                    string comment = $"$ECATVAR${info.SlaveAddr:D04}${info.VariableBitSize:D04}${info.VariableLocalBitOffset:D04}$\n{info.SlaveFullName}.{info.PDOFullName}.{info.VariableName})";
+
+                    (DataContext as VariablesModel).Add(new VariableModel() { Name = revisedName, DataType = dt, Comment = comment });
+                }
+            }
+            catch (LombardiaException ex)
+            {
+                MessageBox.Show("At least one exception has occurred during the operation :\n" + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
             }
         }
     }

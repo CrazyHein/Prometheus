@@ -65,6 +65,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         private OperatingHistory __operating_history;
         private RecentlyOpened __recently_opened;
 
+        private EtherCATPDOViewer __ecat_pdo_viewer;
+        private EtherCATVaribleDataTypeConverter __ecat_variable_datatype_converter;
+
         #region Properties
         /// <summary>
         /// Gets or sets the current visual style.
@@ -145,6 +148,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                 DeviceModels.Content = __device_models_viewer;
 
                 __user_interface_synchronizer = new UserInterfaceSynchronizer(this, __ui_data_refresh_handler);
+
+                __ecat_variable_datatype_converter = new EtherCATVaribleDataTypeConverter(__data_type_catalogue);
             }
             catch (LombardiaException ex)
             {
@@ -919,6 +924,30 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             e.CanExecute = __main_model.IsOffline;
         }
 
+        private void BrowseEtherCATPDOs_Executed(object sender, System.Windows.Input.ExecutedRoutedEventArgs e)
+        {
+            System.Windows.Forms.OpenFileDialog open = new System.Windows.Forms.OpenFileDialog();
+            open.Filter = "EtherCAT-Network-Information Files(*.xml)|*.xml";
+            open.Multiselect = false;
+            if (open.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                try
+                {
+                    __ecat_pdo_viewer = new EtherCATPDOViewer(new ENIUtilityModel(open.FileName), this);
+                    __ecat_pdo_viewer.Show();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("At least one exception has occurred during the operation :\n" + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+        }
+
+        private void BrowseEtherCATPDOs_CanExecuted(object sender, System.Windows.Input.CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = __ecat_pdo_viewer == null || __ecat_pdo_viewer.IsClosed;
+        }
+
         private string __compare_result((VariableDictionary vd, ControllerConfiguration cc, ObjectDictionary od,
                     ProcessDataImage txdiag, ProcessDataImage txbit, ProcessDataImage txblk,
                     ProcessDataImage rxctl, ProcessDataImage rxbit, ProcessDataImage rxblk, InterlockCollection intlk,
@@ -1013,6 +1042,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                         e.Cancel = true;
                 }
             }
+            if (e.Cancel == false && __ecat_pdo_viewer != null)
+                __ecat_pdo_viewer.Close();
         }
 
         private void UndoMenuItemAdv_Click(object sender, RoutedEventArgs e)
@@ -1102,6 +1133,22 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                 else
                     e.Effects = DragDropEffects.Copy;
             }
+        }
+
+        public void AddEtherCATVariable(EtherCATVariableInfo info)
+        {
+            if (__variables_viewer != null)
+                __variables_viewer.AddEtherCATVariable(info, __ecat_variable_datatype_converter);
+            else
+                MessageBox.Show("Perhaps you should first create a new file or open an existing one.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+
+        public void AddEtherCATVariables(IEnumerable<EtherCATVariableInfo> infos)
+        {
+            if (__variables_viewer != null)
+                __variables_viewer.AddEtherCATVariables(infos, __ecat_variable_datatype_converter, true);
+            else
+                MessageBox.Show("Perhaps you should first create a new file or open an existing one.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
 }

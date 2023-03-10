@@ -490,7 +490,12 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             }
         }
         public string? BindingChannelName { get; set; }
-        public uint BindingChannelIndex { get; set; }
+        private uint __binding_channel_index;
+        public uint BindingChannelIndex 
+        { 
+            get { return __binding_channel_index; }
+            set { __binding_channel_index = value;  _notify_property_changed(); } 
+        }
         public bool EnableValueRange { get; set; }
         public string? ValueRangeUp { get; set; } = "1000";
         public string? ValueRangeDown { get; set; } = "0";
