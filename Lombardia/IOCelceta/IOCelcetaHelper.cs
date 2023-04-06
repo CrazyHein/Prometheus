@@ -1,6 +1,7 @@
 ﻿using Spire.Xls;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.IO;
 using System.Security.Cryptography;
 using System.Xml;
@@ -12,6 +13,22 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
         public static uint SupportedFileFormatVersion { get; private set; } = 1;
         public static uint SupportedVariableFileFormatVersion { get; private set; } = VariableDictionary.SupportedFileFormatVersion;
         public static uint SupportedIOFileFormatVersion { get; private set; } = 1;
+
+        public enum WorksheetSelection : uint
+        {
+            VARIABLE_DICTIONARY = 0x00000001,
+            CONTROLLER_CONFIGURATION = 0x00000002,
+            OBJECT_DICTIONARY = 0x00000004,
+            TX_DIAGNOSTIC_AREA = 0x00000008,
+            TX_BIT_AREA = 0x00000010,
+            TX_BLOCK_AREA = 0x00000020,
+            RX_CONTROL_AREA = 0x00000040,
+            RX_BIT_AREA = 0x00000080,
+            RX_BLOCK_AREA = 0x00000100,
+            INTERLOCK_AREA = 0x00000200,
+            MISCELLANEOUS_AREA = 0x00000400,
+            COMMON_USED_AREA = CONTROLLER_CONFIGURATION | TX_BIT_AREA | TX_BLOCK_AREA | RX_BIT_AREA | RX_BLOCK_AREA | INTERLOCK_AREA | MISCELLANEOUS_AREA
+        }
 
         public static VariableDictionary Import(string variableDictionary, DataTypeCatalogue dataTypes, out byte[] md5code)
         {
@@ -295,7 +312,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
             ObjectDictionary od, IEnumerable<uint> objectIndexes,
             ProcessDataImage txdiag, ProcessDataImage txbit, ProcessDataImage txblk,
             ProcessDataImage rxctl, ProcessDataImage rxbit, ProcessDataImage rxblk, InterlockCollection intlk,
-            Miscellaneous misc)
+            Miscellaneous misc, WorksheetSelection selection)
         {
             bool res = IOCelcetaHelper.OVERLAP_DETECTOR(new List<(uint, uint)>()
             {
@@ -326,29 +343,64 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
                 content.HorizontalAlignment = HorizontalAlignType.Left;
 
                 xlsxWorkbook.Worksheets.Clear();
-                Worksheet sheet = xlsxWorkbook.Worksheets.Add("Variable Dictionary");
-                variables.Save(sheet, title, content, variableNames);
-                sheet = xlsxWorkbook.Worksheets.Add("Controller Configuration");
-                cc.Save(sheet, title, content, configurationNames);
-                sheet = xlsxWorkbook.Worksheets.Add("Object Dictionary");
-                od.Save(sheet, title, content, objectIndexes);
-                sheet = xlsxWorkbook.Worksheets.Add("Tx Diagnotic Area");
-                txdiag.Save(sheet, title, content);
-                sheet = xlsxWorkbook.Worksheets.Add("Tx Bit Area");
-                txbit.Save(sheet, title, content);
-                sheet = xlsxWorkbook.Worksheets.Add("Tx Block Area");
-                txblk.Save(sheet, title, content);
-                sheet = xlsxWorkbook.Worksheets.Add("Rx Control Area");
-                rxctl.Save(sheet, title, content);
-                sheet = xlsxWorkbook.Worksheets.Add("Rx Bit Area");
-                rxbit.Save(sheet, title, content);
-                sheet = xlsxWorkbook.Worksheets.Add("Rx Block Area");
-                rxblk.Save(sheet, title, content);
-                sheet = xlsxWorkbook.Worksheets.Add("Interlock Logic Area");
-                intlk.Save(sheet, title, content);
-                sheet = xlsxWorkbook.Worksheets.Add("Miscellaneous");
-                misc.Save(sheet, title, content);
 
+                Worksheet sheet = xlsxWorkbook.Worksheets.Add($"Created by {System.Reflection.Assembly.GetAssembly(typeof(IOCelcetaHelper)).GetName().Name}({System.Reflection.Assembly.GetAssembly(typeof(IOCelcetaHelper)).GetName().Version})");
+
+                if ((selection & WorksheetSelection.VARIABLE_DICTIONARY) != 0)
+                {
+                    sheet = xlsxWorkbook.Worksheets.Add("Variable Dictionary");
+                    variables.Save(sheet, title, content, variableNames);
+                }
+                if ((selection & WorksheetSelection.CONTROLLER_CONFIGURATION) != 0)
+                {
+                    sheet = xlsxWorkbook.Worksheets.Add("Controller Configuration");
+                    cc.Save(sheet, title, content, configurationNames);
+                }
+                if ((selection & WorksheetSelection.OBJECT_DICTIONARY) != 0)
+                {
+                    sheet = xlsxWorkbook.Worksheets.Add("Object Dictionary");
+                    od.Save(sheet, title, content, objectIndexes);
+                }
+                if ((selection & WorksheetSelection.TX_DIAGNOSTIC_AREA) != 0)
+                {
+                    sheet = xlsxWorkbook.Worksheets.Add("Tx Diagnostic Area");
+                    txdiag.Save(sheet, title, content);
+                }
+                if ((selection & WorksheetSelection.TX_BIT_AREA) != 0)
+                {
+                    sheet = xlsxWorkbook.Worksheets.Add("Tx Bit Area");
+                    txbit.Save(sheet, title, content);
+                }
+                if ((selection & WorksheetSelection.TX_BLOCK_AREA) != 0)
+                {
+                    sheet = xlsxWorkbook.Worksheets.Add("Tx Block Area");
+                    txblk.Save(sheet, title, content);
+                }
+                if ((selection & WorksheetSelection.RX_CONTROL_AREA) != 0)
+                {
+                    sheet = xlsxWorkbook.Worksheets.Add("Rx Control Area");
+                    rxctl.Save(sheet, title, content);
+                }
+                if ((selection & WorksheetSelection.RX_BIT_AREA) != 0)
+                {
+                    sheet = xlsxWorkbook.Worksheets.Add("Rx Bit Area");
+                    rxbit.Save(sheet, title, content);
+                }
+                if ((selection & WorksheetSelection.RX_BLOCK_AREA) != 0)
+                {
+                    sheet = xlsxWorkbook.Worksheets.Add("Rx Block Area");
+                    rxblk.Save(sheet, title, content);
+                }
+                if ((selection & WorksheetSelection.INTERLOCK_AREA) != 0)
+                {
+                    sheet = xlsxWorkbook.Worksheets.Add("Interlock Logic Area");
+                    intlk.Save(sheet, title, content);
+                }
+                if ((selection & WorksheetSelection.MISCELLANEOUS_AREA) != 0)
+                {
+                    sheet = xlsxWorkbook.Worksheets.Add("Miscellaneous");
+                    misc.Save(sheet, title, content);
+                }
                 if (sheetWriteProtectionPassword != null && sheetWriteProtectionPassword != "")
                     foreach (var s in xlsxWorkbook.Worksheets)
                         s.Protect(sheetWriteProtectionPassword, SheetProtectionType.LockedCells | SheetProtectionType.UnLockedCells);

@@ -154,7 +154,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility
         }
         public ushort SlaveAddr { get; init; }
         public string SlaveName { get; init; }
-        public string SlaveFullName { get { return $"[{SlaveAddr:D04}][Tx:{SlaveTxGlobalByteOffset}, Rx:{SlaveRxGlobalByteOffset}] {SlaveName}"; } }
+        public string SlaveFullName { get { return $"[{SlaveAddr:D05}][Tx:{SlaveTxGlobalByteOffset}, Rx:{SlaveRxGlobalByteOffset}] {SlaveName}"; } }
         public uint SlaveTxGlobalByteOffset { get; init; }
         public uint SlaveRxGlobalByteOffset { get; init; }
         public ushort PDOIndex { get; init; }
@@ -164,7 +164,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility
         public ushort VariableIndex { get; init; }
         public byte VariableSubIndex { get; init; }
 
-        public string VariableFullIndex { get { return $"0x{VariableIndex:X4}:{VariableSubIndex:D2}"; } }
+        public string VariableFullIndex { get { return $"0x{VariableIndex:X4}:{VariableSubIndex:X2}"; } }
         public string VariableName { get; init; }
         public string VariableDataType { get; init; }
         public ushort VariableBitSize { get; init; }
@@ -191,7 +191,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility
         public uint RxGlobalByteOffset { get; init; }
         public override string ToString()
         {
-            return $"[{Addr:D4}] {Name}";
+            return $"[{Addr:D5}] {Name}";
         }
     }
 

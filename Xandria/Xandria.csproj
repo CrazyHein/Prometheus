@@ -6,7 +6,7 @@
     <UseWPF>true</UseWPF>
     <UseWindowsForms>true</UseWindowsForms>
     <RootNamespace>AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Xandria</RootNamespace>
-    <Version>0.1.0</Version>
+    <Version>0.2.0</Version>
     <Company>AMEC</Company>
     <Authors>CrazyHein</Authors>
     <ApplicationIcon>imgs\logo.ico</ApplicationIcon>
@@ -16,6 +16,7 @@
     <None Remove="App.ico" />
     <None Remove="imgs\about.png" />
     <None Remove="imgs\add.png" />
+    <None Remove="imgs\cfg.png" />
     <None Remove="imgs\close.png" />
     <None Remove="imgs\cpu.png" />
     <None Remove="imgs\edit.png" />
@@ -94,6 +95,7 @@
     <Resource Include="App.ico" />
     <Resource Include="imgs\about.png" />
     <Resource Include="imgs\add.png" />
+    <Resource Include="imgs\cfg.png" />
     <Resource Include="imgs\close.png" />
     <Resource Include="imgs\cpu.png" />
     <Resource Include="imgs\edit.png" />

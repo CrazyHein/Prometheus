@@ -34,6 +34,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility
         private IEnumerable<uint> __object_indexes;
         private DataTypeCatalogue __data_type_catalogue;
         private ControllerModelCatalogue __controller_model_catalogue;
+        private IOCelcetaHelper.WorksheetSelection __worksheet_selection = IOCelcetaHelper.WorksheetSelection.COMMON_USED_AREA;
         public ImportExportModel(ImportExportMode mode,
             VariableDictionary vd, IEnumerable<string> variableNames, 
             ControllerConfiguration cc, IEnumerable<string> configurationNames, 
@@ -115,6 +116,128 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility
         public bool XMLVAR { get; set; } = true;
         public bool XMLIO { get; set; } = true;
 
+        public bool XlsExportVariableDictionary
+        {
+            get { return (__worksheet_selection & IOCelcetaHelper.WorksheetSelection.VARIABLE_DICTIONARY) != 0; }
+            set
+            {
+                if (value)
+                    __worksheet_selection |= IOCelcetaHelper.WorksheetSelection.VARIABLE_DICTIONARY;
+                else
+                    __worksheet_selection &= ~IOCelcetaHelper.WorksheetSelection.VARIABLE_DICTIONARY;
+            }
+        }
+        public bool XlsExportControllerConfiguration
+        {
+            get { return (__worksheet_selection & IOCelcetaHelper.WorksheetSelection.CONTROLLER_CONFIGURATION) != 0; }
+            set
+            {
+                if (value)
+                    __worksheet_selection |= IOCelcetaHelper.WorksheetSelection.CONTROLLER_CONFIGURATION;
+                else
+                    __worksheet_selection &= ~IOCelcetaHelper.WorksheetSelection.CONTROLLER_CONFIGURATION;
+            }
+        }
+        public bool XlsExportObjectDictionary
+        {
+            get { return (__worksheet_selection & IOCelcetaHelper.WorksheetSelection.OBJECT_DICTIONARY) != 0; }
+            set
+            {
+                if (value)
+                    __worksheet_selection |= IOCelcetaHelper.WorksheetSelection.OBJECT_DICTIONARY;
+                else
+                    __worksheet_selection &= ~IOCelcetaHelper.WorksheetSelection.OBJECT_DICTIONARY;
+            }
+        }
+        public bool XlsExportTxDiagnosticArea
+        {
+            get { return (__worksheet_selection & IOCelcetaHelper.WorksheetSelection.TX_DIAGNOSTIC_AREA) != 0; }
+            set
+            {
+                if (value)
+                    __worksheet_selection |= IOCelcetaHelper.WorksheetSelection.TX_DIAGNOSTIC_AREA;
+                else
+                    __worksheet_selection &= ~IOCelcetaHelper.WorksheetSelection.TX_DIAGNOSTIC_AREA;
+            }
+        }
+        public bool XlsExportTxBitArea
+        {
+            get { return (__worksheet_selection & IOCelcetaHelper.WorksheetSelection.TX_BIT_AREA) != 0; }
+            set
+            {
+                if (value)
+                    __worksheet_selection |= IOCelcetaHelper.WorksheetSelection.TX_BIT_AREA;
+                else
+                    __worksheet_selection &= ~IOCelcetaHelper.WorksheetSelection.TX_BIT_AREA;
+            }
+        }
+        public bool XlsExportTxBlockArea
+        {
+            get { return (__worksheet_selection & IOCelcetaHelper.WorksheetSelection.TX_BLOCK_AREA) != 0; }
+            set
+            {
+                if (value)
+                    __worksheet_selection |= IOCelcetaHelper.WorksheetSelection.TX_BLOCK_AREA;
+                else
+                    __worksheet_selection &= ~IOCelcetaHelper.WorksheetSelection.TX_BLOCK_AREA;
+            }
+        }
+        public bool XlsExportRxControlArea
+        {
+            get { return (__worksheet_selection & IOCelcetaHelper.WorksheetSelection.RX_CONTROL_AREA) != 0; }
+            set
+            {
+                if (value)
+                    __worksheet_selection |= IOCelcetaHelper.WorksheetSelection.RX_CONTROL_AREA;
+                else
+                    __worksheet_selection &= ~IOCelcetaHelper.WorksheetSelection.RX_CONTROL_AREA;
+            }
+        }
+        public bool XlsExportRxBitlArea
+        {
+            get { return (__worksheet_selection & IOCelcetaHelper.WorksheetSelection.RX_BIT_AREA) != 0; }
+            set
+            {
+                if (value)
+                    __worksheet_selection |= IOCelcetaHelper.WorksheetSelection.RX_BIT_AREA;
+                else
+                    __worksheet_selection &= ~IOCelcetaHelper.WorksheetSelection.RX_BIT_AREA;
+            }
+        }
+        public bool XlsExportRxBlocklArea
+        {
+            get { return (__worksheet_selection & IOCelcetaHelper.WorksheetSelection.RX_BLOCK_AREA) != 0; }
+            set
+            {
+                if (value)
+                    __worksheet_selection |= IOCelcetaHelper.WorksheetSelection.RX_BLOCK_AREA;
+                else
+                    __worksheet_selection &= ~IOCelcetaHelper.WorksheetSelection.RX_BLOCK_AREA;
+            }
+        }
+        public bool XlsExportInterlockArea
+        {
+            get { return (__worksheet_selection & IOCelcetaHelper.WorksheetSelection.INTERLOCK_AREA) != 0; }
+            set
+            {
+                if (value)
+                    __worksheet_selection |= IOCelcetaHelper.WorksheetSelection.INTERLOCK_AREA;
+                else
+                    __worksheet_selection &= ~IOCelcetaHelper.WorksheetSelection.INTERLOCK_AREA;
+            }
+        }
+        public bool XlsExportMiscArea
+        {
+            get { return (__worksheet_selection & IOCelcetaHelper.WorksheetSelection.MISCELLANEOUS_AREA) != 0; }
+            set
+            {
+                if (value)
+                    __worksheet_selection |= IOCelcetaHelper.WorksheetSelection.MISCELLANEOUS_AREA;
+                else
+                    __worksheet_selection &= ~IOCelcetaHelper.WorksheetSelection.MISCELLANEOUS_AREA;
+            }
+        }
+
         public void Export()
         {
             Debug.Assert(Mode == ImportExportMode.Export);
@@ -141,7 +264,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility
                     __object_dictionary, __object_indexes,
                     __tx_diagnotic_area, __tx_bit_area, __tx_block_area,
                     __rx_control_area, __rx_bit_area, __rx_block_area,
-                    __interlock_area, __misc_info);
+                    __interlock_area, __misc_info, __worksheet_selection);
             }
         }
 

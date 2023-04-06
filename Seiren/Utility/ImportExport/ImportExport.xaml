@@ -7,7 +7,7 @@
         xmlns:sync="http://schemas.syncfusion.com/wpf"
         xmlns:syncfusionskin ="clr-namespace:Syncfusion.SfSkinManager;assembly=Syncfusion.SfSkinManager.WPF"
         mc:Ignorable="d"
-        Title="{Binding Mode}" Height="420" Width="500" WindowStartupLocation="CenterScreen" Closing="Window_Closing">
+        Title="{Binding Mode}" Height="470" Width="500" WindowStartupLocation="CenterScreen" Closing="Window_Closing">
     <DockPanel syncfusionskin:SfSkinManager.Theme="{syncfusionskin:SkinManagerExtension ThemeName=FluentLight}"  Margin="8,4,8,4" LastChildFill="True">
         <DockPanel.Resources>
             <local:InvertBooleanValue x:Key="InvertBoolean"/>
@@ -67,6 +67,7 @@
                     </Grid.ColumnDefinitions>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="auto"/>
+                        <RowDefinition Height="auto"/>
                     </Grid.RowDefinitions>
                     <sync:SfTextInputLayout Hint="Microsoft Excel 2007 File" FontSize="12" FontStyle="Italic" ContainerType="Filled" Margin="4,8,4,8" HintFloatMode="AlwaysFloat">
                         <TextBox FontStyle="Normal" Text="{Binding XlsArchivesPath}"/>
@@ -76,6 +77,19 @@
                             <BitmapImage  UriSource="../../imgs/open.png"/>
                         </sync:ButtonAdv.SmallIcon>
                     </sync:ButtonAdv>
+                    <UniformGrid Columns="4" Rows="3" Grid.Row="1" Grid.ColumnSpan="2">
+                        <CheckBox Content="Var Dictionary" Margin="2" IsChecked="{Binding XlsExportVariableDictionary}"/>
+                        <CheckBox Content="Controller CFG" Margin="2" IsChecked="{Binding XlsExportControllerConfiguration}"/>
+                        <CheckBox Content="OBJ Dictionary" Margin="2" IsChecked="{Binding XlsExportObjectDictionary}"/>
+                        <CheckBox Content="Tx DIAG" Margin="2" IsChecked="{Binding XlsExportTxDiagnosticArea}"/>
+                        <CheckBox Content="Tx BIT" Margin="2" IsChecked="{Binding XlsExportTxBitArea}"/>
+                        <CheckBox Content="Tx BLK" Margin="2" IsChecked="{Binding XlsExportTxBlockArea}"/>
+                        <CheckBox Content="Rx CTRL" Margin="2" IsChecked="{Binding XlsExportRxControlArea}"/>
+                        <CheckBox Content="RX BIT" Margin="2" IsChecked="{Binding XlsExportRxBitlArea}"/>
+                        <CheckBox Content="RX BLK" Margin="2" IsChecked="{Binding XlsExportRxBlocklArea}"/>
+                        <CheckBox Content="INTLK" Margin="2" IsChecked="{Binding XlsExportInterlockArea}"/>
+                        <CheckBox Content="MISC" Margin="2" IsChecked="{Binding XlsExportMiscArea}"/>
+                    </UniformGrid>
                 </Grid>
             </GroupBox>
         </Grid>

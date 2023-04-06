@@ -45,7 +45,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Xandria
         public static RoutedUICommand Cancel { get; private set; }
         public static RoutedUICommand Confirm { get; private set; }
         public static RoutedUICommand About { get; private set; }
-
+        public static RoutedUICommand OpenRuntimeConfiguration { get; private set; }
 
         static ConsoleControl()
         {
@@ -112,6 +112,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Xandria
                 new KeyGesture(Key.F1, ModifierKeys.Control, "Ctrl+F1")
             };
             About = new RoutedUICommand("About", "About", typeof(ConsoleControl), gestureAbout);
+
+            OpenRuntimeConfiguration = new RoutedUICommand("RuntimeConfiguration", "Open Runtime Configuration", typeof(ConsoleControl));
         }
     }
 

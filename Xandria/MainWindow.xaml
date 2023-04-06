@@ -15,6 +15,7 @@
         <CommandBinding Command="local:ConsoleControl.Close" Executed="CloseCommand_Executed" CanExecute="CloseCommand_CanExecuted"/>
         <CommandBinding Command="local:ConsoleControl.Quit" Executed="QuitCommand_Executed"/>
         <CommandBinding Command="local:ConsoleControl.About" Executed="AboutCommand_Executed"/>
+        <CommandBinding Command="local:ConsoleControl.OpenRuntimeConfiguration" Executed="OpenRuntimeConfiguration_Executed" CanExecute="OpenRuntimeConfiguration_CanExecuted"/>
     </Window.CommandBindings>
     <Grid syncfusionskin:SfSkinManager.Theme="{syncfusionskin:SkinManagerExtension ThemeName=FluentLight}">
         <Grid.Resources>
@@ -76,6 +77,12 @@
                         <Image Source="imgs/ftpd.png" Height="28" Width="28"/>
                     </sync:MenuItemAdv.Icon>
                 </sync:MenuItemAdv>
+                <sync:MenuItemSeparator/>
+                <sync:MenuItemAdv Command="local:ConsoleControl.OpenRuntimeConfiguration" ToolTip="Edit &amp; View Runtime Configuration">
+                    <sync:MenuItemAdv.Icon>
+                        <Image Source="imgs/cfg.png" Height="28" Width="28"/>
+                    </sync:MenuItemAdv.Icon>
+                </sync:MenuItemAdv>
             </sync:MenuItemAdv>
             <sync:MenuItemAdv  Header="_Help" Margin="2">
                 <sync:MenuItemAdv Command="local:ConsoleControl.About">
@@ -115,6 +122,12 @@
             <sync:ButtonAdv Command="local:ConsoleControl.DownloadviaFTP" SizeMode="Large" Label="FTP" Margin="2" Width="60" ToolTip="Download via FTP">
                 <sync:ButtonAdv.LargeIcon>
                     <BitmapImage  UriSource="imgs/ftpd.png"/>
+                </sync:ButtonAdv.LargeIcon>
+            </sync:ButtonAdv>
+            <sync:ToolBarItemSeparator/>
+            <sync:ButtonAdv Command="local:ConsoleControl.OpenRuntimeConfiguration" SizeMode="Large" Label="CFG" Margin="2" Width="60" ToolTip="Edit &amp; View Runtime Configuration">
+                <sync:ButtonAdv.LargeIcon>
+                    <BitmapImage  UriSource="imgs/cfg.png"/>
                 </sync:ButtonAdv.LargeIcon>
             </sync:ButtonAdv>
             <sync:ToolBarItemSeparator/>

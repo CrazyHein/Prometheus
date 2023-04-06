@@ -1,0 +1,258 @@
+﻿<Window x:Class="AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Xandria.RuntimeConfigurationViewer"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Xandria"
+             xmlns:lombardia="clr-namespace:AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia.OrbmentParameters;assembly=Lombardia"
+             xmlns:syncfusionskin ="clr-namespace:Syncfusion.SfSkinManager;assembly=Syncfusion.SfSkinManager.WPF"
+             xmlns:sync="http://schemas.syncfusion.com/wpf"
+             xmlns:sys="clr-namespace:System;assembly=mscorlib"
+             mc:Ignorable="d" 
+             d:DesignHeight="600" d:DesignWidth="400" d:DataContext="{d:DesignInstance Type=local:RuntimeConfigurationModel}" WindowStartupLocation="CenterOwner" ResizeMode="CanResize"
+             Width="600" Height="700">
+    <DockPanel syncfusionskin:SfSkinManager.Theme="{syncfusionskin:SkinManagerExtension ThemeName=FluentLight}"  Margin="8,4,8,4" LastChildFill="True">
+        <UniformGrid Columns="2" Margin="0,16,0,0" DockPanel.Dock="Bottom">
+            <Button Content="Cancel" Height="30" Margin="0,0,4,4" Click="Cancel_Click"/>
+            <Button Content="OK"  Height="30" Margin="4,0,0,4"  Click="OK_Click"/>
+        </UniformGrid>
+        <ScrollViewer>
+            <Grid syncfusionskin:SfSkinManager.Theme="{syncfusionskin:SkinManagerExtension ThemeName=FluentLight}" Validation.Error="Input_Error">
+                <Grid.Resources>
+                    <ObjectDataProvider ObjectType="{x:Type sys:Enum}" MethodName="GetValues" x:Key="eventloggers">
+                        <ObjectDataProvider.MethodParameters>
+                            <x:Type TypeName="lombardia:EventLogger"/>
+                        </ObjectDataProvider.MethodParameters>
+                    </ObjectDataProvider>
+                    <ObjectDataProvider ObjectType="{x:Type sys:Enum}" MethodName="GetValues" x:Key="clocksources">
+                        <ObjectDataProvider.MethodParameters>
+                            <x:Type TypeName="lombardia:ClockSource"/>
+                        </ObjectDataProvider.MethodParameters>
+                    </ObjectDataProvider>
+                </Grid.Resources>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
+                </Grid.RowDefinitions>
+                <GroupBox Header="Event Logger" Padding="4,6,4,4" Margin="2" Grid.Row="0">
+                    <StackPanel>
+                        <CheckBox IsChecked="{Binding Configuration.CustomEventLogger}" HorizontalContentAlignment="Stretch">
+                            <sync:SfTextInputLayout Grid.Column="1" Hint="Event Logger" HelperText="Select the default event logger here" ContainerType="Filled"  FontStyle="Italic" FontSize="12" Margin="4">
+                                <ComboBox ItemsSource="{Binding Source={StaticResource eventloggers}}" FontStyle="Normal" SelectedItem="{Binding Configuration.EventLogger}"/>
+                            </sync:SfTextInputLayout>
+                        </CheckBox>
+                    </StackPanel>
+                </GroupBox>
+                <GroupBox Header="Device IO Scan Task" Padding="4,8,4,4" Margin="2" Grid.Row="1">
+                    <StackPanel Name="DeviceIOScanTaskSettings">
+                        <CheckBox IsChecked="{Binding Configuration.DeviceIOScanTaskConfiguration.CustomPosixPriority}" HorizontalContentAlignment="Stretch">
+                            <sync:SfTextInputLayout Hint="Posix Priority (0 ~ 255)" 
+                                            HelperText="Set the posix priority for Device IO Scan Task (0 ~ 255)" 
+                                            ErrorText="The posix priority should be between 0 and 255" 
+                                            ContainerType="Filled"  FontStyle="Italic" FontSize="12" Margin="4" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}">
+                                <TextBox FontStyle="Normal" Text="{Binding Configuration.DeviceIOScanTaskConfiguration.PosixPriority, ValidatesOnExceptions=True, NotifyOnValidationError=True}"/>
+                            </sync:SfTextInputLayout>
+                        </CheckBox>
+
+                        <CheckBox Grid.Row="1" IsChecked="{Binding Configuration.DeviceIOScanTaskConfiguration.CustomClockSource}" HorizontalContentAlignment="Stretch">
+                            <sync:SfTextInputLayout Hint="Clock Source" HelperText="Select the default clock source for Device IO Scan Task" ContainerType="Filled"  FontStyle="Italic" FontSize="12" Margin="4" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}">
+                                <ComboBox ItemsSource="{Binding Source={StaticResource clocksources}}" FontStyle="Normal" SelectedItem="{Binding Configuration.DeviceIOScanTaskConfiguration.ClockSource}"/>
+                            </sync:SfTextInputLayout>
+                        </CheckBox>
+
+                        <CheckBox Grid.Row="2" IsChecked="{Binding Configuration.DeviceIOScanTaskConfiguration.CustomPeriod}" HorizontalContentAlignment="Stretch">
+                            <sync:SfTextInputLayout Hint="Period" 
+                                            HelperText="Set the period(ms) for Device IO Scan Task" 
+                                            ErrorText="For 1 to 1000: Specify multiples of 5 (by 5 milliseconds) For 1000 to 60,000: Specify multiples of 1000 (1 s units)"
+                                            ContainerType="Filled"  FontStyle="Italic" FontSize="12" Margin="4" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}">
+                                <TextBox FontStyle="Normal" Text="{Binding Configuration.DeviceIOScanTaskConfiguration.PeriodInMillisecond, ValidatesOnExceptions=True, NotifyOnValidationError=True}"/>
+                            </sync:SfTextInputLayout>
+                        </CheckBox>
+
+                        <CheckBox Grid.Row="3" IsChecked="{Binding Configuration.DeviceIOScanTaskConfiguration.CustomTaskStack}" HorizontalContentAlignment="Stretch">
+                            <sync:SfTextInputLayout Hint="Task Stack Size" 
+                                            HelperText="Set the task stack size(bytes) for Device IO Scan Task" ContainerType="Filled"  
+                                            ErrorText="Please input a positive number or zero"
+                                            FontStyle="Italic" FontSize="12" Margin="4" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}">
+                                <TextBox FontStyle="Normal" Text="{Binding Configuration.DeviceIOScanTaskConfiguration.TaskStackInByte, ValidatesOnExceptions=True, NotifyOnValidationError=True}"/>
+                            </sync:SfTextInputLayout>
+                        </CheckBox>
+                    </StackPanel>
+                </GroupBox>
+                <GroupBox Header="Device Control Task" Padding="4,8,4,4" Margin="2" Grid.Row="2">
+                    <StackPanel Name="DeviceControlTaskSettings">
+                        <CheckBox IsChecked="{Binding Configuration.DeviceControlTaskConfiguration.CustomPosixPriority}" HorizontalContentAlignment="Stretch">
+                            <sync:SfTextInputLayout Hint="Posix Priority (0 ~ 255)" 
+                                            HelperText="Set the posix priority for Device Control Task (0 ~ 255)" 
+                                            ErrorText="The posix priority should be between 0 and 255"
+                                            ContainerType="Filled"  FontStyle="Italic" FontSize="12" Margin="4" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}">
+                                <TextBox FontStyle="Normal" Text="{Binding Configuration.DeviceControlTaskConfiguration.PosixPriority, ValidatesOnExceptions=True, NotifyOnValidationError=True}"/>
+                            </sync:SfTextInputLayout>
+                        </CheckBox>
+
+                        <CheckBox Grid.Row="1" IsChecked="{Binding Configuration.DeviceControlTaskConfiguration.CustomPeriod}" HorizontalContentAlignment="Stretch">
+                            <sync:SfTextInputLayout Hint="Period" 
+                                            HelperText="Set the period(ms) for Device Control Task" 
+                                            ErrorText="For 1 to 1000: Specify multiples of 5 (by 5 milliseconds) For 1000 to 60,000: Specify multiples of 1000 (1 s units)"
+                                            ContainerType="Filled"  FontStyle="Italic" FontSize="12" Margin="4" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}">
+                                <TextBox FontStyle="Normal" Text="{Binding Configuration.DeviceControlTaskConfiguration.PeriodInMillisecond, ValidatesOnExceptions=True, NotifyOnValidationError=True}"/>
+                            </sync:SfTextInputLayout>
+                        </CheckBox>
+                        <CheckBox Grid.Row="2" IsChecked="{Binding Configuration.DeviceControlTaskConfiguration.CustomTaskStack}" HorizontalContentAlignment="Stretch">
+                            <sync:SfTextInputLayout Hint="Task Stack Size" 
+                                            HelperText="Set the task stack size(bytes) for Device Control Task" 
+                                            ErrorText="Please input a positive number or zero"
+                                            ContainerType="Filled"  FontStyle="Italic" FontSize="12" Margin="4" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}">
+                                <TextBox FontStyle="Normal" Text="{Binding Configuration.DeviceControlTaskConfiguration.TaskStackInByte, ValidatesOnExceptions=True, NotifyOnValidationError=True}"/>
+                            </sync:SfTextInputLayout>
+                        </CheckBox>
+                    </StackPanel>
+                </GroupBox>
+                <GroupBox Header="DLink Service" Padding="4,8,4,4" Margin="2" Grid.Row="3">
+                    <StackPanel Name="DLinkServiceSettings">
+                        <CheckBox IsChecked="{Binding Configuration.DLinkServiceConfiguration.CustomPosixPriority}" HorizontalContentAlignment="Stretch">
+                            <sync:SfTextInputLayout Hint="Posix Priority (0 ~ 255)" 
+                                            HelperText="Set the posix priority for DLink Service (0 ~ 255)" 
+                                            ErrorText="The posix priority should be between 0 and 255"
+                                            ContainerType="Filled"  FontStyle="Italic" FontSize="12" Margin="4" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}">
+                                <TextBox FontStyle="Normal" Text="{Binding Configuration.DLinkServiceConfiguration.PosixPriority, ValidatesOnExceptions=True, NotifyOnValidationError=True}"/>
+                            </sync:SfTextInputLayout>
+                        </CheckBox>
+                        <CheckBox Grid.Row="1" IsChecked="{Binding Configuration.DLinkServiceConfiguration.CustomPort}" HorizontalContentAlignment="Stretch">
+                            <sync:SfTextInputLayout Hint="Port" 
+                                            HelperText="Set port number which DLink Service will listen on" 
+                                            ErrorText="The port number should be between 0 and 65535"
+                                            ContainerType="Filled"  FontStyle="Italic" FontSize="12" Margin="4" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}">
+                                <TextBox FontStyle="Normal" Text="{Binding Configuration.DLinkServiceConfiguration.Port, ValidatesOnExceptions=True, NotifyOnValidationError=True}"/>
+                            </sync:SfTextInputLayout>
+                        </CheckBox>
+                        <CheckBox Grid.Row="2" IsChecked="{Binding Configuration.DLinkServiceConfiguration.CustomRecv}" HorizontalContentAlignment="Stretch">
+                            <sync:SfTextInputLayout Hint="Receive Timeout" 
+                                            HelperText="Set a value that specifies the amount of time(ms) after which a synchronous Receive call will time out" 
+                                            ErrorText="Please input a positive number or zero"
+                                            ContainerType="Filled"  FontStyle="Italic" FontSize="12" Margin="4" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}">
+                                <TextBox FontStyle="Normal" Text="{Binding Configuration.DLinkServiceConfiguration.RecvTimeout, ValidatesOnExceptions=True, NotifyOnValidationError=True}"/>
+                            </sync:SfTextInputLayout>
+                        </CheckBox>
+                        <CheckBox Grid.Row="3" IsChecked="{Binding Configuration.DLinkServiceConfiguration.CustomSend}" HorizontalContentAlignment="Stretch">
+                            <sync:SfTextInputLayout Hint="Send Timeout" 
+                                            HelperText="Set a value that specifies the amount of time(ms) after which a synchronous Send call will time out" 
+                                            ErrorText="Please input a positive number or zero"
+                                            ContainerType="Filled"  FontStyle="Italic" FontSize="12" Margin="4" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}">
+                                <TextBox FontStyle="Normal" Text="{Binding Configuration.DLinkServiceConfiguration.SendTimeout, ValidatesOnExceptions=True, NotifyOnValidationError=True}"/>
+                            </sync:SfTextInputLayout>
+                        </CheckBox>
+                        <CheckBox Grid.Row="4" IsChecked="{Binding Configuration.DLinkServiceConfiguration.CustomReservedMemory}" HorizontalContentAlignment="Stretch">
+                            <sync:SfTextInputLayout Hint="User IO Space Size" 
+                                            HelperText="Set reserved memory space capacity(bytes) for common usage" 
+                                            ErrorText="Please input a positive number or zero"
+                                            ContainerType="Filled"  FontStyle="Italic" FontSize="12" Margin="4" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}">
+                                <TextBox FontStyle="Normal" Text="{Binding Configuration.DLinkServiceConfiguration.UserReservedMemoryInByte, ValidatesOnExceptions=True, NotifyOnValidationError=True}"/>
+                            </sync:SfTextInputLayout>
+                        </CheckBox>
+                    </StackPanel>
+                </GroupBox>
+                <GroupBox Header="RLink Service" Padding="4,8,4,4" Margin="2" Grid.Row="4">
+                    <StackPanel Name="RLinkServiceSettings">
+                        <CheckBox IsChecked="{Binding Configuration.RLinkServiceConfiguration.CustomPosixPriority}" HorizontalContentAlignment="Stretch">
+                            <sync:SfTextInputLayout Hint="Posix Priority (0 ~ 255)" 
+                                            HelperText="Set the posix priority for DLink Service (0 ~ 255)" 
+                                            ErrorText="The posix priority should be between 0 and 255"
+                                            ContainerType="Filled"  FontStyle="Italic" FontSize="12" Margin="4" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}">
+                                <TextBox FontStyle="Normal" Text="{Binding Configuration.RLinkServiceConfiguration.PosixPriority, ValidatesOnExceptions=True, NotifyOnValidationError=True}"/>
+                            </sync:SfTextInputLayout>
+                        </CheckBox>
+                        <CheckBox Grid.Row="1" IsChecked="{Binding Configuration.RLinkServiceConfiguration.CustomPort}" HorizontalContentAlignment="Stretch">
+                            <sync:SfTextInputLayout Hint="Port" 
+                                            HelperText="Set port number which RLink Service will listen on" 
+                                            ErrorText="The port number should be between 0 and 65535"
+                                            ContainerType="Filled"  FontStyle="Italic" FontSize="12" Margin="4" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}">
+                                <TextBox FontStyle="Normal" Text="{Binding Configuration.RLinkServiceConfiguration.Port, ValidatesOnExceptions=True, NotifyOnValidationError=True}"/>
+                            </sync:SfTextInputLayout>
+                        </CheckBox>
+                        <CheckBox Grid.Row="2" IsChecked="{Binding Configuration.RLinkServiceConfiguration.CustomRecv}" HorizontalContentAlignment="Stretch">
+                            <sync:SfTextInputLayout Hint="Receive Timeout" 
+                                            HelperText="Set a value that specifies the amount of time(ms) after which a synchronous Receive call will time out" 
+                                            ErrorText="Please input a positive number or zero"
+                                            ContainerType="Filled"  FontStyle="Italic" FontSize="12" Margin="4" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}">
+                                <TextBox FontStyle="Normal" Text="{Binding Configuration.RLinkServiceConfiguration.RecvTimeout, ValidatesOnExceptions=True, NotifyOnValidationError=True}"/>
+                            </sync:SfTextInputLayout>
+                        </CheckBox>
+                        <CheckBox Grid.Row="3" IsChecked="{Binding Configuration.RLinkServiceConfiguration.CustomSend}" HorizontalContentAlignment="Stretch">
+                            <sync:SfTextInputLayout Hint="Send Timeout" 
+                                            HelperText="Set a value that specifies the amount of time(ms) after which a synchronous Send call will time out" 
+                                            ErrorText="Please input a positive number or zero"
+                                            ContainerType="Filled"  FontStyle="Italic" FontSize="12" Margin="4" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}">
+                                <TextBox FontStyle="Normal" Text="{Binding Configuration.RLinkServiceConfiguration.SendTimeout, ValidatesOnExceptions=True, NotifyOnValidationError=True}"/>
+                            </sync:SfTextInputLayout>
+                        </CheckBox>
+                        <CheckBox Grid.Row="4" IsChecked="{Binding Configuration.RLinkServiceConfiguration.CustomReservedMemory}" HorizontalContentAlignment="Stretch">
+                            <sync:SfTextInputLayout Hint="Reserved Memory" 
+                                            HelperText="Set reserved memory capacity(words) for DAQ FIFO Queue" 
+                                            ErrorText="Please input a positive number or zero"
+                                            ContainerType="Filled"  FontStyle="Italic" FontSize="12" Margin="4" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}">
+                                <TextBox FontStyle="Normal" Text="{Binding Configuration.RLinkServiceConfiguration.ReservedMemoryInWord, ValidatesOnExceptions=True, NotifyOnValidationError=True}"/>
+                            </sync:SfTextInputLayout>
+                        </CheckBox>
+                        <CheckBox Grid.Row="5" IsChecked="{Binding Configuration.RLinkServiceConfiguration.CustomAcquisitionRate}" HorizontalContentAlignment="Stretch">
+                            <sync:SfTextInputLayout Hint="Rate" 
+                                            HelperText="Set the data sampling rate(runtime io scan cycle)"
+                                            ErrorText="Please input a positive number or zero"
+                                            ContainerType="Filled"  FontStyle="Italic" FontSize="12" Margin="4" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}">
+                                <TextBox FontStyle="Normal" Text="{Binding Configuration.RLinkServiceConfiguration.AcquisitionRate, ValidatesOnExceptions=True, NotifyOnValidationError=True}"/>
+                            </sync:SfTextInputLayout>
+                        </CheckBox>
+                    </StackPanel>
+                </GroupBox>
+                <GroupBox Header="ILink Service" Padding="4,8,4,4" Margin="2" Grid.Row="5">
+                    <StackPanel Name="ILinkServiceSettings">
+                        <CheckBox IsChecked="{Binding Configuration.ILinkServiceConfiguration.CustomPosixPriority}" HorizontalContentAlignment="Stretch">
+                            <sync:SfTextInputLayout Hint="Posix Priority  (0 ~ 255)" 
+                                            HelperText="Set the posix priority for ILink Service (0 ~ 255)" 
+                                            ErrorText="The posix priority should be between 0 and 255"
+                                            ContainerType="Filled"  FontStyle="Italic" FontSize="12" Margin="4" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}">
+                                <TextBox FontStyle="Normal" Text="{Binding Configuration.ILinkServiceConfiguration.PosixPriority, ValidatesOnExceptions=True, NotifyOnValidationError=True}"/>
+                            </sync:SfTextInputLayout>
+                        </CheckBox>
+                        <CheckBox IsChecked="{Binding Configuration.ILinkServiceConfiguration.CustomPort}" HorizontalContentAlignment="Stretch">
+                            <sync:SfTextInputLayout Hint="Port" 
+                                            HelperText="Set port number which ILink Service will listen on" 
+                                            ErrorText="The port number should be between 0 and 65535"
+                                            ContainerType="Filled"  FontStyle="Italic" FontSize="12" Margin="4" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}">
+                                <TextBox FontStyle="Normal" Text="{Binding Configuration.ILinkServiceConfiguration.Port, ValidatesOnExceptions=True, NotifyOnValidationError=True}"/>
+                            </sync:SfTextInputLayout>
+                        </CheckBox>
+                        <CheckBox IsChecked="{Binding Configuration.ILinkServiceConfiguration.CustomRecv}" HorizontalContentAlignment="Stretch">
+                            <sync:SfTextInputLayout Hint="Receive Timeout" 
+                                            HelperText="Set a value that specifies the amount of time(ms) after which a synchronous Receive call will time out" 
+                                            ErrorText="Please input a positive number or zero"
+                                            ContainerType="Filled"  FontStyle="Italic" FontSize="12" Margin="4" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}">
+                                <TextBox FontStyle="Normal" Text="{Binding Configuration.ILinkServiceConfiguration.RecvTimeout, ValidatesOnExceptions=True, NotifyOnValidationError=True}"/>
+                            </sync:SfTextInputLayout>
+                        </CheckBox>
+                        <CheckBox IsChecked="{Binding Configuration.ILinkServiceConfiguration.CustomSend}" HorizontalContentAlignment="Stretch">
+                            <sync:SfTextInputLayout Hint="Send Timeout" 
+                                            HelperText="Set a value that specifies the amount of time(ms) after which a synchronous Send call will time out" 
+                                            ErrorText="Please input a positive number or zero"
+                                            ContainerType="Filled"  FontStyle="Italic" FontSize="12" Margin="4" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}">
+                                <TextBox FontStyle="Normal" Text="{Binding Configuration.ILinkServiceConfiguration.SendTimeout, ValidatesOnExceptions=True, NotifyOnValidationError=True}"/>
+                            </sync:SfTextInputLayout>
+                        </CheckBox>
+                        <CheckBox IsChecked="{Binding Configuration.ILinkServiceConfiguration.CustomStepCapacity}" HorizontalContentAlignment="Stretch">
+                            <sync:SfTextInputLayout Hint="Step Capacity" 
+                                            HelperText="Set reserved step capacity for Napishtim Script Executing Engine Step Queue" 
+                                            ErrorText="Please input a positive number or zero"
+                                            ContainerType="Filled"  FontStyle="Italic" FontSize="12" Margin="4" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}">
+                                <TextBox FontStyle="Normal" Text="{Binding Configuration.ILinkServiceConfiguration.EngineStepCapacity, ValidatesOnExceptions=True, NotifyOnValidationError=True}"/>
+                            </sync:SfTextInputLayout>
+                        </CheckBox>
+                    </StackPanel>
+                </GroupBox>
+            </Grid>
+        </ScrollViewer>
+    </DockPanel>
+</Window>

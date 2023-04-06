@@ -1,7 +1,9 @@
-﻿using System;
+﻿using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia.OrbmentParameters;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Security.Cryptography;
 using System.Xml;
 
@@ -16,6 +18,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
         public IReadOnlyList<LocalHardwareModule> LocalHardwareCollection { get; private set; }
         private List<RemoteHardwareModule> __remote_hardware_collection = new List<RemoteHardwareModule>();
         public IReadOnlyList<RemoteHardwareModule> RemoteHardwareCollection { get; private set; }
+        public RuntimeConfiguration RuntimeConfiguration { get; set; }
         public TaskUserParameterHelper(ControllerModelCatalogue models, string path, out byte[] md5code): this(models)
         {
             __load(path, out md5code);
@@ -30,6 +33,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
             __controller_model_catalogue = models;
             LocalHardwareCollection = __local_hardware_collection;
             RemoteHardwareCollection = __remote_hardware_collection;
+            RuntimeConfiguration = new RuntimeConfiguration();
         }
 
         public LocalHardwareModule Add(ushort id, string name, ushort bit, uint sw, ushort localAddress, List<(string, string)> customs)
@@ -192,6 +196,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
                 remote.AppendChild(m.ToXml(xmlDoc));
             root.AppendChild(remote);
 
+            if(RuntimeConfiguration != null)
+                root.AppendChild(RuntimeConfiguration.ToXml(xmlDoc));
+
             xmlDoc.AppendChild(root);
             return xmlDoc;
         }
@@ -225,6 +232,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
                 __load_local_hardware_modules(node);
                 node = xmlDoc.SelectSingleNode("/R2H_Task_UserParameters/EthernetModules");
                 __load_remote_hardware_modules(node);
+
+                node = xmlDoc.SelectSingleNode("/R2H_Task_UserParameters/RuntimeConfiguration");
+                RuntimeConfiguration.ReLoad(node);
             }
             catch(LombardiaException)
             {
@@ -248,6 +258,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
                 __load_local_hardware_modules(node);
                 node = xmlDoc.SelectSingleNode("/R2H_Task_UserParameters/EthernetModules");
                 __load_remote_hardware_modules(node);
+
+                node = xmlDoc.SelectSingleNode("/R2H_Task_UserParameters/RuntimeConfiguration");
+                RuntimeConfiguration.ReLoad(node);
             }
             catch (LombardiaException)
             {

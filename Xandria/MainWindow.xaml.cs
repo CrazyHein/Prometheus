@@ -12,6 +12,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia;
+using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia.OrbmentParameters;
 using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Xandria.Utility;
 using Syncfusion.SfSkinManager;
 
@@ -22,15 +23,16 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Xandria
     /// </summary>
     public partial class MainWindow : Window
     {
-		#region Fields
+        #region Fields
         private string currentVisualStyle;
-		private string currentSizeMode;
+        private string currentSizeMode;
         #endregion
         private ControllerModelCatalogue __controller_model_catalogue;
         private TaskUserParameterHelper __task_user_parameter_helper;
         private MainModel __main_model = new MainModel();
         private HardwareCollectionViewer __hardware_collection_viewer;
         private Info __info = new Info();
+        private bool __runtime_configuration_modified = false;
         #region Properties
         /// <summary>
         /// Gets or sets the current visual style.
@@ -49,8 +51,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Xandria
                 OnVisualStyleChanged();
             }
         }
-		
-		/// <summary>
+
+        /// <summary>
         /// Gets or sets the current Size mode.
         /// </summary>
         /// <value></value>
@@ -71,11 +73,11 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Xandria
         public MainWindow()
         {
             InitializeComponent();
-			this.Loaded += OnLoaded;
+            this.Loaded += OnLoaded;
 
             DataContext = __main_model;
         }
-		/// <summary>
+        /// <summary>
         /// Called when [loaded].
         /// </summary>
         /// <param name="sender">The sender.</param>
@@ -83,7 +85,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Xandria
         private void OnLoaded(object sender, RoutedEventArgs e)
         {
             CurrentVisualStyle = "FluentLight";
-	        CurrentSizeMode = "Default";
+            CurrentSizeMode = "Default";
 
             try
             {
@@ -97,14 +99,14 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Xandria
                 this.Close();
             }
         }
-		/// <summary>
+        /// <summary>
         /// On Visual Style Changed.
         /// </summary>
         /// <remarks></remarks>
         private void OnVisualStyleChanged()
         {
             VisualStyles visualStyle = VisualStyles.Default;
-            Enum.TryParse(CurrentVisualStyle, out visualStyle);            
+            Enum.TryParse(CurrentVisualStyle, out visualStyle);
             if (visualStyle != VisualStyles.Default)
             {
                 SfSkinManager.ApplyStylesOnApplication = true;
@@ -112,8 +114,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Xandria
                 SfSkinManager.ApplyStylesOnApplication = false;
             }
         }
-		
-		/// <summary>
+
+        /// <summary>
         /// On Size Mode Changed event.
         /// </summary>
         /// <remarks></remarks>
@@ -133,7 +135,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Xandria
         {
             if (__hardware_collection_viewer == null)
                 return false;
-            return (__hardware_collection_viewer.DataContext as HardwareModels).Modified ;
+            return (__hardware_collection_viewer.DataContext as HardwareModels).Modified || __runtime_configuration_modified ;
         }
 
         private void __reset_layout()
@@ -147,6 +149,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Xandria
         {
             __hardware_collection_viewer = null;
             HardwareModuleConfiguraton.Content = null;
+            HardwareModuleConfiguraton.DataContext = null;
         }
 
         public string __update_binding_source()
@@ -160,6 +163,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Xandria
         public void __commit_changes()
         {
             (__hardware_collection_viewer.DataContext as HardwareModels).CommitChanges();
+            __runtime_configuration_modified = false;
         }
 
         private void NewCommand_CanExecuted(object sender, System.Windows.Input.CanExecuteRoutedEventArgs e)
@@ -357,6 +361,21 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Xandria
                 var res = MessageBox.Show("Discard the changes you have made ?", "Question", MessageBoxButton.YesNo, MessageBoxImage.Question);
                 if (res == MessageBoxResult.No)
                     e.Cancel = true;
+            }
+        }
+
+        private void OpenRuntimeConfiguration_CanExecuted(object sender, System.Windows.Input.CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = __main_model.IsOpened;
+        }
+
+        private void OpenRuntimeConfiguration_Executed(object sender, System.Windows.Input.ExecutedRoutedEventArgs e)
+        {
+            RuntimeConfigurationViewer v = new RuntimeConfigurationViewer(__task_user_parameter_helper.RuntimeConfiguration);
+            if (v.ShowDialog() == true)
+            {
+                __task_user_parameter_helper.RuntimeConfiguration = v.UserConfiguration;
+                __runtime_configuration_modified = true;
             }
         }
     }
