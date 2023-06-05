@@ -28,7 +28,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility
             ProcessDataImage txdiag, ProcessDataImage txbit, ProcessDataImage txblk,
             ProcessDataImage rxctl, ProcessDataImage rxbit, ProcessDataImage rxblk,
             InterlockCollection intlk, Miscellaneous misc,
-            DataTypeCatalogue dataTypes, ControllerModelCatalogue models)
+            DataTypeCatalogue dataTypes, ControllerModelCatalogue models, FTPTargetProperty property)
         {
             InitializeComponent();
             DataContext = new FTPUtilityModel(mode,
@@ -36,8 +36,16 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility
                 cc, configurationNames,
                 od, objectIndexes,
                 txdiag, txbit, txblk, rxctl, rxbit, rxblk, intlk, misc,
-                dataTypes, models);
-            if(mode == FTPMode.Upload || mode == FTPMode.Compare)
+                dataTypes, models)
+            {
+                HostIPv4 = property.HostIPv4String,
+                HostPort = property.HostPort,
+                User = property.User,
+                Password = property.Password,
+                Timeout = property.TimeoutValue,
+                ReadWriteTimeout = property.ReadWriteTimeoutValue
+            };
+            if (mode == FTPMode.Upload || mode == FTPMode.Compare)
             {
                 CheckboxVAR.IsChecked = true;
                 CheckboxVAR.IsEnabled = false;

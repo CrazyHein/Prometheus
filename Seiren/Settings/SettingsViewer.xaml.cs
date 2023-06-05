@@ -33,11 +33,19 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             Settings = settings;
             DebuggerSettings.DataContext = Settings.SlmpTargetProperty;
             PreferenceSettings.DataContext = Settings.PreferenceProperty;
+            FTPSettings.DataContext = Settings.FTPTargetProperty;
         }
 
         private void DebuggerSettings_Error(object sender, ValidationErrorEventArgs e)
         {
             if(e.Action == ValidationErrorEventAction.Added)
+                __errors++;
+            else
+                __errors--;
+        }
+        private void FTPSettings_Error(object sender, ValidationErrorEventArgs e)
+        {
+            if (e.Action == ValidationErrorEventAction.Added)
                 __errors++;
             else
                 __errors--;

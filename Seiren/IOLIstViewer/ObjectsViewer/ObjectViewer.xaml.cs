@@ -51,6 +51,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             }
         }
 
+        private void BindingTips_Click(object sender, RoutedEventArgs e)
+        {
+            __apply_binding_tips();
+        }
         private void Cancel_Click(object sender, RoutedEventArgs e)
         {
             DialogResult = false;
@@ -107,7 +111,20 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                 __result_object_model.VariableDataType = v.Type.Name;
                 __result_object_model.VariableUnit = v.Unit;
                 __result_object_model.VariableComment = v.Comment;
+            }
+            else
+            {
+                __result_object_model.VariableDataType = "unnamed";
+                __result_object_model.VariableUnit = "N/A";
+            }
+        }
 
+        private void __apply_binding_tips()
+        {
+            var binding = VariableInput.GetBindingExpression(SfTextBoxExt.TextProperty);
+            binding.UpdateSource();
+            if (__object_model_collection.Variables.Variables.TryGetValue(__result_object_model.VariableName.Trim(), out var v) == true)
+            {
                 if (__binding_tips_reg.IsMatch(v.Comment))
                 {
                     if (v.Type.BitSize == 1)
@@ -115,13 +132,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                             (uint)(Convert.ToUInt16(v.Comment.Substring(9, 4)) * 10000 + Convert.ToUInt16(v.Comment.Substring(19, 4)));
                     else
                         __result_object_model.BindingChannelIndex =
-                            (uint)(Convert.ToUInt16(v.Comment.Substring(9, 4)) * 10000 + Convert.ToUInt16(v.Comment.Substring(19, 4))/8);
+                            (uint)(Convert.ToUInt16(v.Comment.Substring(9, 4)) * 10000 + Convert.ToUInt16(v.Comment.Substring(19, 4)) / 8);
                 }
-            }
-            else
-            {
-                __result_object_model.VariableDataType = "unnamed";
-                __result_object_model.VariableUnit = "N/A";
             }
         }
 

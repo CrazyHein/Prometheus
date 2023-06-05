@@ -29,6 +29,7 @@
         <CommandBinding Command="local:ConsoleControl.SaveLayoutState" Executed="SaveLayoutStateCommand_Executed" CanExecute="SaveLayoutStateCommand_CanExecuted"/>
         <CommandBinding Command="local:ConsoleControl.ControllerRemoteOperation" Executed="RemoteOperationCommand_Executed" CanExecute="RemoteOperationCommand_CanExecuted"/>
         <CommandBinding Command="local:ConsoleControl.BrowseEtherCATPDOs" Executed="BrowseEtherCATPDOs_Executed" CanExecute="BrowseEtherCATPDOs_CanExecuted"/>
+        <CommandBinding Command="local:ConsoleControl.EventHistory" Executed="EventHistory_Executed" CanExecute="EventHistory_CanExecuted"/>
     </Window.CommandBindings>
     <Window.Resources>
         <local:InvertBooleanValue x:Key="InvertBoolean"/>
@@ -142,6 +143,12 @@
             <sync:ButtonAdv Command="local:ConsoleControl.BrowseEtherCATPDOs" SizeMode="Large" Label="ENI" Margin="2" Width="60">
                 <sync:ButtonAdv.LargeIcon>
                     <BitmapImage  UriSource="imgs/pdos.png"/>
+                </sync:ButtonAdv.LargeIcon>
+            </sync:ButtonAdv>
+            <sync:ToolBarItemSeparator/>
+            <sync:ButtonAdv Command="local:ConsoleControl.EventHistory" SizeMode="Large" Label="LOG" Margin="2" Width="60">
+                <sync:ButtonAdv.LargeIcon>
+                    <BitmapImage  UriSource="imgs/log.png"/>
                 </sync:ButtonAdv.LargeIcon>
             </sync:ButtonAdv>
             <sync:ToolBarItemSeparator/>
@@ -322,6 +329,11 @@
                 <sync:MenuItemAdv Command="local:ConsoleControl.BrowseEtherCATPDOs" ToolTip="Browse EtherCAT PDOs from ENI">
                     <sync:MenuItemAdv.Icon>
                         <Image Source="imgs/pdos.png" Height="28" Width="28"/>
+                    </sync:MenuItemAdv.Icon>
+                </sync:MenuItemAdv>
+                <sync:MenuItemAdv Command="local:ConsoleControl.EventHistory" ToolTip="Browse R12CCPU-V Event History">
+                    <sync:MenuItemAdv.Icon>
+                        <Image Source="imgs/log.png" Height="28" Width="28"/>
                     </sync:MenuItemAdv.Icon>
                 </sync:MenuItemAdv>
             </sync:MenuItemAdv>

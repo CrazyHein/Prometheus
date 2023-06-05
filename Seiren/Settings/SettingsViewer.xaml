@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren"
         xmlns:debugger="clr-namespace:AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Debugger"
+        xmlns:utility="clr-namespace:AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility"
         xmlns:sync="http://schemas.syncfusion.com/wpf"
         xmlns:syncfusionskin ="clr-namespace:Syncfusion.SfSkinManager;assembly=Syncfusion.SfSkinManager.WPF"
         xmlns:slmp="clr-namespace:AMEC.PCSoftware.CommunicationProtocol.CrazyHein.SLMP.Message;assembly=Gagharv"
@@ -152,6 +153,38 @@
                             </sync:SfTextInputLayout>
                         </UniformGrid>
                     </GroupBox>
+                </Grid>
+            </TabItem>
+            <TabItem Header="FTP" Width="135" Name="FTPSettingsTab">
+                <Grid d:DataContext="{d:DesignInstance Type=utility:FTPTargetProperty}" x:Name="FTPSettings" Validation.Error="FTPSettings_Error">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="auto"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <sync:SfTextInputLayout Hint="Host" HelperText="Input FTP host IPv4 here" ContainerType="Filled" FontStyle="Italic" FontSize="12" Margin="4,8,4,8" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}">
+                        <TextBox Text="{Binding HostIPv4String, ValidatesOnExceptions=True, NotifyOnValidationError=True}" FontStyle="Normal"/>
+                    </sync:SfTextInputLayout>
+                    <sync:SfTextInputLayout Grid.Column="1" Hint="Port" HelperText="Input FTP host port here" ContainerType="Filled" FontStyle="Italic" FontSize="12" Margin="4,8,4,8" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}">
+                        <TextBox Text="{Binding HostPort, ValidatesOnExceptions=True, NotifyOnValidationError=True}" FontStyle="Normal"/>
+                    </sync:SfTextInputLayout>
+                    <sync:SfTextInputLayout Grid.Row="1" Hint="User" HelperText="Input login user name here" ContainerType="Filled" FontStyle="Italic" FontSize="12" Margin="4,8,4,8">
+                        <TextBox Text="{Binding User}" FontStyle="Normal"/>
+                    </sync:SfTextInputLayout>
+                    <sync:SfTextInputLayout Grid.Row="1" Grid.Column="1" Hint="Password" HelperText="Input login password here" ContainerType="Filled" FontStyle="Italic" FontSize="12" Margin="4,8,4,8">
+                        <TextBox Text="{Binding Password}" FontStyle="Normal"/>
+                    </sync:SfTextInputLayout>
+
+                    <sync:SfTextInputLayout Grid.Row="2" Hint="Timeout" HelperText="Input timeout value here" ContainerType="Filled" FontStyle="Italic" FontSize="12" Margin="4,8,4,8" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}">
+                        <TextBox Text="{Binding TimeoutValue, ValidatesOnExceptions=True, NotifyOnValidationError=True}" FontStyle="Normal"/>
+                    </sync:SfTextInputLayout>
+                    <sync:SfTextInputLayout Grid.Row="2" Grid.Column="1" Hint="Read &amp; Write Timeout" HelperText="Input read/write timeout value here" ContainerType="Filled" FontStyle="Italic" FontSize="12" Margin="4,8,4,8" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}">
+                        <TextBox Text="{Binding ReadWriteTimeoutValue, ValidatesOnExceptions=True, NotifyOnValidationError=True}" FontStyle="Normal"/>
+                    </sync:SfTextInputLayout>
                 </Grid>
             </TabItem>
             <TabItem Header="Preferences"  Width="135" x:Name="PreferenceSettings">

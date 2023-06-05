@@ -67,6 +67,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         public static RoutedUICommand ControllerRemoteOperation { get; private set; }
         public static RoutedUICommand BrowseEtherCATPDOs { get; private set; }
         public static RoutedUICommand AddAllSelectedRecords { get; private set; }
+        public static RoutedUICommand EventHistory { get; private set; }
 
         static ConsoleControl()
         {
@@ -241,9 +242,15 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             {
                 new KeyGesture(Key.F9, ModifierKeys.Control, "Ctrl+F9")
             };
-            BrowseEtherCATPDOs = new RoutedUICommand("BrowseEtherCATPDOs", "Browse PDOs from EtherCAT ENI", typeof(ConsoleControl), gestureImportEtherCATPDOs);
+            BrowseEtherCATPDOs = new RoutedUICommand("Browse EtherCAT PDOs", "Browse PDOs from EtherCAT ENI", typeof(ConsoleControl), gestureImportEtherCATPDOs);
 
-            AddAllSelectedRecords = new RoutedUICommand("AddAllSelectedRecords", "Add All Selected Records", typeof(ConsoleControl));
+            AddAllSelectedRecords = new RoutedUICommand("Add All Selected Records", "Add All Selected Records", typeof(ConsoleControl));
+
+            InputGestureCollection gestureEventHistory = new InputGestureCollection
+            {
+                new KeyGesture(Key.F10, ModifierKeys.Control, "Ctrl+F10")
+            };
+            EventHistory = new RoutedUICommand("Event History", "Browse R12CCPU-V Event History", typeof(ConsoleControl), gestureEventHistory);
         }
     }
 

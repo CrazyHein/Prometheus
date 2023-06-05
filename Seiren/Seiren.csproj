@@ -7,7 +7,7 @@
     <UseWindowsForms>true</UseWindowsForms>
     <RootNamespace>AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren</RootNamespace>
     <Nullable>annotations</Nullable>
-    <Version>0.20.0</Version>
+    <Version>0.21.0</Version>
     <Authors>CrazyHein</Authors>
     <Company>AMEC</Company>
     <ApplicationIcon>imgs\logo.ico</ApplicationIcon>
@@ -43,6 +43,7 @@
     <None Remove="imgs\layout.png" />
     <None Remove="imgs\list.png" />
     <None Remove="imgs\local_io.png" />
+    <None Remove="imgs\log.png" />
     <None Remove="imgs\logo.png" />
     <None Remove="imgs\meta.png" />
     <None Remove="imgs\metadata.png" />
@@ -107,6 +108,7 @@
     <Resource Include="imgs\insert.png" />
     <Resource Include="imgs\layout.png" />
     <Resource Include="imgs\local_io.png" />
+    <Resource Include="imgs\log.png" />
     <Resource Include="imgs\logo.png" />
     <Resource Include="imgs\miscellaneous.png" />
     <Resource Include="imgs\move_down.png" />
@@ -210,6 +212,14 @@
   
   <ItemGroup>
     <SplashScreen Include="splash.jpg" />
+  </ItemGroup>
+
+  
+  
+  <ItemGroup>
+    <Compile Update="Utility\EventLog\EventLogViewer.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
   </ItemGroup>
 
   

@@ -667,7 +667,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                    __object_dictionary, (__objects_viewer.DataContext as ObjectsModel).ObjectIndexes,
                    __tx_diagnostic_area, __tx_bit_area, __tx_block_area,
                    __rx_control_area, __rx_bit_area, __rx_block_area,
-                   __interlock_area, __misc_info, __data_type_catalogue, __controller_model_catalogue);
+                   __interlock_area, __misc_info, __data_type_catalogue, __controller_model_catalogue,
+                   __settings.FTPTargetProperty);
             wnd.ShowDialog();
         }
 
@@ -691,7 +692,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                     __object_dictionary, null,
                     __tx_diagnostic_area, __tx_bit_area, __tx_block_area,
                     __rx_control_area, __rx_bit_area, __rx_block_area,
-                    __interlock_area, __misc_info, __data_type_catalogue, __controller_model_catalogue);
+                    __interlock_area, __misc_info, __data_type_catalogue, __controller_model_catalogue,
+                    __settings.FTPTargetProperty);
             if (wnd.ShowDialog() == true)
             {
                 (__variable_dictionary, __controller_configuration, __object_dictionary,
@@ -894,7 +896,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                     __object_dictionary, null,
                     __tx_diagnostic_area, __tx_bit_area, __tx_block_area,
                     __rx_control_area, __rx_bit_area, __rx_block_area,
-                    __interlock_area, __misc_info, __data_type_catalogue, __controller_model_catalogue);
+                    __interlock_area, __misc_info, __data_type_catalogue, __controller_model_catalogue, __settings.FTPTargetProperty);
             if (wnd.ShowDialog() == true)
                 MessageBox.Show(__compare_result(wnd.UploadResult, (wnd.DataContext as FTPUtilityModel).IO), "Comparison Result", MessageBoxButton.OK, MessageBoxImage.Information);
         }
@@ -1149,6 +1151,18 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                 __variables_viewer.AddEtherCATVariables(infos, __ecat_variable_datatype_converter, true);
             else
                 MessageBox.Show("Perhaps you should first create a new file or open an existing one.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+
+        private void EventHistory_Executed(object sender, System.Windows.Input.ExecutedRoutedEventArgs e)
+        {
+
+            EventLogViewer viewer = new EventLogViewer(__settings.FTPTargetProperty);
+            viewer.ShowDialog();
+        }
+
+        private void EventHistory_CanExecuted(object sender, System.Windows.Input.CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = true;
         }
     }
 }

@@ -1,0 +1,55 @@
+﻿<Window x:Class="AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility.EventLogViewer"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility"
+        xmlns:sync="http://schemas.syncfusion.com/wpf"
+        xmlns:syncfusionskin ="clr-namespace:Syncfusion.SfSkinManager;assembly=Syncfusion.SfSkinManager.WPF"
+         xmlns:sys="clr-namespace:System;assembly=mscorlib"
+        mc:Ignorable="d"
+        Title="EventLog Viewer" Height="450" Width="800">
+    <Grid syncfusionskin:SfSkinManager.Theme="{syncfusionskin:SkinManagerExtension ThemeName=FluentLight}">
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition Height="auto"/>
+        </Grid.RowDefinitions>
+        
+        <Grid Grid.Row="1" Margin="4" HorizontalAlignment="Stretch">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition/>
+                <ColumnDefinition Width="32"/>
+            </Grid.ColumnDefinitions>
+            <Grid.Resources>
+                <ObjectDataProvider ObjectType="{x:Type sys:Enum}" MethodName="GetValues" x:Key="destinations">
+                    <ObjectDataProvider.MethodParameters>
+                        <x:Type TypeName="local:EventLogDestination"/>
+                    </ObjectDataProvider.MethodParameters>
+                </ObjectDataProvider>
+            </Grid.Resources>
+            <sync:SfTextInputLayout DockPanel.Dock="Left" Hint="Destination" HelperText="Choose save destination of event history file." FontSize="12" FontStyle="Italic" ContainerType="Filled" Margin="4,8,4,8">
+                <sync:ComboBoxAdv FontStyle="Normal" ItemsSource="{Binding Source={StaticResource destinations}}" SelectedItem="{Binding HistoryDestination}"/>
+            </sync:SfTextInputLayout>
+
+            <Button Grid.Column="1" VerticalAlignment="Center" Height="30" Width="128" Margin="4" Click="Upload_Click" HorizontalAlignment="Right" Name="UploadBt">
+                Upload
+            </Button>
+            <sync:SfBusyIndicator Grid.Column="2" IsBusy="{Binding IsBusy}" AnimationType="Cupertino" ViewboxHeight="28" ViewboxWidth="28"/>
+        </Grid>
+        <sync:SfDataGrid Name="MainViewer" Margin="4" AutoGenerateColumns="False"  ShowRowHeader="True" ColumnSizer="AutoLastColumnFill"
+                         LiveDataUpdateMode="AllowDataShaping" ScrollMode="Async" QueryRowHeight="MainViewer_QueryRowHeight">
+            <sync:SfDataGrid.Columns>
+                <sync:GridTextColumn ValueBinding="{Binding Data}" HeaderText="Occurrence Data"/>
+                <sync:GridTextColumn ValueBinding="{Binding EventType, StringFormat='0x{0:X04}'}" HeaderText="Event Type"/>
+                <sync:GridTextColumn ValueBinding="{Binding EventCode, StringFormat='0x{0:X04}'}" HeaderText="Event Code"/>
+                <sync:GridTextColumn ValueBinding="{Binding Source, StringFormat='0x{0:X08}'}" HeaderText="Source"/>
+                <sync:GridTextColumn ValueBinding="{Binding StartIO, StringFormat='0x{0:X04}'}" HeaderText="Start I/O"/>
+                <sync:GridTextColumn ValueBinding="{Binding OrbmentErrorCode, StringFormat='0x{0:X08}'}" HeaderText="Orbment Error Code"/>
+                <sync:GridTextColumn ValueBinding="{Binding OrbmentEventDetails}" HeaderText="Orbment Event Details"/>
+            </sync:SfDataGrid.Columns>
+        </sync:SfDataGrid>
+
+        
+    </Grid>
+</Window>

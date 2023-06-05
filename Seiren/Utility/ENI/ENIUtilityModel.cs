@@ -62,7 +62,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility
                         if (varEntry.SelectSingleNode("Name") != null)
                         {
                             string? varName = varEntry.SelectSingleNode("Name").FirstChild.Value;
-                            string? varType = varEntry.SelectSingleNode("DataType").FirstChild.Value;
+                            string? varType = varEntry.SelectSingleNode("DataType").FirstChild.Value.ToUpper();
                             ushort varIndex = Convert.ToUInt16(varEntry.SelectSingleNode("Index").FirstChild.Value.Substring(2), 16);
                             byte varSubIndex = Convert.ToByte(varEntry.SelectSingleNode("SubIndex").FirstChild.Value, 10);
 
@@ -89,7 +89,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility
                         if (varEntry.SelectSingleNode("Name") != null)
                         {
                             string? varName = varEntry.SelectSingleNode("Name").FirstChild.Value;
-                            string? varType = varEntry.SelectSingleNode("DataType").FirstChild.Value;
+                            string? varType = varEntry.SelectSingleNode("DataType").FirstChild.Value.ToUpper();
                             ushort varIndex = Convert.ToUInt16(varEntry.SelectSingleNode("Index").FirstChild.Value.Substring(2), 16);
                             byte varSubIndex = Convert.ToByte(varEntry.SelectSingleNode("SubIndex").FirstChild.Value, 10);
 
@@ -234,6 +234,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility
                         __lombardia_data_type_dictionary["BOOL"] = dt.Value; break;
                     case "BYTE":
                         __lombardia_data_type_dictionary["USINT"] = dt.Value;
+                        __lombardia_data_type_dictionary["BYTE"] = dt.Value;
                         DefaultLombardiaDataType = dt.Value;
                         break;
                     case "SBYTE":

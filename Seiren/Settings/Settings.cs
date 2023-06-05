@@ -1,6 +1,7 @@
 ﻿using AMEC.PCSoftware.CommunicationProtocol.CrazyHein.SLMP.Master;
 using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia;
 using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Debugger;
+using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -35,6 +36,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         public string GagharvVersion { get; init; } = System.Reflection.Assembly.GetAssembly(typeof(RemoteOperationMaster)).GetName().Version.ToString();
 
         public SlmpTargetProperty SlmpTargetProperty { get; private set; }
+        public FTPTargetProperty FTPTargetProperty { get; private set; }
         public PreferenceProperty PreferenceProperty { get; private set; }
 
         private static ReadOnlySpan<byte> __UTF8_BOM => new byte[] { 0xEF, 0xBB, 0xBF };
@@ -46,6 +48,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             writer.WriteStartObject();
             writer.WritePropertyName("Debugger");
             SlmpTargetProperty.Save(writer);
+            writer.WritePropertyName("FTP");
+            FTPTargetProperty.Save(writer);
             writer.WritePropertyName("Preference");
             PreferenceProperty.Save(writer);
             writer.WriteEndObject();
@@ -77,6 +81,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                             {
                                 case "Debugger":
                                     SlmpTargetProperty = SlmpTargetProperty.RESTORE(ref reader); break;
+                                case "FTP":
+                                    FTPTargetProperty = FTPTargetProperty.RESTORE(ref reader); break;
                                 case "Preference":
                                     PreferenceProperty = PreferenceProperty.RESTORE(ref reader); break;
                             }
@@ -93,6 +99,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             finally
             {
                 SlmpTargetProperty ??= new SlmpTargetProperty();
+                FTPTargetProperty ??= new FTPTargetProperty();
                 PreferenceProperty ??= new PreferenceProperty();
             }
         }
