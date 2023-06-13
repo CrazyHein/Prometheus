@@ -27,7 +27,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility
             ProcessDataImage txdiag, ProcessDataImage txbit, ProcessDataImage txblk,
             ProcessDataImage rxctl, ProcessDataImage rxbit, ProcessDataImage rxblk,
             InterlockCollection intlk, Miscellaneous misc,
-            DataTypeCatalogue dataTypes, ControllerModelCatalogue models,
+            DataTypeCatalogue dataTypes, ControllerModelCatalogue models, ImportExportPreference? preference,
             string? currentlyOpenedFile)
         {
             InitializeComponent();
@@ -36,7 +36,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility
                 cc, configurationNames,
                 od, objectIndexes,
                 txdiag, txbit, txblk, rxctl, rxbit, rxblk, intlk, misc,
-                dataTypes, models,
+                dataTypes, models, preference,
                 currentlyOpenedFile);
             if (mode == ImportExportMode.Import || mode == ImportExportMode.Compare)
             {

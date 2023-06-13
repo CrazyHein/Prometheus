@@ -139,6 +139,14 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         public DataSyncMode RxBlockAreaSyncMode { get; set; } = DataSyncMode.Read;
         public DataSyncMode RxControlAreaSyncMode { get; set; } = DataSyncMode.Write;
         public bool SaveLayoutState { get; set; } = false;
+        public bool SeparateHardwareInterlocks { get; set; } = false;
+        public bool SeparateExclusiveInterlocks { get; set; } = false;
+        public string XlsSheetProtectionPassword { get; set; } = "password";
+
+        public string HardwareInterlocksAlias { get; set; } = "Hardware";
+        public string NonHardwareInterlocksAlias { get; set; } = "Software";
+        public string ExclusiveInterlocksAlias { get; set; } = "Exclusive";
+        public string NonExclusiveInterlocksAlias { get; set; } = "General";
 
         private static JsonSerializerOptions __JSON_OPTION = new JsonSerializerOptions
         {

@@ -575,6 +575,16 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                     __tx_diagnostic_area, __tx_bit_area, __tx_block_area,
                     __rx_control_area, __rx_bit_area, __rx_block_area,
                     __interlock_area, __misc_info, __data_type_catalogue, __controller_model_catalogue,
+                    new ImportExportPreference()
+                    {
+                        SeparateOutHardwareIntlk = __settings.PreferenceProperty.SeparateHardwareInterlocks,
+                        SeparateOutExclusiveIntlk = __settings.PreferenceProperty.SeparateExclusiveInterlocks,
+                        XlsSheetProtectionPassword = __settings.PreferenceProperty.XlsSheetProtectionPassword,
+                        HardwareIntlkSheetName = __settings.PreferenceProperty.HardwareInterlocksAlias,
+                        NonHardwareIntlkSheetName = __settings.PreferenceProperty.NonHardwareInterlocksAlias,
+                        ExclusiveIntlkSheetName = __settings.PreferenceProperty.ExclusiveInterlocksAlias,
+                        NonExclusiveIntlkSheetName = __settings.PreferenceProperty.NonExclusiveInterlocksAlias
+                    },
                     __main_model.IsNonTemporaryFile ? __main_model.CurrentlyOpenFile : null);
             wnd.ShowDialog();
         }
@@ -599,7 +609,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                     __object_dictionary, null,
                     __tx_diagnostic_area, __tx_bit_area, __tx_block_area,
                     __rx_control_area, __rx_bit_area, __rx_block_area, 
-                    __interlock_area, __misc_info, __data_type_catalogue, __controller_model_catalogue, 
+                    __interlock_area, __misc_info, __data_type_catalogue, __controller_model_catalogue,
+                    null,
                     __main_model.IsNonTemporaryFile ? __main_model.CurrentlyOpenFile : null);
             if(wnd.ShowDialog() == true)
             {
@@ -876,6 +887,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                     __tx_diagnostic_area, __tx_bit_area, __tx_block_area,
                     __rx_control_area, __rx_bit_area, __rx_block_area,
                     __interlock_area, __misc_info, __data_type_catalogue, __controller_model_catalogue,
+                    null,
                     __main_model.IsNonTemporaryFile ? __main_model.CurrentlyOpenFile : null);
             if (wnd.ShowDialog() == true)
                 MessageBox.Show(__compare_result(wnd.ImportResult, (wnd.DataContext as ImportExportModel).XMLIO), "Comparison Result", MessageBoxButton.OK, MessageBoxImage.Information);

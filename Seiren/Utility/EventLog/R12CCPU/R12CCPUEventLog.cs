@@ -31,27 +31,37 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility.R12C
             __parse(content, start, Info.record_size_in_byte, content.Length);
         }
 
-        private byte[] __read_record(byte[] content, int start, int capacity)
+        private byte[] __read_record(byte[] content, int start, int leftbytes, int capacity)
         {
-            if(capacity < 4)
+            if(leftbytes < Marshal.SizeOf<RecordHeader>() || capacity < Marshal.SizeOf<RecordHeader>())
                 return null;
 
             byte stx_value0 = content[start % capacity];
             byte stx_value1 = content[(start + 1) % capacity];
+            byte stx_value2 = content[(start + 2) % capacity];
+            byte stx_value3 = content[(start + 3) % capacity];
 
-            int end = (start + 2) % capacity;
-            while (true)
+            int end = (start + Marshal.SizeOf<RecordHeader>()) % capacity;
+            int read = Marshal.SizeOf<RecordHeader>();
+            bool match = false;
+            while (read + 4 <= leftbytes)
             {
-                byte etx_value0 = content[end % capacity];
+                byte etx_value0 = content[(end + 0) % capacity];
                 byte etx_value1 = content[(end + 1) % capacity];
-                if(etx_value0 == stx_value0 && etx_value1 == stx_value1)
+                byte etx_value2 = content[(end + 2) % capacity];
+                byte etx_value3 = content[(end + 3) % capacity];
+                if (etx_value2 == stx_value0 && etx_value3 == stx_value1 && etx_value0 == stx_value2 && etx_value1 == stx_value3)
+                {
+                    match = true;
                     break;
+                }
 
-                end = (end + 1) % capacity;
+                end = (end + 4) % capacity;
+                read += 4;
             }
-
-            if(end != start && (end + 1) % capacity != start)
+            if(match)
             {
+                end = (end + 2) % capacity;
                 int length = end > start ? end - start + 2 : capacity - (start - end) + 2;
                 byte[] one = new byte[length];
                 end = (end + 1) % capacity;
@@ -75,8 +85,13 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility.R12C
             ReadOnlySpan<byte> buffer = content;
             while(read < size)
             {
-                byte[] r = __read_record(content, (start + read) % capacity, capacity);
-                if (r.Length + read <= size)
+                if(content[(start + read) % capacity] == 0)
+                {
+                    read++;
+                    continue;
+                }
+                byte[] r = __read_record(content, (start + read) % capacity, size - read, capacity);
+                if (r != null)
                 {
                     rheater = MemoryMarshal.Read<RecordHeader>(buffer.Slice((start + read) % capacity));
                     string data =

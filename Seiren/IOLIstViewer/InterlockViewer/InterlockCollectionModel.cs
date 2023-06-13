@@ -21,6 +21,56 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         private ProcessDataImage __rx_bit_data_image;
         //public IReadOnlyList<InterlockLogic> InterlockLogicModels { get; private set; }
         public IReadOnlyList<InterlockLogicModel> InterlockLogicModels { get; private set; }
+
+        public bool IgnoreHardwareIntlks
+        {
+            set
+            {
+                if (value && (__interlock_collection.IgnoredAttribute & (uint)InterlockAttribute.Hardware) == 0)
+                {
+                    __interlock_collection.IgnoredAttribute |= (uint)InterlockAttribute.Hardware;
+                    OnPropertyChanged("IgnoreHardwareIntlks");
+                    Modified = true;
+                    __objects_source.SubsModified = true;
+                }
+                else if (!value && (__interlock_collection.IgnoredAttribute & (uint)InterlockAttribute.Hardware) != 0)
+                {
+                    __interlock_collection.IgnoredAttribute &= (uint)~InterlockAttribute.Hardware;
+                    OnPropertyChanged("IgnoreHardwareIntlks");
+                    Modified = true;
+                    __objects_source.SubsModified = true;
+                }
+            }
+            get
+            {
+                return (__interlock_collection.IgnoredAttribute & (uint)InterlockAttribute.Hardware) != 0;
+            }
+        }
+
+        public bool IgnoreExclusiveIntlks
+        {
+            set
+            {
+                if (value && (__interlock_collection.IgnoredAttribute & (uint)InterlockAttribute.Exclusive) == 0)
+                {
+                    __interlock_collection.IgnoredAttribute |= (uint)InterlockAttribute.Exclusive;
+                    OnPropertyChanged("IgnoreExclusiveIntlks");
+                    Modified = true;
+                    __objects_source.SubsModified = true;
+                }
+                else if (!value && (__interlock_collection.IgnoredAttribute & (uint)InterlockAttribute.Exclusive) != 0)
+                {
+                    __interlock_collection.IgnoredAttribute &= (uint)~InterlockAttribute.Exclusive;
+                    OnPropertyChanged("IgnoreExclusiveIntlks");
+                    Modified = true;
+                    __objects_source.SubsModified = true;
+                }
+            }
+            get
+            {
+                return (__interlock_collection.IgnoredAttribute & (uint)InterlockAttribute.Exclusive) != 0;
+            }
+        }
         private bool __is_offline = true;
         public bool IsOffline
         {
@@ -63,10 +113,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             }
         }
 
-        public void Add(string name, string target, string statement, bool log = true)
+        public void Add(uint attr, string name, string target, string statement, bool log = true)
         {
             //__interlock_logic_models.Add(__interlock_collection.Add(name, target, statement));
-            __interlock_logic_models.Add(new InterlockLogicModel(__interlock_collection.Add(name, target, statement)));
+            __interlock_logic_models.Add(new InterlockLogicModel(__interlock_collection.Add(attr, name, target, statement)));
             Modified = true;
             __objects_source.SubsModified = true;
             if (log && OperatingHistory != null)
@@ -74,10 +124,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                     NewValue = new Tuple<string, string, string>(name, target, statement) });
         }
 
-        public void Insert(int index, string name, string target, string statement, bool log = true)
+        public void Insert(int index, uint attr, string name, string target, string statement, bool log = true)
         {
             //__interlock_logic_models.Insert(index, __interlock_collection.Insert(index, name, target, statement));
-            __interlock_logic_models.Insert(index, new InterlockLogicModel(__interlock_collection.Insert(index, name, target, statement)));
+            __interlock_logic_models.Insert(index, new InterlockLogicModel(__interlock_collection.Insert(index, attr, name, target, statement)));
             Modified = true;
             __objects_source.SubsModified = true;
             if (log && OperatingHistory != null)
@@ -104,11 +154,11 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             }
         }
 
-        public void Replace(int index, string name, string target, string statement, bool log = true)
+        public void Replace(int index, uint attr, string name, string target, string statement, bool log = true)
         {
             //__interlock_logic_models[index] = __interlock_collection.Replace(index, name, target, statement);
             var logic = __interlock_collection.Logics[index];
-            __interlock_logic_models[index] = new InterlockLogicModel(__interlock_collection.Replace(index, name, target, statement));
+            __interlock_logic_models[index] = new InterlockLogicModel(__interlock_collection.Replace(index, attr, name, target, statement));
             Modified = true;
             __objects_source.SubsModified = true;
             if (log && OperatingHistory != null)
@@ -126,6 +176,20 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             }
         }
 
+        public void Move(int srcIndex, int dstIndex, bool log = true)
+        {
+            if (srcIndex >= __interlock_logic_models.Count || dstIndex >= __interlock_logic_models.Count || srcIndex < 0 || dstIndex < 0)
+                throw new ArgumentOutOfRangeException();
+            __interlock_collection.Move(srcIndex, dstIndex);
+            var temp = __interlock_logic_models[srcIndex];
+            __interlock_logic_models.RemoveAt(srcIndex);
+            __interlock_logic_models.Insert(dstIndex, temp);
+            Modified = true;
+            __objects_source.SubsModified = true;
+            if (log && OperatingHistory != null)
+                OperatingHistory.PushOperatingRecord(new OperatingRecord() { Host = this, Operation = Operation.Move, OriginaPos = srcIndex, NewPos = dstIndex, OriginalValue = temp, NewValue = temp });
+        }
+
         public void Save(XmlDocument doc, XmlElement root)
         {
             __interlock_collection.Save(doc, root);
@@ -135,7 +199,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         public void ProcessDataValueChanged(ushort[] tx, ushort[] rx)
         {
             foreach (var logic in __interlock_logic_models)
-                logic.Eval(tx, rx);
+                logic.Eval(tx, rx, __interlock_collection.IgnoredAttribute);
         }
 
         public void ResetProcessDataValue()
@@ -153,18 +217,21 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                     Remove(r.NewPos, false);
                     break;
                 case Operation.Remove:
-                    var v = r.OriginalValue as Tuple<string, string, string>;
+                    var v = r.OriginalValue as Tuple<uint, string, string, string>;
                     if (r.OriginaPos == __interlock_logic_models.Count)
-                        Add(v.Item1, v.Item2, v.Item3, false);
+                        Add(v.Item1, v.Item2, v.Item3, v.Item4, false);
                     else
-                        Insert(r.OriginaPos, v.Item1, v.Item2, v.Item3, false);
+                        Insert(r.OriginaPos, v.Item1, v.Item2, v.Item3, v.Item4, false);
                     break;
                 case Operation.Insert:
                     Remove(r.NewPos, false);
                     break;
                 case Operation.Replace:
-                    v = r.OriginalValue as Tuple<string, string, string>;
-                    Replace(r.NewPos, v.Item1, v.Item2, v.Item3, false);
+                    v = r.OriginalValue as Tuple<uint, string, string, string>;
+                    Replace(r.NewPos, v.Item1, v.Item2, v.Item3, v.Item4, false);
+                    break;
+                case Operation.Move:
+                    Move(r.NewPos, r.OriginaPos, false);
                     break;
                 default:
                     throw new NotImplementedException();
@@ -176,19 +243,22 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             switch (r.Operation)
             {
                 case Operation.Add:
-                    var v = r.NewValue as Tuple<string, string, string>;
-                    Add(v.Item1, v.Item2, v.Item3, false);
+                    var v = r.NewValue as Tuple<uint, string, string, string>;
+                    Add(v.Item1, v.Item2, v.Item3, v.Item4, false);
                     break;
                 case Operation.Remove:
                     Remove(r.OriginaPos, false);
                     break;
                 case Operation.Insert:
-                    v = r.NewValue as Tuple<string, string, string>;
-                    Insert(r.NewPos, v.Item1, v.Item2, v.Item3, false);
+                    v = r.NewValue as Tuple<uint, string, string, string>;
+                    Insert(r.NewPos, v.Item1, v.Item2, v.Item3, v.Item4, false);
                     break;
                 case Operation.Replace:
-                    v = r.NewValue as Tuple<string, string, string>;
-                    Replace(r.OriginaPos, v.Item1, v.Item2, v.Item3, false);
+                    v = r.NewValue as Tuple<uint, string, string, string>;
+                    Replace(r.OriginaPos, v.Item1, v.Item2, v.Item3, v.Item4, false);
+                    break;
+                case Operation.Move:
+                    Move(r.OriginaPos, r.NewPos, false);
                     break;
                 default:
                     throw new NotImplementedException();
@@ -292,6 +362,19 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                 }
             }
         }
+        private bool __ignored = false;
+        public bool Ignored
+        {
+            get { return __ignored; }
+            set
+            {
+                if (value != __ignored)
+                {
+                    __ignored = value;
+                    _notify_property_changed();
+                }
+            }
+        }
 
         public LogicTargetModel(ProcessData data, LogicExpressionModel root) : base(data, root)
         {
@@ -355,6 +438,30 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
 
         public InterlockLogic Logic { get; private set; }
 
+        public bool IsHardware { get { return (Logic.Attr & (uint)InterlockAttribute.Hardware) != 0; } }
+        public bool IsExclusive { get { return (Logic.Attr & (uint)InterlockAttribute.Exclusive) != 0; } }
+
+        public string Title { get { return Logic.Attr == 0 ? Logic.Name : AttributeValue(Logic.Attr) + " " + Logic.Name; } }
+
+        public static string? AttributeValue(uint value)
+        {
+            if (value == 0)
+                return null;
+            StringBuilder sb = new StringBuilder("[");
+            if ((value & (uint)InterlockAttribute.Hardware) != 0)
+            {
+                sb.Append("Hardware");
+            }
+            if ((value & (uint)InterlockAttribute.Exclusive) != 0)
+            {
+                if(sb.Length > 1)
+                    sb.Append(", Exclusive");
+                else
+                    sb.Append("Exclusive");
+            }
+            return sb.Append("]").ToString();
+        }
+
         public InterlockLogicModel(InterlockLogic logic)
         {
             Logic = logic;
@@ -402,13 +509,27 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             }
         }
 
-        public void Eval(ushort[] tx, ushort[] rx)
+        public void Eval(ushort[] tx, ushort[] rx, uint attr)
         {
             bool res = Statement.Eval(tx, rx);
             foreach (var t in Targets)
             {
-                t.Warning = (t.Eval(tx, rx) == true && res == false);
+                t.Warning = (t.Eval(tx, rx) == true && res == false && (attr & Logic.Attr) == 0);
+                t.Ignored = (attr & Logic.Attr) != 0;
             }
         }
+
+        public override string ToString()
+        {
+            return Title;
+        }
+    }
+
+    [System.Flags]
+    public enum InterlockAttribute : uint
+    {
+        None = 0x00000000,
+        Hardware = 0x00000001,
+        Exclusive = 0x00000002
     }
 }

@@ -472,6 +472,38 @@
 				<BitArea>8192</BitArea>
 			</RX>
 		</ExtensionModel>
+		<ExtensionModel>
+			<ID>0x0080</ID>
+			<Name>RJ61BT11_MASTER_V1</Name>
+			<BitSize>0x20</BitSize>
+			<TX>
+				<RX>2048</RX>
+				<RYFB>2048</RYFB>
+				<Link>64</Link>
+				<XStatus>1</XStatus>
+				<RWr>256</RWr>
+			</TX>
+			<RX>
+				<RY>2048</RY>
+				<RWw>256</RWw>
+			</RX>
+		</ExtensionModel>
+		<ExtensionModel>
+			<ID>0x0081</ID>
+			<Name>RJ61BT11_MASTER_V2</Name>
+			<BitSize>0x20</BitSize>
+			<TX>
+				<RX>8192</RX>
+				<RYFB>8192</RYFB>
+				<Link>64</Link>
+				<XStatus>1</XStatus>
+				<RWr>2048</RWr>
+			</TX>
+			<RX>
+				<RY>8192</RY>
+				<RWw>2048</RWw>
+			</RX>
+		</ExtensionModel>
 	</ExtensionModels>
 	<EthernetModels ConfigurationFields = "Timeout;Timer;Interval;Priority;InputDataOffset;InputDataSize;OutputDataOffset;OutputDataSize;">
 		<EthernetModel>

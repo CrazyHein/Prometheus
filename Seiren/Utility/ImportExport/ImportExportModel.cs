@@ -10,6 +10,16 @@ using System.Threading.Tasks;
 
 namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility
 {
+    public class ImportExportPreference
+    {
+        public bool SeparateOutHardwareIntlk { get; init; } = false;
+        public bool SeparateOutExclusiveIntlk { get; init; } = false;
+        public string? XlsSheetProtectionPassword { get; init; } = null;
+        public string HardwareIntlkSheetName { get; init; } = "Hardware";
+        public string NonHardwareIntlkSheetName { get; init; } = "Software";
+        public string ExclusiveIntlkSheetName { get; init; } = "Exclusive";
+        public string NonExclusiveIntlkSheetName { get; init; } = "General";
+    }
     internal class ImportExportModel : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
@@ -35,6 +45,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility
         private DataTypeCatalogue __data_type_catalogue;
         private ControllerModelCatalogue __controller_model_catalogue;
         private IOCelcetaHelper.WorksheetSelection __worksheet_selection = IOCelcetaHelper.WorksheetSelection.COMMON_USED_AREA;
+        private ImportExportPreference __preference;
         public ImportExportModel(ImportExportMode mode,
             VariableDictionary vd, IEnumerable<string> variableNames, 
             ControllerConfiguration cc, IEnumerable<string> configurationNames, 
@@ -42,7 +53,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility
             ProcessDataImage txdiag, ProcessDataImage txbit, ProcessDataImage txblk,
             ProcessDataImage rxctl, ProcessDataImage rxbit, ProcessDataImage rxblk,
             InterlockCollection intlk, Miscellaneous misc, 
-            DataTypeCatalogue dataTypes, ControllerModelCatalogue models, 
+            DataTypeCatalogue dataTypes, ControllerModelCatalogue models, ImportExportPreference? preference,
             string? currentlyOpenedFile)
         {
             Mode = mode;
@@ -62,6 +73,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility
             __object_indexes = objectIndexes;
             __data_type_catalogue = dataTypes;
             __controller_model_catalogue = models;
+
+            __preference = preference??new ImportExportPreference();
 
             if (currentlyOpenedFile == null || currentlyOpenedFile.Length == 0)
             {
@@ -255,16 +268,63 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility
                 
             if (XLS)
             {
-                var pass = System.Security.Cryptography.SHA256.Create();
-                var bytes = pass.ComputeHash(BitConverter.GetBytes((new object()).GetHashCode()));
-                pass.Dispose();
-                IOCelcetaHelper.Export(__xls_archives_path, null, null, bytes[7].ToString("X2") + bytes[15].ToString("X2") + bytes[23].ToString("X2") + bytes[31].ToString("X2"),
+                //var pass = System.Security.Cryptography.SHA256.Create();
+                //var bytes = pass.ComputeHash(BitConverter.GetBytes((new object()).GetHashCode()));
+                //pass.Dispose();
+
+                List<Tuple<Func<uint, bool>, string>>? names = null;
+                if(__preference.SeparateOutHardwareIntlk == true && __preference.SeparateOutExclusiveIntlk == false)
+                {
+                    names = new List<Tuple<Func<uint, bool>, string>>
+                    {
+                        new Tuple<Func<uint, bool>, string>(v => (v & (uint)InterlockAttribute.Hardware) == 0,
+                            __preference.NonHardwareIntlkSheetName + " Intlks"),
+                        new Tuple<Func<uint, bool>, string>(v => (v & (uint)InterlockAttribute.Hardware) != 0,
+                            __preference.HardwareIntlkSheetName + " Intlks")
+                    };
+                }
+                else if(__preference.SeparateOutHardwareIntlk == false && __preference.SeparateOutExclusiveIntlk == true)
+                {
+                    names = new List<Tuple<Func<uint, bool>, string>>
+                    {
+                        new Tuple<Func<uint, bool>, string>(v => (v & (uint)InterlockAttribute.Exclusive) == 0,
+                            __preference.NonExclusiveIntlkSheetName + " Intlks"),
+                        new Tuple<Func<uint, bool>, string>(v => (v & (uint)InterlockAttribute.Exclusive) != 0,
+                            __preference.ExclusiveIntlkSheetName + " Intlks")
+                    };
+                }
+                else if (__preference.SeparateOutHardwareIntlk == true && __preference.SeparateOutExclusiveIntlk == true)
+                {
+                    names = new List<Tuple<Func<uint, bool>, string>>
+                    {
+                        new Tuple<Func<uint, bool>, string>(v => ((v & (uint)InterlockAttribute.Hardware) == 0) && ((v & (uint)InterlockAttribute.Exclusive) == 0),
+                            string.Join(" ", __preference.NonHardwareIntlkSheetName, __preference.NonExclusiveIntlkSheetName, "Intlks")),
+                        new Tuple<Func<uint, bool>, string>(v => ((v & (uint)InterlockAttribute.Hardware) != 0) && ((v & (uint)InterlockAttribute.Exclusive) == 0),
+                            string.Join(" ", __preference.HardwareIntlkSheetName, __preference.NonExclusiveIntlkSheetName, "Intlks")),
+                        new Tuple<Func<uint, bool>, string>(v => ((v & (uint)InterlockAttribute.Hardware) == 0) && ((v & (uint)InterlockAttribute.Exclusive) != 0),
+                            string.Join(" ", __preference.NonHardwareIntlkSheetName, __preference.ExclusiveIntlkSheetName, "Intlks")),
+                        new Tuple<Func<uint, bool>, string>(v => ((v & (uint)InterlockAttribute.Hardware) != 0) && ((v & (uint)InterlockAttribute.Exclusive) != 0),
+                            string.Join(" ", __preference.HardwareIntlkSheetName, __preference.ExclusiveIntlkSheetName, "Intlks"))
+                    };
+                }
+                else
+                {
+                    names = new List<Tuple<Func<uint, bool>, string>>
+                    {
+                        new Tuple<Func<uint, bool>, string>(v => true,
+                            "Legacy Intlk Table"),
+                    };
+                }
+
+                //IOCelcetaHelper.Export(__xls_archives_path, null, null, bytes[7].ToString("X2") + bytes[15].ToString("X2") + bytes[23].ToString("X2") + bytes[31].ToString("X2"),
+                IOCelcetaHelper.Export(__xls_archives_path, null, null, __preference.XlsSheetProtectionPassword,
                     __variable_dictionary, __variable_names,
                     __controller_configuration, __configuration_names,
                     __object_dictionary, __object_indexes,
                     __tx_diagnotic_area, __tx_bit_area, __tx_block_area,
                     __rx_control_area, __rx_bit_area, __rx_block_area,
-                    __interlock_area, __misc_info, __worksheet_selection);
+                    __interlock_area, __misc_info, __worksheet_selection,
+                    InterlockLogicModel.AttributeValue, names);
             }
         }
 

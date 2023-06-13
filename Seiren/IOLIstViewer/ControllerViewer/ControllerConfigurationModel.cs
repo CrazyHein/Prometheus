@@ -90,7 +90,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
 
         public void Move(int srcIndex, int dstIndex, bool log = true)
         {
-            if (srcIndex > __device_configurations.Count || dstIndex > __device_configurations.Count || srcIndex < 0 || dstIndex < 0)
+            if (srcIndex >= __device_configurations.Count || dstIndex >= __device_configurations.Count || srcIndex < 0 || dstIndex < 0)
                 throw new ArgumentOutOfRangeException();
             var temp = __device_configurations[srcIndex];
             __device_configurations.RemoveAt(srcIndex);

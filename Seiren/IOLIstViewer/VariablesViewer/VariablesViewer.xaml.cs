@@ -38,7 +38,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                 var variablesModel = DataContext as VariablesModel;
                 VariableModel targetVariable = variablesModel.Variables[(int)e.TargetRecord];
 
-                MainViewer.BeginInit();
+                MainViewer.View.BeginInit();
                 int dragIndex = variablesModel.IndexOf(draggingRecords[0] as VariableModel);
                 int targetIndex = variablesModel.IndexOf(targetVariable);
                 int insertionIndex = 0;
@@ -47,7 +47,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                 else
                     insertionIndex = e.DropPosition == DropPosition.DropAbove ? targetIndex - 1 : targetIndex;
                 variablesModel.Move(dragIndex, insertionIndex);
-                MainViewer.EndInit();
+                MainViewer.View.EndInit();
                 CommandManager.InvalidateRequerySuggested();
             }
         }

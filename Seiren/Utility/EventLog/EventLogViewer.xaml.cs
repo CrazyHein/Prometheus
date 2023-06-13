@@ -40,18 +40,48 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility
             try
             {
                 model.IsBusy = true;
-                UploadBt.IsEnabled = false;
+                ControlPanelGrid.IsEnabled = false;
                 await Task.Run(() => model.Upload());
-                model.IsBusy = false;
-                UploadBt.IsEnabled = true;
                 MainViewer.ItemsSource = model.Records;
+                model.IsBusy = false;
+                ControlPanelGrid.IsEnabled = true;
             }
             catch (Exception ex)
             {
                 MessageBox.Show("At least one exception has occurred during the operation :\n" + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 model.IsBusy = false;
-                UploadBt.IsEnabled = true;
+                ControlPanelGrid.IsEnabled = true;
                 MainViewer.ItemsSource = null;
+            }
+        }
+
+        private async void BrowseOpenLocal_Click(object sender, RoutedEventArgs e)
+        {
+            EventLogModel model = DataContext as EventLogModel;
+            System.Windows.Forms.OpenFileDialog open = new System.Windows.Forms.OpenFileDialog();
+            open.Filter = "Event log history file(*.LOG)|*.LOG";
+            open.Multiselect = false;
+            if (open.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                try
+                {
+                    model.IsBusy = true;
+                    ControlPanelGrid.IsEnabled = false;
+                    model.LocalEventLogPath = open.FileName;
+                    await Task.Run(() => model.ReadLocal());
+                    MainViewer.ItemsSource = model.Records;
+                    LocalEventLogFilePathTxt.Text = model.LocalEventLogPath;
+                    model.IsBusy = false;
+                    ControlPanelGrid.IsEnabled = true;
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("At least one exception has occurred during the operation :\n" + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    MainViewer.ItemsSource = null;
+                    LocalEventLogFilePathTxt.Text = "";
+                    model.IsBusy = false;
+                    ControlPanelGrid.IsEnabled = true;
+                }
             }
         }
 

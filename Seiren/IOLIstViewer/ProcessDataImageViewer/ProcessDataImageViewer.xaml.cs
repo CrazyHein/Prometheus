@@ -55,7 +55,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                 var dataImage = DataContext as ProcessDataImageModel;
                 ProcessDataModel targetData = dataImage.ProcessDataModels[(int)e.TargetRecord];
 
-                ProcessDataImageGrid.BeginInit();
+                ProcessDataImageGrid.View.BeginInit();
                 int dragIndex = dataImage.IndexOf(draggingRecords[0] as ProcessDataModel);
                 int targetIndex = dataImage.IndexOf(targetData);
                 int insertionIndex = 0;
@@ -64,7 +64,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                 else
                     insertionIndex = e.DropPosition == DropPosition.DropAbove ? targetIndex - 1 : targetIndex;
                 dataImage.Move(dragIndex, insertionIndex);
-                ProcessDataImageGrid.EndInit();
+                ProcessDataImageGrid.View.EndInit();
                 CommandManager.InvalidateRequerySuggested();
             }
         }
@@ -211,7 +211,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
 
         private void MoveUpRecordCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            ProcessDataImageGrid.BeginInit();
+            ProcessDataImageGrid.View.BeginInit();
             var dataImage = DataContext as ProcessDataImageModel;
 
             var indexes = ProcessDataImageGrid.SelectedItems.Select(r => r as ProcessDataModel).OrderBy(r => dataImage.IndexOf(r)).ToList();
@@ -225,7 +225,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             ProcessDataImageGrid.ScrollInView(new Syncfusion.UI.Xaml.ScrollAxis.RowColumnIndex(
                  ProcessDataImageGrid.ResolveToRowIndex(indexes[0]),
                  ProcessDataImageGrid.ResolveToStartColumnIndex()));
-            ProcessDataImageGrid.EndInit();
+            ProcessDataImageGrid.View.EndInit();
             CommandManager.InvalidateRequerySuggested();
         }
 
@@ -238,7 +238,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
 
         private void MoveDownRecordCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            ProcessDataImageGrid.BeginInit();
+            ProcessDataImageGrid.View.BeginInit();
             var dataImage = DataContext as ProcessDataImageModel;
 
             var indexes = ProcessDataImageGrid.SelectedItems.Select(r => r as ProcessDataModel).OrderByDescending(r => dataImage.IndexOf(r)).ToList();
@@ -252,7 +252,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             ProcessDataImageGrid.ScrollInView(new Syncfusion.UI.Xaml.ScrollAxis.RowColumnIndex(
                  ProcessDataImageGrid.ResolveToRowIndex(indexes[0]),
                  ProcessDataImageGrid.ResolveToStartColumnIndex()));
-            ProcessDataImageGrid.EndInit();
+            ProcessDataImageGrid.View.EndInit();
             CommandManager.InvalidateRequerySuggested();
         }
 

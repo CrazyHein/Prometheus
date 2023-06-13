@@ -17,7 +17,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
         private List<InterlockLogic> __logics;
         private int __reference_find_pos = 0;
         private uint? __reference_found = null;
-        public IReadOnlyList<InterlockLogic> Logics;
+        public IReadOnlyList<InterlockLogic> Logics { get; init; }
+        public uint IgnoredAttribute { get; set; } = 0;
         public InterlockCollection(ObjectDictionary od, ProcessDataImage tx, ProcessDataImage rx)
         {
             __tx_process_data_image = tx;
@@ -34,12 +35,32 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
             {
                 if (intlksNode?.NodeType == XmlNodeType.Element)
                 {
+                    string? attrS;
+                    try
+                    {
+                        attrS = intlksNode.Attributes["IgnoredAttribute"]?.Value;
+                        IgnoredAttribute = Convert.ToUInt32(attrS, 16);
+                    }
+                    catch
+                    {
+                        IgnoredAttribute = 0;
+                    }
                     foreach (XmlNode interlock in intlksNode.ChildNodes)
                     {
                         if (interlock.NodeType != XmlNodeType.Element || interlock.Name != "Interlock")
                             continue;
 
                         List<ProcessData> subs = new List<ProcessData>();
+                        uint attr = 0;
+                        try
+                        {
+                            attrS = interlock.Attributes["Attr"]?.Value;
+                            attr = Convert.ToUInt32(attrS, 16);
+                        }
+                        catch
+                        {
+                            attr = 0;
+                        }
                         string name = interlock.SelectSingleNode("Name").FirstChild.Value;
                         var targets = __load_interlock_logic_target(interlock.SelectSingleNode("Target"), subs);
                         var statement = __load_interlock_logic_statement(interlock.SelectSingleNode("Statement").FirstChild, null, subs) as LogicExpression;
@@ -47,7 +68,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
                         if (statement == null)
                             throw new LombardiaException(LOMBARDIA_ERROR_CODE_T.INVALID_INTERLOCK_LOGIC_EXPRESSION_FORMAT);
 
-                        InterlockLogic loc = new InterlockLogic(name, targets, statement, od, tx, rx, subs);
+                        InterlockLogic loc = new InterlockLogic(attr, name, targets, statement, od, tx, rx, subs);
                         __logics.Add(loc);
                     }
                 }
@@ -62,25 +83,25 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
             }
         }
 
-        public InterlockLogic Add(string name, string target, string statement)
+        public InterlockLogic Add(uint attr, string name, string target, string statement)
         {
-            InterlockLogic logic = new InterlockLogic(name, target, statement, __object_dictionary, __tx_process_data_image, __rx_process_data_image);
+            InterlockLogic logic = new InterlockLogic(attr, name, target, statement, __object_dictionary, __tx_process_data_image, __rx_process_data_image);
             logic.AddSubscription();
             __logics.Add(logic);
             return logic;
         }
 
-        public InterlockLogic Insert(int index,string name, string target, string statement)
+        public InterlockLogic Insert(int index, uint attr, string name, string target, string statement)
         {
-            InterlockLogic logic = new InterlockLogic(name, target, statement, __object_dictionary, __tx_process_data_image, __rx_process_data_image);
+            InterlockLogic logic = new InterlockLogic(attr, name, target, statement, __object_dictionary, __tx_process_data_image, __rx_process_data_image);
             logic.AddSubscription();
             __logics.Insert(index, logic);
             return logic;
         }
 
-        public InterlockLogic Replace(int index, string name, string target, string statement, ReplaceMode mode = ReplaceMode.Full)
+        public InterlockLogic Replace(int index, uint attr, string name, string target, string statement, ReplaceMode mode = ReplaceMode.Full)
         {
-            InterlockLogic logic = new InterlockLogic(name, target, statement, __object_dictionary, __tx_process_data_image, __rx_process_data_image);
+            InterlockLogic logic = new InterlockLogic(attr, name, target, statement, __object_dictionary, __tx_process_data_image, __rx_process_data_image);
             var origin = __logics[index];
             __logics[index] = logic;
 
@@ -105,13 +126,26 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
             return __logics.IndexOf(logic);
         }
 
+        public void Move(int srcIndex, int dstIndex)
+        {
+            if (srcIndex >= __logics.Count || dstIndex >= __logics.Count || srcIndex < 0 || dstIndex < 0)
+                throw new ArgumentOutOfRangeException();
+            var temp = __logics[srcIndex];
+            __logics.RemoveAt(srcIndex);
+            __logics.Insert(dstIndex, temp);
+        }
+
         public void Save(XmlDocument doc, XmlElement intlkCollectionNode, uint version = 1)
         {
             try
             {
+                intlkCollectionNode.SetAttribute("IgnoredAttribute", "0x" + IgnoredAttribute.ToString("X8"));
                 foreach (var i in __logics)
                 {
                     XmlElement interlock = doc.CreateElement("Interlock");
+
+                    if (i.Attr != 0)
+                        interlock.SetAttribute("Attr", "0x" + i.Attr.ToString("X8"));
 
                     XmlElement e = doc.CreateElement("Name");
                     e.AppendChild(doc.CreateTextNode(i.Name));
@@ -139,7 +173,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
             }
         }
 
-        public void Save(Worksheet sheet, CellStyle title, CellStyle content, uint version = 1)
+        public void Save(Worksheet sheet, CellStyle title, CellStyle content, Func<uint, string> attributeValue, uint version = 1)
         {
             try
             {
@@ -150,7 +184,15 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
                     sheet.Range[2 + counter * 4, 1].Text = "Target";
                     sheet.Range[3 + counter * 4, 1].Text = "Statement";
 
-                    sheet.Range[1 + counter * 4, 2].Text = i.Name;
+                    if (i.Attr != 0)
+                        sheet.Range[1 + counter * 4, 2].Text = attributeValue(i.Attr) + " " + i.Name;
+                    else
+                        sheet.Range[1 + counter * 4, 2].Text = i.Name;
+
+                    sheet.Range[1 + counter * 4, 2].Style = content;
+                    if ((IgnoredAttribute & i.Attr) != 0)
+                        sheet.Range[1 + counter * 4, 2].Style.Font.IsStrikethrough = true;
+
                     StringBuilder target = new StringBuilder();
                     foreach (var t in i.Targets)
                     {
@@ -159,6 +201,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
                     }
                     sheet.Range[2 + counter * 4, 2].Text = target.ToString();
                     sheet.Range[3 + counter * 4, 2].Text = i.Statement.ToString();
+                    sheet.Range[2 + counter * 4, 2, 3 + counter * 4, 2].Style = content;
 
                     counter++;
                 }
@@ -166,10 +209,79 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
                 if (counter > 0)
                 {
                     sheet.Range[1, 1, counter * 4, 1].Style = title;
-                    sheet.Range[1, 2, counter * 4, 2].Style = content;
+                    //sheet.Range[1, 2, counter * 4, 2].Style = content;
                 }
                 sheet.AllocatedRange.AutoFitColumns();
                 sheet.AllocatedRange.AutoFitRows();
+            }
+            catch (Exception ex)
+            {
+                throw new LombardiaException(ex);
+            }
+        }
+
+        public void SaveToLegacy(Worksheet sheet, CellStyle columnHeading, CellStyle rowHeading, CellStyle content, Func<uint, bool> filter, uint version = 1)
+        {
+            int cols = 3;
+            List<StringBuilder> logicStrings = new List<StringBuilder>();
+            try
+            {
+                Dictionary<ProcessData, int> rows = new Dictionary<ProcessData, int>();
+                foreach (var i in __logics)
+                {
+                    if (filter(i.Attr) == false)
+                        continue;
+
+                    StringBuilder sb = new StringBuilder("If ");
+                    Dictionary<ProcessData, string> tags = new Dictionary<ProcessData, string>();
+                    int counter = 0;
+
+                    i.Statement.ToLegacy(tags, sb, ref counter);
+                    //logicStrings.AddRange(Enumerable.Repeat(sb, i.Targets.Count));
+                    logicStrings.Add(sb);
+
+                    for (int c = 0; c < i.Targets.Count; ++c)
+                    {
+                        sheet.Range[1, c + cols].Text = string.Join("",
+                            i.Targets[c].Access == ProcessDataImageAccess.RX ? "DO" : "DI", " - ", i.Targets[c].BitPos.ToString());
+                        sheet.Range[2, c + cols].Text = i.Targets[c].ProcessObject.Variable.Name;
+                        sheet.Range[2, c + cols].Comment.Text = i.Targets[c].ProcessObject.Variable.Comment;
+                    }
+                    foreach(var k in tags.Keys)
+                    {
+                        if(rows.ContainsKey(k) == false)
+                            rows.Add(k, rows.Count);
+
+                        sheet.Range[3 + rows[k], 1].Text = string.Join("",
+                            k.Access == ProcessDataImageAccess.RX ? "DO" : "DI", " - ", k.BitPos.ToString());
+                        sheet.Range[3 + rows[k], 2].Text = k.ProcessObject.Variable.Name;
+                        sheet.Range[3 + rows[k], 2].Comment.Text = k.ProcessObject.Variable.Comment;
+
+                        sheet.Range[3 + rows[k], cols, 3 + rows[k], cols + i.Targets.Count - 1].Text = tags[k];
+                    }
+                    cols += i.Targets.Count;
+                }
+
+                int colpos = 3;
+                int stringIdx = 0;
+                foreach (var i in __logics)
+                {
+                    if (filter(i.Attr) == false)
+                        continue;
+                    sheet.Range[rows.Count + 3, colpos, rows.Count + 3, colpos + i.Targets.Count - 1].Text = logicStrings[stringIdx].Append(", it is enabled.").ToString();
+                    colpos += i.Targets.Count;
+                    stringIdx++;
+                }
+
+                if (cols > 3)
+                {
+                    sheet.Range[1, 1, 2, cols + 2].Style = columnHeading;
+                    sheet.Range[1, 1, rows.Count + 2, 2].Style = rowHeading;
+                    sheet.Range[rows.Count + 3, 3, rows.Count + 3, cols + 2].Style = columnHeading;
+
+                    sheet.AllocatedRange.AutoFitColumns();
+                    sheet.AllocatedRange.AutoFitRows();
+                }
             }
             catch (Exception ex)
             {
@@ -320,7 +432,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
 
         public bool IsEquivalent(InterlockCollection? other)
         {
-            return other != null && other.Logics.Count == Logics.Count && other.Logics.Select((l, i) => l.IsEquivalent(Logics[i])).All(r => r == true);
+            return other != null && other.IgnoredAttribute == IgnoredAttribute && other.Logics.Count == Logics.Count && other.Logics.Select((l, i) => l.IsEquivalent(Logics[i])).All(r => r == true);
         }
 
         public int FindNext(uint index)
@@ -355,6 +467,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
         public int Layer { get; private set; }
 
         public abstract string Serialize(ProcessData? origin = null, ProcessData? replace = null);
+        public abstract void ToLegacy(Dictionary<ProcessData, string> tags, StringBuilder legacyString, ref int counter);
 
         public bool IsEquivalent(LogicElement? other)
         {
@@ -418,6 +531,16 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
                 tabs.Append("    ");
             return tabs.Append("∟").Append(Operand.ToString()).Append("\r\n").ToString();
         }
+
+        public override void ToLegacy(Dictionary<ProcessData, string> tags, StringBuilder legacyString, ref int counter)
+        {
+            if (tags.ContainsKey(Operand) == false)
+            {
+                tags[Operand] = $"X{counter}";
+                counter++;
+            }
+            legacyString.Append(" ").Append(tags[Operand]).Append(" ");
+        }
     }
 
     public class LogicExpression : LogicElement
@@ -453,10 +576,19 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
                 str.Append(e.ToString());
             return str.ToString();
         }
+
+        public override void ToLegacy(Dictionary<ProcessData, string> tags, StringBuilder legacyString, ref int counter)
+        {
+            legacyString.Append(" ").Append(Operator).Append("(");
+            foreach (var e in Elements)
+                e.ToLegacy(tags, legacyString, ref counter);
+            legacyString.Append(") ");
+        }
     }
 
     public class InterlockLogic : ISubscriber<ProcessData>, IComparable<InterlockLogic>
     {
+        public uint Attr { get; private set; } = 0;
         public string Name { get; private set; }
         public List<ProcessData> Targets { get; private set; }
         public LogicExpression Statement { get; private set; }
@@ -466,8 +598,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
         private ProcessDataImage __tx_process_data_image;
         private ProcessDataImage __rx_process_data_image;
 
-        public InterlockLogic(string name, List<ProcessData> targets, LogicExpression statement, ObjectDictionary od, ProcessDataImage tx, ProcessDataImage rx, IReadOnlyList<ProcessData> subs)
+        public InterlockLogic(uint attr, string name, List<ProcessData> targets, LogicExpression statement, ObjectDictionary od, ProcessDataImage tx, ProcessDataImage rx, IReadOnlyList<ProcessData> subs)
         {
+            Attr = attr;
             Name = name;
             Targets = targets; 
             Statement = statement;
@@ -493,9 +626,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
             Subscriptions = __subscriptions;
         }
 
-        public InterlockLogic(string name, string target, string statement,
+        public InterlockLogic(uint attr, string name, string target, string statement,
             ObjectDictionary od, ProcessDataImage tx, ProcessDataImage rx)
         {
+            Attr = attr;
             Name = name;
             try
             {
@@ -678,7 +812,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
                         targets.Append("0x").Append(t.ProcessObject.Index.ToString("X08"));
                     targets.Append("\r\n");
                 }
-                return Publisher.Replace(pos, this.Name, targets.ToString().TrimEnd(), Statement.Serialize(origin, newcome), ReplaceMode.ProcessData);
+                return Publisher.Replace(pos, this.Attr, this.Name, targets.ToString().TrimEnd(), Statement.Serialize(origin, newcome), ReplaceMode.ProcessData);
             }
             else
                 return null;
@@ -686,7 +820,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
 
         public bool IsEquivalent(InterlockLogic? other)
         {
-            if(other == null || other.Name != Name || other.Targets.Count != Targets.Count || other.Statement.IsEquivalent(Statement) == false)
+            if(other == null ||other.Attr != Attr || other.Name != Name || other.Targets.Count != Targets.Count || other.Statement.IsEquivalent(Statement) == false)
                 return false;
             else
                 return other.Targets.Select((t, i) => Targets[i].IsEquivalent(t)).All(r => r == true);

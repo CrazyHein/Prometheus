@@ -5,6 +5,7 @@ using System.Data;
 using System.IO;
 using System.Security.Cryptography;
 using System.Xml;
+using System.Linq;
 
 namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
 {
@@ -306,13 +307,13 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
             }
         }
 
-        public static void Export(string path, string workbookOpenProtectionPassword,  string workbookWriteProtectionPassword, string sheetWriteProtectionPassword,
+        public static void Export(string path, string workbookOpenProtectionPassword, string workbookWriteProtectionPassword, string sheetWriteProtectionPassword,
             VariableDictionary variables, IEnumerable<string> variableNames,
             ControllerConfiguration cc, IEnumerable<string> configurationNames,
             ObjectDictionary od, IEnumerable<uint> objectIndexes,
             ProcessDataImage txdiag, ProcessDataImage txbit, ProcessDataImage txblk,
             ProcessDataImage rxctl, ProcessDataImage rxbit, ProcessDataImage rxblk, InterlockCollection intlk,
-            Miscellaneous misc, WorksheetSelection selection)
+            Miscellaneous misc, WorksheetSelection selection, Func<uint, string> intlkAttributes, IEnumerable<Tuple<Func<uint, bool>, string>>? legacySheetNames)
         {
             bool res = IOCelcetaHelper.OVERLAP_DETECTOR(new List<(uint, uint)>()
             {
@@ -341,6 +342,13 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
                 content.VerticalAlignment = VerticalAlignType.Center;
                 content.WrapText = true;
                 content.HorizontalAlignment = HorizontalAlignType.Left;
+
+                CellStyle column = xlsxWorkbook.Styles.Add("Column");
+                column.Font.IsItalic = true;
+                column.Font.IsBold = true;
+                column.VerticalAlignment = VerticalAlignType.Center;
+                column.HorizontalAlignment = HorizontalAlignType.Center;
+                column.Rotation = 90;
 
                 xlsxWorkbook.Worksheets.Clear();
 
@@ -394,7 +402,18 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
                 if ((selection & WorksheetSelection.INTERLOCK_AREA) != 0)
                 {
                     sheet = xlsxWorkbook.Worksheets.Add("Interlock Logic Area");
-                    intlk.Save(sheet, title, content);
+                    intlk.Save(sheet, title, content, intlkAttributes);
+
+                    if(legacySheetNames != null)
+                    {
+                        foreach(var t in legacySheetNames)
+                        {
+                            if (xlsxWorkbook.Worksheets.Any(w => w.Name == t.Item2))
+                                throw new LombardiaException(LOMBARDIA_ERROR_CODE_T.DUPLICATED_WORKSHEET_NAME);
+                            sheet = xlsxWorkbook.Worksheets.Add(t.Item2);
+                            intlk.SaveToLegacy(sheet, column, title, content, t.Item1);
+                        }
+                    } 
                 }
                 if ((selection & WorksheetSelection.MISCELLANEOUS_AREA) != 0)
                 {

@@ -39,12 +39,12 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Xandria
                 var hardwareModels = DataContext as HardwareModels;
                 HardwareModel targetHardwareModel = hardwareModels.LocalHardwareModelCollection[(int)e.TargetRecord];
 
-                LocalModuleViewer.BeginInit();
+                LocalModuleViewer.View.BeginInit();
                 hardwareModels.RemoveLocal(hardwareModels.IndexOfLocal(draggingRecords[0] as HardwareModel));
                 int targetIndex = hardwareModels.IndexOfLocal(targetHardwareModel);
                 int insertionIndex = e.DropPosition == DropPosition.DropAbove ? targetIndex : targetIndex + 1;
                 hardwareModels.InsertLocal(insertionIndex, draggingRecords[0] as HardwareModel);
-                LocalModuleViewer.EndInit();
+                LocalModuleViewer.View.EndInit();
             }
         }
 
@@ -56,12 +56,12 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Xandria
                 var hardwareModels = DataContext as HardwareModels;
                 HardwareModel targetHardwareModel = hardwareModels.RemoteHardwareModelCollection[(int)e.TargetRecord];
 
-                RemoteModuleViewer.BeginInit();
+                RemoteModuleViewer.View.BeginInit();
                 hardwareModels.RemoveRemote(hardwareModels.IndexOfRemote(draggingRecords[0] as HardwareModel));
                 int targetIndex = hardwareModels.IndexOfRemote(targetHardwareModel);
                 int insertionIndex = e.DropPosition == DropPosition.DropAbove ? targetIndex : targetIndex + 1;
                 hardwareModels.InsertRemote(insertionIndex, draggingRecords[0] as HardwareModel);
-                RemoteModuleViewer.EndInit();
+                RemoteModuleViewer.View.EndInit();
             }
         }
 

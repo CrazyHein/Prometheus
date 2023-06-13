@@ -15,11 +15,10 @@
             <RowDefinition Height="auto"/>
         </Grid.RowDefinitions>
         
-        <Grid Grid.Row="1" Margin="4" HorizontalAlignment="Stretch">
+        <Grid Grid.Row="1" Margin="4" HorizontalAlignment="Stretch" Name="ControlPanelGrid">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="auto"/>
-                <ColumnDefinition/>
-                <ColumnDefinition Width="32"/>
+                <ColumnDefinition />
+                <ColumnDefinition />
             </Grid.ColumnDefinitions>
             <Grid.Resources>
                 <ObjectDataProvider ObjectType="{x:Type sys:Enum}" MethodName="GetValues" x:Key="destinations">
@@ -28,14 +27,36 @@
                     </ObjectDataProvider.MethodParameters>
                 </ObjectDataProvider>
             </Grid.Resources>
-            <sync:SfTextInputLayout DockPanel.Dock="Left" Hint="Destination" HelperText="Choose save destination of event history file." FontSize="12" FontStyle="Italic" ContainerType="Filled" Margin="4,8,4,8">
-                <sync:ComboBoxAdv FontStyle="Normal" ItemsSource="{Binding Source={StaticResource destinations}}" SelectedItem="{Binding HistoryDestination}"/>
-            </sync:SfTextInputLayout>
-
-            <Button Grid.Column="1" VerticalAlignment="Center" Height="30" Width="128" Margin="4" Click="Upload_Click" HorizontalAlignment="Right" Name="UploadBt">
-                Upload
-            </Button>
-            <sync:SfBusyIndicator Grid.Column="2" IsBusy="{Binding IsBusy}" AnimationType="Cupertino" ViewboxHeight="28" ViewboxWidth="28"/>
+            <GroupBox Header="via FTP" Padding="2,4,2,2">
+                <DockPanel LastChildFill="True">
+                    <Button DockPanel.Dock="Right" Height="30" Width="90" Margin="24,2,2,2" Click="Upload_Click" HorizontalAlignment="Right" Name="UploadBt">
+                        <Button.Content>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="Upload  " VerticalAlignment="Center"/>
+                                <sync:SfBusyIndicator IsBusy="{Binding IsBusy}" AnimationType="Cupertino" ViewboxHeight="24" ViewboxWidth="24" Background="Transparent"/>
+                            </StackPanel>
+                        </Button.Content>
+                    </Button>
+                    <sync:SfTextInputLayout DockPanel.Dock="Left" Hint="Destination" HelperText="Choose save destination of event history file." FontSize="12" FontStyle="Italic" ContainerType="Filled">
+                        <sync:ComboBoxAdv FontStyle="Normal" ItemsSource="{Binding Source={StaticResource destinations}}" SelectedItem="{Binding HistoryDestination}"/>
+                    </sync:SfTextInputLayout>
+                </DockPanel>
+            </GroupBox>
+            <GroupBox Header="Local" Grid.Column="1">
+                <DockPanel LastChildFill="True">
+                    <Button DockPanel.Dock="Right" Height="30" Width="130" Margin="24,2,2,2" Click="BrowseOpenLocal_Click" HorizontalAlignment="Right" Name="BrowseOpenLocalBt">
+                        <Button.Content>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="Browse &amp; Open  " VerticalAlignment="Center"/>
+                                <sync:SfBusyIndicator IsBusy="{Binding IsBusy}" AnimationType="Cupertino" ViewboxHeight="24" ViewboxWidth="24" Background="Transparent"/>
+                            </StackPanel>
+                        </Button.Content>
+                    </Button>
+                    <sync:SfTextInputLayout DockPanel.Dock="Left" Hint="Local Event Log File" HelperText="Browse a local event log file and open it." FontSize="12" FontStyle="Italic" ContainerType="Filled">
+                        <TextBox FontStyle="Normal" IsReadOnly="True" Name="LocalEventLogFilePathTxt"/>
+                    </sync:SfTextInputLayout>
+                </DockPanel>
+            </GroupBox>
         </Grid>
         <sync:SfDataGrid Name="MainViewer" Margin="4" AutoGenerateColumns="False"  ShowRowHeader="True" ColumnSizer="AutoLastColumnFill"
                          LiveDataUpdateMode="AllowDataShaping" ScrollMode="Async" QueryRowHeight="MainViewer_QueryRowHeight">

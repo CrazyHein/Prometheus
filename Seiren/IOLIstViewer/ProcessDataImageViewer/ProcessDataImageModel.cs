@@ -232,7 +232,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
 
         public void Move(int srcIndex, int dstIndex, bool log = true)
         {
-            if (srcIndex > __process_data_models.Count || dstIndex > __process_data_models.Count || srcIndex < 0 || dstIndex < 0)
+            if (srcIndex >= __process_data_models.Count || dstIndex >= __process_data_models.Count || srcIndex < 0 || dstIndex < 0)
                 throw new ArgumentOutOfRangeException();
             __process_data_image.Move(srcIndex, dstIndex);
             var temp = __process_data_models[srcIndex];

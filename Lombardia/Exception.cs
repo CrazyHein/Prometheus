@@ -75,6 +75,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
         INVALID_TIMER_CYCLE_SETTING = 0x00000301,
         INVALID_TIME_OUT_SETTING = 0x00000302,
 
+        DUPLICATED_WORKSHEET_NAME = 0x00000400,
 
         RUNTIME_ERROR = 0x80000000
     }

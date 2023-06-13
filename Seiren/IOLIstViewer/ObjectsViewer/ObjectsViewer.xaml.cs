@@ -118,7 +118,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                 var objects = DataContext as ObjectsModel;
                 ObjectModel targetObject = objects.Objects[(int)e.TargetRecord];
 
-                MainViewer.BeginInit();
+                MainViewer.View.BeginInit();
                 int dragIndex = objects.IndexOf(draggingRecords[0] as ObjectModel);
                 int targetIndex = objects.IndexOf(targetObject);
                 int insertionIndex = 0;
@@ -127,7 +127,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                 else
                     insertionIndex = e.DropPosition == DropPosition.DropAbove ? targetIndex - 1 : targetIndex;
                 objects.Move(dragIndex, insertionIndex);
-                MainViewer.EndInit();
+                MainViewer.View.EndInit();
                 CommandManager.InvalidateRequerySuggested();
             }
         }

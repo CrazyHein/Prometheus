@@ -287,7 +287,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
 
         public void Move(int srcIndex, int dstIndex)
         {
-            if (srcIndex > __process_datas.Count || dstIndex > __process_datas.Count || srcIndex < 0 || dstIndex < 0)
+            if (srcIndex >= __process_datas.Count || dstIndex >= __process_datas.Count || srcIndex < 0 || dstIndex < 0)
                 throw new ArgumentOutOfRangeException();
             var temp = __process_datas[srcIndex];
             __process_datas.RemoveAt(srcIndex);

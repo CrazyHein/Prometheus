@@ -188,54 +188,99 @@
                 </Grid>
             </TabItem>
             <TabItem Header="Preferences"  Width="135" x:Name="PreferenceSettings">
-                <Grid Validation.Error="DebuggerSettings_Error">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="auto" />
-                        <RowDefinition Height="auto" />
-                        <RowDefinition Height="auto" />
-                        <RowDefinition Height="auto" />
-                    </Grid.RowDefinitions>
-                    <GroupBox Header="Undo Queue of Record Operating" Padding="3,0,3,0" Margin="0,4,0,0">
-                        <sync:SfTextInputLayout Hint="Depth"  FontSize="12" FontStyle="Italic" ContainerType="Filled" Margin="4" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}"
+                <ScrollViewer>
+                    <Grid Validation.Error="DebuggerSettings_Error">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto" />
+                            <RowDefinition Height="auto" />
+                            <RowDefinition Height="auto" />
+                            <RowDefinition Height="auto" />
+                            <RowDefinition Height="auto" />
+                        </Grid.RowDefinitions>
+                        <GroupBox Header="Undo Queue of Record Operating" Padding="3,0,3,0" Margin="0,4,0,0">
+                            <sync:SfTextInputLayout Hint="Depth"  FontSize="12" FontStyle="Italic" ContainerType="Filled" Margin="4" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}"
                                                 HelperText="Restarting the application to put the change in effect.">
-                            <TextBox FontStyle="Normal" Text="{Binding RecordOperatingUndoQueueDepth, ValidatesOnExceptions=True, NotifyOnValidationError=True}"/>
-                        </sync:SfTextInputLayout>
-                    </GroupBox>
-                    <GroupBox Header="Recently Opened File Collection Capacity" Padding="3,0,3,0" Margin="0,4,0,0" Grid.Row="1">
-                        <sync:SfTextInputLayout Hint="Capacity"  FontSize="12" FontStyle="Italic" ContainerType="Filled" Margin="4" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}"
+                                <TextBox FontStyle="Normal" Text="{Binding RecordOperatingUndoQueueDepth, ValidatesOnExceptions=True, NotifyOnValidationError=True}"/>
+                            </sync:SfTextInputLayout>
+                        </GroupBox>
+                        <GroupBox Header="Recently Opened File Collection Capacity" Padding="3,0,3,0" Margin="0,4,0,0" Grid.Row="1">
+                            <sync:SfTextInputLayout Hint="Capacity"  FontSize="12" FontStyle="Italic" ContainerType="Filled" Margin="4" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}"
                                                 HelperText="Restarting the application to put the change in effect.">
-                            <TextBox FontStyle="Normal" Text="{Binding RecentlyOpenedFileCollectionCapacity, ValidatesOnExceptions=True, NotifyOnValidationError=True}"/>
-                        </sync:SfTextInputLayout>
-                    </GroupBox>
-                    <GroupBox Header="Data Synchronization Mode of Debugging" Padding="3,0,3,0" Margin="0,4,0,0" Grid.Row="2">
-                        <Grid>
-                            <Grid.Resources>
-                                <ObjectDataProvider ObjectType="{x:Type sys:Enum}" MethodName="GetValues" x:Key="datasyncmode">
-                                    <ObjectDataProvider.MethodParameters>
-                                        <x:Type TypeName="debugger:DataSyncMode" />
-                                    </ObjectDataProvider.MethodParameters>
-                                </ObjectDataProvider>
-                            </Grid.Resources>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="auto" />
-                                <RowDefinition Height="auto" />
-                                <RowDefinition Height="auto" />
-                            </Grid.RowDefinitions>
-                            <sync:SfTextInputLayout Grid.Row="0" Hint="Rx Bit Area"  FontSize="12" FontStyle="Italic" ContainerType="Filled" Margin="4">
-                                <ComboBox FontStyle="Normal" ItemsSource="{Binding Source={StaticResource datasyncmode}}" SelectedItem="{Binding RxBitAreaSyncMode}" />
+                                <TextBox FontStyle="Normal" Text="{Binding RecentlyOpenedFileCollectionCapacity, ValidatesOnExceptions=True, NotifyOnValidationError=True}"/>
                             </sync:SfTextInputLayout>
-                            <sync:SfTextInputLayout Grid.Row="1" Hint="Rx Block Area"  FontSize="12" FontStyle="Italic" ContainerType="Filled" Margin="4">
-                                <ComboBox FontStyle="Normal" ItemsSource="{Binding Source={StaticResource datasyncmode}}" SelectedItem="{Binding RxBlockAreaSyncMode}" />
-                            </sync:SfTextInputLayout>
-                            <sync:SfTextInputLayout Grid.Row="2" Hint="Rx Control Area"  FontSize="12" FontStyle="Italic" ContainerType="Filled" Margin="4">
-                                <ComboBox FontStyle="Normal" ItemsSource="{Binding Source={StaticResource datasyncmode}}" SelectedItem="{Binding RxControlAreaSyncMode}" />
-                            </sync:SfTextInputLayout>
-                        </Grid>
-                    </GroupBox>
-                    <GroupBox Header="Layout State of PDO Dictionary &amp; INTLK" Padding="3,8,3,8" Margin="0,4,0,0" Grid.Row="3">
-                        <CheckBox Content="Save the Layout State Automatically" Margin="4" IsChecked="{Binding SaveLayoutState}" IsEnabled="False"/>
-                    </GroupBox>
-                </Grid>
+                        </GroupBox>
+                        <GroupBox Header="Data Synchronization Mode of Debugging" Padding="3,0,3,0" Margin="0,4,0,0" Grid.Row="2">
+                            <Grid>
+                                <Grid.Resources>
+                                    <ObjectDataProvider ObjectType="{x:Type sys:Enum}" MethodName="GetValues" x:Key="datasyncmode">
+                                        <ObjectDataProvider.MethodParameters>
+                                            <x:Type TypeName="debugger:DataSyncMode" />
+                                        </ObjectDataProvider.MethodParameters>
+                                    </ObjectDataProvider>
+                                </Grid.Resources>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="auto" />
+                                    <RowDefinition Height="auto" />
+                                    <RowDefinition Height="auto" />
+                                </Grid.RowDefinitions>
+                                <sync:SfTextInputLayout Grid.Row="0" Hint="Rx Bit Area"  FontSize="12" FontStyle="Italic" ContainerType="Filled" Margin="4">
+                                    <ComboBox FontStyle="Normal" ItemsSource="{Binding Source={StaticResource datasyncmode}}" SelectedItem="{Binding RxBitAreaSyncMode}" />
+                                </sync:SfTextInputLayout>
+                                <sync:SfTextInputLayout Grid.Row="1" Hint="Rx Block Area"  FontSize="12" FontStyle="Italic" ContainerType="Filled" Margin="4">
+                                    <ComboBox FontStyle="Normal" ItemsSource="{Binding Source={StaticResource datasyncmode}}" SelectedItem="{Binding RxBlockAreaSyncMode}" />
+                                </sync:SfTextInputLayout>
+                                <sync:SfTextInputLayout Grid.Row="2" Hint="Rx Control Area"  FontSize="12" FontStyle="Italic" ContainerType="Filled" Margin="4">
+                                    <ComboBox FontStyle="Normal" ItemsSource="{Binding Source={StaticResource datasyncmode}}" SelectedItem="{Binding RxControlAreaSyncMode}" />
+                                </sync:SfTextInputLayout>
+                            </Grid>
+                        </GroupBox>
+                        <GroupBox Header="Layout State of PDO Dictionary &amp; INTLK" Padding="3,8,3,8" Margin="0,4,0,0" Grid.Row="3">
+                            <CheckBox Content="Save the Layout State Automatically" Margin="4" IsChecked="{Binding SaveLayoutState}" IsEnabled="False"/>
+                        </GroupBox>
+                        <GroupBox Header="XLS-based Format" Padding="3,0,3,0" Margin="0,4,0,0" Grid.Row="4">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="auto" />
+                                    <RowDefinition Height="auto" />
+                                </Grid.RowDefinitions>
+                                <sync:SfTextInputLayout Grid.ColumnSpan="2" Hint="Password"  FontSize="12" FontStyle="Italic" ContainerType="Filled" Margin="4" HelperText="Input password to protect xls work sheets.">
+                                    <TextBox FontStyle="Normal" Text="{Binding XlsSheetProtectionPassword}"/>
+                                </sync:SfTextInputLayout>
+                                <GroupBox Grid.Row="1" Margin="0,4,4,0" Padding="3,0,3,0" >
+                                    <GroupBox.Header>
+                                        <CheckBox Content="Separate out Hardware Interlocks" IsChecked="{Binding SeparateHardwareInterlocks}" Name="IsSeparateHardware"/>
+                                    </GroupBox.Header>
+                                    <UniformGrid Rows="2" IsEnabled="{Binding ElementName=IsSeparateHardware, Path=IsChecked}">
+                                        <sync:SfTextInputLayout Grid.ColumnSpan="2" Hint="Hardware"  FontSize="12" FontStyle="Italic" ContainerType="Filled" Margin="4" HelperText="Title for Hardware Interlocks sheet.">
+                                            <TextBox FontStyle="Normal" Text="{Binding HardwareInterlocksAlias}"/>
+                                        </sync:SfTextInputLayout>
+                                        <sync:SfTextInputLayout Grid.ColumnSpan="2" Hint="Non-Hardware"  FontSize="12" FontStyle="Italic" ContainerType="Filled" Margin="4" HelperText="Title for Non-Hardware Interlocks sheet.">
+                                            <TextBox FontStyle="Normal" Text="{Binding NonHardwareInterlocksAlias}"/>
+                                        </sync:SfTextInputLayout>
+                                    </UniformGrid>
+                                </GroupBox>
+                                <GroupBox Grid.Row="1" Grid.Column="1" Margin="4,4,0,0" Padding="3,0,3,0">
+                                    <GroupBox.Header>
+                                        <CheckBox Content="Separate out Exclusive Interlocks" IsChecked ="{Binding SeparateExclusiveInterlocks}" Name="IsSeparateExclusive"/>
+                                    </GroupBox.Header>
+                                    <UniformGrid Rows="2" IsEnabled="{Binding ElementName=IsSeparateExclusive, Path=IsChecked}">
+                                        <sync:SfTextInputLayout Grid.ColumnSpan="2" Hint="Exclusive"  FontSize="12" FontStyle="Italic" ContainerType="Filled" Margin="4" HelperText="Title for Hardware Interlocks sheet.">
+                                            <TextBox FontStyle="Normal" Text="{Binding ExclusiveInterlocksAlias}"/>
+                                        </sync:SfTextInputLayout>
+                                        <sync:SfTextInputLayout Grid.ColumnSpan="2" Hint="Non-Exclusive"  FontSize="12" FontStyle="Italic" ContainerType="Filled" Margin="4" HelperText="Title for Non-Hardware Interlocks sheet.">
+                                            <TextBox FontStyle="Normal" Text="{Binding NonExclusiveInterlocksAlias}"/>
+                                        </sync:SfTextInputLayout>
+                                    </UniformGrid>
+                                </GroupBox>
+                                
+                            </Grid>
+                        </GroupBox>
+                    </Grid>
+                </ScrollViewer>
             </TabItem>
         </TabControl>
     </DockPanel>

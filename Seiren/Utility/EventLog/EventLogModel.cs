@@ -30,6 +30,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility
         public int Timeout { get; set; } = 5000;
         public int ReadWriteTimeout { get; set; } = 5000;
         public EventLogDestination HistoryDestination { get; set; } = EventLogDestination.DATA_MEMORY;
+        public string LocalEventLogPath { get; set; } = "";
 
         private const string __EVENT_HISTORY_DATA_MEMORY = "/4/MELPRJ/EVENT.LOG";
         private const string __EVENT_HISTORY_MEMORY_CARD = "/2/MELPRJ/EVENT.LOG";
@@ -56,8 +57,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility
 
             using (FtpWebResponse response = (FtpWebResponse)request.GetResponse())
             using (System.IO.Stream sm = response.GetResponseStream())
+            using (System.IO.BinaryReader br = new System.IO.BinaryReader(sm))
             {
-                EventLog log = new EventLog(new System.IO.BinaryReader(sm));
+                EventLog log = new EventLog(br);
 
                 __records.Clear();
                 foreach (var r in log.Records)
@@ -67,6 +69,22 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility
                 Records = __records.Reverse<OrbmemtEventLog>();
             }
 
+        }
+
+        public void ReadLocal()
+        {
+            using (System.IO.FileStream fs = System.IO.File.OpenRead(LocalEventLogPath))
+            using (System.IO.BinaryReader br = new System.IO.BinaryReader(fs))
+            {
+                EventLog log = new EventLog(br);
+
+                __records.Clear();
+                foreach (var r in log.Records)
+                {
+                    __records.Add(new OrbmemtEventLog(r.Data, r.EventType, r.EventCode, r.Source, r.StartIO, r.Raw));
+                }
+                Records = __records.Reverse<OrbmemtEventLog>();
+            }
         }
 
         private bool __busy = false;

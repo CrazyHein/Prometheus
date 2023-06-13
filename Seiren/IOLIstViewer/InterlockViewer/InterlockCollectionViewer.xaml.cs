@@ -29,6 +29,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         }
 
         private InputDialogDisplayMode __display_mode;
+        private uint __attribute;
 
         private void EditRecordCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
@@ -39,6 +40,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         {
             InterlockLogicContainer.IsEnabled = false;
             InterlockLogic logic = (InterlockLogicList.SelectedItem as InterlockLogicModel).Logic;
+            InputInterlockLogicIsHardware.IsChecked = (InterlockLogicList.SelectedItem as InterlockLogicModel).IsHardware;
+            InputInterlockLogicIsExclusive.IsChecked = (InterlockLogicList.SelectedItem as InterlockLogicModel).IsExclusive;
+            __attribute = logic.Attr;
             InputInterlockLogicName.Text = logic.Name;
             StringBuilder sb = new StringBuilder();
             foreach(var t in logic.Targets)
@@ -60,6 +64,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         private void AddRecordCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             InterlockLogicContainer.IsEnabled = false;
+            InputInterlockLogicIsHardware.IsChecked = false;
+            InputInterlockLogicIsExclusive.IsChecked = false;
+            __attribute = 0;
             InputInterlockLogicName.Text = String.Empty;
             InputInterlockLogicTargets.Text = String.Empty;
             InputInterlockLogicStatement.Text = String.Empty;
@@ -75,6 +82,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         private void InsertRecordCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             InterlockLogicContainer.IsEnabled = false;
+            InputInterlockLogicIsHardware.IsChecked = false;
+            InputInterlockLogicIsExclusive.IsChecked = false;
+            __attribute = 0;
             InputInterlockLogicName.Text = String.Empty;
             InputInterlockLogicTargets.Text = String.Empty;
             InputInterlockLogicStatement.Text = String.Empty;
@@ -103,6 +113,31 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             }
         }
 
+        private void MoveUpRecordCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = InterlockLogicList?.SelectedItem != null && (DataContext as InterlockCollectionModel).IsOffline == true && InterlockLogicList.SelectedIndex != 0;
+        }
+
+        private void MoveDownRecordCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = InterlockLogicList?.SelectedItem != null && (DataContext as InterlockCollectionModel).IsOffline == true && InterlockLogicList.SelectedIndex != InterlockLogicList.Items.Count - 1;
+        }
+
+        private void MoveUpRecordCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            int src = InterlockLogicList.SelectedIndex;
+            (DataContext as InterlockCollectionModel).Move(src, src - 1);
+            InterlockLogicList.SelectedIndex = src - 1;
+            InterlockLogicList.ScrollIntoView(InterlockLogicList.SelectedItem);
+        }
+        private void MoveDownRecordCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            int src = InterlockLogicList.SelectedIndex;
+            (DataContext as InterlockCollectionModel).Move(src, src + 1);
+            InterlockLogicList.SelectedIndex = src + 1;
+            InterlockLogicList.ScrollIntoView(InterlockLogicList.SelectedItem);
+        }
+
         private void CancelCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             InterlockLogicContainer.IsEnabled = true;
@@ -112,20 +147,28 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         private void ConfirmCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             int index = InterlockLogicList.SelectedIndex;
+            if (InputInterlockLogicIsHardware.IsChecked == true)
+                __attribute |= (uint)InterlockAttribute.Hardware;
+            else
+                __attribute &= ~(uint)InterlockAttribute.Hardware;
+            if (InputInterlockLogicIsExclusive.IsChecked == true)
+                __attribute |= (uint)InterlockAttribute.Exclusive;
+            else
+                __attribute &= ~(uint)InterlockAttribute.Exclusive;
             try
             {
                 switch (__display_mode)
                 {
                     case InputDialogDisplayMode.Edit:
-                        (DataContext as InterlockCollectionModel).Replace(InterlockLogicList.SelectedIndex,
+                        (DataContext as InterlockCollectionModel).Replace(InterlockLogicList.SelectedIndex, __attribute,
                             InputInterlockLogicName.Text, InputInterlockLogicTargets.Text, InputInterlockLogicStatement.Text);
                         break;
                     case InputDialogDisplayMode.Add:
-                        (DataContext as InterlockCollectionModel).Add(InputInterlockLogicName.Text, InputInterlockLogicTargets.Text, InputInterlockLogicStatement.Text);
+                        (DataContext as InterlockCollectionModel).Add(__attribute, InputInterlockLogicName.Text, InputInterlockLogicTargets.Text, InputInterlockLogicStatement.Text);
                         index = (DataContext as InterlockCollectionModel).InterlockLogicModels.Count - 1;
                         break;
                     case InputDialogDisplayMode.Insert:
-                        (DataContext as InterlockCollectionModel).Insert(InterlockLogicList.SelectedIndex,
+                        (DataContext as InterlockCollectionModel).Insert(InterlockLogicList.SelectedIndex, __attribute,
                             InputInterlockLogicName.Text, InputInterlockLogicTargets.Text, InputInterlockLogicStatement.Text);
                         break;
                 }

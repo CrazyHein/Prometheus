@@ -30,7 +30,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                 var controllerConfiguration = DataContext as ControllerConfigurationModel;
                 DeviceConfigurationModel targetDeviceConfiguration = controllerConfiguration.DeviceConfigurations[(int)e.TargetRecord];
 
-                MainViewer.BeginInit();
+                MainViewer.View.BeginInit();
                 int dragIndex = controllerConfiguration.IndexOf(draggingRecords[0] as DeviceConfigurationModel);       
                 int targetIndex = controllerConfiguration.IndexOf(targetDeviceConfiguration);
                 int insertionIndex = 0;
@@ -39,7 +39,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                 else
                     insertionIndex = e.DropPosition == DropPosition.DropAbove ? targetIndex - 1 : targetIndex;
                 controllerConfiguration.Move(dragIndex, insertionIndex);
-                MainViewer.EndInit();
+                MainViewer.View.EndInit();
                 CommandManager.InvalidateRequerySuggested();
             }
         }
@@ -136,7 +136,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             open.Multiselect = false;
             if (open.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
-                MainViewer.BeginInit();
+                MainViewer.View.BeginInit();
                 try
                 {
                     (DataContext as ControllerConfigurationModel).ImportDevices(open.FileName); 
@@ -145,7 +145,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                 {
                     MessageBox.Show("At least one exception has occurred during the operation :\n" + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
-                MainViewer.EndInit();
+                MainViewer.View.EndInit();
             }
         }
 
