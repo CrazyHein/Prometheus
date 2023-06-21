@@ -1,4 +1,5 @@
-﻿using Syncfusion.UI.Xaml.Grid;
+﻿using Spire.Pdf.Widget;
+using Syncfusion.UI.Xaml.Grid;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,6 +21,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility
     /// </summary>
     public partial class EventLogViewer : Window
     {
+        private static string __TITLE = "EventLog Viewer";
         public EventLogViewer(FTPTargetProperty property)
         {
             InitializeComponent();
@@ -42,16 +44,16 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility
                 model.IsBusy = true;
                 ControlPanelGrid.IsEnabled = false;
                 await Task.Run(() => model.Upload());
-                MainViewer.ItemsSource = model.Records;
                 model.IsBusy = false;
                 ControlPanelGrid.IsEnabled = true;
+
+                this.Title = __TITLE + " - via FTP - " + model.HistoryDestination.ToString();
             }
             catch (Exception ex)
             {
                 MessageBox.Show("At least one exception has occurred during the operation :\n" + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 model.IsBusy = false;
                 ControlPanelGrid.IsEnabled = true;
-                MainViewer.ItemsSource = null;
             }
         }
 
@@ -69,15 +71,15 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility
                     ControlPanelGrid.IsEnabled = false;
                     model.LocalEventLogPath = open.FileName;
                     await Task.Run(() => model.ReadLocal());
-                    MainViewer.ItemsSource = model.Records;
                     LocalEventLogFilePathTxt.Text = model.LocalEventLogPath;
                     model.IsBusy = false;
                     ControlPanelGrid.IsEnabled = true;
+
+                    this.Title = __TITLE + " - via Local - " + model.LocalEventLogPath;
                 }
                 catch (Exception ex)
                 {
                     MessageBox.Show("At least one exception has occurred during the operation :\n" + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                    MainViewer.ItemsSource = null;
                     LocalEventLogFilePathTxt.Text = "";
                     model.IsBusy = false;
                     ControlPanelGrid.IsEnabled = true;

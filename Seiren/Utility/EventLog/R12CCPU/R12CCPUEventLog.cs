@@ -81,7 +81,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility.R12C
         private void __parse(byte[] content, int start, int size, int capacity)
         {
             int read = 0;
-            RecordHeader rheater;
+            RecordHeader rheader;
             ReadOnlySpan<byte> buffer = content;
             while(read < size)
             {
@@ -93,10 +93,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility.R12C
                 byte[] r = __read_record(content, (start + read) % capacity, size - read, capacity);
                 if (r != null)
                 {
-                    rheater = MemoryMarshal.Read<RecordHeader>(buffer.Slice((start + read) % capacity));
+                    rheader = MemoryMarshal.Read<RecordHeader>(buffer.Slice((start + read) % capacity));
                     string data =
-                        $"{rheater.data_time_0:X02}/{rheater.data_time_1:X02}/{rheater.data_time_2:X02} {rheater.data_time_3:X02}:{rheater.data_time_4:X02}:{rheater.data_time_5:X02}.{rheater.data_time_8:X}{rheater.data_time_9:X02}";
-                    __records.Add(new Log(data, rheater.event_type, rheater.event_code, rheater.source_code, rheater.start_io, r));
+                        $"{rheader.data_time_0:X02}/{rheader.data_time_1:X02}/{rheader.data_time_2:X02} {rheader.data_time_3:X02}:{rheader.data_time_4:X02}:{rheader.data_time_5:X02}.{rheader.data_time_8:X}{rheader.data_time_9:X02}";
+                    __records.Add(new Log(data, rheader.event_type, rheader.event_code, rheader.source_code, rheader.start_io, r));
                     read += r.Length;
                 }
                 else

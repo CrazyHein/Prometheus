@@ -13,6 +13,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.ListView;
 
 namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility
 {
@@ -35,8 +36,30 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility
         private const string __EVENT_HISTORY_DATA_MEMORY = "/4/MELPRJ/EVENT.LOG";
         private const string __EVENT_HISTORY_MEMORY_CARD = "/2/MELPRJ/EVENT.LOG";
 
-        public IEnumerable<OrbmemtEventLog> Records { get; private set; }
+        public IEnumerable<OrbmemtEventLog> Records
+        {
+            get
+            { 
+                if(ViewOrbmentLogOnly)
+                    return __records.Reverse<OrbmemtEventLog>().Where(r => r.EventCode == 0x5000 && r.Source == 0x00004820);
+                else
+                    return __records.Reverse<OrbmemtEventLog>();
+            }
+        }
         private List<OrbmemtEventLog> __records = new List<OrbmemtEventLog>();
+
+        private bool __view_orbment_log_only = true;
+        public bool ViewOrbmentLogOnly
+        {
+            get { return __view_orbment_log_only; }
+            set
+            {
+                __view_orbment_log_only = value;
+                OnPropertyChanged("ViewOrbmentLogOnly");
+                OnPropertyChanged("Records");
+            }
+
+        }
 
         public void Upload()
         {
@@ -60,13 +83,13 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility
             using (System.IO.BinaryReader br = new System.IO.BinaryReader(sm))
             {
                 EventLog log = new EventLog(br);
-
-                __records.Clear();
+                List<OrbmemtEventLog> records = new List<OrbmemtEventLog>();
                 foreach (var r in log.Records)
                 {
-                    __records.Add(new OrbmemtEventLog(r.Data, r.EventType, r.EventCode, r.Source, r.StartIO, r.Raw));
+                    records.Add(new OrbmemtEventLog(r.Data, r.EventType, r.EventCode, r.Source, r.StartIO, r.Raw));
                 }
-                Records = __records.Reverse<OrbmemtEventLog>();
+                __records = records;
+                OnPropertyChanged("Records");
             }
 
         }
@@ -77,13 +100,13 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility
             using (System.IO.BinaryReader br = new System.IO.BinaryReader(fs))
             {
                 EventLog log = new EventLog(br);
-
-                __records.Clear();
+                List<OrbmemtEventLog> records = new List<OrbmemtEventLog>();
                 foreach (var r in log.Records)
                 {
-                    __records.Add(new OrbmemtEventLog(r.Data, r.EventType, r.EventCode, r.Source, r.StartIO, r.Raw));
+                    records.Add(new OrbmemtEventLog(r.Data, r.EventType, r.EventCode, r.Source, r.StartIO, r.Raw));
                 }
-                Records = __records.Reverse<OrbmemtEventLog>();
+                __records = records;
+                OnPropertyChanged("Records");
             }
         }
 
@@ -118,7 +141,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility
             EventCode = eventCode; 
             Source = source;
             StartIO = startIO;
-            if(eventCode == 0x5000 && source == 0x00004820 && details.Length > 24)
+            if(eventCode == 0x5000 && source == 0x00004820 && details.Length >= 24 + Marshal.SizeOf<RecordHeader>() + 2)
             {
                 OrbmentErrorCode = MemoryMarshal.Read<uint>(new ReadOnlySpan<byte>(details, Marshal.SizeOf<RecordHeader>() + 12, 4));
                 OrbmentEventDetails = Encoding.Unicode.GetString(details, Marshal.SizeOf<RecordHeader>() + 24, details.Length - Marshal.SizeOf<RecordHeader>() - 24 - 2);
