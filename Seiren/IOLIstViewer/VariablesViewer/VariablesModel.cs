@@ -1,4 +1,5 @@
 ﻿using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia;
+using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Console;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -28,32 +29,62 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
 
         public void Add(VariableModel model, bool log = true)
         {
-            __variable_dictionary.Add(model.Name, model.DataType.Name, model.Unit, model.Comment);
+            var op = new OperatingRecord() { Host = this, Operation = Operation.Add, OriginaPos = -1, NewPos = __variables.Count, OriginalValue = null, NewValue = model };
+            try
+            {
+                __variable_dictionary.Add(model.Name, model.DataType.Name, model.Unit, model.Comment);
+            }
+            catch (Exception ex)
+            {
+                DebugConsole.WriteException(ex, op);
+                throw;
+            }
             __variables.Add(model);
             Modified = true;
             if (log && OperatingHistory != null)
-                OperatingHistory.PushOperatingRecord(new OperatingRecord(){ Host = this, Operation= Operation.Add, OriginaPos = -1, NewPos = __variables.Count - 1, OriginalValue = null, NewValue = model});
+                OperatingHistory.PushOperatingRecord(op);
+            DebugConsole.WriteOperatingRecord(op);
         }
 
         public VariableModel RemoveAt(int index, bool log = true)
         {
             VariableModel model = __variables[index];
-            __variable_dictionary.Remove(model.Name);
+            var op = new OperatingRecord() { Host = this, Operation = Operation.Remove, OriginaPos = index, NewPos = -1, OriginalValue = model, NewValue = null };
+            try
+            {
+                __variable_dictionary.Remove(model.Name);
+            }
+            catch (Exception ex)
+            {
+                DebugConsole.WriteException(ex, op);
+                throw;
+            }
             __variables.RemoveAt(index);
             Modified = true;
             if (log && OperatingHistory != null)
-                OperatingHistory.PushOperatingRecord(new OperatingRecord(){ Host = this, Operation = Operation.Remove, OriginaPos = index, NewPos = -1, OriginalValue = model, NewValue = null });
+                OperatingHistory.PushOperatingRecord(op);
+            DebugConsole.WriteOperatingRecord(op);
             return model;
         }
 
         public void Remove(VariableModel model, bool log = true)
         {
-            __variable_dictionary.Remove(model.Name);
             int index = __variables.IndexOf(model);
+            var op = new OperatingRecord() { Host = this, Operation = Operation.Remove, OriginaPos = index, NewPos = -1, OriginalValue = model, NewValue = null };
+            try
+            {
+                __variable_dictionary.Remove(model.Name);
+            }
+            catch (Exception ex)
+            {
+                DebugConsole.WriteException(ex, op);
+                throw;
+            }
             __variables.Remove(model);
             Modified = true;
             if (log && OperatingHistory != null)
-                OperatingHistory.PushOperatingRecord(new OperatingRecord(){ Host = this, Operation = Operation.Remove, OriginaPos = index, NewPos = -1, OriginalValue = model, NewValue = null });
+                OperatingHistory.PushOperatingRecord(op);
+            DebugConsole.WriteOperatingRecord(op);
         }
 
         public bool IsUnused(string name)
@@ -70,11 +101,22 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         {
             if (index > __variables.Count)
                 throw new ArgumentOutOfRangeException();
-            __variable_dictionary.Add(model.Name, model.DataType.Name, model.Unit, model.Comment);
+
+            var op = new OperatingRecord() { Host = this, Operation = Operation.Insert, OriginaPos = -1, NewPos = index, OriginalValue = null, NewValue = model };
+            try
+            {
+                __variable_dictionary.Add(model.Name, model.DataType.Name, model.Unit, model.Comment);
+            }
+            catch (Exception ex)
+            {
+                DebugConsole.WriteException(ex, op);
+                throw;
+            }
             __variables.Insert(index, model);
             Modified = true;
             if (log && OperatingHistory != null)
-                OperatingHistory.PushOperatingRecord(new OperatingRecord(){ Host = this, Operation = Operation.Insert, OriginaPos = -1, NewPos = index, OriginalValue = null, NewValue = model });
+                OperatingHistory.PushOperatingRecord(op);
+            DebugConsole.WriteOperatingRecord(op);
         }
 
         public void Move(int srcIndex, int dstIndex, bool log = true)
@@ -85,8 +127,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             __variables.RemoveAt(srcIndex);
             __variables.Insert(dstIndex, temp);
             Modified = true;
+            var op = new OperatingRecord() { Host = this, Operation = Operation.Move, OriginaPos = srcIndex, NewPos = dstIndex, OriginalValue = temp, NewValue = temp };
             if (log && OperatingHistory != null)
-                OperatingHistory.PushOperatingRecord(new OperatingRecord() { Host = this, Operation = Operation.Move, OriginaPos = srcIndex, NewPos = dstIndex, OriginalValue = temp, NewValue = temp });
+                OperatingHistory.PushOperatingRecord(op);
+            DebugConsole.WriteOperatingRecord(op);
         }
 
 
@@ -109,23 +153,43 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         public void Replace(int index, VariableModel newModel, bool log = true)
         {
             VariableModel original = __variables[index];
-            __variable_dictionary.Replace(original.Name, newModel.Name, newModel.DataType.Name, newModel.Unit, newModel.Comment);
+            var op = new OperatingRecord() { Host = this, Operation = Operation.Replace, OriginaPos = index, NewPos = index, OriginalValue = original, NewValue = newModel };
+            try
+            {
+                __variable_dictionary.Replace(original.Name, newModel.Name, newModel.DataType.Name, newModel.Unit, newModel.Comment);
+            }
+            catch (Exception ex)
+            {
+                DebugConsole.WriteException(ex, op);
+                throw;
+            }
             __variables[index] = newModel;
             Modified = true;
             if (log && OperatingHistory != null)
-                OperatingHistory?.PushOperatingRecord(new OperatingRecord() { Host = this, Operation = Operation.Replace, OriginaPos = index, NewPos = index, OriginalValue = original, NewValue = newModel });
+                OperatingHistory?.PushOperatingRecord(op);
+            DebugConsole.WriteOperatingRecord(op);
             //Notify others here
             SubscriberObjects?.UpdateVariable(original.Name);
         }
 
         public void Replace(VariableModel originalModel, VariableModel newModel, bool log = true)
         {
-            __variable_dictionary.Replace(originalModel.Name, newModel.Name, newModel.DataType.Name, newModel.Unit, newModel.Comment);
             int index = __variables.IndexOf(originalModel);
+            var op = new OperatingRecord() { Host = this, Operation = Operation.Replace, OriginaPos = index, NewPos = index, OriginalValue = originalModel, NewValue = newModel };
+            try
+            {
+                __variable_dictionary.Replace(originalModel.Name, newModel.Name, newModel.DataType.Name, newModel.Unit, newModel.Comment);
+            }
+            catch (Exception ex)
+            {
+                DebugConsole.WriteException(ex, op);
+                throw;
+            }
             __variables[index] = newModel;
             Modified = true;
             if (log && OperatingHistory != null)
-                OperatingHistory?.PushOperatingRecord(new OperatingRecord(){ Host = this, Operation = Operation.Replace, OriginaPos = index, NewPos = index, OriginalValue = originalModel, NewValue = newModel });
+                OperatingHistory?.PushOperatingRecord(op);
+            DebugConsole.WriteOperatingRecord(op);
             //Notify others here
             SubscriberObjects?.UpdateVariable(originalModel.Name);
         }

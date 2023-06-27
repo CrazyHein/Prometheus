@@ -177,7 +177,7 @@
                         </sync:ButtonAdv.SmallIcon>
                     </sync:ButtonAdv>
                 </StackPanel>
-                <sync:SfDataGrid Name="MainViewer" AutoGenerateColumns="False" 
+                <sync:SfDataGrid Name="MainViewer" AutoGenerateColumns="False"  SelectionMode="Extended"
                              ItemsSource="{Binding Objects}" ColumnSizer="Auto" AllowResizingColumns="True"
                              AllowGrouping="True" ShowGroupDropArea="True"
                              AllowFiltering="True" 

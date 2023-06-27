@@ -1,5 +1,7 @@
 ﻿using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia;
 using Syncfusion.UI.Xaml.Grid;
+using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
@@ -73,9 +75,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         {
             try
             {
-                ObjectModel o;
-                if((DataContext as ProcessDataImageModel).DirectModeOperation)
+                if ((DataContext as ProcessDataImageModel).DirectModeOperation)
                 {
+                    ObjectModel o;
                     uint mindex = 0;
                     if (__process_data_access == ProcessDataImageAccess.TX)
                         mindex = __objects_model.Objects.AsParallel().Select(o => o.Index).Where(i => (i & 0x80000000) != 0).DefaultIfEmpty<uint>(0x7FFFFFFF).Max(i => i) + 1;
@@ -87,15 +89,55 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                         o = wnd.Result;
                     else
                         return;
+                    ProcessDataModel p = new ProcessDataModel(__object_dictionary.ProcessObjects[o.Index], __process_data_access, __process_data_layout);
+                    (DataContext as ProcessDataImageModel).Add(p);
+                    ProcessDataImageGrid.SelectedItem = p;
+                    ProcessDataImageGrid.ScrollInView(new Syncfusion.UI.Xaml.ScrollAxis.RowColumnIndex(
+                                     ProcessDataImageGrid.ResolveToRowIndex(ProcessDataImageGrid.SelectedItem),
+                                     ProcessDataImageGrid.ResolveToStartColumnIndex()));
                 }
                 else
-                    o = __object_source.SelectedItem as ObjectModel;
-                ProcessDataModel p = new ProcessDataModel(__object_dictionary.ProcessObjects[o.Index], __process_data_access, __process_data_layout);
-                (DataContext as ProcessDataImageModel).Add(p);
-                ProcessDataImageGrid.SelectedItem = p;
-                ProcessDataImageGrid.ScrollInView(new Syncfusion.UI.Xaml.ScrollAxis.RowColumnIndex(
-                                 ProcessDataImageGrid.ResolveToRowIndex(ProcessDataImageGrid.SelectedItem),
-                                 ProcessDataImageGrid.ResolveToStartColumnIndex()));
+                {
+                    try
+                    {
+                        IEnumerable<ObjectModel> os = __object_source.SelectedItems.Select(r => r as ObjectModel).OrderBy(r => __objects_model.IndexOf(r));
+
+                        //ProcessDataImageGrid.View.BeginInit();
+
+                        ProcessDataImageGrid.SelectedItems.Clear(); //= new ObservableCollection<object>();
+                        foreach (var o in os)
+                        {
+                            ProcessDataModel p = new ProcessDataModel(__object_dictionary.ProcessObjects[o.Index], __process_data_access, __process_data_layout);
+                            (DataContext as ProcessDataImageModel).Add(p);
+                            ProcessDataImageGrid.SelectedItems.Add(p);
+                        }
+
+                        //ProcessDataImageGrid.View.EndInit();
+                    }
+                    catch
+                    {
+                        //ProcessDataImageGrid.View.EndInit();
+                        throw;
+                    }
+                    finally
+                    {
+                        if (ProcessDataImageGrid.SelectedItems.Count != 0)
+                        {
+                            ProcessDataImageGrid.ScrollInView(new Syncfusion.UI.Xaml.ScrollAxis.RowColumnIndex(
+                                                    ProcessDataImageGrid.ResolveToRowIndex(ProcessDataImageGrid.SelectedItems.Last()),
+                                                    ProcessDataImageGrid.ResolveToStartColumnIndex()));
+
+                            if (__object_source.SelectedItems.Count == 1 && __object_source.SelectedIndex < __objects_model.Objects.Count - 1)
+                            {
+                                __object_source.SelectedIndex = __object_source.SelectedIndex + 1;
+                                __object_source.ScrollInView(new Syncfusion.UI.Xaml.ScrollAxis.RowColumnIndex(
+                                            __object_source.ResolveToRowIndex(__object_source.SelectedItem),
+                                            __object_source.ResolveToStartColumnIndex()));
+                            }
+                        }
+                    }
+                }
+
             }
             catch (LombardiaException ex)
             {
@@ -112,9 +154,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         {
             try
             {
-                ObjectModel o;
                 if ((DataContext as ProcessDataImageModel).DirectModeOperation)
                 {
+                    ObjectModel o;
                     uint mindex = 0;
                     if (__process_data_access == ProcessDataImageAccess.TX)
                         mindex = __objects_model.Objects.AsParallel().Select(o => o.Index).Where(i => (i & 0x80000000) != 0).DefaultIfEmpty<uint>(0x7FFFFFFF).Max(i => i) + 1;
@@ -126,15 +168,55 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                         o = wnd.Result;
                     else
                         return;
+                    ProcessDataModel p = new ProcessDataModel(__object_dictionary.ProcessObjects[o.Index], __process_data_access, __process_data_layout);
+                    (DataContext as ProcessDataImageModel).Insert(ProcessDataImageGrid.SelectedIndex, p);
+                    ProcessDataImageGrid.SelectedItem = p;
+                    ProcessDataImageGrid.ScrollInView(new Syncfusion.UI.Xaml.ScrollAxis.RowColumnIndex(
+                                     ProcessDataImageGrid.ResolveToRowIndex(ProcessDataImageGrid.SelectedItem),
+                                     ProcessDataImageGrid.ResolveToStartColumnIndex()));
                 }
                 else
-                    o = __object_source.SelectedItem as ObjectModel;
-                ProcessDataModel p = new ProcessDataModel(__object_dictionary.ProcessObjects[o.Index], __process_data_access, __process_data_layout);
-                (DataContext as ProcessDataImageModel).Insert(ProcessDataImageGrid.SelectedIndex, p);
-                ProcessDataImageGrid.SelectedItem = p;
-                ProcessDataImageGrid.ScrollInView(new Syncfusion.UI.Xaml.ScrollAxis.RowColumnIndex(
-                                 ProcessDataImageGrid.ResolveToRowIndex(ProcessDataImageGrid.SelectedItem),
-                                 ProcessDataImageGrid.ResolveToStartColumnIndex()));
+                {
+                    try
+                    {
+                        IEnumerable<ObjectModel> os = __object_source.SelectedItems.Select(r => r as ObjectModel).OrderByDescending(r => __objects_model.IndexOf(r));
+
+                        //ProcessDataImageGrid.View.BeginInit();
+
+                        int index = ProcessDataImageGrid.SelectedIndex;
+                        ProcessDataImageGrid.SelectedItems.Clear();
+                        foreach (var o in os)
+                        {
+                            ProcessDataModel p = new ProcessDataModel(__object_dictionary.ProcessObjects[o.Index], __process_data_access, __process_data_layout);
+                            (DataContext as ProcessDataImageModel).Insert(index, p);
+                            ProcessDataImageGrid.SelectedItems.Add(p);
+                        }
+
+                        //ProcessDataImageGrid.View.EndInit();
+                    }
+                    catch
+                    {
+                        //ProcessDataImageGrid.View.EndInit();
+                        throw;
+                    }
+                    finally
+                    {
+                        if (ProcessDataImageGrid.SelectedItems.Count != 0)
+                        {
+                            ProcessDataImageGrid.ScrollInView(new Syncfusion.UI.Xaml.ScrollAxis.RowColumnIndex(
+                                                     ProcessDataImageGrid.ResolveToRowIndex(ProcessDataImageGrid.SelectedItems.First()),
+                                                     ProcessDataImageGrid.ResolveToStartColumnIndex()));
+
+                            if (__object_source.SelectedItems.Count == 1 && __object_source.SelectedIndex != 0)
+                            {
+                                __object_source.SelectedIndex = __object_source.SelectedIndex - 1;
+                                __object_source.ScrollInView(new Syncfusion.UI.Xaml.ScrollAxis.RowColumnIndex(
+                                            __object_source.ResolveToRowIndex(__object_source.SelectedItem),
+                                            __object_source.ResolveToStartColumnIndex()));
+                            }
+                        }
+                    }
+                }
             }
             catch (LombardiaException ex)
             {

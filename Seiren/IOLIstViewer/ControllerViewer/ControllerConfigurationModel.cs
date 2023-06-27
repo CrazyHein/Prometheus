@@ -1,4 +1,5 @@
 ﻿using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia;
+using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Console;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -39,32 +40,68 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
 
         public void Add(DeviceConfigurationModel model, bool log = true)
         {
-            __controller_configuration_collection.Add(model.DeviceModel.ID, model.Switch, model.LocalAddress, model.IPv4, model.Port, model.ReferenceName);
+            var op = new OperatingRecord() { Host = this, Operation = Operation.Add, OriginaPos = -1, NewPos = __device_configurations.Count, OriginalValue = null, NewValue = model };
+            try
+            {
+                __controller_configuration_collection.Add(model.DeviceModel.ID, model.Switch, model.LocalAddress, model.IPv4, model.Port, model.ReferenceName);
+            }
+            catch (Exception ex)
+            {
+                DebugConsole.WriteException(ex, op);
+                throw;
+            }
             __device_configurations.Add(model);
             Modified = true;
+
             if (log && OperatingHistory != null)
-                OperatingHistory.PushOperatingRecord(new OperatingRecord() { Host = this, Operation = Operation.Add, OriginaPos = -1, NewPos = __device_configurations.Count - 1, OriginalValue = null, NewValue = model });
+                OperatingHistory.PushOperatingRecord(op);
+
+            DebugConsole.WriteOperatingRecord(op);
         }
 
         public DeviceConfigurationModel RemoveAt(int index, bool log = true)
         {
             DeviceConfigurationModel model = __device_configurations[index];
-            __controller_configuration_collection.Remove(model.ReferenceName);
+            var op = new OperatingRecord() { Host = this, Operation = Operation.Remove, OriginaPos = index, NewPos = -1, OriginalValue = model, NewValue = null };
+            try
+            {
+                __controller_configuration_collection.Remove(model.ReferenceName);
+            }
+            catch (Exception ex)
+            {
+                DebugConsole.WriteException(ex, op);
+                throw;
+            }
             __device_configurations.RemoveAt(index);
             Modified = true;
+
             if (log && OperatingHistory != null)
-                OperatingHistory.PushOperatingRecord(new OperatingRecord() { Host = this, Operation = Operation.Remove, OriginaPos = index, NewPos = -1, OriginalValue = model, NewValue = null });
+                OperatingHistory.PushOperatingRecord(op);
+
+            DebugConsole.WriteOperatingRecord(op);
             return model;
         }
 
         public void Remove(DeviceConfigurationModel model, bool log = true)
         {
-            __controller_configuration_collection.Remove(model.ReferenceName);
             int index = __device_configurations.IndexOf(model);
+            var op = new OperatingRecord() { Host = this, Operation = Operation.Remove, OriginaPos = index, NewPos = -1, OriginalValue = model, NewValue = null };
+            try
+            {
+                __controller_configuration_collection.Remove(model.ReferenceName);
+            }
+            catch(Exception ex)
+            {
+                DebugConsole.WriteException(ex, op);
+                throw;
+            }
             __device_configurations.Remove(model);
             Modified = true;
+
             if (log && OperatingHistory != null)
-                OperatingHistory.PushOperatingRecord(new OperatingRecord() { Host = this, Operation = Operation.Remove, OriginaPos = index, NewPos = -1, OriginalValue = model, NewValue = null });
+                OperatingHistory.PushOperatingRecord(op);
+
+            DebugConsole.WriteOperatingRecord(op);
         }
 
         public bool IsUnused(string name)
@@ -81,11 +118,24 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         {
             if (index > __device_configurations.Count)
                 throw new ArgumentOutOfRangeException();
-            __controller_configuration_collection.Add(model.DeviceModel.ID, model.Switch, model.LocalAddress, model.IPv4, model.Port, model.ReferenceName);
+
+            var op = new OperatingRecord() { Host = this, Operation = Operation.Insert, OriginaPos = -1, NewPos = index, OriginalValue = null, NewValue = model };
+            try
+            {
+                __controller_configuration_collection.Add(model.DeviceModel.ID, model.Switch, model.LocalAddress, model.IPv4, model.Port, model.ReferenceName);
+            }
+            catch (Exception ex)
+            {
+                DebugConsole.WriteException(ex, op);
+                throw;
+            }
             __device_configurations.Insert(index, model);
             Modified = true;
+
             if (log && OperatingHistory != null)
-                OperatingHistory.PushOperatingRecord(new OperatingRecord() { Host = this, Operation = Operation.Insert, OriginaPos = -1, NewPos = index, OriginalValue = null, NewValue = model });
+                OperatingHistory.PushOperatingRecord(op);
+
+            DebugConsole.WriteOperatingRecord(op);
         }
 
         public void Move(int srcIndex, int dstIndex, bool log = true)
@@ -96,8 +146,11 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             __device_configurations.RemoveAt(srcIndex);
             __device_configurations.Insert(dstIndex, temp);
             Modified = true;
+            var op = new OperatingRecord() { Host = this, Operation = Operation.Move, OriginaPos = srcIndex, NewPos = dstIndex, OriginalValue = temp, NewValue = temp };
             if (log && OperatingHistory != null)
-                OperatingHistory.PushOperatingRecord(new OperatingRecord() { Host = this, Operation = Operation.Move, OriginaPos = srcIndex, NewPos = dstIndex, OriginalValue = temp, NewValue = temp });
+                OperatingHistory.PushOperatingRecord(op);
+
+            DebugConsole.WriteOperatingRecord(op);
         }
 
         public int IndexOf(DeviceConfigurationModel model)
@@ -118,23 +171,46 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         public void Replace(int index, DeviceConfigurationModel newModel, bool log = true)
         {
             DeviceConfigurationModel original = __device_configurations[index];
-            __controller_configuration_collection.Replace(original.ReferenceName, newModel.DeviceModel.ID, newModel.Switch, newModel.LocalAddress, newModel.IPv4, newModel.Port, newModel.ReferenceName);
+            var op = new OperatingRecord() { Host = this, Operation = Operation.Replace, OriginaPos = index, NewPos = index, OriginalValue = original, NewValue = newModel };
+            try
+            {
+                __controller_configuration_collection.Replace(original.ReferenceName, newModel.DeviceModel.ID, newModel.Switch, newModel.LocalAddress, newModel.IPv4, newModel.Port, newModel.ReferenceName);
+            }
+            catch (Exception ex)
+            {
+                DebugConsole.WriteException(ex, op);
+                throw;
+            }
             __device_configurations[index] = newModel;
             Modified = true;
+
             if (log && OperatingHistory != null)
-                OperatingHistory?.PushOperatingRecord(new OperatingRecord() { Host = this, Operation = Operation.Replace, OriginaPos = index, NewPos = index, OriginalValue = original, NewValue = newModel });
+                OperatingHistory?.PushOperatingRecord(op);
+            DebugConsole.WriteOperatingRecord(op);
             //Notify others here
             SubscriberObjects?.UpdateBinding(original.ReferenceName);
         }
 
         public void Replace(DeviceConfigurationModel originalModel, DeviceConfigurationModel newModel, bool log = true)
         {
-            __controller_configuration_collection.Replace(originalModel.ReferenceName, newModel.DeviceModel.ID, newModel.Switch, newModel.LocalAddress, newModel.IPv4, newModel.Port, newModel.ReferenceName);
             int index = __device_configurations.IndexOf(originalModel);
+            var op = new OperatingRecord() { Host = this, Operation = Operation.Replace, OriginaPos = index, NewPos = index, OriginalValue = originalModel, NewValue = newModel };
+
+            try
+            {
+                __controller_configuration_collection.Replace(originalModel.ReferenceName, newModel.DeviceModel.ID, newModel.Switch, newModel.LocalAddress, newModel.IPv4, newModel.Port, newModel.ReferenceName);
+            }
+            catch (Exception ex)
+            {
+                DebugConsole.WriteException(ex, op);
+                throw;
+            }
             __device_configurations[index] = newModel;
             Modified = true;
+
             if (log && OperatingHistory != null)
-                OperatingHistory?.PushOperatingRecord(new OperatingRecord() { Host = this, Operation = Operation.Replace, OriginaPos = index, NewPos = index, OriginalValue = originalModel, NewValue = newModel });
+                OperatingHistory?.PushOperatingRecord(op);
+            DebugConsole.WriteOperatingRecord(op);
             //Notify others here
             SubscriberObjects?.UpdateBinding(originalModel.ReferenceName);
         }
@@ -168,8 +244,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                 DeviceConfigurationModel model = new DeviceConfigurationModel() { DeviceModel = d.DeviceModel, Switch = d.Switch, LocalAddress = d.LocalAddress, ReferenceName = refer };
                 __controller_configuration_collection.Add(model.DeviceModel.ID, model.Switch, model.LocalAddress, model.IPv4, model.Port, model.ReferenceName);
                 __device_configurations.Add(model);
+                var op = new OperatingRecord() { Host = this, Operation = Operation.Add, OriginaPos = -1, NewPos = __device_configurations.Count - 1, OriginalValue = null, NewValue = model };
                 if (log && OperatingHistory != null)
-                    OperatingHistory.PushOperatingRecord(new OperatingRecord() { Host = this, Operation = Operation.Add, OriginaPos = -1, NewPos = __device_configurations.Count - 1, OriginalValue = null, NewValue = model });
+                    OperatingHistory.PushOperatingRecord(op);
+                DebugConsole.WriteOperatingRecord(op);
             }
             foreach (var d in helper.RemoteHardwareCollection)
             {
@@ -184,8 +262,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                 DeviceConfigurationModel model = new DeviceConfigurationModel() { DeviceModel = d.DeviceModel, Switch = d.Switch, IPv4 = d.IPv4, Port = d.Port, ReferenceName = refer };
                 __controller_configuration_collection.Add(model.DeviceModel.ID, model.Switch, model.LocalAddress, model.IPv4, model.Port, model.ReferenceName);
                 __device_configurations.Add(model);
+                var op = new OperatingRecord() { Host = this, Operation = Operation.Add, OriginaPos = -1, NewPos = __device_configurations.Count - 1, OriginalValue = null, NewValue = model };
                 if (log && OperatingHistory != null)
-                    OperatingHistory.PushOperatingRecord(new OperatingRecord() { Host = this, Operation = Operation.Add, OriginaPos = -1, NewPos = __device_configurations.Count - 1, OriginalValue = null, NewValue = model });
+                    OperatingHistory.PushOperatingRecord(op);
+                DebugConsole.WriteOperatingRecord(op);
             }
             if (helper.LocalHardwareCollection.Count != 0 || helper.RemoteHardwareCollection.Count != 0)
                 Modified = true;

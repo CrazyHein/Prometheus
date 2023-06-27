@@ -1,4 +1,5 @@
 ﻿using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia;
+using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Console;
 using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Debugger;
 using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility;
 using Syncfusion.SfSkinManager;
@@ -116,6 +117,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             __recently_opened = new RecentlyOpened(__settings.PreferenceProperty.RecentlyOpenedFileCollectionCapacity);
             __main_model.RecentlyOpened = __recently_opened.PathCollection;
             DataContext = __main_model;
+
+            DebugConsole.CreateConsole();
         }
         /// <summary>
         /// Called when [loaded].
@@ -133,6 +136,14 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                 __controller_model_catalogue = new ControllerModelCatalogue(__settings.ControllerModelCataloguePath);
                 __settings.DataTypeCatalogueHash = __data_type_catalogue.MD5Code;
                 __settings.ControllerModelCatalogueHash = __controller_model_catalogue.MD5Code;
+
+                DebugConsole.WriteInfo($"Data Type Catalogue Path: {__settings.DataTypeCataloguePath}");
+                DebugConsole.WriteInfo($"Data Type Catalogue Hash: {string.Join("-", __settings.DataTypeCatalogueHash.Select(b => b.ToString("X2")))}");
+                DebugConsole.WriteInfo($"Controller Model Catalogue Path: {__settings.ControllerModelCataloguePath}");
+                DebugConsole.WriteInfo($"Controller Model Catalogue Hash: {string.Join("-", __settings.ControllerModelCatalogueHash.Select(b => b.ToString("X2")))}");
+                DebugConsole.WriteInfo($"Seiren Version: {__settings.SeirenVersion}");
+                DebugConsole.WriteInfo($"Lombardia Version: {__settings.LombardiaVersion}");
+                DebugConsole.WriteInfo($"Gagharv Version: {__settings.GagharvVersion}");
 
                 __data_types_viewer = new DataTypesViewer(__data_type_catalogue);
                 __device_models_viewer = new DeviceModelsViewer(__controller_model_catalogue);

@@ -91,7 +91,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
 
         private void OnMainViewer_DragStart(object sender, GridRowDragStartEventArgs e)
         {
-            if (__raw_viewer() == false)
+            if (__raw_viewer() == false || MainViewer.SelectedItems.Count != 1)
                 e.Handled = true;
         }
 
@@ -177,7 +177,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
 
         private void InsertRecordCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = MainViewer != null && MainViewer.SelectedItem != null && __raw_viewer();
+            e.CanExecute = MainViewer != null && MainViewer.SelectedItem != null && __raw_viewer() && MainViewer.SelectedItems.Count == 1;
         }
 
         private void EditRecordCommand_Executed(object sender, ExecutedRoutedEventArgs e)
@@ -190,7 +190,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
 
         private void EditRecordCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = MainViewer != null && MainViewer.SelectedItem != null;
+            e.CanExecute = MainViewer != null && MainViewer.SelectedItem != null && MainViewer.SelectedItems.Count == 1;
         }
 
         private void RemoveRecordCommand_Executed(object sender, ExecutedRoutedEventArgs e)

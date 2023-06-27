@@ -1,4 +1,5 @@
 ﻿using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia;
+using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Console;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -28,6 +29,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             {
                 if (value && (__interlock_collection.IgnoredAttribute & (uint)InterlockAttribute.Hardware) == 0)
                 {
+                    DebugConsole.WriteInfo($"{Name} Property Changed: [IgnoreHardwareIntlks] False -> {value}");
                     __interlock_collection.IgnoredAttribute |= (uint)InterlockAttribute.Hardware;
                     OnPropertyChanged("IgnoreHardwareIntlks");
                     Modified = true;
@@ -35,6 +37,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                 }
                 else if (!value && (__interlock_collection.IgnoredAttribute & (uint)InterlockAttribute.Hardware) != 0)
                 {
+                    DebugConsole.WriteInfo($"{Name} Property Changed: [IgnoreHardwareIntlks] True -> {value}");
                     __interlock_collection.IgnoredAttribute &= (uint)~InterlockAttribute.Hardware;
                     OnPropertyChanged("IgnoreHardwareIntlks");
                     Modified = true;
@@ -53,6 +56,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             {
                 if (value && (__interlock_collection.IgnoredAttribute & (uint)InterlockAttribute.Exclusive) == 0)
                 {
+                    DebugConsole.WriteInfo($"{Name} Property Changed: [IgnoreExclusiveIntlks] False -> {value}");
                     __interlock_collection.IgnoredAttribute |= (uint)InterlockAttribute.Exclusive;
                     OnPropertyChanged("IgnoreExclusiveIntlks");
                     Modified = true;
@@ -60,6 +64,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                 }
                 else if (!value && (__interlock_collection.IgnoredAttribute & (uint)InterlockAttribute.Exclusive) != 0)
                 {
+                    DebugConsole.WriteInfo($"{Name} Property Changed: [IgnoreExclusiveIntlks] True -> {value}");
                     __interlock_collection.IgnoredAttribute &= (uint)~InterlockAttribute.Exclusive;
                     OnPropertyChanged("IgnoreExclusiveIntlks");
                     Modified = true;
@@ -116,64 +121,112 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         public void Add(uint attr, string name, string target, string statement, bool log = true)
         {
             //__interlock_logic_models.Add(__interlock_collection.Add(name, target, statement));
-            __interlock_logic_models.Add(new InterlockLogicModel(__interlock_collection.Add(attr, name, target, statement)));
+            var op = new OperatingRecord()
+            {
+                Host = this,
+                Operation = Operation.Add,
+                OriginaPos = -1,
+                NewPos = __interlock_logic_models.Count,
+                OriginalValue = null,
+                NewValue = new Tuple<uint, string, string, string>(attr, name, target, statement)
+            };
+            try
+            {
+                __interlock_logic_models.Add(new InterlockLogicModel(__interlock_collection.Add(attr, name, target, statement)));
+            }
+            catch (Exception ex)
+            {
+                DebugConsole.WriteException(ex, op);
+                throw;
+            }
             Modified = true;
             __objects_source.SubsModified = true;
             if (log && OperatingHistory != null)
-                OperatingHistory.PushOperatingRecord(new OperatingRecord() { Host = this, Operation = Operation.Add, OriginaPos = -1, NewPos = __interlock_logic_models.Count - 1, OriginalValue = null, 
-                    NewValue = new Tuple<string, string, string>(name, target, statement) });
+                OperatingHistory.PushOperatingRecord(op);
+            DebugConsole.WriteOperatingRecord(op);
         }
 
         public void Insert(int index, uint attr, string name, string target, string statement, bool log = true)
         {
             //__interlock_logic_models.Insert(index, __interlock_collection.Insert(index, name, target, statement));
-            __interlock_logic_models.Insert(index, new InterlockLogicModel(__interlock_collection.Insert(index, attr, name, target, statement)));
+            var op = new OperatingRecord()
+            {
+                Host = this,
+                Operation = Operation.Insert,
+                OriginaPos = -1,
+                NewPos = index,
+                OriginalValue = null,
+                NewValue = new Tuple<uint, string, string, string>(attr, name, target, statement)
+            };
+            try
+            {
+                __interlock_logic_models.Insert(index, new InterlockLogicModel(__interlock_collection.Insert(index, attr, name, target, statement)));
+            }
+            catch (Exception ex)
+            {
+                DebugConsole.WriteException(ex, op);
+                throw;
+            }
             Modified = true;
             __objects_source.SubsModified = true;
             if (log && OperatingHistory != null)
-                OperatingHistory.PushOperatingRecord(new OperatingRecord() { Host = this, Operation = Operation.Insert, OriginaPos = -1, NewPos = index, OriginalValue = null, 
-                    NewValue = new Tuple<string, string, string>(name, target, statement) });
+                OperatingHistory.PushOperatingRecord(op);
+            DebugConsole.WriteOperatingRecord(op);
         }
 
         public void Remove(int index, bool log = true)
         {
             var logic = __interlock_collection.Remove(index);
+            StringBuilder sb = new StringBuilder();
+            foreach (var t in logic.Targets)
+            {
+                sb.Append("0x").Append(t.ProcessObject.Index.ToString("X08"));
+                sb.Append("\r\n");
+            }
+            var v = new Tuple<uint, string, string, string>(logic.Attr, logic.Name, sb.ToString(), logic.Statement.Serialize());
+            var op = new OperatingRecord() { Host = this, Operation = Operation.Remove, OriginaPos = index, NewPos = -1, OriginalValue = v, NewValue = null };
             __interlock_logic_models.RemoveAt(index);
             Modified = true;
             __objects_source.SubsModified = true;
             if (log && OperatingHistory != null)
-            {
-                StringBuilder sb = new StringBuilder();
-                foreach (var t in logic.Targets)
-                {
-                    sb.Append("0x").Append(t.ProcessObject.Index.ToString("X08"));
-                    sb.Append("\r\n");
-                }
-                var v = new Tuple<string, string, string>(logic.Name, sb.ToString(), logic.Statement.Serialize());
-                OperatingHistory.PushOperatingRecord(new OperatingRecord() { Host = this, Operation = Operation.Remove, OriginaPos = index, NewPos = -1, OriginalValue = v, NewValue = null });
-            }
+                OperatingHistory.PushOperatingRecord(op);
+            DebugConsole.WriteOperatingRecord(op);
         }
 
         public void Replace(int index, uint attr, string name, string target, string statement, bool log = true)
         {
             //__interlock_logic_models[index] = __interlock_collection.Replace(index, name, target, statement);
             var logic = __interlock_collection.Logics[index];
-            __interlock_logic_models[index] = new InterlockLogicModel(__interlock_collection.Replace(index, attr, name, target, statement));
+            StringBuilder sb = new StringBuilder();
+            foreach (var t in logic.Targets)
+            {
+                sb.Append("0x").Append(t.ProcessObject.Index.ToString("X08"));
+                sb.Append("\r\n");
+            }
+            var v = new Tuple<uint, string, string, string>(logic.Attr, logic.Name, sb.ToString(), logic.Statement.Serialize());
+            var op = new OperatingRecord()
+            {
+                Host = this,
+                Operation = Operation.Replace,
+                OriginaPos = index,
+                NewPos = index,
+                OriginalValue = v,
+                NewValue = new Tuple<uint, string, string, string>(attr, name, target, statement)
+            };
+            try
+            {
+                __interlock_logic_models[index] = new InterlockLogicModel(__interlock_collection.Replace(index, attr, name, target, statement));
+            }
+            catch (Exception ex)
+            {
+                DebugConsole.WriteException(ex, op);
+                throw;
+            }
             Modified = true;
             __objects_source.SubsModified = true;
             if (log && OperatingHistory != null)
-            {
-                StringBuilder sb = new StringBuilder();
-                foreach (var t in logic.Targets)
-                {
-                    sb.Append("0x").Append(t.ProcessObject.Index.ToString("X08"));
-                    sb.Append("\r\n");
-                }
-                var v = new Tuple<string, string, string>(logic.Name, sb.ToString(), logic.Statement.Serialize());
-                OperatingHistory?.PushOperatingRecord(new OperatingRecord() { Host = this, Operation = Operation.Replace, OriginaPos = index, NewPos = index, 
-                    OriginalValue = v, 
-                    NewValue = new Tuple<string, string, string>(name, target, statement) });
-            }
+                OperatingHistory?.PushOperatingRecord(op);
+            DebugConsole.WriteOperatingRecord(op);
         }
 
         public void Move(int srcIndex, int dstIndex, bool log = true)
@@ -186,8 +239,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             __interlock_logic_models.Insert(dstIndex, temp);
             Modified = true;
             __objects_source.SubsModified = true;
+            var op = new OperatingRecord() { Host = this, Operation = Operation.Move, OriginaPos = srcIndex, NewPos = dstIndex, OriginalValue = temp, NewValue = temp };
             if (log && OperatingHistory != null)
-                OperatingHistory.PushOperatingRecord(new OperatingRecord() { Host = this, Operation = Operation.Move, OriginaPos = srcIndex, NewPos = dstIndex, OriginalValue = temp, NewValue = temp });
+                OperatingHistory.PushOperatingRecord(op);
+            DebugConsole.WriteOperatingRecord(op);
         }
 
         public void Save(XmlDocument doc, XmlElement root)

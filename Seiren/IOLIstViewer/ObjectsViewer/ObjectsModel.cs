@@ -1,4 +1,5 @@
 ﻿using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia;
+using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Console;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -84,14 +85,24 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
 
         public void Add(ObjectModel model, bool log = true)
         {
+            var op = new OperatingRecord() { Host = this, Operation = Operation.Add, OriginaPos = -1, NewPos = __objects.Count, OriginalValue = null, NewValue = model };
             var p = _process_object_property(model);
-            __object_dictionary.Add(p.Index, p.VariableName, 
-                p.BindingDeviceName, p.BindingChannelName, p.BindingChannelIndex,
-                p.Range, p.Converter);
+            try
+            {
+                __object_dictionary.Add(p.Index, p.VariableName,
+                    p.BindingDeviceName, p.BindingChannelName, p.BindingChannelIndex,
+                    p.Range, p.Converter);
+            }
+            catch (Exception ex)
+            {
+                DebugConsole.WriteException(ex, op);
+                throw;
+            }
             __objects.Add(model);
             Modified = true;
             if (log && OperatingHistory != null)
-                OperatingHistory.PushOperatingRecord(new OperatingRecord() { Host = this, Operation = Operation.Add, OriginaPos = -1, NewPos = __objects.Count - 1, OriginalValue = null, NewValue = model });
+                OperatingHistory.PushOperatingRecord(op);
+            DebugConsole.WriteOperatingRecord(op);
             __varialble_model_source.ReEvaluate(model.VariableName);
             if (model.EnableBinding)
                 __controller_configuration_model_source.ReEvaluate(model.BindingDeviceName);
@@ -100,11 +111,21 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         public ObjectModel RemoveAt(int index, bool log = true)
         {
             ObjectModel model = __objects[index];
-            __object_dictionary.Remove(model.Index);
+            var op = new OperatingRecord() { Host = this, Operation = Operation.Remove, OriginaPos = index, NewPos = -1, OriginalValue = model, NewValue = null };
+            try
+            {
+                __object_dictionary.Remove(model.Index);
+            }
+            catch (Exception ex)
+            {
+                DebugConsole.WriteException(ex, op);
+                throw;
+            }
             __objects.RemoveAt(index);
             Modified = true;
             if (log && OperatingHistory != null)
-                OperatingHistory.PushOperatingRecord(new OperatingRecord() { Host = this, Operation = Operation.Remove, OriginaPos = index, NewPos = -1, OriginalValue = model, NewValue = null });
+                OperatingHistory.PushOperatingRecord(op);
+            DebugConsole.WriteOperatingRecord(op);
             __varialble_model_source.ReEvaluate(model.VariableName);
             if (model.EnableBinding)
                 __controller_configuration_model_source.ReEvaluate(model.BindingDeviceName);
@@ -113,13 +134,23 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
 
         public ObjectModel Remove(uint index, bool log = true)
         {
-            __object_dictionary.Remove(index);
             var o = __objects.First(o => o.Index == index);
             int i = __objects.IndexOf(o);
+            var op = new OperatingRecord() { Host = this, Operation = Operation.Remove, OriginaPos = i, NewPos = -1, OriginalValue = o, NewValue = null };
+            try
+            {
+                __object_dictionary.Remove(index);
+            }
+            catch (Exception ex)
+            {
+                DebugConsole.WriteException(ex, op);
+                throw;
+            }
             __objects.Remove(o);
             Modified = true;
             if (log && OperatingHistory != null)
-                OperatingHistory.PushOperatingRecord(new OperatingRecord() { Host = this, Operation = Operation.Remove, OriginaPos = i, NewPos = -1, OriginalValue = o, NewValue = null });
+                OperatingHistory.PushOperatingRecord(op);
+            DebugConsole.WriteOperatingRecord(op);
             __varialble_model_source.ReEvaluate(o.VariableName);
             if (o.EnableBinding)
                 __controller_configuration_model_source.ReEvaluate(o.BindingDeviceName);
@@ -128,12 +159,22 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
 
         public void Remove(ObjectModel model, bool log = true)
         {
-            __object_dictionary.Remove(model.Index);
             int index = __objects.IndexOf(model);
+            var op = new OperatingRecord() { Host = this, Operation = Operation.Remove, OriginaPos = index, NewPos = -1, OriginalValue = model, NewValue = null };
+            try
+            {
+                __object_dictionary.Remove(model.Index);
+            }
+            catch (Exception ex)
+            {
+                DebugConsole.WriteException(ex, op);
+                throw;
+            }
             __objects.Remove(model);
             Modified = true;
             if (log && OperatingHistory != null)
-                OperatingHistory.PushOperatingRecord(new OperatingRecord() { Host = this, Operation = Operation.Remove, OriginaPos = index, NewPos = -1, OriginalValue = model, NewValue = null });
+                OperatingHistory.PushOperatingRecord(op);
+            DebugConsole.WriteOperatingRecord(op);
             __varialble_model_source.ReEvaluate(model.VariableName);
             if (model.EnableBinding)
                 __controller_configuration_model_source.ReEvaluate(model.BindingDeviceName);
@@ -154,15 +195,24 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             if (index > __objects.Count)
                 throw new ArgumentOutOfRangeException();
 
+            var op = new OperatingRecord() { Host = this, Operation = Operation.Insert, OriginaPos = -1, NewPos = index, OriginalValue = null, NewValue = model };
             var p = _process_object_property(model);
-
-            __object_dictionary.Add(p.Index, p.VariableName,
-                p.BindingDeviceName, p.BindingChannelName, p.BindingChannelIndex,
-                p.Range, p.Converter);
+            try
+            {              
+                __object_dictionary.Add(p.Index, p.VariableName,
+                    p.BindingDeviceName, p.BindingChannelName, p.BindingChannelIndex,
+                    p.Range, p.Converter);
+            }
+            catch (Exception ex)
+            {
+                DebugConsole.WriteException(ex, op);
+                throw;
+            }
             __objects.Insert(index, model);
             Modified = true;
             if (log && OperatingHistory != null)
-                OperatingHistory.PushOperatingRecord(new OperatingRecord() { Host = this, Operation = Operation.Insert, OriginaPos = -1, NewPos = index, OriginalValue = null, NewValue = model });
+                OperatingHistory.PushOperatingRecord(op);
+            DebugConsole.WriteOperatingRecord(op);
             __varialble_model_source.ReEvaluate(model.VariableName);
             if(model.EnableBinding)
                 __controller_configuration_model_source.ReEvaluate(model.BindingDeviceName);
@@ -176,8 +226,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             __objects.RemoveAt(srcIndex);
             __objects.Insert(dstIndex, temp);
             Modified = true;
+            var op = new OperatingRecord() { Host = this, Operation = Operation.Move, OriginaPos = srcIndex, NewPos = dstIndex, OriginalValue = temp, NewValue = temp };
             if (log && OperatingHistory != null)
-                OperatingHistory.PushOperatingRecord(new OperatingRecord() { Host = this, Operation = Operation.Move, OriginaPos = srcIndex, NewPos = dstIndex, OriginalValue = temp, NewValue = temp });
+                OperatingHistory.PushOperatingRecord(op);
+            DebugConsole.WriteOperatingRecord(op);
         }
 
         public int IndexOf(ObjectModel model)
@@ -199,15 +251,25 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         {
             ObjectModel original = __objects[index];
             var p = _process_object_property(newModel);
-            __object_dictionary.Replace(original.Index, 
-                p.Index, p.VariableName,
-                p.BindingDeviceName, p.BindingChannelName, p.BindingChannelIndex,
-                p.Range, p.Converter);
+            var op = new OperatingRecord() { Host = this, Operation = Operation.Replace, OriginaPos = index, NewPos = index, OriginalValue = original, NewValue = newModel };
+            try
+            {
+                __object_dictionary.Replace(original.Index,
+                    p.Index, p.VariableName,
+                    p.BindingDeviceName, p.BindingChannelName, p.BindingChannelIndex,
+                    p.Range, p.Converter);
+            }
+            catch (Exception ex)
+            {
+                DebugConsole.WriteException(ex, op);
+                throw;
+            }
             __objects[index] = newModel;
             Modified = true;
             if (log && OperatingHistory != null)
-                OperatingHistory?.PushOperatingRecord(new OperatingRecord() { Host = this, Operation = Operation.Replace, OriginaPos = index, NewPos = index, OriginalValue = original, NewValue = newModel });
-            
+                OperatingHistory?.PushOperatingRecord(op);
+            DebugConsole.WriteOperatingRecord(op);
+
             __varialble_model_source.ReEvaluate(original.VariableName);
             if (original.EnableBinding)
                 __controller_configuration_model_source.ReEvaluate(original.BindingDeviceName);
@@ -238,16 +300,27 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         public void Replace(ObjectModel originalModel, ObjectModel newModel, bool log = true)
         {
             var p = _process_object_property(newModel);
-            __object_dictionary.Replace(originalModel.Index, 
+            int index = __objects.IndexOf(originalModel);
+            var op = new OperatingRecord() { Host = this, Operation = Operation.Replace, OriginaPos = index, NewPos = index, OriginalValue = originalModel, NewValue = newModel };
+
+            try
+            {
+                __object_dictionary.Replace(originalModel.Index,
                 p.Index, p.VariableName,
                 p.BindingDeviceName, p.BindingChannelName, p.BindingChannelIndex,
                 p.Range, p.Converter);
-            int index = __objects.IndexOf(originalModel);
+            }
+            catch (Exception ex)
+            {
+                DebugConsole.WriteException(ex, op);
+                throw;
+            }
             __objects[index] = newModel;
             Modified = true;
             if (log && OperatingHistory != null)
-                OperatingHistory?.PushOperatingRecord(new OperatingRecord() { Host = this, Operation = Operation.Replace, OriginaPos = index, NewPos = index, OriginalValue = originalModel, NewValue = newModel });
-            
+                OperatingHistory?.PushOperatingRecord(op);
+            DebugConsole.WriteOperatingRecord(op);
+
             __varialble_model_source.ReEvaluate(originalModel.VariableName);
             if (originalModel.EnableBinding)
                 __controller_configuration_model_source.ReEvaluate(originalModel.BindingDeviceName);

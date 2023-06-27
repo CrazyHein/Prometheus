@@ -1,4 +1,6 @@
 ﻿using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia;
+using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Console;
+using Spire.Pdf.Interactive.DigitalSignatures;
 using Syncfusion.UI.Xaml.Grid;
 using System;
 using System.Collections.Generic;
@@ -174,43 +176,74 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         public void Add(ProcessDataModel model, bool log = true)
         {
             Debug.Assert(model.Access == __process_data_image.Access);
-            __process_data_image.Add(model.Index);
+
+            var op = new OperatingRecord() { Host = this, Operation = Operation.Add, OriginaPos = -1, NewPos = __process_data_models.Count, OriginalValue = null, NewValue = model };
+            try
+            {
+                __process_data_image.Add(model.Index);
+            }
+            catch (Exception ex)
+            {
+                DebugConsole.WriteException(ex, op);
+                throw;
+            }
             __process_data_models.Add(model);
             __copy_bitpos(__process_data_image.ProcessDatas, __process_data_models, __process_data_image.ProcessDatas.Count - 1);
             ActualSizeInWord = __process_data_image.ActualSizeInWord;
             Modified = true;
             __objects_source.SubsModified = true;
             if (log && OperatingHistory != null)
-                OperatingHistory.PushOperatingRecord(new OperatingRecord() { Host = this, Operation = Operation.Add, OriginaPos = -1, NewPos = __process_data_models.Count - 1, OriginalValue = null, NewValue = model });
+                OperatingHistory.PushOperatingRecord(op);
+            DebugConsole.WriteOperatingRecord(op);
             __objects_source.ReEvaluate(model.Index);
         }
 
         public ObjectModel RemoveAt(int index, bool log = true)
         {
             ProcessDataModel model = __process_data_models[index];
-            __process_data_image.Remove(ObjectDictionary.ProcessObjects[model.Index]);
+            var op = new OperatingRecord() { Host = this, Operation = Operation.Remove, OriginaPos = index, NewPos = -1, OriginalValue = model, NewValue = null };
+            try
+            {
+                __process_data_image.Remove(ObjectDictionary.ProcessObjects[model.Index]);
+            }
+            catch (Exception ex)
+            {
+                DebugConsole.WriteException(ex, op);
+                throw;
+            }
             __process_data_models.RemoveAt(index);
             __copy_bitpos(__process_data_image.ProcessDatas, __process_data_models, index);
             ActualSizeInWord = __process_data_image.ActualSizeInWord;
             Modified = true;
             __objects_source.SubsModified = true;
             if (log && OperatingHistory != null)
-                OperatingHistory.PushOperatingRecord(new OperatingRecord() { Host = this, Operation = Operation.Remove, OriginaPos = index, NewPos = -1, OriginalValue = model, NewValue = null });
+                OperatingHistory.PushOperatingRecord(op);
+            DebugConsole.WriteOperatingRecord(op);
             __objects_source.ReEvaluate(model.Index);
             return model;
         }
 
         public void Remove(ProcessDataModel model, bool log = true)
         {
-            __process_data_image.Remove(ObjectDictionary.ProcessObjects[model.Index]);
             int index = __process_data_models.IndexOf(model);
+            var op = new OperatingRecord() { Host = this, Operation = Operation.Remove, OriginaPos = index, NewPos = -1, OriginalValue = model, NewValue = null };
+            try
+            {
+                __process_data_image.Remove(ObjectDictionary.ProcessObjects[model.Index]);
+            }
+            catch (Exception ex)
+            {
+                DebugConsole.WriteException(ex, op);
+                throw;
+            }
             __process_data_models.Remove(model);
             __copy_bitpos(__process_data_image.ProcessDatas, __process_data_models, index);
             ActualSizeInWord = __process_data_image.ActualSizeInWord;
             Modified = true;
             __objects_source.SubsModified = true;
             if (log && OperatingHistory != null)
-                OperatingHistory.PushOperatingRecord(new OperatingRecord() { Host = this, Operation = Operation.Remove, OriginaPos = index, NewPos = -1, OriginalValue = model, NewValue = null });
+                OperatingHistory.PushOperatingRecord(op);
+            DebugConsole.WriteOperatingRecord(op);
             __objects_source.ReEvaluate(model.Index);
         }
 
@@ -219,14 +252,25 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             Debug.Assert(model.Access == __process_data_image.Access);
             if (index > __process_data_models.Count)
                 throw new ArgumentOutOfRangeException();
-            __process_data_image.Insert(index, model.Index);
+
+            var op = new OperatingRecord() { Host = this, Operation = Operation.Insert, OriginaPos = -1, NewPos = index, OriginalValue = null, NewValue = model };
+            try
+            {
+                __process_data_image.Insert(index, model.Index);
+            }
+            catch (Exception ex)
+            {
+                DebugConsole.WriteException(ex, op);
+                throw;
+            }
             __process_data_models.Insert(index, model);
             __copy_bitpos(__process_data_image.ProcessDatas, __process_data_models, index);
             ActualSizeInWord = __process_data_image.ActualSizeInWord;
             Modified = true;
             __objects_source.SubsModified = true;
             if (log && OperatingHistory != null)
-                OperatingHistory.PushOperatingRecord(new OperatingRecord() { Host = this, Operation = Operation.Insert, OriginaPos = -1, NewPos = index, OriginalValue = null, NewValue = model });
+                OperatingHistory.PushOperatingRecord(op);
+            DebugConsole.WriteOperatingRecord(op);
             __objects_source.ReEvaluate(model.Index);
         }
 
@@ -242,8 +286,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             ActualSizeInWord = __process_data_image.ActualSizeInWord;
             Modified = true;
             __objects_source.SubsModified = true;
+            var op = new OperatingRecord() { Host = this, Operation = Operation.Move, OriginaPos = srcIndex, NewPos = dstIndex, OriginalValue = temp, NewValue = temp };
             if (log && OperatingHistory != null)
-                OperatingHistory.PushOperatingRecord(new OperatingRecord() { Host = this, Operation = Operation.Move, OriginaPos = srcIndex, NewPos = dstIndex, OriginalValue = temp, NewValue = temp });
+                OperatingHistory.PushOperatingRecord(op);
+            DebugConsole.WriteOperatingRecord(op);
         }
 
         public int IndexOf(ProcessDataModel model)
@@ -258,6 +304,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             {
                 if (__process_data_image.OffsetInWord != value)
                 {
+                    DebugConsole.WriteInfo($"{Name} Property Changed: [OffsetInWord] {__process_data_image.OffsetInWord} -> {value}");
                     __process_data_image.OffsetInWord = value;
                     Modified = true;
                     __objects_source.SubsModified = true;
@@ -272,6 +319,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             {
                 if (__process_data_image.SizeInWord != value)
                 {
+                    DebugConsole.WriteInfo($"{Name} Property Changed: [SizeInWord] {__process_data_image.SizeInWord} -> {value}");
                     __process_data_image.SizeInWord = value;
                     Modified = true;
                     __objects_source.SubsModified = true;
