@@ -3,6 +3,7 @@ using AMEC.PCSoftware.CommunicationProtocol.CrazyHein.SLMP.IOUtility;
 using AMEC.PCSoftware.CommunicationProtocol.CrazyHein.SLMP.Master;
 using AMEC.PCSoftware.CommunicationProtocol.CrazyHein.SLMP.Message;
 using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Debugger;
+using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,9 +32,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         {
             InitializeComponent();
             Settings = settings;
-            DebuggerSettings.DataContext = Settings.SlmpTargetProperty;
-            PreferenceSettings.DataContext = Settings.PreferenceProperty;
-            FTPSettings.DataContext = Settings.FTPTargetProperty;
+            DebuggerSettings.DataContext = Settings.SlmpTargetProperty.Copy();
+            PreferenceSettings.DataContext = Settings.PreferenceProperty.Copy();
+            FTPSettings.DataContext = Settings.FTPTargetProperty.Copy();
         }
 
         private void DebuggerSettings_Error(object sender, ValidationErrorEventArgs e)
@@ -57,6 +58,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                 MessageBox.Show("At least one user input is invalid.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             else
             {
+                Settings.SlmpTargetProperty = DebuggerSettings.DataContext as SlmpTargetProperty;
+                Settings.PreferenceProperty = PreferenceSettings.DataContext as PreferenceProperty;
+                Settings.FTPTargetProperty = FTPSettings.DataContext as FTPTargetProperty;
                 Settings.Save();
                 DialogResult = true;
             }

@@ -481,6 +481,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             {
                 try
                 {
+                    DebugConsole.WriteInfo($"Save flie '{save.FileName}'.");
                     IOCelcetaHelper.Save(save.FileName,
                         __variable_dictionary, (__variables_viewer.DataContext as VariablesModel).VariableNames,
                         __controller_configuration, (__controller_configuration_viewer.DataContext as ControllerConfigurationModel).ReferenceNames,
@@ -494,6 +495,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                 }
                 catch(LombardiaException ex)
                 {
+                    DebugConsole.WriteException(ex);
                     MessageBox.Show("At least one exception has occurred during the operation :\n" + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
@@ -514,6 +516,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                     MessageBox.Show(error, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                     return;
                 }
+                DebugConsole.WriteInfo($"Save flie '{__main_model.CurrentlyOpenFile}'.");
                 IOCelcetaHelper.Save(__main_model.CurrentlyOpenFile,
                     __variable_dictionary, (__variables_viewer.DataContext as VariablesModel).VariableNames,
                     __controller_configuration, (__controller_configuration_viewer.DataContext as ControllerConfigurationModel).ReferenceNames,
@@ -525,6 +528,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             }
             catch (LombardiaException ex)
             {
+                DebugConsole.WriteException(ex);
                 MessageBox.Show("At least one exception has occurred during the operation :\n" + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
@@ -550,6 +554,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             {
                 try
                 {
+                    DebugConsole.WriteInfo($"Open flie '{open.FileName}'.");
                     (__variable_dictionary, __controller_configuration, __object_dictionary,
                         __tx_diagnostic_area, __tx_bit_area, __tx_block_area,
                         __rx_control_area, __rx_bit_area, __rx_block_area, 
@@ -560,6 +565,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                 }
                 catch (LombardiaException ex)
                 {
+                    DebugConsole.WriteException(ex);
                     MessageBox.Show("At least one exception has occurred during the operation :\n" + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
@@ -650,6 +656,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
 
             try
             {
+                DebugConsole.WriteInfo($"Create new file with default settings.");
                 (__variable_dictionary, __controller_configuration, __object_dictionary,
                     __tx_diagnostic_area, __tx_bit_area, __tx_block_area,
                     __rx_control_area, __rx_bit_area, __rx_block_area,
@@ -659,6 +666,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             }
             catch (LombardiaException ex)
             {
+                DebugConsole.WriteException(ex);
                 MessageBox.Show("At least one exception has occurred during the operation :\n" + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
@@ -718,6 +726,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                     __settings.FTPTargetProperty);
             if (wnd.ShowDialog() == true)
             {
+                DebugConsole.WriteInfo($"Create new file with settings reading from connected controller.");
                 (__variable_dictionary, __controller_configuration, __object_dictionary,
                         __tx_diagnostic_area, __tx_bit_area, __tx_block_area,
                         __rx_control_area, __rx_bit_area, __rx_block_area,
@@ -746,6 +755,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                 if (res == MessageBoxResult.No)
                     return;
             }
+
+            DebugConsole.WriteInfo($"Close flie '{__main_model.CurrentlyOpenFile}'.");
 
             __variable_dictionary = null;
             __controller_configuration = null;
@@ -1101,6 +1112,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             string path = menu.Header.ToString();
             try
             {
+                DebugConsole.WriteInfo($"Open flie '{path}'.");
                 (__variable_dictionary, __controller_configuration, __object_dictionary,
                     __tx_diagnostic_area, __tx_bit_area, __tx_block_area,
                     __rx_control_area, __rx_bit_area, __rx_block_area,
@@ -1111,6 +1123,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             }
             catch (LombardiaException ex)
             {
+                DebugConsole.WriteException(ex);
                 MessageBox.Show("At least one exception has occurred during the operation :\n" + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
@@ -1131,6 +1144,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
      
             try
             {
+                DebugConsole.WriteInfo($"Open flie '{path}'.");
                 (__variable_dictionary, __controller_configuration, __object_dictionary,
                     __tx_diagnostic_area, __tx_bit_area, __tx_block_area,
                     __rx_control_area, __rx_bit_area, __rx_block_area,
@@ -1141,6 +1155,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             }
             catch (LombardiaException ex)
             {
+                DebugConsole.WriteException(ex);
                 MessageBox.Show("At least one exception has occurred during the operation :\n" + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }

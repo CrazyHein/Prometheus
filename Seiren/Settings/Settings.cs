@@ -35,9 +35,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         public uint SupportedIOFileFormatVersion { get; init; } = IOCelcetaHelper.SupportedIOFileFormatVersion;
         public string GagharvVersion { get; init; } = System.Reflection.Assembly.GetAssembly(typeof(RemoteOperationMaster)).GetName().Version.ToString();
 
-        public SlmpTargetProperty SlmpTargetProperty { get; private set; }
-        public FTPTargetProperty FTPTargetProperty { get; private set; }
-        public PreferenceProperty PreferenceProperty { get; private set; }
+        public SlmpTargetProperty SlmpTargetProperty { get; set; }
+        public FTPTargetProperty FTPTargetProperty { get; set; }
+        public PreferenceProperty PreferenceProperty { get; set; }
 
         private static ReadOnlySpan<byte> __UTF8_BOM => new byte[] { 0xEF, 0xBB, 0xBF };
 
@@ -107,6 +107,11 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
 
     public class PreferenceProperty
     {
+        public PreferenceProperty Copy()
+        {
+            return MemberwiseClone() as PreferenceProperty;
+        }
+
         private int __record_operating_undo_queue_depth = 64;
         public int RecordOperatingUndoQueueDepth
         {

@@ -27,7 +27,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility.R12C
             byte[] content = sm.ReadBytes(Info.size_in_kbyte * 1024 - Marshal.SizeOf<FileHeader>() - Marshal.SizeOf<ManagementInformation>());
 
             int start = Info.record_end_pos_in_byte - Info.record_size_in_byte >= 0 ?
-                Info.record_end_pos_in_byte - Info.record_size_in_byte : content.Length + (Info.record_end_pos_in_byte - Info.record_size_in_byte);
+                Info.record_end_pos_in_byte - Info.record_size_in_byte : Info.size_in_kbyte * 1024 + (Info.record_end_pos_in_byte - Info.record_size_in_byte);
             __parse(content, start, Info.record_size_in_byte, content.Length);
         }
 

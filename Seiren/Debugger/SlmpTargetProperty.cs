@@ -33,6 +33,11 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Debugger
                 MODULE_IO_NAMES.Add(__CCIEF_MODULE_IO_PREFIX + name);
         }
 
+        public SlmpTargetProperty Copy()
+        {
+            return MemberwiseClone() as SlmpTargetProperty;
+        }
+
         [JsonIgnore]
         public IPAddress SourceIPv4 { get; private set; } = IPAddress.Any;
         [JsonPropertyName("SourceIPv4")]

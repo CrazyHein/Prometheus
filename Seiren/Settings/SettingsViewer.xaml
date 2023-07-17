@@ -26,6 +26,7 @@
                         </Trigger>
                     </Style.Triggers>
                 </Style>
+                <sync:BoolNegationConverter x:Key="boolnegation"/>
             </TabControl.Resources>
             <TabItem Header="Debugger" Width="135" Name="DebuggerSettingsTab">
                 <Grid d:DataContext="{d:DesignInstance Type=debugger:SlmpTargetProperty}" x:Name="DebuggerSettings" Validation.Error="DebuggerSettings_Error">
@@ -95,11 +96,11 @@
                             <StackPanel Orientation="Horizontal" Margin="4,8,4,8" Grid.ColumnSpan="2">
                                 <TextBlock Text="Transport layer :" Margin="0,0,8,0" VerticalAlignment="Center" Width="100"/>
                                 <RadioButton Content="UDP" GroupName="TLP" IsChecked="{Binding UDPTransportLayer}" Margin="8,0,8,0" Width="50"/>
-                                <RadioButton Content="TCP" GroupName="TLP" IsChecked="True" Margin="8,0,8,0" Width="50"/>
+                                <RadioButton Content="TCP" GroupName="TLP" IsChecked="{Binding UDPTransportLayer, Converter={StaticResource boolnegation}}" Margin="8,0,8,0" Width="50"/>
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" Margin="4,8,4,8" Grid.Column="2" Grid.ColumnSpan="2">
                                 <TextBlock Text="Message Format :" Margin="0,0,8,0" VerticalAlignment="Center" Width="100"/>
-                                <RadioButton Content="Q / L" GroupName="MFT" IsChecked="True" Margin="8,0,8,0" Width="50"/>
+                                <RadioButton Content="Q / L" GroupName="MFT" IsChecked="{Binding R_DedicatedMessageFormat, Converter={StaticResource boolnegation}}" Margin="8,0,8,0" Width="50"/>
                                 <RadioButton Content="R" GroupName="MFT" IsChecked="{Binding R_DedicatedMessageFormat}" Margin="8,0,8,0" Width="50"/>
                             </StackPanel>
                             <sync:SfTextInputLayout Grid.Row="1" Hint="Data Code"  FontSize="12" FontStyle="Italic" ContainerType="Filled" Margin="4">

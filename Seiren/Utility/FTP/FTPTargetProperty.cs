@@ -12,6 +12,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility
 {
     public class FTPTargetProperty
     {
+        public FTPTargetProperty Copy()
+        {
+            return MemberwiseClone() as FTPTargetProperty;
+        }
         [JsonIgnore]
         public IPAddress HostIPv4 { get; private set; } = IPAddress.Parse("192.168.3.3");
         [JsonPropertyName("HostIPv4")]

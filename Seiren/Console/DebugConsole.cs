@@ -61,6 +61,11 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Console
             PrintPromptString(__INFO_PROMPT);
             System.Console.WriteLine(info);
         }
+        public static void WriteException(Exception ex)
+        {
+            PrintPromptString(__EXCEPTION_PROMPT, ConsoleColor.Red);
+            System.Console.WriteLine(ex.Message);
+        }
 
         public static void WriteOperatingRecord(OperatingRecord rd)
         {
