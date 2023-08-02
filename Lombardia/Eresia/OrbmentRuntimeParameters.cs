@@ -18,6 +18,33 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia.OrbmentPa
         INTER_MODULE_SYNC_CLOCK = 0x0002
     }
 
+    public class EventLoggerConfiguration
+    {
+        private uint __posix_priority = 255 - 245;
+        public uint PosixPriority
+        {
+            get { return __posix_priority; }
+            set { if (value > 255) throw new LombardiaException(LOMBARDIA_ERROR_CODE_T.POSIX_PRIORITY_OUT_OF_RANGE); __posix_priority = value; }
+        }
+        public uint TaskStackInByte { get; set; } = 0;
+        public ushort QueueDepth { get; set; } = 128;
+        public bool CustomPosixPriority { get; set; } = false;
+        public bool CustomTaskStack { get; set; } = false;
+        public bool CustomQueueDepth { get; set; } = false;
+
+        public void ApplyDeviceRuntimeDefault()
+        {
+            CustomPosixPriority = false;
+            CustomTaskStack = false;
+            CustomQueueDepth = false;
+        }
+
+        public EventLoggerConfiguration ShallowCopy()
+        {
+            return (EventLoggerConfiguration)this.MemberwiseClone();
+        }
+    }
+
     public class DeviceIOScanTaskConfiguration
     {
         private uint __posix_priority = 255 - 47;
@@ -242,6 +269,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia.OrbmentPa
     {
         public EventLogger EventLogger { get; set; } = EventLogger.CCPU_BUILT_IN_LOGGER;
         public bool CustomEventLogger { get; set; } = false;
+        public EventLoggerConfiguration EventLoggerConfiguration { get; init; } = new EventLoggerConfiguration();
         public DeviceIOScanTaskConfiguration DeviceIOScanTaskConfiguration { get; init; } = new DeviceIOScanTaskConfiguration();
         public DeviceControlTaskConfiguration DeviceControlTaskConfiguration { get; init; } = new DeviceControlTaskConfiguration();
         public DLinkServiceConfiguration DLinkServiceConfiguration { get; init; } = new DLinkServiceConfiguration();
@@ -273,6 +301,23 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia.OrbmentPa
                             case "EventLogger":
                                 EventLogger = Enum.Parse<EventLogger>(sub.FirstChild.Value);
                                 CustomEventLogger = true;
+                                break;
+                            case "EventLoggerConfiguration":
+                                if (sub.SelectSingleNode("Priority") != null)
+                                {
+                                    EventLoggerConfiguration.PosixPriority = Convert.ToUInt32(sub.SelectSingleNode("Priority").FirstChild.Value);
+                                    EventLoggerConfiguration.CustomPosixPriority = true;
+                                }
+                                if (sub.SelectSingleNode("StackBytes") != null)
+                                {
+                                    EventLoggerConfiguration.TaskStackInByte = Convert.ToUInt32(sub.SelectSingleNode("StackBytes").FirstChild.Value);
+                                    EventLoggerConfiguration.CustomTaskStack = true;
+                                }
+                                if (sub.SelectSingleNode("QueueDepth") != null)
+                                {
+                                    EventLoggerConfiguration.QueueDepth = Convert.ToUInt16(sub.SelectSingleNode("QueueDepth").FirstChild.Value);
+                                    EventLoggerConfiguration.CustomQueueDepth = true;
+                                }
                                 break;
                             case "DeviceIOScanTask":
                                 if (sub.SelectSingleNode("Priority") != null)
@@ -416,6 +461,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia.OrbmentPa
         public void ReLoad(XmlNode node)
         {
             CustomEventLogger = false;
+            EventLoggerConfiguration.ApplyDeviceRuntimeDefault();
             DeviceIOScanTaskConfiguration.ApplyDeviceRuntimeDefault();
             DeviceControlTaskConfiguration.ApplyDeviceRuntimeDefault();
             DLinkServiceConfiguration.ApplyDeviceRuntimeDefault();
@@ -436,6 +482,27 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia.OrbmentPa
                 areaNode.AppendChild(doc.CreateTextNode(EventLogger.ToString()));
                 configurationNode.AppendChild(areaNode);
             }
+
+            areaNode = doc.CreateElement("EventLoggerConfiguration");
+            if (EventLoggerConfiguration.CustomPosixPriority)
+            {
+                propertyNode = doc.CreateElement("Priority");
+                propertyNode.AppendChild(doc.CreateTextNode(EventLoggerConfiguration.PosixPriority.ToString()));
+                areaNode.AppendChild(propertyNode);
+            }
+            if (EventLoggerConfiguration.CustomTaskStack)
+            {
+                propertyNode = doc.CreateElement("StackBytes");
+                propertyNode.AppendChild(doc.CreateTextNode(EventLoggerConfiguration.TaskStackInByte.ToString()));
+                areaNode.AppendChild(propertyNode);
+            }
+            if (EventLoggerConfiguration.CustomQueueDepth)
+            {
+                propertyNode = doc.CreateElement("QueueDepth");
+                propertyNode.AppendChild(doc.CreateTextNode(EventLoggerConfiguration.QueueDepth.ToString()));
+                areaNode.AppendChild(propertyNode);
+            }
+            configurationNode.AppendChild(areaNode);
 
             areaNode = doc.CreateElement("DeviceIOScanTask");
             if (DeviceIOScanTaskConfiguration.CustomPosixPriority)

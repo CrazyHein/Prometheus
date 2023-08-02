@@ -45,6 +45,30 @@
                                 <ComboBox ItemsSource="{Binding Source={StaticResource eventloggers}}" FontStyle="Normal" SelectedItem="{Binding Configuration.EventLogger}"/>
                             </sync:SfTextInputLayout>
                         </CheckBox>
+                        <CheckBox IsChecked="{Binding Configuration.EventLoggerConfiguration.CustomPosixPriority}" HorizontalContentAlignment="Stretch">
+                            <sync:SfTextInputLayout Hint="Posix Priority (0 ~ 255)" 
+                                            HelperText="Set the posix priority for Event Logger Task (0 ~ 255)" 
+                                            ErrorText="The posix priority should be between 0 and 255" 
+                                            ContainerType="Filled"  FontStyle="Italic" FontSize="12" Margin="4" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}">
+                                <TextBox FontStyle="Normal" Text="{Binding Configuration.EventLoggerConfiguration.PosixPriority, ValidatesOnExceptions=True, NotifyOnValidationError=True}"/>
+                            </sync:SfTextInputLayout>
+                        </CheckBox>
+                        <CheckBox IsChecked="{Binding Configuration.EventLoggerConfiguration.CustomTaskStack}" HorizontalContentAlignment="Stretch">
+                            <sync:SfTextInputLayout Hint="Task Stack Size" 
+                                            HelperText="Set the task stack size(bytes) for Event Logger Task" ContainerType="Filled"  
+                                            ErrorText="Please input a positive number or zero"
+                                            FontStyle="Italic" FontSize="12" Margin="4" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}">
+                                <TextBox FontStyle="Normal" Text="{Binding Configuration.EventLoggerConfiguration.TaskStackInByte, ValidatesOnExceptions=True, NotifyOnValidationError=True}"/>
+                            </sync:SfTextInputLayout>
+                        </CheckBox>
+                        <CheckBox Grid.Row="1" IsChecked="{Binding Configuration.EventLoggerConfiguration.CustomQueueDepth}" HorizontalContentAlignment="Stretch">
+                            <sync:SfTextInputLayout Hint="Queue Depth" 
+                                            HelperText="Set event queue depth for asynchronous operation" 
+                                            ErrorText="The event queue depth should be between 0 and 65535"
+                                            ContainerType="Filled"  FontStyle="Italic" FontSize="12" Margin="4" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}">
+                                <TextBox FontStyle="Normal" Text="{Binding Configuration.EventLoggerConfiguration.QueueDepth, ValidatesOnExceptions=True, NotifyOnValidationError=True}"/>
+                            </sync:SfTextInputLayout>
+                        </CheckBox>
                     </StackPanel>
                 </GroupBox>
                 <GroupBox Header="Device IO Scan Task" Padding="4,8,4,4" Margin="2" Grid.Row="1">

@@ -18,6 +18,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Xandria
             {
                 EventLogger = data.EventLogger,
                 CustomEventLogger = data.CustomEventLogger,
+                EventLoggerConfiguration = data.EventLoggerConfiguration.ShallowCopy(),
                 DeviceIOScanTaskConfiguration = data.DeviceIOScanTaskConfiguration.ShallowCopy(),
                 DeviceControlTaskConfiguration = data.DeviceControlTaskConfiguration.ShallowCopy(),
                 DLinkServiceConfiguration = data.DLinkServiceConfiguration.ShallowCopy(),

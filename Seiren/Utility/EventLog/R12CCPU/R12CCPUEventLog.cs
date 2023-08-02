@@ -13,12 +13,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility.R12C
         public FileHeader Header { get; private set; }
         public ManagementInformation Info { get; private set; }
         private List<Log> __records = new List<Log>();
-        public IReadOnlyList<Log> Records { get; private set; }
-       
+        public IEnumerable<Log> Records { get; private set; }
+
         public EventLog(System.IO.BinaryReader sm)
         {
-            Records = __records;
-
             Header = new FileHeader { bytes = sm.ReadBytes(Marshal.SizeOf<FileHeader>()) };
 
             byte[] info = sm.ReadBytes(Marshal.SizeOf<ManagementInformation>());
@@ -26,9 +24,70 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility.R12C
 
             byte[] content = sm.ReadBytes(Info.size_in_kbyte * 1024 - Marshal.SizeOf<FileHeader>() - Marshal.SizeOf<ManagementInformation>());
 
-            int start = Info.record_end_pos_in_byte - Info.record_size_in_byte >= 0 ?
-                Info.record_end_pos_in_byte - Info.record_size_in_byte : Info.size_in_kbyte * 1024 + (Info.record_end_pos_in_byte - Info.record_size_in_byte);
-            __parse(content, start, Info.record_size_in_byte, content.Length);
+            if (Info.record_size_in_byte > 0)
+            {
+                int end = __modulus(Info.record_end_pos_in_byte - 1, content.Length);
+                __parse_backwards(content, end, Info.record_size_in_byte, content.Length);
+                Records = __records.Reverse<Log>();
+            }
+        }
+
+        private int __modulus(int v, int capacity)
+        {
+            if(v >= 0)
+                return v % capacity;
+            else
+                return capacity + v % capacity;
+        }
+
+        private byte[] __read_record_backwards(byte[] content, int end, int leftbytes, int capacity)
+        {
+            if (leftbytes < Marshal.SizeOf<RecordHeader>() || capacity < Marshal.SizeOf<RecordHeader>())
+                return null;
+
+            byte etx_value0 = content[__modulus(end - 0, capacity)];
+            byte etx_value1 = content[__modulus(end - 1, capacity)];
+            byte etx_value2 = content[__modulus(end - 2, capacity)];
+            byte etx_value3 = content[__modulus(end - 3, capacity)];
+
+            int start = (end - Marshal.SizeOf<RecordHeader>()) % capacity;
+            int read = Marshal.SizeOf<RecordHeader>();
+            bool match = false;
+            while (read + 4 <= leftbytes)
+            {
+                byte stx_value0 = content[__modulus(start - 0, capacity)];
+                byte stx_value1 = content[__modulus(start - 1, capacity)];
+                byte stx_value2 = content[__modulus(start - 2, capacity)];
+                byte stx_value3 = content[__modulus(start - 3, capacity)];
+                if (etx_value2 == stx_value0 && etx_value3 == stx_value1 && etx_value0 == stx_value2 && etx_value1 == stx_value3)
+                {
+                    match = true;
+                    break;
+                }
+
+                start = __modulus(start - 4, capacity);
+                read += 4;
+            }
+            if (match)
+            {
+                start = __modulus(start - 3, capacity);
+                end = __modulus(end - 3, capacity);
+
+                end = (end + 2) % capacity;
+                int length = end > start ? end - start + 2 : capacity - (start - end) + 2;
+                byte[] one = new byte[length];
+                end = (end + 1) % capacity;
+                if (end > start)
+                    Buffer.BlockCopy(content, start, one, 0, end - start + 1);
+                else
+                {
+                    Buffer.BlockCopy(content, start, one, 0, capacity - start);
+                    Buffer.BlockCopy(content, 0, one, capacity - start, one.Length - (capacity - start));
+                }
+                return one;
+            }
+            else
+                return null;
         }
 
         private byte[] __read_record(byte[] content, int start, int leftbytes, int capacity)
@@ -78,6 +137,27 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility.R12C
                 return null; 
         }
 
+        private void __parse_backwards(byte[] content, int end, int size, int capacity)
+        {
+            int read = 0;
+            RecordHeader rheader;
+            ReadOnlySpan<byte> buffer = content;
+            while (read < size)
+            {
+                byte[] r = __read_record_backwards(content, __modulus(end - read, capacity), size - read, capacity);
+                if (r != null)
+                {
+                    rheader = MemoryMarshal.Read<RecordHeader>(r);
+                    string data =
+                        $"{rheader.data_time_0:X02}/{rheader.data_time_1:X02}/{rheader.data_time_2:X02} {rheader.data_time_3:X02}:{rheader.data_time_4:X02}:{rheader.data_time_5:X02}.{rheader.data_time_8:X}{rheader.data_time_9:X02}";
+                    __records.Add(new Log(data, rheader.event_type, rheader.event_code, rheader.source_code, rheader.start_io, r));
+                    read += r.Length;
+                }
+                else
+                    break;
+            }
+        }
+
         private void __parse(byte[] content, int start, int size, int capacity)
         {
             int read = 0;
@@ -93,7 +173,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility.R12C
                 byte[] r = __read_record(content, (start + read) % capacity, size - read, capacity);
                 if (r != null)
                 {
-                    rheader = MemoryMarshal.Read<RecordHeader>(buffer.Slice((start + read) % capacity));
+                    rheader = MemoryMarshal.Read<RecordHeader>(r);
                     string data =
                         $"{rheader.data_time_0:X02}/{rheader.data_time_1:X02}/{rheader.data_time_2:X02} {rheader.data_time_3:X02}:{rheader.data_time_4:X02}:{rheader.data_time_5:X02}.{rheader.data_time_8:X}{rheader.data_time_9:X02}";
                     __records.Add(new Log(data, rheader.event_type, rheader.event_code, rheader.source_code, rheader.start_io, r));

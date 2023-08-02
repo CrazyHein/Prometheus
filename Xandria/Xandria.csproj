@@ -6,7 +6,7 @@
     <UseWPF>true</UseWPF>
     <UseWindowsForms>true</UseWindowsForms>
     <RootNamespace>AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Xandria</RootNamespace>
-    <Version>0.3.0</Version>
+    <Version>0.4.0</Version>
     <Company>AMEC</Company>
     <Authors>CrazyHein</Authors>
     <ApplicationIcon>imgs\logo.ico</ApplicationIcon>
