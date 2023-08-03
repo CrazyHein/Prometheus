@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
@@ -69,6 +70,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
                             throw new LombardiaException(LOMBARDIA_ERROR_CODE_T.INVALID_INTERLOCK_LOGIC_EXPRESSION_FORMAT);
 
                         InterlockLogic loc = new InterlockLogic(attr, name, targets, statement, od, tx, rx, subs);
+                        loc.AddSubscription();
                         __logics.Add(loc);
                     }
                 }
@@ -607,9 +609,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
 
             if (subs != null)
             {
-                foreach (var d in subs)
+                foreach (var d in subs.Distinct())
                 {
                     __subscriptions.Add(d);
+                    /*
                     switch (d.Access)
                     {
                         case ProcessDataImageAccess.TX:
@@ -619,6 +622,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
                             rx.AddSubscriber(d, this);
                             break;
                     }
+                    */
                 }
             }
             __tx_process_data_image = tx;
@@ -647,7 +651,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
                     uint id = Convert.ToUInt32(line, 16);
                     var d = InterlockCollection.LOGIC_TARGET_PROCESS_DATA(id, od, rx);
                     //rx.AddSubscriber(d, this);
-                    __subscriptions.Add(d);
+                    if (__subscriptions.Contains(d) == false)
+                        __subscriptions.Add(d);
                     Targets.Add(d);
                 }
 
@@ -774,7 +779,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
                         throw new LombardiaException(LOMBARDIA_ERROR_CODE_T.INVALID_INTERLOCK_LOGIC_EXPRESSION_FORMAT);
                     var (d, r) = InterlockCollection.LOGIC_STATEMENT_PROCESS_DATA(id, od, tx, rx);
                     //r.AddSubscriber(d, this);
-                    __subscriptions.Add(d);
+                    if (__subscriptions.Contains(d) == false)
+                        __subscriptions.Add(d);
                     return new LogicOperand(d, root);
             }
 
