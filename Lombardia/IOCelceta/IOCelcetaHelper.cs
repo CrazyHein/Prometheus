@@ -11,9 +11,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
 {
     public class IOCelcetaHelper
     {
-        public static uint SupportedFileFormatVersion { get; private set; } = 1;
+        public static uint SupportedFileFormatVersion { get; private set; } = 2;
         public static uint SupportedVariableFileFormatVersion { get; private set; } = VariableDictionary.SupportedFileFormatVersion;
-        public static uint SupportedIOFileFormatVersion { get; private set; } = 1;
+        public static uint SupportedIOFileFormatVersion { get; private set; } = 2;
 
         public enum WorksheetSelection : uint
         {
@@ -55,7 +55,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
                     xmlDoc.Load(stream);
                 }
                 XmlNode rootNode = xmlDoc.SelectSingleNode("/AMECIOList");
-                if (SupportedFileFormatVersion < uint.Parse(rootNode.Attributes.GetNamedItem("FormatVersion").Value))
+                if (SupportedIOFileFormatVersion < uint.Parse(rootNode.Attributes.GetNamedItem("FormatVersion").Value))
                     throw new LombardiaException(LOMBARDIA_ERROR_CODE_T.UNSUPPORTED_FILE_FORMAT_VERSION);
                 var (cc, od, txdiag, txbit, txblk, rxctl, rxbit, rxblk, intlk, misc) = __load_io_list(rootNode, variables, dataTypes, models);
                 txbit.Associated = rxbit;
@@ -89,7 +89,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
                 XmlDocument xmlDoc = new XmlDocument();
                 xmlDoc.Load(iolist);
                 XmlNode rootNode = xmlDoc.SelectSingleNode("/AMECIOList");
-                if (SupportedFileFormatVersion < uint.Parse(rootNode.Attributes.GetNamedItem("FormatVersion").Value))
+                if (SupportedIOFileFormatVersion < uint.Parse(rootNode.Attributes.GetNamedItem("FormatVersion").Value))
                     throw new LombardiaException(LOMBARDIA_ERROR_CODE_T.UNSUPPORTED_FILE_FORMAT_VERSION);
                 var (cc, od, txdiag, txbit, txblk, rxctl, rxbit, rxblk, intlk, misc) = __load_io_list(rootNode, variables, dataTypes, models);
                 txbit.Associated = rxbit;

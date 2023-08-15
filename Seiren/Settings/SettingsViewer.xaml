@@ -269,10 +269,10 @@
                                         <CheckBox Content="Separate out Exclusive Interlocks" IsChecked ="{Binding SeparateExclusiveInterlocks}" Name="IsSeparateExclusive"/>
                                     </GroupBox.Header>
                                     <UniformGrid Rows="2" IsEnabled="{Binding ElementName=IsSeparateExclusive, Path=IsChecked}">
-                                        <sync:SfTextInputLayout Grid.ColumnSpan="2" Hint="Exclusive"  FontSize="12" FontStyle="Italic" ContainerType="Filled" Margin="4" HelperText="Title for Hardware Interlocks sheet.">
+                                        <sync:SfTextInputLayout Grid.ColumnSpan="2" Hint="Exclusive"  FontSize="12" FontStyle="Italic" ContainerType="Filled" Margin="4" HelperText="Title for Exclusive Interlocks sheet.">
                                             <TextBox FontStyle="Normal" Text="{Binding ExclusiveInterlocksAlias}"/>
                                         </sync:SfTextInputLayout>
-                                        <sync:SfTextInputLayout Grid.ColumnSpan="2" Hint="Non-Exclusive"  FontSize="12" FontStyle="Italic" ContainerType="Filled" Margin="4" HelperText="Title for Non-Hardware Interlocks sheet.">
+                                        <sync:SfTextInputLayout Grid.ColumnSpan="2" Hint="Non-Exclusive"  FontSize="12" FontStyle="Italic" ContainerType="Filled" Margin="4" HelperText="Title for Non-Exclusive Interlocks sheet.">
                                             <TextBox FontStyle="Normal" Text="{Binding NonExclusiveInterlocksAlias}"/>
                                         </sync:SfTextInputLayout>
                                     </UniformGrid>
