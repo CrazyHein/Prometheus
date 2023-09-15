@@ -54,6 +54,21 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                 }
             }
         }
+
+        private bool __is_data_acquisiting = false;
+        public bool IsDataAcquisiting
+        {
+            get { return __is_data_acquisiting; }
+            set
+            {
+                if (value != __is_data_acquisiting)
+                {
+                    __is_data_acquisiting = value;
+                    OnPropertyChanged("IsDataAcquisiting");
+                }
+            }
+        }
+
         public ProcessDataImageLayout Layout { get; private set; }
 
         public ProcessDataImageModel(ProcessDataImage pdi, ObjectDictionary od, ObjectsModel objectsSource, OperatingHistory history)
@@ -63,7 +78,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             ObjectDictionary = od;
             __process_data_models = new ObservableCollection<ProcessDataModel>(
                 pdi.ProcessDatas.Select(
-                    d => new ProcessDataModel(d.ProcessObject, __process_data_image.Access, __process_data_image.Layout) { Bit = d.BitPos }));;
+                    d => new ProcessDataModel(d.ProcessObject, __process_data_image.Access, __process_data_image.Layout, d.DAQ) { Bit = d.BitPos }));;
             Access = __process_data_image.Access;
             Layout = pdi.Layout;
             ProcessDataModels = __process_data_models;
@@ -100,7 +115,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             {
                 if (__process_data_models[i].Index == origin)
                 {
-                    __process_data_models[i] = new ProcessDataModel(ObjectDictionary.ProcessObjects[newcome], __process_data_models[i].Access, __process_data_image.Layout)
+                    __process_data_models[i] = new ProcessDataModel(ObjectDictionary.ProcessObjects[newcome], __process_data_models[i].Access, __process_data_image.Layout, __process_data_models[i].DAQ)
                     {
                         Bit = __process_data_models[i].Bit
                     };
@@ -121,7 +136,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             {
                 if (__process_data_models[i].VariableName == origin)
                 {
-                    __process_data_models[i] = new ProcessDataModel(ObjectDictionary.ProcessObjects[__process_data_models[i].Index], __process_data_models[i].Access, __process_data_image.Layout)
+                    __process_data_models[i] = new ProcessDataModel(ObjectDictionary.ProcessObjects[__process_data_models[i].Index], __process_data_models[i].Access, __process_data_image.Layout, __process_data_models[i].DAQ)
                     {
                         Bit = __process_data_models[i].Bit
                     };
@@ -138,7 +153,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             {
                 if (__process_data_models[i].EnableBinding && __process_data_models[i].BindingDeviceName == origin)
                 {
-                    __process_data_models[i] = new ProcessDataModel(ObjectDictionary.ProcessObjects[__process_data_models[i].Index], __process_data_models[i].Access, __process_data_image.Layout)
+                    __process_data_models[i] = new ProcessDataModel(ObjectDictionary.ProcessObjects[__process_data_models[i].Index], __process_data_models[i].Access, __process_data_image.Layout, __process_data_models[i].DAQ)
                     {
                         Bit = __process_data_models[i].Bit
                     };
@@ -180,7 +195,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             var op = new OperatingRecord() { Host = this, Operation = Operation.Add, OriginaPos = -1, NewPos = __process_data_models.Count, OriginalValue = null, NewValue = model };
             try
             {
-                __process_data_image.Add(model.Index);
+                __process_data_image.Add(model.Index, model.DAQ);
             }
             catch (Exception ex)
             {
@@ -256,7 +271,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             var op = new OperatingRecord() { Host = this, Operation = Operation.Insert, OriginaPos = -1, NewPos = index, OriginalValue = null, NewValue = model };
             try
             {
-                __process_data_image.Insert(index, model.Index);
+                __process_data_image.Insert(index, model.Index, model.DAQ);
             }
             catch (Exception ex)
             {
@@ -295,6 +310,25 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         public int IndexOf(ProcessDataModel model)
         {
             return __process_data_models.IndexOf(model);
+        }
+
+        public void SetDAQ(int pos, bool flag, bool log = true)
+        {
+            if (pos >= __process_data_models.Count || pos < 0)
+                throw new ArgumentOutOfRangeException();
+            
+            bool oflag = __process_data_models[pos].DAQ;
+            if (oflag == flag)
+                return;
+
+            __process_data_image.SetDAQ(pos, flag);
+            __process_data_models[pos].DAQ = flag;
+            Modified = true;
+            __objects_source.SubsModified = true;
+            var op = new OperatingRecord() { Host = this, Operation = Operation.ReviseDAQ, OriginaPos = pos, NewPos = pos, OriginalValue = oflag, NewValue = flag };
+            if (log && OperatingHistory != null)
+                OperatingHistory.PushOperatingRecord(op);
+            DebugConsole.WriteOperatingRecord(op);
         }
 
         public uint OffsetInWord
@@ -354,6 +388,11 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                     break;
                 case Operation.Replace:
                     throw new NotImplementedException();
+                case Operation.ReviseDAQ:
+                    SetDAQ(r.OriginaPos, (bool)r.OriginalValue, false);
+                    break;
+                default: 
+                    throw new NotImplementedException();
             }
         }
 
@@ -372,6 +411,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                     break;
                 case Operation.Insert:
                     Insert(r.NewPos, r.NewValue as ProcessDataModel, false);
+                    break;
+                case Operation.ReviseDAQ:
+                    SetDAQ(r.NewPos, (bool)r.NewValue, false);
                     break;
                 default:
                     throw new NotImplementedException();
@@ -402,10 +444,11 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
 
     public class ProcessDataModel : ObjectModel, IEquatable<ProcessDataModel>
     {
-        public ProcessDataModel(ProcessObject o, ProcessDataImageAccess access, ProcessDataImageLayout layout) : base(o, true)
+        public ProcessDataModel(ProcessObject o, ProcessDataImageAccess access, ProcessDataImageLayout layout, bool daq) : base(o, true)
         {
             Access = access;
             Layout = layout;
+            DAQ = daq;
             __data_type = o.Variable.Type;
             //__data_size_in_byte = (int)__data_type.BitSize / 8;
             if (__data_type.BitSize == 1)
@@ -438,6 +481,17 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                 __bits = value;
                 _notify_property_changed();
                 _notify_property_changed("Byte");
+            }
+        }
+
+        private bool __DAQ;
+        public bool DAQ
+        {
+            get { return __DAQ; }
+            set
+            {
+                __DAQ = value;
+                _notify_property_changed();
             }
         }
 
@@ -885,7 +939,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
 
         public bool Equals(ProcessDataModel? other)
         {
-            return base.Equals(other) && Access == other.Access && Layout == other.Layout && Bit == other.Bit;
+            return base.Equals(other) && Access == other.Access && Layout == other.Layout && Bit == other.Bit && DAQ == other.DAQ;
         }
     }
 

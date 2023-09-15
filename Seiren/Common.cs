@@ -68,6 +68,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         public static RoutedUICommand BrowseEtherCATPDOs { get; private set; }
         public static RoutedUICommand AddAllSelectedRecords { get; private set; }
         public static RoutedUICommand EventHistory { get; private set; }
+        public static RoutedUICommand SetDAQFlag { get; private set; }
+        public static RoutedUICommand ResetDAQFlag { get; private set; }
+        public static RoutedUICommand StartBackgroundDAQ { get; private set; }
+        public static RoutedUICommand StopBackgroundDAQ { get; private set; }
 
         static ConsoleControl()
         {
@@ -251,6 +255,12 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                 new KeyGesture(Key.F10, ModifierKeys.Control, "Ctrl+F10")
             };
             EventHistory = new RoutedUICommand("Event History", "Browse R12CCPU-V Event History", typeof(ConsoleControl), gestureEventHistory);
+
+            SetDAQFlag = new RoutedUICommand("Set DAQ Flag", "Set DAQ Flag", typeof(ConsoleControl));
+            ResetDAQFlag = new RoutedUICommand("Reset DAQ Flag", "Reset DAQ Flag", typeof(ConsoleControl));
+
+            StartBackgroundDAQ = new RoutedUICommand("Start Background DAQ", "Start Background DAQ", typeof(ConsoleControl));
+            StopBackgroundDAQ = new RoutedUICommand("Stop Background DAQ", "Stop Background DAQ", typeof(ConsoleControl));
         }
     }
 

@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+    <Company>AMEC</Company>
+    <Authors>CrazyHein</Authors>
+  </PropertyGroup>
+
+</Project>

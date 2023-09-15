@@ -44,6 +44,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
             {
                 __process_datas.Clear();
                 uint wordsize, bitoffset;
+                bool daq = false;
                 __actual_size_in_bit = 0;
                 if (dataImageNode?.NodeType == XmlNodeType.Element)
                 {
@@ -64,7 +65,12 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
                             if (wordsize > SizeInWord)
                                 throw new LombardiaException(LOMBARDIA_ERROR_CODE_T.PROCESS_DATA_IMAGE_SIZE_OUT_OF_RANGE);
 
-                            ProcessData data = new ProcessData(o, this.Access) {BitPos = bitoffset, Publisher = this };
+                            if ((index as XmlElement).GetAttribute("DAQ") == "1")
+                                daq = true;
+                            else
+                                daq = false;
+
+                            ProcessData data = new ProcessData(o, this.Access, daq) {BitPos = bitoffset, Publisher = this };
                             __process_datas.Add(data);
                             __process_object_hash.Add(o, data);
                             __object_dictionary.AddSubscriber(o, data);
@@ -97,11 +103,11 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
             __actual_size_in_bit = size;
             return __actual_size_in_bit;
         }
-        public ProcessData InspectProcessData(uint poindex)
+        public ProcessData InspectProcessData(uint poindex, bool daq)
         {
             if (__object_dictionary.ProcessObjects.TryGetValue(poindex, out var po) == false)
                 throw new LombardiaException(LOMBARDIA_ERROR_CODE_T.INVALID_OBJECT_REFERENCE_IN_DATA_IMAGE);
-            return new ProcessData(po, Access) { Publisher = this};
+            return new ProcessData(po, Access, daq) { Publisher = this};
         }
 
         private void __check_process_data(ProcessData d, bool checkforsameindex = true)
@@ -153,6 +159,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
                 {
                     XmlElement index = doc.CreateElement("Index");
                     index.AppendChild(doc.CreateTextNode($"0x{data.ProcessObject.Index:X8}"));
+                    if (data.DAQ)
+                        index.SetAttribute("DAQ", "1");
                     dataImageNode.AppendChild(index);
                 }
             }
@@ -179,6 +187,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
                 sheet.Range[1, 2, 3, 2].Style = content;
 
                 System.Data.DataTable dt = new System.Data.DataTable();
+                dt.Columns.Add("DAQ");
                 dt.Columns.Add("Bit");
                 dt.Columns.Add("Byte");
                 dt.Columns.Add("Index");
@@ -191,7 +200,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
                 dt.Columns.Add("Comment");
 
                 foreach(var p in __process_datas)
-                    dt.Rows.Add(p.BitPos.ToString(),
+                    dt.Rows.Add(p.DAQ.ToString(),
+                                p.BitPos.ToString(),
                                 p.BytePos.ToString(),
                                 "0x" + p.ProcessObject.Index.ToString("X08"),
                                 p.ProcessObject.Variable.Name,
@@ -224,9 +234,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
             __object_dictionary.AddSubscriber(d.ProcessObject, d);
         }
 
-        public ProcessData Add(uint poindex)
+        public ProcessData Add(uint poindex, bool daq)
         {
-            ProcessData d = InspectProcessData(poindex);
+            ProcessData d = InspectProcessData(poindex, daq);
             __check_process_data(d);
             __process_datas.Add(d);
             __actual_size_in_bit = __rebuild_process_data_bit_pos(__process_datas.Count - 1);
@@ -252,7 +262,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
         public (ProcessData, ProcessObject) ProcessDataAddEx(uint index, string name, string? deviceName, string? channelName, uint channelIndex, ValueRange? vr, ValueConverter? vc)
         {
             var po = __object_dictionary.Add(index, name, deviceName, channelName, channelIndex, vr, vc);
-            var pd = Add(index);
+            var pd = Add(index, false);
             return (pd, po);
         }
 
@@ -274,9 +284,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
             __object_dictionary.AddSubscriber(d.ProcessObject, d);
         }
 
-        public ProcessData Insert(int index, uint poindex)
+        public ProcessData Insert(int index, uint poindex, bool daq)
         {
-            ProcessData d = InspectProcessData(poindex);
+            ProcessData d = InspectProcessData(poindex, daq);
             __check_process_data(d);
             __process_datas.Insert(index, d);
             __actual_size_in_bit = __rebuild_process_data_bit_pos(index);
@@ -367,9 +377,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
             Replace(origin, d, mode);
         }
 
-        public ProcessData Replace(ProcessObject reference, uint newpoindex, ReplaceMode mode = ReplaceMode.Full)
+        public ProcessData Replace(ProcessObject reference, uint newpoindex, bool daq, ReplaceMode mode = ReplaceMode.Full)
         {
-            ProcessData d = InspectProcessData(newpoindex);
+            ProcessData d = InspectProcessData(newpoindex, daq);
             Replace(reference, d, mode);
             return d;
         }
@@ -380,6 +390,13 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
                 throw new LombardiaException(LOMBARDIA_ERROR_CODE_T.INVALID_OBJECT_REFERENCE_IN_DATA_IMAGE);
             uint bits = Align(o.Variable.Type, start);
             return (o, bits);
+        }
+
+        public void SetDAQ(int pos, bool flag)
+        {
+            if(pos < 0 || pos >= __process_datas.Count)
+                throw new LombardiaException(LOMBARDIA_ERROR_CODE_T.PROCESS_DATA_UNFOUND);
+            __process_datas[pos].DAQ = flag;
         }
 
         public uint Align(DataType type, uint startbit)
@@ -432,7 +449,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
         {
             Debug.Assert(this.ProcessObject == origin);
             Debug.Assert(this.ProcessObject.Variable.Type == newcome.Variable.Type);
-            var n =(Publisher as ProcessDataImage)?.Replace(this.ProcessObject, newcome.Index, ReplaceMode.ProcessObject);
+            var n =(Publisher as ProcessDataImage)?.Replace(this.ProcessObject, newcome.Index, DAQ, ReplaceMode.ProcessObject);
             return n;
         }
 
@@ -440,14 +457,17 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
         public uint BitPos { get; set; }
         public uint BytePos { get { return BitPos / 8; } }
 
+        public bool DAQ { get; set; }
+
         public ProcessDataImageAccess Access { get; private set; }
 
         public Publisher<ProcessData>? Publisher { get; set; }
 
-        public ProcessData(ProcessObject o, ProcessDataImageAccess access)
+        public ProcessData(ProcessObject o, ProcessDataImageAccess access, bool daq)
         {
             ProcessObject = o;
             Access = access;
+            DAQ = daq;
         }
 
         public string DeviceBindingInfo
@@ -476,7 +496,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
 
         public bool IsEquivalent(ProcessData? other)
         {
-            return other != null && other.BitPos == BitPos && other.ProcessObject.IsEquivalent(ProcessObject) && other.Access == Access;
+            return other != null && other.BitPos == BitPos && other.ProcessObject.IsEquivalent(ProcessObject) && other.Access == Access && other.DAQ == DAQ;
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Debugger;
+﻿using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.DAQ;
+using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Debugger;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -79,6 +80,13 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             set { SetProperty(ref __is_monitoring, value); }
         }
 
+        private bool __is_data_acquisiting = false;
+        public bool IsDataAcquisiting
+        {
+            get { return __is_data_acquisiting; }
+            set { SetProperty(ref __is_data_acquisiting, value); }
+        }
+
         private bool __is_busy = false;
         public bool IsBusy
         {
@@ -112,6 +120,41 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         {
             get { return __debugger_heartbeat; }
             set { SetProperty(ref __debugger_heartbeat, value); }
+        }
+
+        private string __daq_unit_exception_message = "N/A";
+        public string DAQUnitExceptionMessage
+        {
+            get { return __daq_unit_exception_message; }
+            set { if (value != __daq_unit_exception_message) SetProperty(ref __daq_unit_exception_message, value); }
+        }
+
+        private AcquisitionUnitState __daq_unit_state = AcquisitionUnitState.Idle;
+        public AcquisitionUnitState DAQUnitState
+        {
+            get { return __daq_unit_state; }
+            set { if (value != __daq_unit_state) SetProperty(ref __daq_unit_state, value); }
+        }
+
+        public int __daq_unit_disk_write_interval = 0;
+        public int DAQUnitDiskWriteInterval
+        {
+            get { return __daq_unit_disk_write_interval; }
+            set { SetProperty(ref __daq_unit_disk_write_interval, value); }
+        }
+
+        public uint __daq_unit_heartbeat = 0;
+        public uint DAQUnitHeartbeat
+        {
+            get { return __daq_unit_heartbeat; }
+            set { SetProperty(ref __daq_unit_heartbeat, value); }
+        }
+
+        public AcquisitionUnitStatus __daq_unit_status;
+        public AcquisitionUnitStatus DAQUnitStatus
+        {
+            get { return __daq_unit_status; }
+            set { SetProperty(ref __daq_unit_status, value); }
         }
 
         private IReadOnlyList<OperatingRecord> __undo_operating_records;

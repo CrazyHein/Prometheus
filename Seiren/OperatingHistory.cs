@@ -13,7 +13,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         Insert,
         Replace,
         Remove,
-        Move
+        Move,
+        ReviseDAQ
     }
     public class OperatingRecord
     {

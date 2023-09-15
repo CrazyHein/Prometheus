@@ -7,7 +7,7 @@
     <UseWindowsForms>true</UseWindowsForms>
     <RootNamespace>AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren</RootNamespace>
     <Nullable>annotations</Nullable>
-    <Version>0.22.3</Version>
+    <Version>0.22.3.1</Version>
     <Authors>CrazyHein</Authors>
     <Company>AMEC</Company>
     <ApplicationIcon>imgs\logo.ico</ApplicationIcon>
@@ -20,12 +20,14 @@
     <None Remove="imgs\add.png" />
     <None Remove="imgs\all.png" />
     <None Remove="imgs\cancel.png" />
+    <None Remove="imgs\check.png" />
     <None Remove="imgs\clear.png" />
     <None Remove="imgs\close.png" />
     <None Remove="imgs\compare.png" />
     <None Remove="imgs\configuration.png" />
     <None Remove="imgs\confirm.png" />
     <None Remove="imgs\copy.png" />
+    <None Remove="imgs\dataacquisition.png" />
     <None Remove="imgs\datatypes.png" />
     <None Remove="imgs\devices.png" />
     <None Remove="imgs\edit.png" />
@@ -76,6 +78,7 @@
     <None Remove="imgs\stop.png" />
     <None Remove="imgs\stopdebugging.png" />
     <None Remove="imgs\type.png" />
+    <None Remove="imgs\uncheck.png" />
     <None Remove="imgs\undo.png" />
     <None Remove="imgs\unselect_all.png" />
     <None Remove="imgs\variables.png" />
@@ -88,12 +91,14 @@
     <Resource Include="imgs\add.png" />
     <Resource Include="imgs\all.png" />
     <Resource Include="imgs\cancel.png" />
+    <Resource Include="imgs\check.png" />
     <Resource Include="imgs\clear.png" />
     <Resource Include="imgs\close.png" />
     <Resource Include="imgs\compare.png" />
     <Resource Include="imgs\configuration.png" />
     <Resource Include="imgs\confirm.png" />
     <Resource Include="imgs\copy.png" />
+    <Resource Include="imgs\dataacquisition.png" />
     <Resource Include="imgs\edit.png" />
     <Resource Include="imgs\export.png" />
     <Resource Include="imgs\file.png" />
@@ -132,6 +137,7 @@
     <Resource Include="imgs\stop.png" />
     <Resource Include="imgs\stopdebugging.png" />
     <Resource Include="imgs\type.png" />
+    <Resource Include="imgs\uncheck.png" />
     <Resource Include="imgs\undo.png" />
     <Resource Include="imgs\unselect_all.png" />
     <Resource Include="imgs\variables.png" />
@@ -146,7 +152,14 @@
   
   
   <ItemGroup>
+    <PackageReference Include="CsvHelper" Version="30.0.1" />
+  </ItemGroup>
+
+  
+  
+  <ItemGroup>
     <ProjectReference Include="..\Lombardia\Lombardia.csproj" />
+    <ProjectReference Include="..\Tirasweel\Tirasweel.csproj" />
   </ItemGroup>
 
   

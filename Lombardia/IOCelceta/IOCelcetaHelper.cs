@@ -11,9 +11,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
 {
     public class IOCelcetaHelper
     {
-        public static uint SupportedFileFormatVersion { get; private set; } = 2;
+        public static uint SupportedFileFormatVersion { get; private set; } = 3;
         public static uint SupportedVariableFileFormatVersion { get; private set; } = VariableDictionary.SupportedFileFormatVersion;
-        public static uint SupportedIOFileFormatVersion { get; private set; } = 2;
+        public static uint SupportedIOFileFormatVersion { get; private set; } = 3;
 
         public enum WorksheetSelection : uint
         {

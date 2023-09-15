@@ -1,5 +1,6 @@
 ﻿using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia;
 using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Console;
+using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.DAQ;
 using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Debugger;
 using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility;
 using Syncfusion.SfSkinManager;
@@ -11,6 +12,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Documents;
 using System.Windows.Input;
 
 namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
@@ -62,6 +64,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         private ushort[] __rx_block_area_data;
         private List<ushort[]> __area_data_array;
         private ushort __area_data_end;
+
+        private DataAcquisitionUnit __data_acquisition_unit;
+        private UserInterfaceSynchronizer __user_interface_acquisition_unit;
 
         private OperatingHistory __operating_history;
         private RecentlyOpened __recently_opened;
@@ -144,6 +149,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                 DebugConsole.WriteInfo($"Seiren Version: {__settings.SeirenVersion}");
                 DebugConsole.WriteInfo($"Lombardia Version: {__settings.LombardiaVersion}");
                 DebugConsole.WriteInfo($"Gagharv Version: {__settings.GagharvVersion}");
+                DebugConsole.WriteInfo($"Tirasweel Version: {__settings.TirasweelVersion}");
 
                 __data_types_viewer = new DataTypesViewer(__data_type_catalogue);
                 __device_models_viewer = new DeviceModelsViewer(__controller_model_catalogue);
@@ -159,6 +165,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                 DeviceModels.Content = __device_models_viewer;
 
                 __user_interface_synchronizer = new UserInterfaceSynchronizer(this, __ui_data_refresh_handler);
+                __user_interface_acquisition_unit = new UserInterfaceSynchronizer(this, __daq_ui_data_refresh_handler);
 
                 __ecat_variable_datatype_converter = new EtherCATVaribleDataTypeConverter(__data_type_catalogue);
             }
@@ -283,6 +290,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
 
         private void __startup_debugger(DataSyncMode rxbit, DataSyncMode rxblock, DataSyncMode rxcotrol)
         {
+            DebugConsole.WriteInfo("Startup Debugger");
             (__objects_viewer.DataContext as ObjectsModel).TxDiagnosticObjects.ResetProcessDataValue();
             (__objects_viewer.DataContext as ObjectsModel).TxBitObjects.ResetProcessDataValue();
             (__objects_viewer.DataContext as ObjectsModel).TxBlockObjects.ResetProcessDataValue();
@@ -360,6 +368,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
 
         private void __stop_debugger() 
         {
+            DebugConsole.WriteInfo("Stopping Debugger");
             __user_interface_synchronizer.Stop();
             __main_model.IsBusy = true;
             BusyDialog diag = new BusyDialog(__data_synchronizer.Stop());
@@ -416,7 +425,79 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
 
             if (__main_model.DebuggerState == DataSynchronizerState.Exception)
             {
+                DebugConsole.WriteException($"Debugger Exception({__main_model.DebuggerExceptionMessage})");
                 __stop_debugger();
+            }
+        }
+
+        private void __startup_daq_unit()
+        {
+            DebugConsole.WriteInfo("Startup Data Acquisition");
+            __data_acquisition_unit = new DataAcquisitionUnit();
+            __main_model.IsBusy = true;
+            BusyDialog diag = new BusyDialog(__data_acquisition_unit.Startup(__settings.DAQTargetProperty, 
+                __tx_diagnostic_area.ProcessDatas, __tx_bit_area.ProcessDatas, __tx_block_area.ProcessDatas,
+                __rx_control_area.ProcessDatas, __rx_bit_area.ProcessDatas, __rx_block_area.ProcessDatas));
+            diag.ShowDialog();
+            __main_model.IsBusy = false;
+
+            (__objects_viewer.DataContext as ObjectsModel).TxDiagnosticObjects.IsDataAcquisiting = true;
+            (__objects_viewer.DataContext as ObjectsModel).TxBitObjects.IsDataAcquisiting = true;
+            (__objects_viewer.DataContext as ObjectsModel).TxBlockObjects.IsDataAcquisiting = true;
+            (__objects_viewer.DataContext as ObjectsModel).RxControlObjects.IsDataAcquisiting = true;
+            (__objects_viewer.DataContext as ObjectsModel).RxBitObjects.IsDataAcquisiting = true;
+            (__objects_viewer.DataContext as ObjectsModel).RxBlockObjects.IsDataAcquisiting = true;
+
+            __main_model.IsDataAcquisiting = true;
+            __main_model.DAQUnitExceptionMessage = "N/A";
+            __main_model.DAQUnitState = AcquisitionUnitState.Idle;
+            __main_model.DAQUnitDiskWriteInterval = 0;
+            __main_model.DAQUnitHeartbeat = 0;
+            __main_model.DAQUnitStatus = new AcquisitionUnitStatus();
+
+            __user_interface_acquisition_unit.Startup(__settings.DAQTargetProperty.ExpectedDiskWriteInterval);
+            CommandManager.InvalidateRequerySuggested();
+        }
+
+        private void __stop_daq_unit()
+        {
+            DebugConsole.WriteInfo("Stopping Data Acquisition");
+            __user_interface_acquisition_unit.Stop();
+            __main_model.IsBusy = true;
+            BusyDialog diag = new BusyDialog(__data_acquisition_unit.Stop());
+            diag.ShowDialog();
+            __main_model.IsBusy = false;
+            __data_acquisition_unit = null;
+
+            (__objects_viewer.DataContext as ObjectsModel).TxDiagnosticObjects.IsDataAcquisiting = false;
+            (__objects_viewer.DataContext as ObjectsModel).TxBitObjects.IsDataAcquisiting = false;
+            (__objects_viewer.DataContext as ObjectsModel).TxBlockObjects.IsDataAcquisiting = false;
+            (__objects_viewer.DataContext as ObjectsModel).RxControlObjects.IsDataAcquisiting = false;
+            (__objects_viewer.DataContext as ObjectsModel).RxBitObjects.IsDataAcquisiting = false;
+            (__objects_viewer.DataContext as ObjectsModel).RxBlockObjects.IsDataAcquisiting = false;
+
+            __main_model.IsDataAcquisiting = false;
+            __main_model.DAQUnitDiskWriteInterval = 0;
+            __main_model.DAQUnitHeartbeat = 0;
+            if (__main_model.DAQUnitState != AcquisitionUnitState.Exception)
+                __main_model.DAQUnitState = AcquisitionUnitState.Idle;
+            CommandManager.InvalidateRequerySuggested();
+        }
+
+        private void __daq_ui_data_refresh_handler()
+        {
+            if (__main_model.IsDataAcquisiting == false || __data_acquisition_unit == null || __main_model.IsBusy)
+                return;
+            __main_model.DAQUnitExceptionMessage = __data_acquisition_unit.ExceptionMessage;
+            __main_model.DAQUnitState = __data_acquisition_unit.State;
+            __main_model.DAQUnitDiskWriteInterval = __data_acquisition_unit.DiskWriteInterval;
+            __main_model.DAQUnitHeartbeat = __data_acquisition_unit.Counter;
+            __main_model.DAQUnitStatus = __data_acquisition_unit.Status;
+
+            if (__main_model.DAQUnitState == AcquisitionUnitState.Exception)
+            {
+                DebugConsole.WriteException($"Data Acquisition Exception({ __main_model.DAQUnitExceptionMessage})");
+                __stop_daq_unit();
             }
         }
 
@@ -573,7 +654,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
 
         private void OpenCommand_CanExecuted(object sender, System.Windows.Input.CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = __main_model.IsOffline && !__main_model.IsBusy;
+            e.CanExecute = __main_model.IsOffline && !__main_model.IsBusy && !__main_model.IsDataAcquisiting;
         }
 
         private void ExportCommand_Executed(object sender, System.Windows.Input.ExecutedRoutedEventArgs e)
@@ -642,7 +723,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
 
         private void ImportCommand_CanExecuted(object sender, System.Windows.Input.CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = __main_model.IsOffline && !__main_model.IsBusy;
+            e.CanExecute = __main_model.IsOffline && !__main_model.IsBusy && !__main_model.IsDataAcquisiting;
         }
 
         private void NewCommand_Executed(object sender, System.Windows.Input.ExecutedRoutedEventArgs e)
@@ -673,7 +754,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
 
         private void NewCommand_CanExecuted(object sender, System.Windows.Input.CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = __main_model.IsOffline && !__main_model.IsBusy;
+            e.CanExecute = __main_model.IsOffline && !__main_model.IsBusy && !__main_model.IsDataAcquisiting;
         }
 
         private void QuitCommand_Executed(object sender, System.Windows.Input.ExecutedRoutedEventArgs e)
@@ -738,7 +819,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
 
         private void UploadviaFTPCommand_CanExecuted(object sender, System.Windows.Input.CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = __main_model.IsOffline && !__main_model.IsBusy;
+            e.CanExecute = __main_model.IsOffline && !__main_model.IsBusy && !__main_model.IsDataAcquisiting;
         }
 
         private void AboutCommand_Executed(object sender, System.Windows.Input.ExecutedRoutedEventArgs e)
@@ -776,7 +857,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
 
         private void CloseCommand_CanExecuted(object sender, System.Windows.Input.CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = __main_model.IsOpened && __main_model.IsOffline && !__main_model.IsBusy;
+            e.CanExecute = __main_model.IsOpened && __main_model.IsOffline && !__main_model.IsBusy && !__main_model.IsDataAcquisiting;
         }
 
         private void StartMonitoringCommand_Executed(object sender, System.Windows.Input.ExecutedRoutedEventArgs e)
@@ -804,6 +885,26 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             e.CanExecute = __main_model.IsOpened && !__data_model_has_changes() && __main_model.IsOffline && !__main_model.IsBusy;
         }
 
+        private void StartBackgroundDAQCommand_Executed(object sender, System.Windows.Input.ExecutedRoutedEventArgs e)
+        {
+            if (__tx_diagnostic_area.ProcessDatas.Any(d => d.DAQ == true) == false &&
+                __tx_block_area.ProcessDatas.Any(d => d.DAQ == true) == false &&
+                __tx_bit_area.ProcessDatas.Any(d => d.DAQ == true) == false &&
+                __rx_control_area.ProcessDatas.Any(d => d.DAQ == true) == false &&
+                __rx_block_area.ProcessDatas.Any(d => d.DAQ == true) == false &&
+                __rx_bit_area.ProcessDatas.Any(d => d.DAQ == true) == false)
+            {
+                MessageBox.Show("No process data objects marked as DAQ were found.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+            __startup_daq_unit();
+        }
+
+        private void StartBackgroundDAQCommand_CanExecuted(object sender, System.Windows.Input.CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = __main_model.IsOpened && !__data_model_has_changes() && !__main_model.IsDataAcquisiting && !__main_model.IsBusy;
+        }
+
         private void StopDebuggingCommand_Executed(object sender, System.Windows.Input.ExecutedRoutedEventArgs e)
         {
             __stop_debugger();
@@ -812,6 +913,16 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         private void StopDebuggingCommand_CanExecuted(object sender, System.Windows.Input.CanExecuteRoutedEventArgs e)
         {
             e.CanExecute = !__main_model.IsOffline && !__main_model.IsBusy;
+        }
+
+        private void StopBackgroundDAQCommand_Executed(object sender, System.Windows.Input.ExecutedRoutedEventArgs e)
+        {
+            __stop_daq_unit();
+        }
+
+        private void StopBackgroundDAQCommand_CanExecuted(object sender, System.Windows.Input.CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = __main_model.IsDataAcquisiting && !__main_model.IsBusy;
         }
 
         private void RecordUndoCommand_Executed(object sender, System.Windows.Input.ExecutedRoutedEventArgs e)
@@ -836,7 +947,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
 
         private void RecordUndoCommand_CanExecuted(object sender, System.Windows.Input.CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = __main_model.IsOffline && __main_model.IsOpened && __operating_history.CanUndo;
+            e.CanExecute = __main_model.IsOffline && __main_model.IsOpened && __operating_history.CanUndo && !__main_model.IsDataAcquisiting;
         }
 
         private void RecordRedoCommand_Executed(object sender, System.Windows.Input.ExecutedRoutedEventArgs e)
@@ -865,7 +976,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
 
         private void RecordRedoCommand_CanExecuted(object sender, System.Windows.Input.CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = __main_model.IsOffline && __main_model.IsOpened && __operating_history.CanRedo;
+            e.CanExecute = __main_model.IsOffline && __main_model.IsOpened && __operating_history.CanRedo && !__main_model.IsDataAcquisiting;
         }
 
         private void OpenCompareCommand_Executed(object sender, System.Windows.Input.ExecutedRoutedEventArgs e)
@@ -957,7 +1068,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
 
         private void RemoteOperationCommand_CanExecuted(object sender, System.Windows.Input.CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = __main_model.IsOffline;
+            e.CanExecute = __main_model.IsOffline && !__main_model.IsDataAcquisiting;
         }
 
         private void BrowseEtherCATPDOs_Executed(object sender, System.Windows.Input.ExecutedRoutedEventArgs e)
@@ -1064,9 +1175,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
 
         private void MainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            if (__main_model.IsOffline == false)
+            if (__main_model.IsOffline == false || __main_model.IsDataAcquisiting)
             {
-                MessageBox.Show("Please stop debugging/monitoring first .", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show("Please stop debugging/monitoring/DAQ first .", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
                 e.Cancel = true;
             }
             else
@@ -1100,7 +1211,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         private void RecentlyOpened_Click(object sender, RoutedEventArgs e)
         {
             Syncfusion.Windows.Shared.MenuItemAdv menu = e.OriginalSource as Syncfusion.Windows.Shared.MenuItemAdv;
-            if (RecentlyOpenedMenu == e.OriginalSource || __recently_opened.PathCollection.Count == 0 || __main_model.IsOffline == false || __main_model.IsBusy == true)
+            if (RecentlyOpenedMenu == e.OriginalSource || __recently_opened.PathCollection.Count == 0 || __main_model.IsOffline == false || __main_model.IsBusy == true || __main_model.IsDataAcquisiting)
                 return;
            
             if ((__main_model.IsNonTemporaryFile && __data_model_has_changes()) || __main_model.IsTemporaryFile)
@@ -1165,7 +1276,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             if (e.Source == CurrentlyOpenedFile)
             {
                 var p = e.Data.GetData(DataFormats.FileDrop) as string[];
-                if (__main_model.IsOffline == false || __main_model.IsBusy == true || p == null || p.Length != 1 || File.Exists(p[0]) == false || p[0].EndsWith(".folst") == false)
+                if (__main_model.IsDataAcquisiting || __main_model.IsOffline == false || __main_model.IsBusy == true || p == null || p.Length != 1 || File.Exists(p[0]) == false || p[0].EndsWith(".folst") == false)
                 {
                     e.Handled = true;
                     e.Effects = DragDropEffects.None;

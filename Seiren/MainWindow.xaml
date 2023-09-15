@@ -21,6 +21,8 @@
         <CommandBinding Command="local:ConsoleControl.StartMonitoring" Executed="StartMonitoringCommand_Executed" CanExecute="StartDebuggingCommand_CanExecuted"/>
         <CommandBinding Command="local:ConsoleControl.StartDebugging" Executed="StartDebuggingCommand_Executed" CanExecute="StartDebuggingCommand_CanExecuted"/>
         <CommandBinding Command="local:ConsoleControl.StopDebugging" Executed="StopDebuggingCommand_Executed" CanExecute="StopDebuggingCommand_CanExecuted"/>
+        <CommandBinding Command="local:ConsoleControl.StartBackgroundDAQ" Executed="StartBackgroundDAQCommand_Executed" CanExecute="StartBackgroundDAQCommand_CanExecuted"/>
+        <CommandBinding Command="local:ConsoleControl.StopBackgroundDAQ" Executed="StopBackgroundDAQCommand_Executed" CanExecute="StopBackgroundDAQCommand_CanExecuted"/>
         <CommandBinding Command="local:ConsoleControl.RecordUndo" Executed="RecordUndoCommand_Executed" CanExecute="RecordUndoCommand_CanExecuted"/>
         <CommandBinding Command="local:ConsoleControl.RecordRedo" Executed="RecordRedoCommand_Executed" CanExecute="RecordRedoCommand_CanExecuted"/>
         <CommandBinding Command="local:ConsoleControl.OpenCompare" Executed="OpenCompareCommand_Executed" CanExecute="CompareCommand_CanExecuted"/>
@@ -117,7 +119,17 @@
                     <BitmapImage  UriSource="imgs/stopdebugging.png"/>
                 </sync:ButtonAdv.LargeIcon>
             </sync:ButtonAdv>
-
+            <sync:ToolBarItemSeparator/>
+            <sync:ButtonAdv Command="local:ConsoleControl.StartBackgroundDAQ" SizeMode="Large" Label="Start DAQ" Margin="2" Width="100">
+                <sync:ButtonAdv.LargeIcon>
+                    <BitmapImage  UriSource="imgs/dataacquisition.png"/>
+                </sync:ButtonAdv.LargeIcon>
+            </sync:ButtonAdv>
+            <sync:ButtonAdv Command="local:ConsoleControl.StopBackgroundDAQ" SizeMode="Large" Label="Stop DAQ" Margin="2" Width="100">
+                <sync:ButtonAdv.LargeIcon>
+                    <BitmapImage  UriSource="imgs/stop.png"/>
+                </sync:ButtonAdv.LargeIcon>
+            </sync:ButtonAdv>
             <sync:ToolBarItemSeparator/>
             <sync:ButtonAdv Command="local:ConsoleControl.Import" SizeMode="Large" Label="Import" Margin="2" Width="60" ToolTip="Import XML">
                 <sync:ButtonAdv.LargeIcon>
@@ -174,6 +186,15 @@
                     </MultiBinding>
                 </TextBlock.Text>
             </TextBlock>
+            <Separator/>
+            <sync:SfBusyIndicator IsBusy="{Binding IsDataAcquisiting}" AnimationType="Pen" ViewboxHeight="28" ViewboxWidth="28" Background="Transparent" Width="28" Height="28"/>
+            <TextBlock Text="{Binding DAQUnitHeartbeat, Converter={StaticResource HeartbeatIndicator}}" Width="20"/>
+            <Separator/>
+            <TextBlock Text="{Binding DAQUnitState}" Width="80" ToolTip="{Binding DAQUnitExceptionMessage}"/>
+            <Separator/>
+            <TextBlock Text="{Binding DAQUnitDiskWriteInterval}" Width="80"/>
+            <Separator/>
+            <TextBlock Text="{Binding DAQUnitStatus}" Width="200"/>
             <Separator/>
             <TextBlock Margin="8,2" Text="{Binding CurrentlyOpenFile}" Name="CurrentlyOpenedFile"/>
         </StatusBar>
@@ -276,6 +297,17 @@
                 <sync:MenuItemAdv Command="local:ConsoleControl.StopDebugging" ToolTip="Stop Monitoring/Debugging">
                     <sync:MenuItemAdv.Icon>
                         <Image Source="imgs/stopdebugging.png" Height="28" Width="28"/>
+                    </sync:MenuItemAdv.Icon>
+                </sync:MenuItemAdv>
+                <sync:MenuItemSeparator/>
+                <sync:MenuItemAdv Command="local:ConsoleControl.StartBackgroundDAQ" ToolTip="Start Background DAQ">
+                    <sync:MenuItemAdv.Icon>
+                        <Image Source="imgs/dataacquisition.png" Height="28" Width="28"/>
+                    </sync:MenuItemAdv.Icon>
+                </sync:MenuItemAdv>
+                <sync:MenuItemAdv Command="local:ConsoleControl.StopBackgroundDAQ" ToolTip="Stop Background DAQ">
+                    <sync:MenuItemAdv.Icon>
+                        <Image Source="imgs/stop.png" Height="28" Width="28"/>
                     </sync:MenuItemAdv.Icon>
                 </sync:MenuItemAdv>
             </sync:MenuItemAdv>

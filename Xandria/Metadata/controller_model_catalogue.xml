@@ -321,10 +321,15 @@
 				<NetMLP>1</NetMLP>
 				<NetEVT>1</NetEVT>
 				<NodeInfo>10000</NodeInfo>
+				<NodeIOCOM>10000</NodeIOCOM>
 				<Raw>17552</Raw>
 				<BitArea>140416</BitArea>
 				<BitIndex>4294967295</BitIndex>
 				<ByteIndex>4294967295</ByteIndex>
+				<RawReadback>23696</RawReadback>
+				<BitAreaReadback>189568</BitAreaReadback>
+				<BitIndexReadback>4294967295</BitIndexReadback>
+				<ByteIndexReadback>4294967295</ByteIndexReadback>
 			</TX>
 			<RX>
 				<Raw>23696</Raw>
@@ -345,14 +350,19 @@
 				<NetMLP>1</NetMLP>
 				<NetEVT>1</NetEVT>
 				<NodeInfo>10000</NodeInfo>
-				<Raw>28664</Raw>
-				<BitArea>229312</BitArea>
+				<NodeIOCOM>10000</NodeIOCOM>
+				<Raw>25634</Raw>
+				<BitArea>205072</BitArea>
 				<BitIndex>4294967295</BitIndex>
 				<ByteIndex>4294967295</ByteIndex>
+				<RawReadback>27638</RawReadback>
+				<BitAreaReadback>221104</BitAreaReadback>
+				<BitIndexReadback>4294967295</BitIndexReadback>
+				<ByteIndexReadback>4294967295</ByteIndexReadback>
 			</TX>
 			<RX>
-				<Raw>28664</Raw>
-				<BitArea>229312</BitArea>
+				<Raw>27638</Raw>
+				<BitArea>221104</BitArea>
 				<BitIndex>4294967295</BitIndex>
 				<ByteIndex>4294967295</ByteIndex>
 			</RX>
@@ -369,14 +379,19 @@
 				<NetMLP>1</NetMLP>
 				<NetEVT>1</NetEVT>
 				<NodeInfo>10000</NodeInfo>
-				<Raw>28664</Raw>
-				<BitArea>229312</BitArea>
+				<NodeIOCOM>10000</NodeIOCOM>
+				<Raw>25634</Raw>
+				<BitArea>205072</BitArea>
 				<BitIndex>4294967295</BitIndex>
 				<ByteIndex>4294967295</ByteIndex>
+				<RawReadback>27638</RawReadback>
+				<BitAreaReadback>221104</BitAreaReadback>
+				<BitIndexReadback>4294967295</BitIndexReadback>
+				<ByteIndexReadback>4294967295</ByteIndexReadback>
 			</TX>
 			<RX>
-				<Raw>28664</Raw>
-				<BitArea>229312</BitArea>
+				<Raw>27638</Raw>
+				<BitArea>221104</BitArea>
 				<BitIndex>4294967295</BitIndex>
 				<ByteIndex>4294967295</ByteIndex>
 			</RX>

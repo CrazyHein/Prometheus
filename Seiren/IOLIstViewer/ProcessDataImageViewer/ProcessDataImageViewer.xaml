@@ -17,6 +17,8 @@
             <CommandBinding Command="local:ConsoleControl.MoveUpRecord" Executed="MoveUpRecordCommand_Executed" CanExecute="MoveUpRecordCommand_CanExecute"/>
             <CommandBinding Command="local:ConsoleControl.MoveDownRecord" Executed="MoveDownRecordCommand_Executed" CanExecute="MoveDownRecordCommand_CanExecute"/>
             <CommandBinding Command="local:ConsoleControl.FindInInterlock" CanExecute="FindInInterlockCommand_CanExecute"/>
+            <CommandBinding Command="local:ConsoleControl.SetDAQFlag" Executed="SetDAQFlagCommand_Executed" CanExecute="DAQFlagCommand_CanExecute"/>
+            <CommandBinding Command="local:ConsoleControl.ResetDAQFlag" Executed="ResetDAQFlagCommand_Executed" CanExecute="DAQFlagCommand_CanExecute"/>
         </DockPanel.CommandBindings>
         <DockPanel.Resources>
             <local:InvertBooleanValue x:Key="InvertBoolean"/>
@@ -54,6 +56,16 @@
                           ToolTip="Try to find if &lt;Interlock Area&gt; references the selected record">
                     <MenuItem.Icon>
                         <Image Source="/imgs/find.png" Height="20" Margin="4"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Command="local:ConsoleControl.SetDAQFlag">
+                    <MenuItem.Icon>
+                        <Image Source="/imgs/check.png" Height="20" Margin="4"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Command="local:ConsoleControl.ResetDAQFlag">
+                    <MenuItem.Icon>
+                        <Image Source="/imgs/uncheck.png" Height="20" Margin="4"/>
                     </MenuItem.Icon>
                 </MenuItem>
             </ContextMenu>
@@ -160,6 +172,7 @@
                 <local:HideStringValueColumn x:Key="HideStringValueColumn"/>
             </sync:SfDataGrid.Resources>
             <sync:SfDataGrid.Columns>
+                <sync:GridCheckBoxColumn DisplayBinding="{Binding DAQ}" HeaderText="DAQ" Width="40" AllowEditing="False"/>
                 <sync:GridTextColumn DisplayBinding="{Binding Bit}" HeaderText="Bit" MinimumWidth="60"/>
                 <sync:GridTextColumn DisplayBinding="{Binding Byte}" HeaderText="Byte" MinimumWidth="60"/>
                 <sync:GridTextColumn DisplayBinding="{Binding Index, StringFormat='0x{0:X08}'}" HeaderText="Index"/>

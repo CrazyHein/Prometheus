@@ -1,4 +1,5 @@
 ﻿using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia;
+using Syncfusion.Data.Extensions;
 using Syncfusion.UI.Xaml.Grid;
 using System;
 using System.Collections.Generic;
@@ -36,7 +37,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
 
         private void OnMainViewer_DragStart(object sender, GridRowDragStartEventArgs e)
         {
-            if ((DataContext as ProcessDataImageModel).IsOffline == false || ProcessDataImageGrid.SelectedItems.Count != 1)
+            if ((DataContext as ProcessDataImageModel).IsOffline == false || ProcessDataImageGrid.SelectedItems.Count != 1 || (DataContext as ProcessDataImageModel).IsDataAcquisiting)
                 e.Handled = true;
         }
 
@@ -89,7 +90,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                         o = wnd.Result;
                     else
                         return;
-                    ProcessDataModel p = new ProcessDataModel(__object_dictionary.ProcessObjects[o.Index], __process_data_access, __process_data_layout);
+                    ProcessDataModel p = new ProcessDataModel(__object_dictionary.ProcessObjects[o.Index], __process_data_access, __process_data_layout, false);
                     (DataContext as ProcessDataImageModel).Add(p);
                     ProcessDataImageGrid.SelectedItem = p;
                     ProcessDataImageGrid.ScrollInView(new Syncfusion.UI.Xaml.ScrollAxis.RowColumnIndex(
@@ -107,7 +108,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                         ProcessDataImageGrid.SelectedItems.Clear(); //= new ObservableCollection<object>();
                         foreach (var o in os)
                         {
-                            ProcessDataModel p = new ProcessDataModel(__object_dictionary.ProcessObjects[o.Index], __process_data_access, __process_data_layout);
+                            ProcessDataModel p = new ProcessDataModel(__object_dictionary.ProcessObjects[o.Index], __process_data_access, __process_data_layout, false);
                             (DataContext as ProcessDataImageModel).Add(p);
                             ProcessDataImageGrid.SelectedItems.Add(p);
                         }
@@ -147,7 +148,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
 
         private void AddRecordCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = (DataContext != null) && ((DataContext as ProcessDataImageModel).DirectModeOperation || __object_source?.SelectedItem != null) && (DataContext as ProcessDataImageModel).IsOffline == true;
+            e.CanExecute = (DataContext != null) && ((DataContext as ProcessDataImageModel).DirectModeOperation || __object_source?.SelectedItem != null) && (DataContext as ProcessDataImageModel).IsOffline == true && !(DataContext as ProcessDataImageModel).IsDataAcquisiting;
         }
 
         private void InsertRecordCommand_Executed(object sender, ExecutedRoutedEventArgs e)
@@ -168,7 +169,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                         o = wnd.Result;
                     else
                         return;
-                    ProcessDataModel p = new ProcessDataModel(__object_dictionary.ProcessObjects[o.Index], __process_data_access, __process_data_layout);
+                    ProcessDataModel p = new ProcessDataModel(__object_dictionary.ProcessObjects[o.Index], __process_data_access, __process_data_layout, false);
                     (DataContext as ProcessDataImageModel).Insert(ProcessDataImageGrid.SelectedIndex, p);
                     ProcessDataImageGrid.SelectedItem = p;
                     ProcessDataImageGrid.ScrollInView(new Syncfusion.UI.Xaml.ScrollAxis.RowColumnIndex(
@@ -187,7 +188,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                         ProcessDataImageGrid.SelectedItems.Clear();
                         foreach (var o in os)
                         {
-                            ProcessDataModel p = new ProcessDataModel(__object_dictionary.ProcessObjects[o.Index], __process_data_access, __process_data_layout);
+                            ProcessDataModel p = new ProcessDataModel(__object_dictionary.ProcessObjects[o.Index], __process_data_access, __process_data_layout, false);
                             (DataContext as ProcessDataImageModel).Insert(index, p);
                             ProcessDataImageGrid.SelectedItems.Add(p);
                         }
@@ -226,7 +227,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
 
         private void InsertRecordCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = (DataContext != null) && ((DataContext as ProcessDataImageModel).DirectModeOperation || __object_source?.SelectedItem != null) && ProcessDataImageGrid?.SelectedItems.Count == 1 && (DataContext as ProcessDataImageModel).IsOffline == true;
+            e.CanExecute = (DataContext != null) && ((DataContext as ProcessDataImageModel).DirectModeOperation || __object_source?.SelectedItem != null) && ProcessDataImageGrid?.SelectedItems.Count == 1 && (DataContext as ProcessDataImageModel).IsOffline == true && !(DataContext as ProcessDataImageModel).IsDataAcquisiting;
         }
 
         private void EditRecordCommand_Executed(object sender, ExecutedRoutedEventArgs e)
@@ -239,7 +240,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
 
         private void EditRecordCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = DataContext != null && (DataContext as ProcessDataImageModel).DirectModeOperation && ProcessDataImageGrid?.SelectedItems.Count == 1 && (DataContext as ProcessDataImageModel).IsOffline == true;
+            e.CanExecute = DataContext != null && (DataContext as ProcessDataImageModel).DirectModeOperation && ProcessDataImageGrid?.SelectedItems.Count == 1 && (DataContext as ProcessDataImageModel).IsOffline == true && !(DataContext as ProcessDataImageModel).IsDataAcquisiting;
         }
 
         private void RemoveRecordCommand_Executed(object sender, ExecutedRoutedEventArgs e)
@@ -288,7 +289,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
 
         private void RemoveRecordCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = ProcessDataImageGrid?.SelectedItem != null && (DataContext as ProcessDataImageModel).IsOffline == true;
+            e.CanExecute = ProcessDataImageGrid?.SelectedItem != null && (DataContext as ProcessDataImageModel).IsOffline == true && !(DataContext as ProcessDataImageModel).IsDataAcquisiting;
         }
 
         private void MoveUpRecordCommand_Executed(object sender, ExecutedRoutedEventArgs e)
@@ -315,7 +316,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         {
             e.CanExecute = DataContext != null &&
                 (ProcessDataImageGrid.SelectedItems.Count > 0 && ProcessDataImageGrid.SelectedItems.Min(i => (DataContext as ProcessDataImageModel).IndexOf(i as ProcessDataModel)) != 0) && 
-                (DataContext as ProcessDataImageModel).IsOffline == true;
+                (DataContext as ProcessDataImageModel).IsOffline == true && !(DataContext as ProcessDataImageModel).IsDataAcquisiting;
         }
 
         private void MoveDownRecordCommand_Executed(object sender, ExecutedRoutedEventArgs e)
@@ -342,7 +343,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         {
             e.CanExecute = DataContext != null &&
                 (ProcessDataImageGrid.SelectedItems.Count > 0 && ProcessDataImageGrid.SelectedItems.Max(i => (DataContext as ProcessDataImageModel).IndexOf(i as ProcessDataModel)) != (DataContext as ProcessDataImageModel).ProcessDataModels.Count - 1) &&
-                (DataContext as ProcessDataImageModel).IsOffline == true;
+                (DataContext as ProcessDataImageModel).IsOffline == true && !(DataContext as ProcessDataImageModel).IsDataAcquisiting;
         }
 
         private void FindInInterlockCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
@@ -355,6 +356,31 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             {
                 e.CanExecute = false;
                 e.Handled = true;
+            }
+        }
+
+        private void DAQFlagCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = ProcessDataImageGrid?.SelectedItems.Count >= 1 && (DataContext as ProcessDataImageModel).IsOffline == true && !(DataContext as ProcessDataImageModel).IsDataAcquisiting;
+        }
+
+        private void SetDAQFlagCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            ProcessDataImageModel pdi = DataContext as ProcessDataImageModel;
+            foreach(ProcessDataModel pd in ProcessDataImageGrid.SelectedItems)
+            {
+                int pos = pdi.IndexOf(pd);
+                pdi.SetDAQ(pos, true);
+            }
+        }
+
+        private void ResetDAQFlagCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            ProcessDataImageModel pdi = DataContext as ProcessDataImageModel;
+            foreach (ProcessDataModel pd in ProcessDataImageGrid.SelectedItems)
+            {
+                int pos = pdi.IndexOf(pd);
+                pdi.SetDAQ(pos, false);
             }
         }
 
@@ -389,7 +415,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
 
         private void ProcessDataImageGrid_CellDoubleTapped(object sender, GridCellDoubleTappedEventArgs e)
         {
-            if(DataContext != null && (DataContext as ProcessDataImageModel).DirectModeOperation && (DataContext as ProcessDataImageModel).IsOffline == true)
+            if(DataContext != null && (DataContext as ProcessDataImageModel).DirectModeOperation && (DataContext as ProcessDataImageModel).IsOffline == true && !(DataContext as ProcessDataImageModel).IsDataAcquisiting)
             {
                 ObjectModel o = __objects_model.Objects.Single(m => m.Index == (e.Record as ProcessDataModel).Index);
                 ObjectViewer wnd = new ObjectViewer(__objects_model, o, InputDialogDisplayMode.Edit);

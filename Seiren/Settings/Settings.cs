@@ -1,5 +1,6 @@
 ﻿using AMEC.PCSoftware.CommunicationProtocol.CrazyHein.SLMP.Master;
 using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia;
+using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.DAQ;
 using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Debugger;
 using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility;
 using System;
@@ -34,8 +35,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         public uint SupportedVariableFileFormatVersion { get; init; } = IOCelcetaHelper.SupportedVariableFileFormatVersion;
         public uint SupportedIOFileFormatVersion { get; init; } = IOCelcetaHelper.SupportedIOFileFormatVersion;
         public string GagharvVersion { get; init; } = System.Reflection.Assembly.GetAssembly(typeof(RemoteOperationMaster)).GetName().Version.ToString();
+        public string TirasweelVersion { get; init; } = System.Reflection.Assembly.GetAssembly(typeof(AMEC.PCSoftware.CommunicationProtocol.CrazyHein.OrbmentDAQ.Protocol.Master)).GetName().Version.ToString();
 
         public SlmpTargetProperty SlmpTargetProperty { get; set; }
+        public DAQTargetProperty DAQTargetProperty { get; set; }
         public FTPTargetProperty FTPTargetProperty { get; set; }
         public PreferenceProperty PreferenceProperty { get; set; }
 
@@ -48,6 +51,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             writer.WriteStartObject();
             writer.WritePropertyName("Debugger");
             SlmpTargetProperty.Save(writer);
+            writer.WritePropertyName("DAQ");
+            DAQTargetProperty.Save(writer);
             writer.WritePropertyName("FTP");
             FTPTargetProperty.Save(writer);
             writer.WritePropertyName("Preference");
@@ -81,6 +86,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                             {
                                 case "Debugger":
                                     SlmpTargetProperty = SlmpTargetProperty.RESTORE(ref reader); break;
+                                case "DAQ":
+                                    DAQTargetProperty = DAQTargetProperty.RESTORE(ref reader); break;
                                 case "FTP":
                                     FTPTargetProperty = FTPTargetProperty.RESTORE(ref reader); break;
                                 case "Preference":
@@ -99,6 +106,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             finally
             {
                 SlmpTargetProperty ??= new SlmpTargetProperty();
+                DAQTargetProperty ??= new DAQTargetProperty();
                 FTPTargetProperty ??= new FTPTargetProperty();
                 PreferenceProperty ??= new PreferenceProperty();
             }
