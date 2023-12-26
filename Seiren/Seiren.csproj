@@ -7,7 +7,7 @@
     <UseWindowsForms>true</UseWindowsForms>
     <RootNamespace>AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren</RootNamespace>
     <Nullable>annotations</Nullable>
-    <Version>0.22.3.1</Version>
+    <Version>0.22.4.0</Version>
     <Authors>CrazyHein</Authors>
     <Company>AMEC</Company>
     <ApplicationIcon>imgs\logo.ico</ApplicationIcon>
@@ -32,6 +32,7 @@
     <None Remove="imgs\devices.png" />
     <None Remove="imgs\edit.png" />
     <None Remove="imgs\export.png" />
+    <None Remove="imgs\export_s.png" />
     <None Remove="imgs\file.png" />
     <None Remove="imgs\find.png" />
     <None Remove="imgs\ftp.png" />
@@ -41,6 +42,7 @@
     <None Remove="imgs\ftpupload.png" />
     <None Remove="imgs\import.png" />
     <None Remove="imgs\import_p.png" />
+    <None Remove="imgs\import_s.png" />
     <None Remove="imgs\insert.png" />
     <None Remove="imgs\layout.png" />
     <None Remove="imgs\list.png" />
@@ -55,6 +57,7 @@
     <None Remove="imgs\navigation.png" />
     <None Remove="imgs\new.png" />
     <None Remove="imgs\open.png" />
+    <None Remove="imgs\open_s.png" />
     <None Remove="imgs\paste.png" />
     <None Remove="imgs\pause.png" />
     <None Remove="imgs\pdos.png" />
@@ -101,6 +104,7 @@
     <Resource Include="imgs\dataacquisition.png" />
     <Resource Include="imgs\edit.png" />
     <Resource Include="imgs\export.png" />
+    <Resource Include="imgs\export_s.png" />
     <Resource Include="imgs\file.png" />
     <Resource Include="imgs\find.png" />
     <Resource Include="imgs\ftp.png" />
@@ -110,6 +114,7 @@
     <Resource Include="imgs\ftpupload.png" />
     <Resource Include="imgs\import.png" />
     <Resource Include="imgs\import_p.png" />
+    <Resource Include="imgs\import_s.png" />
     <Resource Include="imgs\insert.png" />
     <Resource Include="imgs\layout.png" />
     <Resource Include="imgs\local_io.png" />
@@ -118,6 +123,7 @@
     <Resource Include="imgs\miscellaneous.png" />
     <Resource Include="imgs\move_down.png" />
     <Resource Include="imgs\move_up.png" />
+    <Resource Include="imgs\open_s.png" />
     <Resource Include="imgs\paste.png" />
     <Resource Include="imgs\pdos.png" />
     <Resource Include="imgs\recent.png" />
@@ -244,6 +250,12 @@
     <None Update="Metadata\data_type_catalogue.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+
+  
+  
+  <ItemGroup>
+    <Folder Include="SMART_ECAT\" />
   </ItemGroup>
 
 </Project>

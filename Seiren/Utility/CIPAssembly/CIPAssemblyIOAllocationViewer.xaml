@@ -1,0 +1,76 @@
+﻿<Window x:Class="AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility.CIPAssemblyIOAllocationViewer"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility"
+        xmlns:common="clr-namespace:AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren"
+        xmlns:sync="http://schemas.syncfusion.com/wpf"
+        xmlns:syncfusionskin ="clr-namespace:Syncfusion.SfSkinManager;assembly=Syncfusion.SfSkinManager.WPF"
+        mc:Ignorable="d"
+        Title="CIP Assembly IO Allocation Viewer" Height="450" Width="800"
+        Closed="Window_Closed">
+    <Grid syncfusionskin:SfSkinManager.Theme="{syncfusionskin:SkinManagerExtension ThemeName=FluentLight}">
+        <Grid.CommandBindings>
+            <CommandBinding Command="common:ConsoleControl.AddRecord" Executed="AddRecordCommand_Executed"/>
+            <CommandBinding Command="common:ConsoleControl.AddAllSelectedRecords" Executed="AddAllSelectedRecordsCommand_Executed" CanExecute="AddAllSelectedRecordsCommand_CanExecute"/>
+        </Grid.CommandBindings>
+        <Grid.RowDefinitions>
+            <RowDefinition />
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+        </Grid.RowDefinitions>
+        <StatusBar Grid.Row="3" HorizontalAlignment="Left" Margin="4">
+            <TextBlock Text="{Binding AInfoPath}"/>
+        </StatusBar>
+        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="4">
+            <sync:ButtonAdv SizeMode="Normal" Label="Select All" Height="30" Width="128" Margin="4" Click="ButtonSelectAll_Click">
+                <sync:ButtonAdv.SmallIcon>
+                    <BitmapImage UriSource="../../imgs/select_all.png"/>
+                </sync:ButtonAdv.SmallIcon>
+            </sync:ButtonAdv>
+            <sync:ButtonAdv SizeMode="Normal" Label="Unselect All" Height="30" Width="128" Margin="4" Click="ButtonUnSelectAll_Click">
+                <sync:ButtonAdv.SmallIcon>
+                    <BitmapImage UriSource="../../imgs/unselect_all.png"/>
+                </sync:ButtonAdv.SmallIcon>
+            </sync:ButtonAdv>
+            <sync:ButtonAdv SizeMode="Normal" Label="Add All Selected" Height="30" Width="128" Margin="4" Command="common:ConsoleControl.AddAllSelectedRecords">
+                <sync:ButtonAdv.SmallIcon>
+                    <BitmapImage UriSource="../../imgs/all.png"/>
+                </sync:ButtonAdv.SmallIcon>
+            </sync:ButtonAdv>
+        </StackPanel>
+        <Grid>
+            <Grid.Resources>
+                <ContextMenu x:Key="GridContextMenu">
+                    <MenuItem Command="common:ConsoleControl.AddRecord">
+                        <MenuItem.Icon>
+                            <Image Source="../../imgs/add.png" Height="20" Margin="4"/>
+                        </MenuItem.Icon>
+                    </MenuItem>
+                </ContextMenu>
+            </Grid.Resources>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <sync:SfDataGrid Name="VariableViewer"  ItemsSource="{Binding CIPAssemblyIOs}" ColumnSizer="Auto" AllowResizingColumns="True" AllowTriStateSorting="True" AutoGenerateColumns="False" 
+                     AllowGrouping="True" ShowGroupDropArea="True"
+                     AllowFiltering="True"
+                     ShowSortNumbers="True" ShowRowHeader="True"
+                     LiveDataUpdateMode="AllowDataShaping" ScrollMode="Async" SelectionMode="Single"
+                     Margin="3" ContextMenu="{StaticResource GridContextMenu}">
+                <sync:SfDataGrid.Columns>
+                    <sync:GridCheckBoxColumn MappingName="IsChecked" HeaderText="Selected" Width="80" AllowEditing="True"/>
+                    <sync:GridTextColumn ValueBinding="{Binding PdoName}" HeaderText="PDO"/>
+                    <sync:GridTextColumn ValueBinding="{Binding UnitName}" HeaderText="Unit"/>
+                    <sync:GridTextColumn ValueBinding="{Binding EntryName}" HeaderText="Entry"/>
+                    <sync:GridTextColumn ValueBinding="{Binding EntryBitOffset}" HeaderText="BitOffset" AllowFiltering="False" AllowSorting="False" AllowGrouping="False"/>
+                    <sync:GridTextColumn ValueBinding="{Binding EntryBitSize}" HeaderText="BitSize" AllowFiltering="False" AllowSorting="False" AllowGrouping="False"/>
+                    <sync:GridTextColumn ValueBinding="{Binding SubEntryName}" HeaderText="SubEntry"/>
+                    <sync:GridTextColumn ValueBinding="{Binding SubEntryBitOffset}" HeaderText="BitOffset" AllowFiltering="False" AllowSorting="False" AllowGrouping="False"/>
+                    <sync:GridTextColumn ValueBinding="{Binding SubEntryBitSize}" HeaderText="BitSize" AllowFiltering="False" AllowSorting="False" AllowGrouping="False"/>
+                </sync:SfDataGrid.Columns>
+            </sync:SfDataGrid>
+        </Grid>
+    </Grid>
+</Window>

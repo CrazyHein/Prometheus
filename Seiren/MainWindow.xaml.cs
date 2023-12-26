@@ -6,6 +6,7 @@ using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility;
 using Syncfusion.SfSkinManager;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -74,6 +75,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         private EtherCATPDOViewer __ecat_pdo_viewer;
         private EtherCATVaribleDataTypeConverter __ecat_variable_datatype_converter;
 
+        private CIPAssemblyIOAllocationViewer __cip_assembly_io_viewer;
+        private CIPAssemblyIODataTypeConverter __cip_assembly_io_datatype_converter;
+
         #region Properties
         /// <summary>
         /// Gets or sets the current visual style.
@@ -122,7 +126,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             __recently_opened = new RecentlyOpened(__settings.PreferenceProperty.RecentlyOpenedFileCollectionCapacity);
             __main_model.RecentlyOpened = __recently_opened.PathCollection;
             DataContext = __main_model;
+        }
 
+        static MainWindow()
+        {
             DebugConsole.CreateConsole();
         }
         /// <summary>
@@ -168,6 +175,12 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                 __user_interface_acquisition_unit = new UserInterfaceSynchronizer(this, __daq_ui_data_refresh_handler);
 
                 __ecat_variable_datatype_converter = new EtherCATVaribleDataTypeConverter(__data_type_catalogue);
+                __cip_assembly_io_datatype_converter = new CIPAssemblyIODataTypeConverter(__data_type_catalogue);
+
+                if (!System.IO.Directory.Exists(__settings.UserSettingsPath))
+                {
+                    System.IO.Directory.CreateDirectory(__settings.UserSettingsPath);
+                }
             }
             catch (LombardiaException ex)
             {
@@ -520,10 +533,32 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         private void MainNavigator_ItemClicked(object sender, Syncfusion.UI.Xaml.NavigationDrawer.NavigationItemClickedEventArgs e)
         {
             object v = null;
-            if(e.Item.Header as string == "Settings")
+            if(e.Item.Header as string == "Open Settings")
             {
                 SettingsViewer st = new SettingsViewer(__settings);
                 st.ShowDialog();
+            }
+            else if (e.Item.Header as string == "Import Settings")
+            {
+                System.Windows.Forms.OpenFileDialog open = new System.Windows.Forms.OpenFileDialog();
+                open.Filter = "Seiren Configuration File(*.json)|*.json";
+                open.Multiselect = false;
+                open.InitialDirectory = System.IO.Path.Combine(System.Environment.CurrentDirectory, __settings.UserSettingsPath);
+                if (open.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                {
+                    Settings s = new Settings(open.FileName);
+                    SettingsViewer st = new SettingsViewer(__settings, s);
+                    st.ShowDialog();
+                }
+            }
+            else if (e.Item.Header as string == "Export Settings")
+            {
+                System.Windows.Forms.SaveFileDialog save = new System.Windows.Forms.SaveFileDialog() { DefaultExt = "json", AddExtension = true };
+                save.InitialDirectory = System.IO.Path.Combine(System.Environment.CurrentDirectory, __settings.UserSettingsPath);
+                save.Filter = "Seiren Configuration File(*.json)|*.json";
+                if (save.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                    __settings.Save(save.FileName);
+
             }
             else if (__viewers.TryGetValue(e.Item, out v) && v != __current_user_control)
             {
@@ -1095,6 +1130,30 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             e.CanExecute = __ecat_pdo_viewer == null || __ecat_pdo_viewer.IsClosed;
         }
 
+        private void BrowseCIPAssemblyIOs_Executed(object sender, System.Windows.Input.ExecutedRoutedEventArgs e)
+        {
+            System.Windows.Forms.OpenFileDialog open = new System.Windows.Forms.OpenFileDialog();
+            open.Filter = "CIP Assembly IO Allocation Files(*.xml)|*.xml";
+            open.Multiselect = false;
+            if (open.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                try
+                {
+                    __cip_assembly_io_viewer = new CIPAssemblyIOAllocationViewer(new CIPAssemblyIOAllocationModel(open.FileName), this);
+                    __cip_assembly_io_viewer.Show();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("At least one exception has occurred during the operation :\n" + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+        }
+
+        private void BrowseCIPAssemblyIOs_CanExecuted(object sender, System.Windows.Input.CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = __cip_assembly_io_viewer == null || __cip_assembly_io_viewer.IsClosed;
+        }
+
         private string __compare_result((VariableDictionary vd, ControllerConfiguration cc, ObjectDictionary od,
                     ProcessDataImage txdiag, ProcessDataImage txbit, ProcessDataImage txblk,
                     ProcessDataImage rxctl, ProcessDataImage rxbit, ProcessDataImage rxblk, InterlockCollection intlk,
@@ -1191,6 +1250,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             }
             if (e.Cancel == false && __ecat_pdo_viewer != null)
                 __ecat_pdo_viewer.Close();
+            if (e.Cancel == false && __cip_assembly_io_viewer != null)
+                __cip_assembly_io_viewer.Close();
         }
 
         private void UndoMenuItemAdv_Click(object sender, RoutedEventArgs e)
@@ -1312,6 +1373,22 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         private void EventHistory_CanExecuted(object sender, System.Windows.Input.CanExecuteRoutedEventArgs e)
         {
             e.CanExecute = true;
+        }
+
+        public void AddCIPAssemblyIO(CIPAssemblyIOInfo info)
+        {
+            if (__variables_viewer != null)
+                __variables_viewer.AddCIPAssemblyIO(info, __cip_assembly_io_datatype_converter);
+            else
+                MessageBox.Show("Perhaps you should first create a new file or open an existing one.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+
+        public void AddCIPAssemblyIOs(IEnumerable<CIPAssemblyIOInfo> infos)
+        {
+            if (__variables_viewer != null)
+                __variables_viewer.AddCIPAssemblyIOs(infos, __cip_assembly_io_datatype_converter, true);
+            else
+                MessageBox.Show("Perhaps you should first create a new file or open an existing one.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
 }

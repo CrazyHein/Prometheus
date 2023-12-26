@@ -273,7 +273,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                 MessageBox.Show("Unable to infer data type of the EtherCAT variable.\nThe default data type will be applied.", "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
                 dt = types.DefaultLombardiaDataType;
             }
-            string comment = $"$ECATVAR${info.SlaveAddr:D04}${info.VariableBitSize:D04}${info.VariableLocalBitOffset:D04}$\n{info.SlaveFullName}.{info.PDOFullName}.{info.VariableName})";
+            string comment = $"$ECATVAR${info.SlaveAddr:D04}${info.VariableBitSize:D04}${info.VariableLocalBitOffset:D04}$\n{info.SlaveFullName}.{info.PDOFullName}.{info.VariableName}";
             VariableViewer wnd = new VariableViewer(DataContext as VariablesModel, new VariableModel() { DataType = dt, Name = info.VariableName.Trim(), Comment = comment}, InputDialogDisplayMode.Add);
             wnd.WindowStartupLocation = WindowStartupLocation.CenterScreen;
             if (wnd.ShowDialog() == true)
@@ -306,9 +306,78 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                     if (types.DataTypeDictionary.ContainsKey(info.VariableDataType))
                         dt = types.DataTypeDictionary[info.VariableDataType];
                     else
+                    {
+                        MessageBox.Show($"Unable to infer data type ({info.VariableDataType}) of the EtherCAT variable ({originalName}).\nThe default data type will be applied.", 
+                            "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        dt = types.DefaultLombardiaDataType;
+                    }
+
+                    string comment = $"$ECATVAR${info.SlaveAddr:D04}${info.VariableBitSize:D04}${info.VariableLocalBitOffset:D04}$\n{info.SlaveFullName}.{info.PDOFullName}.{info.VariableName}";
+
+                    (DataContext as VariablesModel).Add(new VariableModel() { Name = revisedName, DataType = dt, Comment = comment });
+                }
+            }
+            catch (LombardiaException ex)
+            {
+                MessageBox.Show("At least one exception has occurred during the operation :\n" + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+        }
+
+        public void AddCIPAssemblyIO(CIPAssemblyIOInfo info, CIPAssemblyIODataTypeConverter types)
+        {
+            DataType dt;
+            uint bits = info.SubEntryBitSize != null ? info.SubEntryBitSize.Value : info.EntryBitSize;
+            uint offset = info.SubEntryBitOffset != null ? info.SubEntryBitOffset.Value : info.EntryBitOffset;
+            string name = info.SubEntryName != null ? info.SubEntryName.Trim() : info.EntryName.Trim();
+            if (types.DataTypeDictionary.ContainsKey(bits))
+                dt = types.DataTypeDictionary[bits];
+            else
+            {
+                MessageBox.Show("Unable to infer data type of the CIP Assembly IO.\nThe default data type will be applied.", "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
+                dt = types.DefaultLombardiaDataType;
+            }
+            string comment = $"$CIPASSEMBLYIO${bits:D08}${offset:D08}$\n{info.PdoName}.{info.UnitName}.{info.EntryName}.{info.SubEntryName}";
+            VariableViewer wnd = new VariableViewer(DataContext as VariablesModel, new VariableModel() { DataType = dt, Name = name, Comment = comment }, InputDialogDisplayMode.Add);
+            wnd.WindowStartupLocation = WindowStartupLocation.CenterScreen;
+            if (wnd.ShowDialog() == true)
+            {
+                MainViewer.SelectedItem = wnd.Result;
+                var line = MainViewer.ResolveToRowIndex(MainViewer.SelectedItem);
+                if (line != -1)
+                    MainViewer.ScrollInView(new Syncfusion.UI.Xaml.ScrollAxis.RowColumnIndex(line, MainViewer.ResolveToStartColumnIndex()));
+            }
+        }
+
+        public void AddCIPAssemblyIOs(IEnumerable<CIPAssemblyIOInfo> infos, CIPAssemblyIODataTypeConverter types, bool rename)
+        {
+            DataType dt;
+            string originalName;
+            string revisedName;
+            int i = 0;
+            if (MessageBox.Show("The data type of the CIP Assembly IO may not be always accurate.\nDo you want to continue?", "Warning", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.No)
+                return;
+
+            try
+            {
+                foreach (var info in infos)
+                {
+                    uint bits = info.SubEntryBitSize != null ? info.SubEntryBitSize.Value : info.EntryBitSize;
+                    uint offset = info.SubEntryBitOffset != null ? info.SubEntryBitOffset.Value : info.EntryBitOffset;
+                    originalName = info.SubEntryName != null ? info.SubEntryName.Trim() : info.EntryName.Trim();
+                    revisedName = originalName;
+                    i = 0;
+                    while (rename && (DataContext as VariablesModel).Contains(revisedName))
+                    {
+                        revisedName = originalName + $"({i})";
+                        i++;
+                    }
+                    if (types.DataTypeDictionary.ContainsKey(bits))
+                        dt = types.DataTypeDictionary[bits];
+                    else
                         dt = types.DefaultLombardiaDataType;
 
-                    string comment = $"$ECATVAR${info.SlaveAddr:D04}${info.VariableBitSize:D04}${info.VariableLocalBitOffset:D04}$\n{info.SlaveFullName}.{info.PDOFullName}.{info.VariableName})";
+                    string comment = $"$CIPASSEMBLYIO${bits:D08}${offset:D08}$\n{info.PdoName}.{info.UnitName}.{info.EntryName}.{info.SubEntryName}";
 
                     (DataContext as VariablesModel).Add(new VariableModel() { Name = revisedName, DataType = dt, Comment = comment });
                 }

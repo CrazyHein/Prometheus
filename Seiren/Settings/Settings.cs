@@ -1,5 +1,6 @@
 ﻿using AMEC.PCSoftware.CommunicationProtocol.CrazyHein.SLMP.Master;
 using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia;
+using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Console;
 using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.DAQ;
 using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Debugger;
 using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility;
@@ -11,19 +12,32 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Forms;
 
 namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
 {
     public class Settings
     {
-        public Settings()
+        public Settings(string? path = null)
         {
-            Restore(null);
+            Restore(path);
         }
+
+        public Settings(SlmpTargetProperty slmp, DAQTargetProperty daq, FTPTargetProperty ftp, PreferenceProperty pref )
+        {
+            SlmpTargetProperty = slmp;
+            DAQTargetProperty = daq;
+            FTPTargetProperty = ftp;
+            PreferenceProperty = pref;
+        }
+
         public string Description { get; init; } = "A graphical user interface for [Foliage Ocean IO List]";
         public string DataTypeCataloguePath { get; init; } = "Metadata/data_type_catalogue.xml";
         public string ControllerModelCataloguePath { get; init; } = "Metadata/controller_model_catalogue.xml";
         public string SettingsPath { get; init; } = "settings.json";
+
+        public string UserSettingsPath { get; init; } = "USettings";
 
         public byte[] DataTypeCatalogueHash { get; set; }
         public byte[] ControllerModelCatalogueHash { get; set; }
@@ -44,8 +58,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
 
         private static ReadOnlySpan<byte> __UTF8_BOM => new byte[] { 0xEF, 0xBB, 0xBF };
 
-        public void Save()
+        public void Save(string? path = null)
         {
+            if (path == null)
+                path = SettingsPath;
             using var ms = new MemoryStream();
             using var writer = new Utf8JsonWriter(ms, new JsonWriterOptions() { Indented = true });
             writer.WriteStartObject();
@@ -60,13 +76,15 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             writer.WriteEndObject();
             writer.Flush();
 
-            using var fs = new FileStream(SettingsPath, FileMode.Create, FileAccess.Write);
+            using var fs = new FileStream(path, FileMode.Create, FileAccess.Write);
             ms.Seek(0, SeekOrigin.Begin);
             ms.CopyTo(fs);
             fs.Flush();
+
+            DebugConsole.WriteInfo($"Save settings to configuration file : '{path}'.");
         }
 
-        public void Restore(string path)
+        public void Restore(string? path = null)
         {
             if(path == null)
                 path = SettingsPath;
@@ -99,9 +117,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                     }
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                
+                DebugConsole.WriteException($"At least one exception has occurred while reading settings from configuration file : '{path}'.\n{ex.Message}\nThe default settings will be used.");
             }
             finally
             {
@@ -109,6 +127,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                 DAQTargetProperty ??= new DAQTargetProperty();
                 FTPTargetProperty ??= new FTPTargetProperty();
                 PreferenceProperty ??= new PreferenceProperty();
+
+                DebugConsole.WriteInfo($"Read settings from configuration file : '{path}'.");
             }
         }
     }

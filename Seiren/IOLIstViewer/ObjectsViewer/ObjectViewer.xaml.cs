@@ -15,7 +15,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
     /// </summary>
     public partial class ObjectViewer : Window
     {
-        private Regex __binding_tips_reg = new Regex(@"^\$ECATVAR\$([0-9]{4}\$){3}", RegexOptions.Compiled);
+        private Regex __ecatvar_binding_tips_reg = new Regex(@"^\$ECATVAR\$([0-9]{4}\$){3}", RegexOptions.Compiled);
+        private Regex __cipassemblyio_binding_tips_reg = new Regex(@"^\$CIPASSEMBLYIO\$([0-9]{8}\$){2}", RegexOptions.Compiled);
         private ObjectsModel __object_model_collection;
         private InputDialogDisplayMode __input_mode;
         private int __insert_index;
@@ -125,7 +126,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             binding.UpdateSource();
             if (__object_model_collection.Variables.Variables.TryGetValue(__result_object_model.VariableName.Trim(), out var v) == true)
             {
-                if (__binding_tips_reg.IsMatch(v.Comment))
+                if (__ecatvar_binding_tips_reg.IsMatch(v.Comment))
                 {
                     if (v.Type.BitSize == 1)
                         __result_object_model.BindingChannelIndex =
@@ -133,6 +134,13 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                     else
                         __result_object_model.BindingChannelIndex =
                             (uint)(Convert.ToUInt16(v.Comment.Substring(9, 4)) * 10000 + Convert.ToUInt16(v.Comment.Substring(19, 4)) / 8);
+                }
+                else if (__cipassemblyio_binding_tips_reg.IsMatch(v.Comment))
+                {
+                    if (v.Type.BitSize == 1)
+                        __result_object_model.BindingChannelIndex = Convert.ToUInt32(v.Comment.Substring(24, 8));
+                    else
+                        __result_object_model.BindingChannelIndex = Convert.ToUInt32(v.Comment.Substring(24, 8)) / 8;
                 }
             }
         }

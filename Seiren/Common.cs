@@ -72,6 +72,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         public static RoutedUICommand ResetDAQFlag { get; private set; }
         public static RoutedUICommand StartBackgroundDAQ { get; private set; }
         public static RoutedUICommand StopBackgroundDAQ { get; private set; }
+        public static RoutedUICommand BrowseCIPAssemblyIOs { get; private set; }
 
         static ConsoleControl()
         {
@@ -246,7 +247,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             {
                 new KeyGesture(Key.F9, ModifierKeys.Control, "Ctrl+F9")
             };
-            BrowseEtherCATPDOs = new RoutedUICommand("Browse EtherCAT PDOs", "Browse PDOs from EtherCAT ENI", typeof(ConsoleControl), gestureImportEtherCATPDOs);
+            BrowseEtherCATPDOs = new RoutedUICommand("Browse EtherCAT PDOs", "Browse PDOs in EtherCAT ENI", typeof(ConsoleControl), gestureImportEtherCATPDOs);
 
             AddAllSelectedRecords = new RoutedUICommand("Add All Selected Records", "Add All Selected Records", typeof(ConsoleControl));
 
@@ -261,6 +262,12 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
 
             StartBackgroundDAQ = new RoutedUICommand("Start Background DAQ", "Start Background DAQ", typeof(ConsoleControl));
             StopBackgroundDAQ = new RoutedUICommand("Stop Background DAQ", "Stop Background DAQ", typeof(ConsoleControl));
+
+            InputGestureCollection gestureImportCIPAssemblyIOs = new InputGestureCollection
+            {
+                new KeyGesture(Key.F11, ModifierKeys.Control, "Ctrl+F11")
+            };
+            BrowseCIPAssemblyIOs = new RoutedUICommand("Browse CIP Assembly IO", "Browse CIP Assembly IO in IO Allocation File", typeof(ConsoleControl), gestureImportCIPAssemblyIOs);
         }
     }
 

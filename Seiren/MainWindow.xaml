@@ -32,6 +32,7 @@
         <CommandBinding Command="local:ConsoleControl.ControllerRemoteOperation" Executed="RemoteOperationCommand_Executed" CanExecute="RemoteOperationCommand_CanExecuted"/>
         <CommandBinding Command="local:ConsoleControl.BrowseEtherCATPDOs" Executed="BrowseEtherCATPDOs_Executed" CanExecute="BrowseEtherCATPDOs_CanExecuted"/>
         <CommandBinding Command="local:ConsoleControl.EventHistory" Executed="EventHistory_Executed" CanExecute="EventHistory_CanExecuted"/>
+        <CommandBinding Command="local:ConsoleControl.BrowseCIPAssemblyIOs" Executed="BrowseCIPAssemblyIOs_Executed" CanExecute="BrowseCIPAssemblyIOs_CanExecuted"/>
     </Window.CommandBindings>
     <Window.Resources>
         <local:InvertBooleanValue x:Key="InvertBoolean"/>
@@ -358,7 +359,7 @@
                         <Image Source="imgs/remote.png" Height="28" Width="28"/>
                     </sync:MenuItemAdv.Icon>
                 </sync:MenuItemAdv>
-                <sync:MenuItemAdv Command="local:ConsoleControl.BrowseEtherCATPDOs" ToolTip="Browse EtherCAT PDOs from ENI">
+                <sync:MenuItemAdv Command="local:ConsoleControl.BrowseEtherCATPDOs" ToolTip="Browse EtherCAT PDOs in ENI">
                     <sync:MenuItemAdv.Icon>
                         <Image Source="imgs/pdos.png" Height="28" Width="28"/>
                     </sync:MenuItemAdv.Icon>
@@ -366,6 +367,11 @@
                 <sync:MenuItemAdv Command="local:ConsoleControl.EventHistory" ToolTip="Browse R12CCPU-V Event History">
                     <sync:MenuItemAdv.Icon>
                         <Image Source="imgs/log.png" Height="28" Width="28"/>
+                    </sync:MenuItemAdv.Icon>
+                </sync:MenuItemAdv>
+                <sync:MenuItemAdv Command="local:ConsoleControl.BrowseCIPAssemblyIOs" ToolTip="Browse CIP Assembly IO in CIP Assembly IO Allocation File">
+                    <sync:MenuItemAdv.Icon>
+                        <Image Source="imgs/pdos.png" Height="28" Width="28"/>
                     </sync:MenuItemAdv.Icon>
                 </sync:MenuItemAdv>
             </sync:MenuItemAdv>
@@ -454,10 +460,25 @@
             </sync:NavigationItem>
             <sync:SfNavigationDrawer.FooterItems>
                 <sync:NavigationItem ItemType="Separator"/>
-                <sync:NavigationItem Header="Settings" ItemType="Button" Uid="Settings">
+                <sync:NavigationItem Header="Settings" ItemType="Tab" Uid="Settings" IsExpanded="True">
                     <sync:NavigationItem.Icon>
                         <Image Source="imgs/setting.png"/>
                     </sync:NavigationItem.Icon>
+                    <sync:NavigationItem Header="Open Settings" ItemType="Button" Uid="OpenSettings" ToolTip="Open &amp; Edit current settings">
+                        <sync:NavigationItem.Icon>
+                            <Image Source="imgs/open_s.png"/>
+                        </sync:NavigationItem.Icon>
+                    </sync:NavigationItem>
+                    <sync:NavigationItem Header="Import Settings" ItemType="Button" Uid="ImportSettings" ToolTip="Import settings from a JSON file">
+                        <sync:NavigationItem.Icon>
+                            <Image Source="imgs/import_s.png"/>
+                        </sync:NavigationItem.Icon>
+                    </sync:NavigationItem>
+                    <sync:NavigationItem Header="Export Settings" ItemType="Button" Uid="ExportSettings" ToolTip="Export settings to a JSON file">
+                        <sync:NavigationItem.Icon>
+                            <Image Source="imgs/export_s.png"/>
+                        </sync:NavigationItem.Icon>
+                    </sync:NavigationItem>
                 </sync:NavigationItem>
             </sync:SfNavigationDrawer.FooterItems>
             <sync:SfNavigationDrawer.ContentView>

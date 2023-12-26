@@ -553,5 +553,18 @@
 				<BitIndex>4294967295</BitIndex>
 			</RX>
 		</EthernetModel>
+		<EthernetModel>
+			<ID>0x2003</ID>
+			<Name>CIP Assembly IO</Name>
+			<TX>
+				<Raw>504</Raw>
+				<BitArea>4032</BitArea>
+				<Status32>1</Status32>
+			</TX>
+			<RX>
+				<Raw>504</Raw>
+				<BitArea>4032</BitArea>
+			</RX>
+		</EthernetModel>
 	</EthernetModels>
 </AMECControllerModels>

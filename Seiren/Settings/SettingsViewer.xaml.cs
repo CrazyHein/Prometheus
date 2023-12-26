@@ -25,6 +25,8 @@ using AMEC.PCSoftware.CommunicationProtocol.CrazyHein.OrbmentDAQ.Protocol;
 using AMEC.PCSoftware.CommunicationProtocol.CrazyHein.OrbmentDAQ;
 using System.Threading;
 using System.Runtime.InteropServices;
+using System.Runtime;
+using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Console;
 
 namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
 {
@@ -44,6 +46,16 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             DAQSettings.DataContext = Settings.DAQTargetProperty.Copy();
             PreferenceSettings.DataContext = Settings.PreferenceProperty.Copy();
             FTPSettings.DataContext = Settings.FTPTargetProperty.Copy();
+        }
+
+        public SettingsViewer(Settings settings, Settings import)
+        {
+            InitializeComponent();
+            Settings = settings;
+            DebuggerSettings.DataContext = import.SlmpTargetProperty.Copy();
+            DAQSettings.DataContext = import.DAQTargetProperty.Copy();
+            PreferenceSettings.DataContext = import.PreferenceProperty.Copy();
+            FTPSettings.DataContext = import.FTPTargetProperty.Copy();
         }
 
         private void DebuggerSettings_Error(object sender, ValidationErrorEventArgs e)
@@ -100,7 +112,22 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
 
         private void Export_Click(object sender, RoutedEventArgs e)
         {
-            DialogResult = false;
+            if (HasError)
+                MessageBox.Show("At least one user input is invalid.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            else
+            {
+                System.Windows.Forms.SaveFileDialog save = new System.Windows.Forms.SaveFileDialog() { DefaultExt = "json", AddExtension = true };
+                save.InitialDirectory = System.IO.Path.Combine(System.Environment.CurrentDirectory, Settings.UserSettingsPath);
+                save.Filter = "Seiren Configuration File(*.json)|*.json";
+                if (save.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                {
+                    Settings s = new Settings(DebuggerSettings.DataContext as SlmpTargetProperty, 
+                        DAQSettings.DataContext as DAQTargetProperty, 
+                        FTPSettings.DataContext as FTPTargetProperty, 
+                        PreferenceSettings.DataContext as PreferenceProperty);
+                    s.Save(save.FileName);
+                }
+            }
         }
 
         private async void SLMPTest_Click(object sender, RoutedEventArgs e)
