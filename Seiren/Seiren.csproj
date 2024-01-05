@@ -252,6 +252,24 @@
     <None Update="Metadata\data_type_catalogue.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="Metadata\SMART-ECAT\0_08_012\R12CCPU_V\ecatAPL_ClassA.out">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Metadata\SMART-ECAT\0_08_012\R12CCPU_V\emllDW3504.out">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Metadata\SMART-ECAT\0_08_012\RD55UP06_V\ecatAPL_ClassA.out">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Metadata\SMART-ECAT\0_08_012\RD55UP06_V\emllDW3504.out">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Metadata\SMART-ECAT\0_08_012\RD55UP12_V\ecatAPL_ClassA.out">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Metadata\SMART-ECAT\0_08_012\RD55UP12_V\emllDW3504.out">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="Metadata\SMART-ECAT\0_08_014\R12CCPU_V\ecatAPL_ClassA.out">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
