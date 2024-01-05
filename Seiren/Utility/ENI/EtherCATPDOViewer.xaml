@@ -24,6 +24,16 @@
             <TextBlock Text="{Binding ENIPath}"/>
         </StatusBar>
         <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="4">
+            <sync:ButtonAdv SizeMode="Normal" Label="Unselect" Height="30" Width="128" Margin="4" Click="ButtonUnselect_Click">
+                <sync:ButtonAdv.SmallIcon>
+                    <BitmapImage UriSource="../../imgs/uncheck.png"/>
+                </sync:ButtonAdv.SmallIcon>
+            </sync:ButtonAdv>
+            <sync:ButtonAdv SizeMode="Normal" Label="Select" Height="30" Width="128" Margin="4" Click="ButtonSelect_Click">
+                <sync:ButtonAdv.SmallIcon>
+                    <BitmapImage UriSource="../../imgs/check.png"/>
+                </sync:ButtonAdv.SmallIcon>
+            </sync:ButtonAdv>
             <sync:ButtonAdv SizeMode="Normal" Label="Select All" Height="30" Width="128" Margin="4" Click="ButtonSelectAll_Click">
                 <sync:ButtonAdv.SmallIcon>
                     <BitmapImage UriSource="../../imgs/select_all.png"/>
@@ -53,11 +63,11 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
-            <sync:SfDataGrid Name="VariableViewer"  ItemsSource="{Binding EtherCATVariables}" ColumnSizer="Auto" AllowResizingColumns="True" AllowTriStateSorting="True" AutoGenerateColumns="False" 
+            <sync:SfDataGrid Name="VariableViewer"  ItemsSource="{Binding EtherCATVariables}" ColumnSizer="Auto" AllowResizingColumns="True" AllowTriStateSorting="True" AutoGenerateColumns="False"
                      AllowGrouping="True" ShowGroupDropArea="True"
                      AllowFiltering="True"
                      ShowSortNumbers="True" ShowRowHeader="True"
-                     LiveDataUpdateMode="AllowDataShaping" ScrollMode="Async" SelectionMode="Single"
+                     LiveDataUpdateMode="AllowDataShaping" ScrollMode="Async" SelectionMode="Extended"
                      Margin="3" ContextMenu="{StaticResource GridContextMenu}">
                 <sync:SfDataGrid.Columns>
                     <sync:GridCheckBoxColumn MappingName="IsChecked" HeaderText="Selected" Width="80" AllowEditing="True"/>

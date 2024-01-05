@@ -40,6 +40,18 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility
                 variable.IsChecked = true;
         }
 
+        private void ButtonSelect_Click(object sender, RoutedEventArgs e)
+        {
+            foreach (EtherCATVariableInfo variable in VariableViewer.SelectedItems)
+                variable.IsChecked = true;
+        }
+
+        private void ButtonUnselect_Click(object sender, RoutedEventArgs e)
+        {
+            foreach (EtherCATVariableInfo variable in VariableViewer.SelectedItems)
+                variable.IsChecked = false;
+        }
+
         private void ButtonUnSelectAll_Click(object sender, RoutedEventArgs e)
         {
             foreach (var variable in (DataContext as ENIUtilityModel).EtherCATVariables)

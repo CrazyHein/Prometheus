@@ -1,6 +1,7 @@
 ﻿using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia;
 using Syncfusion.Data;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
@@ -73,6 +74,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         public static RoutedUICommand StartBackgroundDAQ { get; private set; }
         public static RoutedUICommand StopBackgroundDAQ { get; private set; }
         public static RoutedUICommand BrowseCIPAssemblyIOs { get; private set; }
+        public static RoutedUICommand SmartECATUtility { get; private set; }
 
         static ConsoleControl()
         {
@@ -268,6 +270,12 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                 new KeyGesture(Key.F11, ModifierKeys.Control, "Ctrl+F11")
             };
             BrowseCIPAssemblyIOs = new RoutedUICommand("Browse CIP Assembly IO", "Browse CIP Assembly IO in IO Allocation File", typeof(ConsoleControl), gestureImportCIPAssemblyIOs);
+
+            InputGestureCollection gestureSmartECATUtility = new InputGestureCollection
+            {
+                new KeyGesture(Key.F12, ModifierKeys.Control, "Ctrl+F12")
+            };
+            SmartECATUtility = new RoutedUICommand("SMART-ECAT Utility", "Open SMART-ECAT Utility Window", typeof(ConsoleControl), gestureSmartECATUtility); 
         }
     }
 

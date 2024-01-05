@@ -35,8 +35,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility
             get { return __timeout_value; }
             set
             {
-                if (value < 0)
-                    throw new ArgumentOutOfRangeException("The setting value should be greater than or equal to 0.");
+                if (value < -1)
+                    throw new ArgumentOutOfRangeException("The setting value should be greater than or equal to -1.");
                 else
                     __timeout_value = value;
             }
@@ -47,8 +47,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility
             get { return __read_write_timeout_value; }
             set
             {
-                if (value < 0)
-                    throw new ArgumentOutOfRangeException("The setting value should be greater than or equal to 0.");
+                if (value < -1)
+                    throw new ArgumentOutOfRangeException("The setting value should be greater than or equal to -1.");
                 else
                     __read_write_timeout_value = value;
             }

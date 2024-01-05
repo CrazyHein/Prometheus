@@ -33,6 +33,7 @@
         <CommandBinding Command="local:ConsoleControl.BrowseEtherCATPDOs" Executed="BrowseEtherCATPDOs_Executed" CanExecute="BrowseEtherCATPDOs_CanExecuted"/>
         <CommandBinding Command="local:ConsoleControl.EventHistory" Executed="EventHistory_Executed" CanExecute="EventHistory_CanExecuted"/>
         <CommandBinding Command="local:ConsoleControl.BrowseCIPAssemblyIOs" Executed="BrowseCIPAssemblyIOs_Executed" CanExecute="BrowseCIPAssemblyIOs_CanExecuted"/>
+        <CommandBinding Command="local:ConsoleControl.SmartECATUtility" Executed="SmartECATUtiltiy_Executed" CanExecute="SmartECATUtiltiy_CanExecuted"/>
     </Window.CommandBindings>
     <Window.Resources>
         <local:InvertBooleanValue x:Key="InvertBoolean"/>
@@ -158,7 +159,6 @@
                     <BitmapImage  UriSource="imgs/pdos.png"/>
                 </sync:ButtonAdv.LargeIcon>
             </sync:ButtonAdv>
-            <sync:ToolBarItemSeparator/>
             <sync:ButtonAdv Command="local:ConsoleControl.EventHistory" SizeMode="Large" Label="LOG" Margin="2" Width="60">
                 <sync:ButtonAdv.LargeIcon>
                     <BitmapImage  UriSource="imgs/log.png"/>
@@ -333,7 +333,6 @@
                         </sync:MenuItemAdv.Icon>
                     </sync:MenuItemAdv>
                 </sync:MenuItemAdv>
-                <sync:MenuItemSeparator/>
                 <sync:MenuItemAdv Header="FTP Tools">
                     <sync:MenuItemAdv.Icon>
                         <Image Source="imgs/ftp.png" Height="28" Width="28"/>
@@ -354,14 +353,10 @@
                         </sync:MenuItemAdv.Icon>
                     </sync:MenuItemAdv>
                 </sync:MenuItemAdv>
+                <sync:MenuItemSeparator/>
                 <sync:MenuItemAdv Command="local:ConsoleControl.ControllerRemoteOperation">
                     <sync:MenuItemAdv.Icon>
                         <Image Source="imgs/remote.png" Height="28" Width="28"/>
-                    </sync:MenuItemAdv.Icon>
-                </sync:MenuItemAdv>
-                <sync:MenuItemAdv Command="local:ConsoleControl.BrowseEtherCATPDOs" ToolTip="Browse EtherCAT PDOs in ENI">
-                    <sync:MenuItemAdv.Icon>
-                        <Image Source="imgs/pdos.png" Height="28" Width="28"/>
                     </sync:MenuItemAdv.Icon>
                 </sync:MenuItemAdv>
                 <sync:MenuItemAdv Command="local:ConsoleControl.EventHistory" ToolTip="Browse R12CCPU-V Event History">
@@ -369,9 +364,19 @@
                         <Image Source="imgs/log.png" Height="28" Width="28"/>
                     </sync:MenuItemAdv.Icon>
                 </sync:MenuItemAdv>
+                <sync:MenuItemAdv Command="local:ConsoleControl.BrowseEtherCATPDOs" ToolTip="Browse EtherCAT PDOs in ENI">
+                    <sync:MenuItemAdv.Icon>
+                        <Image Source="imgs/pdos.png" Height="28" Width="28"/>
+                    </sync:MenuItemAdv.Icon>
+                </sync:MenuItemAdv>
                 <sync:MenuItemAdv Command="local:ConsoleControl.BrowseCIPAssemblyIOs" ToolTip="Browse CIP Assembly IO in CIP Assembly IO Allocation File">
                     <sync:MenuItemAdv.Icon>
                         <Image Source="imgs/pdos.png" Height="28" Width="28"/>
+                    </sync:MenuItemAdv.Icon>
+                </sync:MenuItemAdv>
+                <sync:MenuItemAdv Command="local:ConsoleControl.SmartECATUtility" ToolTip="Open SMART-ECAT Utility Dialog">
+                    <sync:MenuItemAdv.Icon>
+                        <Image Source="imgs/tool.png" Height="28" Width="28"/>
                     </sync:MenuItemAdv.Icon>
                 </sync:MenuItemAdv>
             </sync:MenuItemAdv>

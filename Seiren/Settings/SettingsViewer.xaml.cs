@@ -90,11 +90,27 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                 Settings.DAQTargetProperty = DAQSettings.DataContext as DAQTargetProperty;
                 Settings.PreferenceProperty = PreferenceSettings.DataContext as PreferenceProperty;
                 Settings.FTPTargetProperty = FTPSettings.DataContext as FTPTargetProperty;
-                Settings.Save();
+                try
+                {
+                    Settings.Save();
+                }
+                catch (Exception ex)
+                {                    
+                    MessageBox.Show(this, $"At least one unexpected error occured while saving settings to configuration file : '{Settings.SettingsPath}'.\n" + ex.Message, "Error Message", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
                 if (!System.IO.Directory.Exists(Settings.DAQTargetProperty.DataFilePath))
                 {
-                    if(MessageBox.Show($"Create directory --> {System.IO.Path.GetFullPath(Settings.DAQTargetProperty.DataFilePath)}?", "Question", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
-                        System.IO.Directory.CreateDirectory(Settings.DAQTargetProperty.DataFilePath);
+                    if (MessageBox.Show($"Create directory --> {System.IO.Path.GetFullPath(Settings.DAQTargetProperty.DataFilePath)}?", "Question", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+                    {
+                        try
+                        {
+                            System.IO.Directory.CreateDirectory(Settings.DAQTargetProperty.DataFilePath);
+                        }
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show(this, $"At least one unexpected error occured while creating directory : '{Settings.DAQTargetProperty.DataFilePath}'.\n" + ex.Message, "Error Message", MessageBoxButton.OK, MessageBoxImage.Error); 
+                        }
+                    }
                 }
                 DialogResult = true;
             }
@@ -121,11 +137,18 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                 save.Filter = "Seiren Configuration File(*.json)|*.json";
                 if (save.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                 {
-                    Settings s = new Settings(DebuggerSettings.DataContext as SlmpTargetProperty, 
-                        DAQSettings.DataContext as DAQTargetProperty, 
-                        FTPSettings.DataContext as FTPTargetProperty, 
-                        PreferenceSettings.DataContext as PreferenceProperty);
-                    s.Save(save.FileName);
+                    try
+                    {
+                        Settings s = new Settings(DebuggerSettings.DataContext as SlmpTargetProperty,
+                            DAQSettings.DataContext as DAQTargetProperty,
+                            FTPSettings.DataContext as FTPTargetProperty,
+                            PreferenceSettings.DataContext as PreferenceProperty);
+                        s.Save(save.FileName);
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show(this, $"At least one unexpected error occured while saving settings to configuration file : '{save.FileName}'.\n" + ex.Message, "Error Message", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
                 }
             }
         }

@@ -62,24 +62,32 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         {
             if (path == null)
                 path = SettingsPath;
-            using var ms = new MemoryStream();
-            using var writer = new Utf8JsonWriter(ms, new JsonWriterOptions() { Indented = true });
-            writer.WriteStartObject();
-            writer.WritePropertyName("Debugger");
-            SlmpTargetProperty.Save(writer);
-            writer.WritePropertyName("DAQ");
-            DAQTargetProperty.Save(writer);
-            writer.WritePropertyName("FTP");
-            FTPTargetProperty.Save(writer);
-            writer.WritePropertyName("Preference");
-            PreferenceProperty.Save(writer);
-            writer.WriteEndObject();
-            writer.Flush();
+            try
+            {
+                using var ms = new MemoryStream();
+                using var writer = new Utf8JsonWriter(ms, new JsonWriterOptions() { Indented = true });
+                writer.WriteStartObject();
+                writer.WritePropertyName("Debugger");
+                SlmpTargetProperty.Save(writer);
+                writer.WritePropertyName("DAQ");
+                DAQTargetProperty.Save(writer);
+                writer.WritePropertyName("FTP");
+                FTPTargetProperty.Save(writer);
+                writer.WritePropertyName("Preference");
+                PreferenceProperty.Save(writer);
+                writer.WriteEndObject();
+                writer.Flush();
 
-            using var fs = new FileStream(path, FileMode.Create, FileAccess.Write);
-            ms.Seek(0, SeekOrigin.Begin);
-            ms.CopyTo(fs);
-            fs.Flush();
+                using var fs = new FileStream(path, FileMode.Create, FileAccess.Write);
+                ms.Seek(0, SeekOrigin.Begin);
+                ms.CopyTo(fs);
+                fs.Flush();
+            }
+            catch (Exception ex)
+            {
+                DebugConsole.WriteException(ex);
+                throw;
+            }
 
             DebugConsole.WriteInfo($"Save settings to configuration file : '{path}'.");
         }
@@ -90,6 +98,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                 path = SettingsPath;
             try
             {
+                DebugConsole.WriteInfo($"Read settings from configuration file : '{path}'.");
                 ReadOnlySpan<byte> fs = File.ReadAllBytes(path);
                 if (fs.StartsWith(__UTF8_BOM)) fs = fs.Slice(__UTF8_BOM.Length);
 
@@ -127,8 +136,6 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                 DAQTargetProperty ??= new DAQTargetProperty();
                 FTPTargetProperty ??= new FTPTargetProperty();
                 PreferenceProperty ??= new PreferenceProperty();
-
-                DebugConsole.WriteInfo($"Read settings from configuration file : '{path}'.");
             }
         }
     }

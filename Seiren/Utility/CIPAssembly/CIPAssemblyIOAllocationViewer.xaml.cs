@@ -47,6 +47,18 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility
                 variable.IsChecked = false;
         }
 
+        private void ButtonSelect_Click(object sender, RoutedEventArgs e)
+        {
+            foreach (CIPAssemblyIOInfo variable in VariableViewer.SelectedItems)
+                variable.IsChecked = true;
+        }
+
+        private void ButtonUnselect_Click(object sender, RoutedEventArgs e)
+        {
+            foreach (CIPAssemblyIOInfo variable in VariableViewer.SelectedItems)
+                variable.IsChecked = false;
+        }
+
         private void AddRecordCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             __host.AddCIPAssemblyIO(VariableViewer.SelectedItem as CIPAssemblyIOInfo);

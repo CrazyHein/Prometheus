@@ -78,6 +78,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         private CIPAssemblyIOAllocationViewer __cip_assembly_io_viewer;
         private CIPAssemblyIODataTypeConverter __cip_assembly_io_datatype_converter;
 
+        private SmartECATUtility __smart_ecat_utility;
+
         #region Properties
         /// <summary>
         /// Gets or sets the current visual style.
@@ -557,7 +559,16 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                 save.InitialDirectory = System.IO.Path.Combine(System.Environment.CurrentDirectory, __settings.UserSettingsPath);
                 save.Filter = "Seiren Configuration File(*.json)|*.json";
                 if (save.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-                    __settings.Save(save.FileName);
+                {
+                    try
+                    {
+                        __settings.Save(save.FileName);
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show(this, $"At least one unexpected error occured while saving settings to configuration file : '{save.FileName}'.\n" + ex.Message, "Error Message", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                }
 
             }
             else if (__viewers.TryGetValue(e.Item, out v) && v != __current_user_control)
@@ -1154,6 +1165,20 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             e.CanExecute = __cip_assembly_io_viewer == null || __cip_assembly_io_viewer.IsClosed;
         }
 
+        private void SmartECATUtiltiy_Executed(object sender, System.Windows.Input.ExecutedRoutedEventArgs e)
+        {
+            if(MessageBox.Show("Are you sure to launch SMART-ECAT Utility ?", "Question", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+            {
+                __smart_ecat_utility = new SmartECATUtility(new SmartECATUtilityModel());
+                __smart_ecat_utility.Show();
+            }           
+        }
+
+        private void SmartECATUtiltiy_CanExecuted(object sender, System.Windows.Input.CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = __smart_ecat_utility == null || __smart_ecat_utility.IsClosed;
+        }
+
         private string __compare_result((VariableDictionary vd, ControllerConfiguration cc, ObjectDictionary od,
                     ProcessDataImage txdiag, ProcessDataImage txbit, ProcessDataImage txblk,
                     ProcessDataImage rxctl, ProcessDataImage rxbit, ProcessDataImage rxblk, InterlockCollection intlk,
@@ -1252,6 +1277,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                 __ecat_pdo_viewer.Close();
             if (e.Cancel == false && __cip_assembly_io_viewer != null)
                 __cip_assembly_io_viewer.Close();
+
+            if (e.Cancel == false && __smart_ecat_utility != null)
+                __smart_ecat_utility.Close();
         }
 
         private void UndoMenuItemAdv_Click(object sender, RoutedEventArgs e)

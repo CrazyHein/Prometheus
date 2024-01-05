@@ -7,7 +7,7 @@
     <UseWindowsForms>true</UseWindowsForms>
     <RootNamespace>AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren</RootNamespace>
     <Nullable>annotations</Nullable>
-    <Version>0.22.4.0</Version>
+    <Version>0.22.4.1</Version>
     <Authors>CrazyHein</Authors>
     <Company>AMEC</Company>
     <ApplicationIcon>imgs\logo.ico</ApplicationIcon>
@@ -80,6 +80,7 @@
     <None Remove="imgs\startmonitoring.png" />
     <None Remove="imgs\stop.png" />
     <None Remove="imgs\stopdebugging.png" />
+    <None Remove="imgs\tool.png" />
     <None Remove="imgs\type.png" />
     <None Remove="imgs\uncheck.png" />
     <None Remove="imgs\undo.png" />
@@ -142,6 +143,7 @@
     <Resource Include="imgs\startdebugging.png" />
     <Resource Include="imgs\stop.png" />
     <Resource Include="imgs\stopdebugging.png" />
+    <Resource Include="imgs\tool.png" />
     <Resource Include="imgs\type.png" />
     <Resource Include="imgs\uncheck.png" />
     <Resource Include="imgs\undo.png" />
@@ -250,12 +252,42 @@
     <None Update="Metadata\data_type_catalogue.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-  </ItemGroup>
-
-  
-  
-  <ItemGroup>
-    <Folder Include="SMART_ECAT\" />
+    <None Update="Metadata\SMART-ECAT\0_08_014\R12CCPU_V\ecatAPL_ClassA.out">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Metadata\SMART-ECAT\0_08_014\R12CCPU_V\emllDW3504.out">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Metadata\SMART-ECAT\0_08_014\RD55UP06_V\ecatAPL_ClassA.out">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Metadata\SMART-ECAT\0_08_014\RD55UP06_V\emllDW3504.out">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Metadata\SMART-ECAT\0_08_014\RD55UP12_V\ecatAPL_ClassA.out">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Metadata\SMART-ECAT\0_08_014\RD55UP12_V\emllDW3504.out">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Metadata\SMART-ECAT\R12CCPU_V\ecatAPL_ClassA.out">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Metadata\SMART-ECAT\R12CCPU_V\emllDW3504.out">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Metadata\SMART-ECAT\RD55UP06_V\ecatAPL_ClassA.out">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Metadata\SMART-ECAT\RD55UP06_V\emllDW3504.out">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Metadata\SMART-ECAT\RD55UP12_V\ecatAPL_ClassA.out">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Metadata\SMART-ECAT\RD55UP12_V\emllDW3504.out">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

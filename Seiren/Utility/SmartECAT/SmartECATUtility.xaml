@@ -1,0 +1,290 @@
+﻿<Window x:Class="AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility.SmartECATUtility"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren"
+        xmlns:utility="clr-namespace:AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility"
+        xmlns:sync="http://schemas.syncfusion.com/wpf"
+        xmlns:syncfusionskin ="clr-namespace:Syncfusion.SfSkinManager;assembly=Syncfusion.SfSkinManager.WPF"
+        xmlns:sys="clr-namespace:System;assembly=mscorlib"
+        mc:Ignorable="d"
+        Title="SMART-ECAT Utility" Height="800" Width="1000" Closed="Window_Closed">
+    <Grid syncfusionskin:SfSkinManager.Theme="{syncfusionskin:SkinManagerExtension ThemeName=FluentLight}">
+        <Grid.Resources>
+            <local:IPv4TextConverter x:Key="IPv4"/>
+            <local:InvertBooleanValue x:Key="InvertBoolean"/>
+            <ObjectDataProvider ObjectType="{x:Type sys:Enum}" MethodName="GetValues" x:Key="platforms">
+                <ObjectDataProvider.MethodParameters>
+                    <x:Type TypeName="utility:SmartECATPlatform"/>
+                </ObjectDataProvider.MethodParameters>
+            </ObjectDataProvider>
+            <ObjectDataProvider ObjectType="{x:Type sys:Enum}" MethodName="GetValues" x:Key="ports">
+                <ObjectDataProvider.MethodParameters>
+                    <x:Type TypeName="utility:SmartECATMainPort"/>
+                </ObjectDataProvider.MethodParameters>
+            </ObjectDataProvider>
+        </Grid.Resources>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition />
+        </Grid.RowDefinitions>
+        <StackPanel Grid.Row="0" Margin="2" Orientation="Horizontal">
+            <sync:ButtonAdv SizeMode="Large" Label="Save" Margin="2" Width="60" Click="SaveButtonAdv_Click" Height="50">
+                <sync:ButtonAdv.LargeIcon>
+                    <BitmapImage  UriSource="../../imgs/save.png"/>
+                </sync:ButtonAdv.LargeIcon>
+            </sync:ButtonAdv>
+        </StackPanel>
+        <TabControl TabStripPlacement="Top" Margin="4" Grid.Row="1">
+            <TabControl.Resources>
+                <Style TargetType="TextBox">
+                    <Style.Triggers>
+                        <Trigger Property="Validation.HasError" Value="true">
+                            <Setter Property="ToolTip" Value="{Binding RelativeSource={RelativeSource Mode=Self}, Path=(Validation.Errors)[0].ErrorContent}" />
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </TabControl.Resources>
+            <TabItem Width="150" Header="FTP">
+                <Grid x:Name="FTPSettingsGrid" Margin="0,8,0,0" Validation.Error="FTPSettingsGrid_Error">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="auto"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+
+                    <sync:SfTextInputLayout Grid.Row="0" Hint="Host" HelperText="Input FTP host IPv4 here" ContainerType="Filled" FontStyle="Italic" FontSize="12" Margin="4,8,4,8" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}">
+                        <TextBox Text="{Binding SmartECATProperty.FTPTargetProperty.HostIPv4String, ValidatesOnExceptions=True, NotifyOnValidationError=True}" FontStyle="Normal"/>
+                    </sync:SfTextInputLayout>
+                    <sync:SfTextInputLayout Grid.Row="0" Grid.Column="1" Hint="Port" HelperText="Input FTP host port here" ContainerType="Filled" FontStyle="Italic" FontSize="12" Margin="4,8,4,8" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}">
+                        <TextBox Text="{Binding SmartECATProperty.FTPTargetProperty.HostPort, ValidatesOnExceptions=True, NotifyOnValidationError=True}" FontStyle="Normal"/>
+                    </sync:SfTextInputLayout>
+                    <sync:SfTextInputLayout Grid.Row="1" Hint="User" HelperText="Input login user name here" ContainerType="Filled" FontStyle="Italic" FontSize="12" Margin="4,8,4,8">
+                        <TextBox Text="{Binding SmartECATProperty.FTPTargetProperty.User}" FontStyle="Normal"/>
+                    </sync:SfTextInputLayout>
+                    <sync:SfTextInputLayout Grid.Row="1" Grid.Column="1" Hint="Password" HelperText="Input login password here" ContainerType="Filled" FontStyle="Italic" FontSize="12" Margin="4,8,4,8">
+                        <TextBox Text="{Binding SmartECATProperty.FTPTargetProperty.Password}" FontStyle="Normal"/>
+                    </sync:SfTextInputLayout>
+
+                    <sync:SfTextInputLayout Grid.Row="2" Hint="Timeout" HelperText="Input timeout value here" ContainerType="Filled" FontStyle="Italic" FontSize="12" Margin="4,8,4,8" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}">
+                        <TextBox Text="{Binding SmartECATProperty.FTPTargetProperty.TimeoutValue, ValidatesOnExceptions=True, NotifyOnValidationError=True}" FontStyle="Normal"/>
+                    </sync:SfTextInputLayout>
+                    <sync:SfTextInputLayout Grid.Row="2" Grid.Column="1" Hint="Read &amp; Write Timeout" HelperText="Input read/write timeout value here" ContainerType="Filled" FontStyle="Italic" FontSize="12" Margin="4,8,4,8" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}">
+                        <TextBox Text="{Binding SmartECATProperty.FTPTargetProperty.ReadWriteTimeoutValue, ValidatesOnExceptions=True, NotifyOnValidationError=True}" FontStyle="Normal"/>
+                    </sync:SfTextInputLayout>
+                </Grid>
+            </TabItem>
+            <TabItem Width="150" Header="Installer">
+                <DockPanel Margin="0,8,0,0">
+                    <DockPanel DockPanel.Dock="Bottom" Margin="0,10,0,0">
+                        <Button DockPanel.Dock="Right" Content="Start Transfer" Margin="4" IsEnabled="{Binding IsBusy, Converter={StaticResource InvertBoolean}}" Height="24" Click="StartTransferBtn_Click" Width="120"/>
+                        <StatusBar>
+                            <ProgressBar Width="120" Height="16" Minimum="0" Maximum="100" Value="{Binding InstallationProgress}" Margin="4"/>
+                            <Separator/>
+                            <TextBlock Text="{Binding InstallationState}" ToolTip="{Binding InstallationExceptionInfo}" Margin="4" VerticalAlignment="Center" />
+                        </StatusBar>
+                    </DockPanel>
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <Grid x:Name="InstallerSettingsGrid" Validation.Error="InstallerSettingsGrid_Error">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="auto"/>
+                                <RowDefinition Height="auto"/>
+                                <RowDefinition Height="auto"/>
+                                <RowDefinition Height="auto"/>
+                                <RowDefinition Height="auto"/>
+                            </Grid.RowDefinitions>
+                            <sync:SfBusyIndicator IsBusy="{Binding IsBusy}" Grid.RowSpan="5"/>
+                            <GroupBox Padding="0,8,0,0" Grid.Row="0" Margin="0,8,0,0">
+                                <GroupBox.Header>
+                                    <TextBlock Text="Platform"/>
+                                </GroupBox.Header>
+                                <UniformGrid Columns="2">
+                                    <sync:SfTextInputLayout Grid.Row="0" Hint="Platform Model"  HelperText="Select platform model here" FontSize="12" FontStyle="Italic" ContainerType="Filled" Margin="4,8,4,8">
+                                        <ComboBox FontStyle="Normal" ItemsSource="{Binding Source={StaticResource platforms}}" SelectedItem="{Binding SmartECATProperty.InstallerProperty.PlatformModel}" />
+                                    </sync:SfTextInputLayout>
+                                    <CheckBox Content="Boot From SD Card" Grid.Row="1" Grid.Column="0" Margin="4,8,4,8" IsChecked="{Binding SmartECATProperty.InstallerProperty.BootFromSD}"/>
+                                </UniformGrid>
+                            </GroupBox>
+                            <GroupBox Padding="0,8,0,0" Grid.Row="1">
+                                <GroupBox.Header>
+                                    <TextBlock Text="Firmware"/>
+                                </GroupBox.Header>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition/>
+                                    </Grid.ColumnDefinitions>
+                                    <sync:SfTextInputLayout Grid.Column="0" Grid.ColumnSpan="2" Hint="Available Versions"  HelperText="Select firmware version here" FontSize="12" FontStyle="Italic" ContainerType="Filled" Margin="4,8,4,8">
+                                        <ComboBox FontStyle="Normal" ItemsSource="{Binding AvailableFirmwareVersions}" SelectedItem="{Binding SelectedFirmwareVersion}" />
+                                    </sync:SfTextInputLayout>
+                                    <CheckBox Content="Install Realtime NIC Driver" Grid.Column="2" Margin="4,8,4,8" IsChecked="{Binding SmartECATProperty.InstallerProperty.TransferNIC}"/>
+                                    <CheckBox Content="Install Application" Grid.Column="3" Margin="4,8,4,8" IsChecked="{Binding SmartECATProperty.InstallerProperty.TransferAPP}"/>
+                                </Grid>
+                            </GroupBox>
+                            <GroupBox Padding="0,8,0,0" Grid.Row="2" Margin="0,8,0,0">
+                                <GroupBox.Header>
+                                    <CheckBox Name="CheckboxCFG" Content="Configuration" IsChecked="{Binding SmartECATProperty.InstallerProperty.TransferCFG}"/>
+                                </GroupBox.Header>
+                                <Grid IsEnabled="{Binding ElementName=CheckboxCFG, Path=IsChecked}">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition/>
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition/>
+                                        <RowDefinition/>
+                                    </Grid.RowDefinitions>
+                                    <sync:SfTextInputLayout Hint="Cycle Time(μs)" HelperText="Input SMART-ECAT cycle time in mirco-second here" ContainerType="Filled" FontStyle="Italic" FontSize="12" Margin="4,8,4,8" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}">
+                                        <TextBox Text="{Binding SmartECATProperty.InstallerProperty.CycleTime, ValidatesOnExceptions=True, NotifyOnValidationError=True}" FontStyle="Normal"/>
+                                    </sync:SfTextInputLayout>
+                                    <sync:SfTextInputLayout Grid.Column="1" Hint="Log File Size(kByte)" HelperText="Input log file size in kbyte here" ContainerType="Filled" FontStyle="Italic" FontSize="12" Margin="4,8,4,8" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}">
+                                        <TextBox Text="{Binding SmartECATProperty.InstallerProperty.LogFileSize, ValidatesOnExceptions=True, NotifyOnValidationError=True}" FontStyle="Normal"/>
+                                    </sync:SfTextInputLayout>
+                                    <sync:SfTextInputLayout Grid.Column="2" Hint="Number of Network Scan Reties" HelperText="Input number of network scan reties here" ContainerType="Filled" FontStyle="Italic" FontSize="12" Margin="4,8,4,8" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}">
+                                        <TextBox Text="{Binding SmartECATProperty.InstallerProperty.NumOfNetworkScanReties, ValidatesOnExceptions=True, NotifyOnValidationError=True}" FontStyle="Normal"/>
+                                    </sync:SfTextInputLayout>
+
+                                    <sync:SfTextInputLayout Grid.Column="3" Hint="Main Port"  HelperText="Select main port here" FontSize="12" FontStyle="Italic" ContainerType="Filled" Margin="4,8,4,8">
+                                        <ComboBox FontStyle="Normal" ItemsSource="{Binding Source={StaticResource ports}}" SelectedItem="{Binding SmartECATProperty.InstallerProperty.MainPort}" />
+                                    </sync:SfTextInputLayout>
+
+                                    <CheckBox Content="Enable DCM" Grid.Row="1" Grid.Column="0" Margin="4,8,4,8" IsChecked="{Binding SmartECATProperty.InstallerProperty.EnableDCM}"/>
+                                    <CheckBox Content="Enable Cable Redundancy" Grid.Row="1" Grid.Column="2" Margin="4,8,4,8" IsChecked="{Binding SmartECATProperty.InstallerProperty.EnableCableRedundancy}"/>
+                                </Grid>
+                            </GroupBox>
+                            <GroupBox Padding="0,8,0,0" Grid.Row="3" Margin="0,8,0,0">
+                                <GroupBox.Header>
+                                    <CheckBox x:Name="CheckboxENI" Content="Transfer EtherCAT Network Information File" IsChecked="{Binding SmartECATProperty.InstallerProperty.TransferNetworkInformation}"/>
+                                </GroupBox.Header>
+                                <Grid IsEnabled="{Binding ElementName=CheckboxENI, Path=IsChecked}">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition Width="auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="auto"/>
+                                    </Grid.RowDefinitions>
+                                    <sync:SfTextInputLayout Hint="EtherCAT Network Information File" FontSize="12" FontStyle="Italic" ContainerType="Filled" Margin="4,8,4,8" HintFloatMode="AlwaysFloat">
+                                        <TextBox FontStyle="Normal" Name="ENIPathTxt" IsReadOnly="True"/>
+                                    </sync:SfTextInputLayout>
+                                    <sync:ButtonAdv Grid.Column="1" Margin="4,8,4,8" Height="32" Width="100" Label="Browse" Click="BrowseENIBtn_Click">
+                                        <sync:ButtonAdv.SmallIcon>
+                                            <BitmapImage  UriSource="../../imgs/open.png"/>
+                                        </sync:ButtonAdv.SmallIcon>
+                                    </sync:ButtonAdv>
+                                </Grid>
+                            </GroupBox>
+                            <GroupBox Padding="0,8,0,0" Grid.Row="4" Margin="0,8,0,0">
+                                <GroupBox.Header>
+                                    <CheckBox x:Name="CheckboxLIC" Content="Transfer SMART-ECAT License File" IsChecked="{Binding SmartECATProperty.InstallerProperty.TransferLicense}"/>
+                                </GroupBox.Header>
+                                <Grid IsEnabled="{Binding ElementName=CheckboxLIC, Path=IsChecked}">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition Width="auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="auto"/>
+                                    </Grid.RowDefinitions>
+                                    <sync:SfTextInputLayout Hint="SMART-ECAT License File" FontSize="12" FontStyle="Italic" ContainerType="Filled" Margin="4,8,4,8" HintFloatMode="AlwaysFloat">
+                                        <TextBox FontStyle="Normal" x:Name="LICPathTxt" IsReadOnly="True"/>
+                                    </sync:SfTextInputLayout>
+                                    <sync:ButtonAdv Grid.Column="1" Margin="4,8,4,8" Height="32" Width="100" Label="Browse" Click="BrowseLICBtn_Click">
+                                        <sync:ButtonAdv.SmallIcon>
+                                            <BitmapImage  UriSource="../../imgs/open.png"/>
+                                        </sync:ButtonAdv.SmallIcon>
+                                    </sync:ButtonAdv>
+                                </Grid>
+                            </GroupBox>
+                        </Grid>
+                    </ScrollViewer>
+                </DockPanel>
+            </TabItem>
+            <TabItem Width="150" Header="Log Viewer">
+                <Grid Margin="0,8,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="4"/>
+                        <ColumnDefinition Width="2*"/>
+                    </Grid.ColumnDefinitions>
+                    <sync:SfBusyIndicator IsBusy="{Binding IsBusy}" Grid.ColumnSpan="3"/>
+                    <GridSplitter Grid.Column="1" Background="Gray" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="1"/>
+                    <TabControl Grid.Column="0" TabStripPlacement="Left" Padding="0" RenderTransformOrigin="0.5,0.5">
+                        <TabItem Header="FTP" Width="100">
+                            <TabItem.LayoutTransform>
+                                <TransformGroup>
+                                    <RotateTransform Angle="90"/>
+                                </TransformGroup>
+                            </TabItem.LayoutTransform>
+                            <DockPanel>
+                                <Button DockPanel.Dock="Bottom"  Margin="4" Content="Refresh Remote Log List" Click="RefreshRemoteLogListBtn_Click" Height="24" IsEnabled="{Binding IsBusy, Converter={StaticResource InvertBoolean}}"/>
+                                <sync:SfDataGrid ItemsSource="{Binding RemoteLogFileList}" ColumnSizer="AutoLastColumnFill" AllowResizingColumns="True" AllowTriStateSorting="True" AutoGenerateColumns="False" 
+                                     ShowSortNumbers="True" AllowSorting="True"
+                                     LiveDataUpdateMode="AllowDataShaping" ScrollMode="Async"
+                                     CellDoubleTapped="LogListGrid_CellDoubleTapped"
+                                     Margin="4" Background="Transparent">
+                                    <sync:SfDataGrid.Columns>
+                                        <sync:GridTextColumn ValueBinding="{Binding Name}" HeaderText="Name" MinimumWidth="200"/>
+                                        <sync:GridCheckBoxColumn ValueBinding="{Binding IsDirectory}" HeaderText="Folder" MinimumWidth="48"/>
+                                        <sync:GridTextColumn ValueBinding="{Binding Size}" HeaderText="Size"/>
+                                        <sync:GridTextColumn ValueBinding="{Binding LastModified}" HeaderText="Last Modified"/>
+                                    </sync:SfDataGrid.Columns>
+                                </sync:SfDataGrid>
+                            </DockPanel>
+                        </TabItem>
+                        <TabItem Header="Local" Width="100" >
+                            <TabItem.LayoutTransform>
+                                <TransformGroup>
+                                    <RotateTransform Angle="90"/>
+                                </TransformGroup>
+                            </TabItem.LayoutTransform>
+                            <DockPanel>
+                                <Button DockPanel.Dock="Bottom"  Margin="4" Content="Open Local Log Folder"  Click="OpenLocalLogFolderBtn_Click" Height="24" IsEnabled="{Binding IsBusy, Converter={StaticResource InvertBoolean}}"/>
+                                <sync:SfDataGrid ItemsSource="{Binding LocalLogFileList}" ColumnSizer="AutoLastColumnFill" AllowResizingColumns="True" AllowTriStateSorting="True" AutoGenerateColumns="False" 
+                                         ShowSortNumbers="True" AllowSorting="True"
+                                         LiveDataUpdateMode="AllowDataShaping" ScrollMode="Async"
+                                         CellDoubleTapped="LogListGrid_CellDoubleTapped"
+                                         Margin="4" Background="Transparent">
+                                    <sync:SfDataGrid.Columns>
+                                        <sync:GridTextColumn ValueBinding="{Binding Name}" HeaderText="Name" MinimumWidth="200"/>
+                                        <sync:GridCheckBoxColumn ValueBinding="{Binding IsDirectory}" HeaderText="Folder" Width="50"/>
+                                        <sync:GridTextColumn ValueBinding="{Binding Size}" HeaderText="Size"/>
+                                        <sync:GridTextColumn ValueBinding="{Binding LastModified}" HeaderText="Last Modified"/>
+                                    </sync:SfDataGrid.Columns>
+                                </sync:SfDataGrid>
+                            </DockPanel>
+                        </TabItem>
+                    </TabControl>
+                    <DockPanel Grid.Column="2">
+                        <DockPanel DockPanel.Dock="Bottom">
+                            <Button DockPanel.Dock="Right" Margin="4" Content="Save As" Width="100" IsEnabled="{Binding LogEntryIsEmpty, Converter={StaticResource InvertBoolean}}" Click="LogEntrySaveAsBtn_Click"/>
+                            <TextBox IsReadOnly="True" Margin="4" Text="{Binding CurrentOpenedLogFileName}" Height="24"/>
+                        </DockPanel>
+                        <sync:SfDataGrid ItemsSource="{Binding LogEntryList}" ColumnSizer="AutoLastColumnFill" AllowResizingColumns="True" AllowTriStateSorting="True" AutoGenerateColumns="False" 
+                                ShowSortNumbers="True" AllowSorting="True" AllowFiltering="True"
+                                LiveDataUpdateMode="AllowDataShaping" ScrollMode="Async"
+                                Margin="4" Background="Transparent">
+                            <sync:SfDataGrid.Columns>
+                                <sync:GridTextColumn ValueBinding="{Binding Timestamp, StringFormat={}{0:yy/MM/dd HH:mm:ss.FFF}}" HeaderText="Timestamp" MinimumWidth="150" AllowFiltering="False"/>
+                                <sync:GridTextColumn ValueBinding="{Binding Category}" HeaderText="Cataegory"/>
+                                <sync:GridTextColumn ValueBinding="{Binding Content}" HeaderText="Content"  AllowSorting="False"/>
+                            </sync:SfDataGrid.Columns>
+                        </sync:SfDataGrid>
+                    </DockPanel>
+                </Grid>
+            </TabItem>
+        </TabControl>
+    </Grid>
+</Window>
