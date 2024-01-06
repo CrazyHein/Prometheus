@@ -436,13 +436,16 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility
                     sw.Write($"retryNum={SmartECATProperty.InstallerProperty.NumOfNetworkScanReties}");
                 }
 
-                InstallationState = $"Transfer '{SmartECATInstallerProperty.DEFAULT_SETTING_INI_NAME}'.";
-                using (Stream sm = __ftp_upload_stream(
-                    $"ftp://{SmartECATProperty.FTPTargetProperty.HostIPv4}:{SmartECATProperty.FTPTargetProperty.HostPort}{SmartECATProperty.InstallerProperty.SETTING_PATH}",
-                    SmartECATInstallerProperty.DEFAULT_SETTING_INI_NAME, SmartECATProperty.FTPTargetProperty.User, SmartECATProperty.FTPTargetProperty.Password))
-                using (StreamWriter sw = new StreamWriter(sm, Encoding.ASCII))
+                if (SmartECATProperty.InstallerProperty.BootFromSD)
                 {
-                    sw.Write($"logFileSize={SmartECATProperty.InstallerProperty.LogFileSize*1024}");
+                    InstallationState = $"Transfer '{SmartECATInstallerProperty.DEFAULT_SETTING_INI_NAME}'.";
+                    using (Stream sm = __ftp_upload_stream(
+                        $"ftp://{SmartECATProperty.FTPTargetProperty.HostIPv4}:{SmartECATProperty.FTPTargetProperty.HostPort}{SmartECATProperty.InstallerProperty.SETTING_PATH}",
+                        SmartECATInstallerProperty.DEFAULT_SETTING_INI_NAME, SmartECATProperty.FTPTargetProperty.User, SmartECATProperty.FTPTargetProperty.Password))
+                    using (StreamWriter sw = new StreamWriter(sm, Encoding.ASCII))
+                    {
+                        sw.Write($"logFileSize={SmartECATProperty.InstallerProperty.LogFileSize * 1024}");
+                    }
                 }
 
                 InstallationState = $"Transfer '{SmartECATInstallerProperty.DEFAULT_STARTUP_CMD_NAME}'.";

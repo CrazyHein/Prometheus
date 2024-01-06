@@ -98,6 +98,20 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility
                 return;
             }
 
+            if (model.SmartECATProperty.InstallerProperty.TransferCFG)
+            {
+                string ignore = string.Empty;
+                if (model.SmartECATProperty.InstallerProperty.BootFromSD == false)
+                    ignore += "\nLog File Size(kByte)";
+                if (model.SmartECATProperty.InstallerProperty.PlatformModel == SmartECATPlatform.RD55UP06_V)
+                    ignore += "\nMain Port";
+                if (ignore != string.Empty)
+                {
+                    if(MessageBox.Show("The following field(s) will be ignored. Are you sure you want to continue?"+ignore, "Question", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.No)
+                        return;
+                }
+            }
+
             try
             {
                 model.IsBusy = true;

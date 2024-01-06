@@ -219,10 +219,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility
                     }
                     break;
                 case SmartECATPlatform.RD55UP06_V:
-                    if (MainPort == SmartECATMainPort.CH1)
-                        cable = "-DW3504 2 1 rd55up06";
-                    else
-                        cable = "-DW3504 1 1 rd55up06";
+                    cable = "-DW3504 2 1 rd55up06";
                     break;
                 case SmartECATPlatform.RD55UP12_V:
                     if (EnableCableRedundancy)
