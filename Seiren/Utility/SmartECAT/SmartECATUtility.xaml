@@ -14,6 +14,7 @@
         <Grid.Resources>
             <local:IPv4TextConverter x:Key="IPv4"/>
             <local:InvertBooleanValue x:Key="InvertBoolean"/>
+            <utility:IsDualNetworkPortPlatform x:Key="DualNetwortPort"/>
             <ObjectDataProvider ObjectType="{x:Type sys:Enum}" MethodName="GetValues" x:Key="platforms">
                 <ObjectDataProvider.MethodParameters>
                     <x:Type TypeName="utility:SmartECATPlatform"/>
@@ -108,9 +109,9 @@
                                 </GroupBox.Header>
                                 <UniformGrid Columns="3">
                                     <sync:SfTextInputLayout Grid.Row="0" Hint="Platform Model"  HelperText="Select platform model here" FontSize="12" FontStyle="Italic" ContainerType="Filled" Margin="4,8,4,8">
-                                        <ComboBox FontStyle="Normal" ItemsSource="{Binding Source={StaticResource platforms}}" SelectedItem="{Binding SmartECATProperty.InstallerProperty.PlatformModel}" />
+                                        <ComboBox x:Name="PlatformCombo" FontStyle="Normal" ItemsSource="{Binding Source={StaticResource platforms}}" SelectedItem="{Binding SmartECATProperty.InstallerProperty.PlatformModel}" />
                                     </sync:SfTextInputLayout>
-                                    <CheckBox Content="Boot From SD Card" Grid.Row="1" Grid.Column="0" Margin="4,8,4,8" IsChecked="{Binding SmartECATProperty.InstallerProperty.BootFromSD}"/>
+                                    <CheckBox x:Name="BootFromSDChk" Content="Boot From SD Card" Grid.Row="1" Grid.Column="0" Margin="4,8,4,8" IsChecked="{Binding SmartECATProperty.InstallerProperty.BootFromSD}"/>
                                 </UniformGrid>
                             </GroupBox>
                             <GroupBox Padding="0,8,0,0" Grid.Row="1">
@@ -148,19 +149,19 @@
                                     <sync:SfTextInputLayout Hint="Cycle Time(μs)" HelperText="Input SMART-ECAT cycle time in mirco-second here" ContainerType="Filled" FontStyle="Italic" FontSize="12" Margin="4,8,4,8" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}">
                                         <TextBox Text="{Binding SmartECATProperty.InstallerProperty.CycleTime, ValidatesOnExceptions=True, NotifyOnValidationError=True}" FontStyle="Normal"/>
                                     </sync:SfTextInputLayout>
-                                    <sync:SfTextInputLayout Grid.Column="1" Hint="Log File Size(kByte)" HelperText="(Boot from SD)Input log file size in kbyte here" ContainerType="Filled" FontStyle="Italic" FontSize="12" Margin="4,8,4,8" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}">
+                                    <sync:SfTextInputLayout Grid.Column="1" IsEnabled="{Binding ElementName=BootFromSDChk, Path=IsChecked}" Hint="Log File Size(kByte)" HelperText="(Boot from SD)Input log file size in kbyte here" ContainerType="Filled" FontStyle="Italic" FontSize="12" Margin="4,8,4,8" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}">
                                         <TextBox Text="{Binding SmartECATProperty.InstallerProperty.LogFileSize, ValidatesOnExceptions=True, NotifyOnValidationError=True}" FontStyle="Normal"/>
                                     </sync:SfTextInputLayout>
                                     <sync:SfTextInputLayout Grid.Column="2" Hint="Number of Network Scan Reties" HelperText="Input number of network scan reties here" ContainerType="Filled" FontStyle="Italic" FontSize="12" Margin="4,8,4,8" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}">
                                         <TextBox Text="{Binding SmartECATProperty.InstallerProperty.NumOfNetworkScanReties, ValidatesOnExceptions=True, NotifyOnValidationError=True}" FontStyle="Normal"/>
                                     </sync:SfTextInputLayout>
 
-                                    <sync:SfTextInputLayout Grid.Row="2" Grid.Column="0" Hint="Main Port"  HelperText="(R12CCPU_V/RD55UP12_V)Select main port here" FontSize="12" FontStyle="Italic" ContainerType="Filled" Margin="4,8,4,8">
+                                    <sync:SfTextInputLayout Grid.Row="2" Grid.Column="0" IsEnabled="{Binding ElementName=PlatformCombo, Path=SelectedItem, Converter={StaticResource DualNetwortPort}}" Hint="Main Port"  HelperText="(R12CCPU_V/RD55UP12_V)Select main port here" FontSize="12" FontStyle="Italic" ContainerType="Filled" Margin="4,8,4,8">
                                         <ComboBox FontStyle="Normal" ItemsSource="{Binding Source={StaticResource ports}}" SelectedItem="{Binding SmartECATProperty.InstallerProperty.MainPort}" />
                                     </sync:SfTextInputLayout>
 
                                     <CheckBox Content="Enable DCM" Grid.Row="2" Grid.Column="1" Margin="4,8,4,8" IsChecked="{Binding SmartECATProperty.InstallerProperty.EnableDCM}"/>
-                                    <CheckBox Content="Enable Cable Redundancy" Grid.Row="2" Grid.Column="2" Margin="4,8,4,8" IsChecked="{Binding SmartECATProperty.InstallerProperty.EnableCableRedundancy}"/>
+                                    <CheckBox IsEnabled="{Binding ElementName=PlatformCombo, Path=SelectedItem, Converter={StaticResource DualNetwortPort}}" Content="Enable Cable Redundancy" Grid.Row="2" Grid.Column="2" Margin="4,8,4,8" IsChecked="{Binding SmartECATProperty.InstallerProperty.EnableCableRedundancy}"/>
                                 </Grid>
                             </GroupBox>
                             <GroupBox Padding="0,8,0,0" Grid.Row="3" Margin="0,8,0,0">
@@ -276,7 +277,7 @@
                                 LiveDataUpdateMode="AllowDataShaping" ScrollMode="Async"
                                 Margin="4" Background="Transparent">
                             <sync:SfDataGrid.Columns>
-                                <sync:GridTextColumn ValueBinding="{Binding Timestamp, StringFormat={}{0:yy/MM/dd HH:mm:ss.FFF}}" HeaderText="Timestamp" MinimumWidth="150" AllowFiltering="False"/>
+                                <sync:GridTextColumn ValueBinding="{Binding Timestamp, StringFormat={}{0:yy/MM/dd HH:mm:ss.fff}}" HeaderText="Timestamp" MinimumWidth="150" AllowFiltering="False"/>
                                 <sync:GridTextColumn ValueBinding="{Binding Category}" HeaderText="Cataegory"/>
                                 <sync:GridTextColumn ValueBinding="{Binding Content}" HeaderText="Content"  AllowSorting="False"/>
                             </sync:SfDataGrid.Columns>

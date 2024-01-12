@@ -251,25 +251,32 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility
         {
             string line, subline;
             List<SmartECATLogEntry> entries = new List<SmartECATLogEntry>();
-            while ((line = sr.ReadLine()) != null)
+            try
             {
-                var matchs = SmartECATLogEntry.ENTRY_PATTERN.Matches(line);
-                if (matchs.Count == 0)
+                while ((line = sr.ReadLine()) != null)
                 {
-                    if (entries.Count != 0)
-                        entries[entries.Count - 1].AppendContent(line);
-                    continue;
-                }
+                    var matchs = SmartECATLogEntry.ENTRY_PATTERN.Matches(line);
+                    if (matchs.Count == 0)
+                    {
+                        if (entries.Count != 0)
+                            entries[entries.Count - 1].AppendContent(line);
+                        continue;
+                    }
 
-                foreach (Match match in matchs)
-                {
-                    if (match.NextMatch().Success == true)
-                        subline = line.Substring(match.Groups["Content"].Index, match.NextMatch().Groups["Timestamp"].Index -1 - match.Groups["Content"].Index);
-                    else
-                        subline = line.Substring(match.Groups["Content"].Index);
-                    entries.Add(new SmartECATLogEntry(DateTime.ParseExact(match.Groups["Timestamp"].Value, SmartECATLogEntry.TIMESTAMP_FORMAT, CultureInfo.InvariantCulture),
-                        match.Groups["Category"].Value.Trim(), subline));
+                    foreach (Match match in matchs)
+                    {
+                        if (match.NextMatch().Success == true)
+                            subline = line.Substring(match.Groups["Content"].Index, match.NextMatch().Groups["Timestamp"].Index - 1 - match.Groups["Content"].Index);
+                        else
+                            subline = line.Substring(match.Groups["Content"].Index);
+                        entries.Add(new SmartECATLogEntry(DateTime.ParseExact(match.Groups["Timestamp"].Value, SmartECATLogEntry.TIMESTAMP_FORMAT, CultureInfo.InvariantCulture),
+                            match.Groups["Category"].Value.Trim(), subline));
+                    }
                 }
+            }
+            catch (ObjectDisposedException)
+            {
+                return entries;
             }
             return entries;
         }
@@ -386,6 +393,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility
         }
         public void TransferFirmwareFile()
         {
+            if (SelectedFirmwareVersion == null)
+                return;
             try
             {
                 if (SmartECATProperty.InstallerProperty.TransferNIC)

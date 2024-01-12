@@ -6,7 +6,7 @@
     <UseWPF>true</UseWPF>
     <UseWindowsForms>true</UseWindowsForms>
     <RootNamespace>AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Xandria</RootNamespace>
-    <Version>0.4.0</Version>
+    <Version>0.4.0.1</Version>
     <Company>AMEC</Company>
     <Authors>CrazyHein</Authors>
     <ApplicationIcon>imgs\logo.ico</ApplicationIcon>
@@ -126,6 +126,21 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Metadata\data_type_catalogue.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Metadata\Orbment\20240109\vx_R2H_DLink.out">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Metadata\Orbment\20240109\vx_R2H_EthModule.out">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Metadata\Orbment\20240109\vx_R2H_ExtModule.out">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Metadata\Orbment\20240109\vx_R2H_ILink.out">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Metadata\Orbment\20240109\vx_R2H_Task.out">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

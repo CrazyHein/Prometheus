@@ -3,12 +3,14 @@ using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.DAQ;
 using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Debugger;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using System.Windows.Data;
 
 namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility
 {
@@ -24,6 +26,28 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility
         CH1,
         CH2,
     }
+
+    public class IsDualNetworkPortPlatform : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if(value is SmartECATPlatform)
+            {
+                SmartECATPlatform platform = (SmartECATPlatform)value;
+                if (platform == SmartECATPlatform.RD55UP06_V)
+                    return false;
+                return true;
+            }   
+            else
+                return false;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
     public class SmartECATProperty
     {
         public string SettingsPath { get; init; } = "smart_ecat.json";

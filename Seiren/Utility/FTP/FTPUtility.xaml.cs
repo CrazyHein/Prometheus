@@ -50,6 +50,13 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility
                 CheckboxVAR.IsChecked = true;
                 CheckboxVAR.IsEnabled = false;
             }
+            else
+            {
+                CheckboxVAR.IsChecked = true;
+                CheckboxVAR.IsEnabled = false;
+                CheckboxIO.IsChecked = true;
+                CheckboxIO.IsEnabled = false;
+            }
         }
 
         public (VariableDictionary vd, ControllerConfiguration cc, ObjectDictionary od,
@@ -98,7 +105,30 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility
                     model.IsBusy = true;
                     try
                     {
-                        await Task.Run(() => model.Download());
+                        ConsistencyResult ret = ConsistencyResult.Unknown;
+                        IEnumerable<DeviceConfiguration> notfound = null;
+                        bool download = false;
+                        await Task.Run(() => (ret, notfound) = model.ConfigurationConsistency());
+                        if(ret == ConsistencyResult.Exception)
+                        {
+                            var rsp = MessageBox.Show("Can not read hardware configuration file, so the consistency check is not performed.\nAre you sure you want to download IO List anyway?", "Question", MessageBoxButton.YesNo, MessageBoxImage.Question);
+                            if (rsp == MessageBoxResult.Yes)
+                                download = true;
+                        }
+                        else if(ret == ConsistencyResult.Inconsistent)
+                        {
+                            SimpleDeviceConfigurationViewer result = new SimpleDeviceConfigurationViewer("Consistency Check Result",
+                                "The following hardware configuration(s) in IO List file is(are) not found in the system hardware configuration(s).\nAre you sure you want to download IO List anyway?",
+                                notfound);
+                            
+                            if (result.ShowDialog() == true)
+                                download = true;
+                        }
+                        else
+                            download = true;
+
+                        if (download)
+                            await Task.Run(() => model.Download());
                     }
                     catch (Exception ex)
                     {

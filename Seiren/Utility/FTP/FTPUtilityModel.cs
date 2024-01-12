@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Net;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility
@@ -15,6 +16,15 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility
         Download,
         Compare
     }
+
+    public enum ConsistencyResult
+    {
+        Consistent,
+        Inconsistent,
+        Exception,
+        Unknown
+    }
+
     class FTPUtilityModel : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
@@ -89,7 +99,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility
             get { return __variable_dictionary_path; }
             set
             {
-                if (value == null || value.Trim().Length == 0)
+                if (Regex.IsMatch(value, @"^(/[^/]+)+$") == false)
                     throw new ArgumentException("Invalid variable dictionary file path");
                 __variable_dictionary_path = value;
             }
@@ -100,7 +110,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility
             get { return __io_list_path; }
             set
             {
-                if (value == null || value.Trim().Length == 0)
+                if (Regex.IsMatch(value, @"^(/[^/]+)+$") == false)
                     throw new ArgumentException("Invalid io list file path");
                 __io_list_path = value;
             }
@@ -108,6 +118,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility
 
         public bool VAR { get; set; } = true;
         public bool IO { get; set; } = true;
+
+        public const string R2H_TASK_USER_PARAMETERS_PATH = "/2/r2h_task_user_parameters.xml";
 
         private bool __busy = false;
         public bool IsBusy
@@ -172,6 +184,58 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility
             }
             else
                 throw new NotImplementedException("<Variable Dictionary> must be selected.");   
+        }
+
+        public (ConsistencyResult, IEnumerable<DeviceConfiguration>) ConfigurationConsistency()
+        {
+            NetworkCredential cred = null;
+            if (User != null && User.Trim().Length > 0 && Password != null && Password.Trim().Length > 0)
+                cred = new NetworkCredential(User.Trim(), Password.Trim());
+            FtpWebRequest request;
+            TaskUserParameterHelper helper;
+            request = (FtpWebRequest)FtpWebRequest.Create("ftp://" + HostIPv4 + ":" + HostPort.ToString() + R2H_TASK_USER_PARAMETERS_PATH);
+            request.Credentials = cred;
+            request.KeepAlive = false;
+            request.Method = WebRequestMethods.Ftp.DownloadFile;
+            request.UseBinary = true;
+            request.Timeout = Timeout;
+            request.ReadWriteTimeout = ReadWriteTimeout;
+
+            List<DeviceConfiguration> notfound = new List<DeviceConfiguration>();
+            try
+            {
+                using (FtpWebResponse response = (FtpWebResponse)request.GetResponse())
+                using (System.IO.Stream sm = response.GetResponseStream())
+                {
+                    helper = new TaskUserParameterHelper(__controller_model_catalogue, sm);
+                    sm.Close();
+                    response.Close();
+                }
+            }
+            catch (Exception)
+            {
+                return (ConsistencyResult.Exception, null);
+            }
+            foreach(var c in __controller_configuration.Configurations.Values)
+            {
+                if(c.DeviceModel is LocalExtensionModel)
+                {
+                    if (helper.LocalHardwareCollection.Any(l => l.LocalAddress == c.LocalAddress && l.Switch == c.Switch))
+                        continue;
+                    else
+                        notfound.Add(c);
+                }else if(c.DeviceModel is RemoteEthernetModel)
+                {
+                    if (helper.RemoteHardwareCollection.Any(r => r.IPv4 == c.IPv4 && r.Port == c.Port && r.Switch == c.Switch))
+                        continue;
+                    else
+                        notfound.Add(c);
+                }
+            }
+            if(notfound.Count == 0)
+                return (ConsistencyResult.Consistent, null);
+            else
+                return (ConsistencyResult.Inconsistent, notfound);
         }
 
         public void Download()

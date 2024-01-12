@@ -105,6 +105,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility
                     ignore += "\nLog File Size(kByte)";
                 if (model.SmartECATProperty.InstallerProperty.PlatformModel == SmartECATPlatform.RD55UP06_V)
                     ignore += "\nMain Port";
+                if (model.SmartECATProperty.InstallerProperty.PlatformModel == SmartECATPlatform.RD55UP06_V && model.SmartECATProperty.InstallerProperty.EnableCableRedundancy)
+                    ignore += "\nEnable Cable Redundancy";
                 if (ignore != string.Empty)
                 {
                     if(MessageBox.Show("The following field(s) will be ignored. Are you sure you want to continue?"+ignore, "Question", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.No)
