@@ -46,6 +46,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             DAQSettings.DataContext = Settings.DAQTargetProperty.Copy();
             PreferenceSettings.DataContext = Settings.PreferenceProperty.Copy();
             FTPSettings.DataContext = Settings.FTPTargetProperty.Copy();
+            AppInstallerSettings.DataContext = Settings.AppInstallerProperty.Copy();
         }
 
         public SettingsViewer(Settings settings, Settings import)
@@ -56,6 +57,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             DAQSettings.DataContext = import.DAQTargetProperty.Copy();
             PreferenceSettings.DataContext = import.PreferenceProperty.Copy();
             FTPSettings.DataContext = import.FTPTargetProperty.Copy();
+            AppInstallerSettings.DataContext = import.AppInstallerProperty.Copy();
         }
 
         private void DebuggerSettings_Error(object sender, ValidationErrorEventArgs e)
@@ -79,6 +81,13 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             else
                 __errors--;
         }
+        private void AppInstallerSettings_Error(object sender, ValidationErrorEventArgs e)
+        {
+            if (e.Action == ValidationErrorEventAction.Added)
+                __errors++;
+            else
+                __errors--;
+        }
 
         private void OK_Click(object sender, RoutedEventArgs e)
         {
@@ -90,6 +99,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                 Settings.DAQTargetProperty = DAQSettings.DataContext as DAQTargetProperty;
                 Settings.PreferenceProperty = PreferenceSettings.DataContext as PreferenceProperty;
                 Settings.FTPTargetProperty = FTPSettings.DataContext as FTPTargetProperty;
+                Settings.AppInstallerProperty = AppInstallerSettings.DataContext as AppInstallerProperty;
                 try
                 {
                     Settings.Save();

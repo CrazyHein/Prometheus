@@ -7,7 +7,7 @@
     <UseWindowsForms>true</UseWindowsForms>
     <RootNamespace>AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren</RootNamespace>
     <Nullable>annotations</Nullable>
-    <Version>0.22.4.3</Version>
+    <Version>0.22.4.4</Version>
     <Authors>CrazyHein</Authors>
     <Company>AMEC</Company>
     <ApplicationIcon>imgs\logo.ico</ApplicationIcon>
@@ -306,6 +306,12 @@
     <None Update="Metadata\SMART-ECAT\RD55UP12_V\emllDW3504.out">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+
+  
+  
+  <ItemGroup>
+    <Folder Include="Utility\Orbment\" />
   </ItemGroup>
 
 </Project>

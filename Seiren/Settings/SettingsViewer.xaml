@@ -248,6 +248,30 @@
                     </sync:SfTextInputLayout>
                 </Grid>
             </TabItem>
+            <TabItem Header="AppInstaller" Width="135" Name="AppInstallerSettingsTab">
+                <Grid d:DataContext="{d:DesignInstance Type=utility:AppInstallerProperty}" x:Name="AppInstallerSettings" Validation.Error="AppInstallerSettings_Error">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="auto"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <sync:SfTextInputLayout Hint="Boot Task Name" HelperText="Input boot task name here" ContainerType="Filled" FontStyle="Italic" FontSize="12" Margin="4,8,4,8" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}">
+                        <TextBox Text="{Binding BootTaskName, ValidatesOnExceptions=True, NotifyOnValidationError=True}" FontStyle="Normal"/>
+                    </sync:SfTextInputLayout>
+                    <sync:SfTextInputLayout Grid.Column="1" Hint="Boot Task Stack Size" HelperText="Input boot task stack size(bytes) here" ContainerType="Filled" FontStyle="Italic" FontSize="12" Margin="4,8,4,8" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}">
+                        <TextBox Text="{Binding BootTaskStackSize, StringFormat={}0x{0:X8}, ValidatesOnExceptions=True, NotifyOnValidationError=True}" FontStyle="Normal"/>
+                    </sync:SfTextInputLayout>
+                    <sync:SfTextInputLayout Grid.Row="1" Hint="Boot Task Priority" HelperText="Input boot task priority(0-255) here" ContainerType="Filled" FontStyle="Italic" FontSize="12" Margin="4,8,4,8" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}">
+                        <TextBox Text="{Binding BootTaskPriority, ValidatesOnExceptions=True, NotifyOnValidationError=True}" FontStyle="Normal"/>
+                    </sync:SfTextInputLayout>
+                    <sync:SfTextInputLayout Grid.Row="1" Grid.Column="1" Hint="Boot Task Spawn Flag" HelperText="Input boot task spawn flag here" ContainerType="Filled" FontStyle="Italic" FontSize="12" Margin="4,8,4,8" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}">
+                        <TextBox Text="{Binding BootTaskSpawnFlag, StringFormat={}0x{0:X8}, ValidatesOnExceptions=True, NotifyOnValidationError=True}" FontStyle="Normal"/>
+                    </sync:SfTextInputLayout>
+                </Grid>
+            </TabItem>
             <TabItem Header="Preferences"  Width="135" x:Name="PreferenceSettings">
                 <ScrollViewer>
                     <Grid Validation.Error="DebuggerSettings_Error">

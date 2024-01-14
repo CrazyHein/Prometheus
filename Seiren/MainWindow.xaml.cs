@@ -825,7 +825,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                    __tx_diagnostic_area, __tx_bit_area, __tx_block_area,
                    __rx_control_area, __rx_bit_area, __rx_block_area,
                    __interlock_area, __misc_info, __data_type_catalogue, __controller_model_catalogue,
-                   __settings.FTPTargetProperty);
+                   __settings.FTPTargetProperty, __settings.AppInstallerProperty);
             wnd.ShowDialog();
         }
 
@@ -850,7 +850,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                     __tx_diagnostic_area, __tx_bit_area, __tx_block_area,
                     __rx_control_area, __rx_bit_area, __rx_block_area,
                     __interlock_area, __misc_info, __data_type_catalogue, __controller_model_catalogue,
-                    __settings.FTPTargetProperty);
+                    __settings.FTPTargetProperty, __settings.AppInstallerProperty);
             if (wnd.ShowDialog() == true)
             {
                 DebugConsole.WriteInfo($"Create new file with settings reading from connected controller.");
@@ -1087,7 +1087,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                     __object_dictionary, null,
                     __tx_diagnostic_area, __tx_bit_area, __tx_block_area,
                     __rx_control_area, __rx_bit_area, __rx_block_area,
-                    __interlock_area, __misc_info, __data_type_catalogue, __controller_model_catalogue, __settings.FTPTargetProperty);
+                    __interlock_area, __misc_info, __data_type_catalogue, __controller_model_catalogue, __settings.FTPTargetProperty, __settings.AppInstallerProperty);
             if (wnd.ShowDialog() == true)
                 MessageBox.Show(__compare_result(wnd.UploadResult, (wnd.DataContext as FTPUtilityModel).IO), "Comparison Result", MessageBoxButton.OK, MessageBoxImage.Information);
         }

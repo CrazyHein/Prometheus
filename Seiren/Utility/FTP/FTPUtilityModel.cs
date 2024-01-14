@@ -1,7 +1,10 @@
 ﻿using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia;
+using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Console;
+using Microsoft.VisualBasic.ApplicationServices;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
@@ -25,7 +28,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility
         Unknown
     }
 
-    class FTPUtilityModel : INotifyPropertyChanged
+    public class FTPUtilityModel : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
         virtual internal protected void OnPropertyChanged(string propertyName)
@@ -94,6 +97,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility
         public int Timeout { get; set; } = 5000;
         public int ReadWriteTimeout { get; set; } = 5000;
         private string __variable_dictionary_path = "/2/variable_catalogue.xml";
+        public const string DefaultVariableDictionaryPath = "/2/variable_catalogue.xml";
         public string VariableDictionaryPath
         {
             get { return __variable_dictionary_path; }
@@ -105,6 +109,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility
             }
         }
         private string __io_list_path = "/2/io_list.xml";
+        public const string DefaultIOListPath = "/2/io_list.xml";
         public string IOListPath
         {
             get { return __io_list_path; }
@@ -238,7 +243,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility
                 return (ConsistencyResult.Inconsistent, notfound);
         }
 
-        public void Download()
+        public void Download(string? variableDictionaryPath = null, string? iolistPath = null)
         {
             NetworkCredential cred = null;
             if (User != null && User.Trim().Length > 0 && Password != null && Password.Trim().Length > 0)
@@ -246,7 +251,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility
             FtpWebRequest request;
             if (VAR)
             {
-                request = (FtpWebRequest)FtpWebRequest.Create("ftp://" + HostIPv4 + ":" + HostPort.ToString() + __variable_dictionary_path);
+                request = (FtpWebRequest)FtpWebRequest.Create("ftp://" + HostIPv4 + ":" + HostPort.ToString() + (variableDictionaryPath??__variable_dictionary_path));
                 request.Credentials = cred;
                 request.KeepAlive = false;
                 request.Method = WebRequestMethods.Ftp.UploadFile;
@@ -263,7 +268,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility
 
             if (IO)
             {
-                request = (FtpWebRequest)FtpWebRequest.Create("ftp://" + HostIPv4 + ":" + HostPort.ToString() + __io_list_path);
+                request = (FtpWebRequest)FtpWebRequest.Create("ftp://" + HostIPv4 + ":" + HostPort.ToString() + (iolistPath??__io_list_path));
                 request.Credentials = cred;
                 request.KeepAlive = false;
                 request.Method = WebRequestMethods.Ftp.UploadFile;
@@ -277,6 +282,54 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility
                     sm.Close();
                 }
             }
+        }
+
+        public void TransferLocalFile(string localfilename, string remotepath, string name, int buffersize)
+        {
+            NetworkCredential cred = null;
+            if (User != null && User.Trim().Length > 0 && Password != null && Password.Trim().Length > 0)
+                cred = new NetworkCredential(User.Trim(), Password.Trim());
+
+            FtpWebRequest request;
+            request = (FtpWebRequest)FtpWebRequest.Create($"ftp://{HostIPv4}:{HostPort}{System.IO.Path.Combine(remotepath, name)}");
+            request.Credentials = cred;
+            request.KeepAlive = false;
+            request.Method = WebRequestMethods.Ftp.UploadFile;
+            request.UseBinary = true;
+            request.Timeout = Timeout;
+            request.ReadWriteTimeout = ReadWriteTimeout;
+
+            using (System.IO.FileStream fs = System.IO.File.OpenRead(localfilename))
+            using (System.IO.Stream sm = request.GetRequestStream())
+            {
+                byte[] buffer = new byte[buffersize];
+                int read = 0, total = 0;
+                do
+                {
+                    read = fs.Read(buffer, 0, buffer.Length);
+                    sm.Write(buffer, 0, read);
+                    sm.Flush();
+                    total += read;
+                } while (total != fs.Length);
+            }
+        }
+
+        public Stream RemoteUploadStream(string remotepath, string name)
+        {
+            NetworkCredential cred = null;
+            if (User != null && User.Trim().Length > 0 && Password != null && Password.Trim().Length > 0)
+                cred = new NetworkCredential(User.Trim(), Password.Trim());
+
+            FtpWebRequest request;
+            request = (FtpWebRequest)FtpWebRequest.Create($"ftp://{HostIPv4}:{HostPort}{System.IO.Path.Combine(remotepath, name)}");
+            request.Credentials = cred;
+            request.KeepAlive = true;
+            request.Method = WebRequestMethods.Ftp.UploadFile;
+            request.UseBinary = true;
+            request.Timeout = Timeout;
+            request.ReadWriteTimeout = ReadWriteTimeout;
+
+            return request.GetRequestStream();
         }
     }
 }

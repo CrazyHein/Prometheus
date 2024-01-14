@@ -1,0 +1,60 @@
+﻿<Window x:Class="AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility.OrbmentAppInstaller"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren"
+        xmlns:syncfusionskin ="clr-namespace:Syncfusion.SfSkinManager;assembly=Syncfusion.SfSkinManager.WPF"
+        xmlns:sync="http://schemas.syncfusion.com/wpf"
+        mc:Ignorable="d"
+        Title="Orbment Application Installer" Height="450" Width="800" WindowStartupLocation="CenterScreen" Closing="Window_Closing">
+    <DockPanel syncfusionskin:SfSkinManager.Theme="{syncfusionskin:SkinManagerExtension ThemeName=FluentLight}" Margin="4">
+        <DockPanel.Resources>
+            <local:InvertBooleanValue x:Key="InvertBoolean"/>
+        </DockPanel.Resources>
+        <DockPanel DockPanel.Dock="Bottom" Margin="0,10,0,0">
+            <Button DockPanel.Dock="Right" Content="Start Transfer" Margin="4,2,0,2" IsEnabled="{Binding IsBusy, Converter={StaticResource InvertBoolean}}" Height="24" Width="120" Click="BtnStartTransfer_Click"/>
+            <StatusBar>
+                <sync:SfBusyIndicator IsBusy="{Binding IsBusy}" Margin="0,0,4,0" ViewboxHeight="18" ViewboxWidth="18" Width="18" Height="18" AnimationType="Cupertino" Background="Transparent"/>
+                <Separator/>
+                <ProgressBar Width="120" Height="16" Minimum="0" Maximum="100" Value="{Binding InstallationProgress}" Margin="4,2,4,2"/>
+                <Separator/>
+                <TextBlock Text="{Binding InstallationState}" ToolTip="{Binding InstallationExceptionInfo}" Margin="4,2,4,2" VerticalAlignment="Center" />
+            </StatusBar>
+        </DockPanel>
+        <Grid DockPanel.Dock="Top">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <Grid.Resources>
+                <Style TargetType="TextBox">
+                    <Style.Triggers>
+                        <Trigger Property="Validation.HasError" Value="true">
+                            <Setter Property="ToolTip" Value="{Binding RelativeSource={RelativeSource Mode=Self}, Path=(Validation.Errors)[0].ErrorContent}" />
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </Grid.Resources>
+            <sync:SfTextInputLayout Hint="Application Entry Name" HelperText="Input appliction entry name here" ContainerType="Filled" FontStyle="Italic" FontSize="12" Margin="4,8,4,8" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}">
+                <TextBox Text="{Binding ApplictionEntryName, ValidatesOnExceptions=True, NotifyOnValidationError=True}" FontStyle="Normal"/>
+            </sync:SfTextInputLayout>
+            <sync:SfTextInputLayout Grid.Column="1" Hint="Parameters" HelperText="Please use commas to separate multiple parameters" ContainerType="Filled" FontStyle="Italic" FontSize="12" Margin="4,8,4,8" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}">
+                <TextBox Text="{Binding Parameters, ValidatesOnExceptions=True, NotifyOnValidationError=True}" FontStyle="Normal"/>
+            </sync:SfTextInputLayout>
+        </Grid>
+        <sync:SfDataGrid AllowDrop="True" ItemsSource="{Binding ApplicationFileCollection}" AllowSorting="True" AutoGenerateColumns="False"
+                         ColumnSizer="AutoWithLastColumnFill" AllowResizingColumns="True" 
+                         Keyboard.KeyDown="ApplicationFileGrid_KeyDown" Drop="ApplicationFileGrid_Drop"
+                         Name="SfDataGrid_ApplicationFile">
+            <sync:SfDataGrid.Columns>
+                <sync:GridTextColumn ValueBinding="{Binding Name}" HeaderText="Name" MinimumWidth="120"/>
+                <sync:GridTextColumn ValueBinding="{Binding Length}" HeaderText="Length" MinimumWidth="100"/>
+                <sync:GridTextColumn ValueBinding="{Binding LastWriteTime}" HeaderText="Last Write"/>
+            </sync:SfDataGrid.Columns>
+        </sync:SfDataGrid>
+    </DockPanel>
+</Window>

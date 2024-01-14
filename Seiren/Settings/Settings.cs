@@ -54,6 +54,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         public SlmpTargetProperty SlmpTargetProperty { get; set; }
         public DAQTargetProperty DAQTargetProperty { get; set; }
         public FTPTargetProperty FTPTargetProperty { get; set; }
+        public AppInstallerProperty AppInstallerProperty { get; set; }
         public PreferenceProperty PreferenceProperty { get; set; }
 
         private static ReadOnlySpan<byte> __UTF8_BOM => new byte[] { 0xEF, 0xBB, 0xBF };
@@ -73,6 +74,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                 DAQTargetProperty.Save(writer);
                 writer.WritePropertyName("FTP");
                 FTPTargetProperty.Save(writer);
+                writer.WritePropertyName("AppInstaller");
+                AppInstallerProperty.Save(writer);
                 writer.WritePropertyName("Preference");
                 PreferenceProperty.Save(writer);
                 writer.WriteEndObject();
@@ -117,6 +120,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                                     DAQTargetProperty = DAQTargetProperty.RESTORE(ref reader); break;
                                 case "FTP":
                                     FTPTargetProperty = FTPTargetProperty.RESTORE(ref reader); break;
+                                case "AppInstaller":
+                                    AppInstallerProperty = AppInstallerProperty.RESTORE(ref reader); break;
                                 case "Preference":
                                     PreferenceProperty = PreferenceProperty.RESTORE(ref reader); break;
                             }
@@ -135,6 +140,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                 SlmpTargetProperty ??= new SlmpTargetProperty();
                 DAQTargetProperty ??= new DAQTargetProperty();
                 FTPTargetProperty ??= new FTPTargetProperty();
+                AppInstallerProperty ??= new AppInstallerProperty();
                 PreferenceProperty ??= new PreferenceProperty();
             }
         }

@@ -28,7 +28,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility
             ProcessDataImage txdiag, ProcessDataImage txbit, ProcessDataImage txblk,
             ProcessDataImage rxctl, ProcessDataImage rxbit, ProcessDataImage rxblk,
             InterlockCollection intlk, Miscellaneous misc,
-            DataTypeCatalogue dataTypes, ControllerModelCatalogue models, FTPTargetProperty property)
+            DataTypeCatalogue dataTypes, ControllerModelCatalogue models, FTPTargetProperty property, AppInstallerProperty app)
         {
             InitializeComponent();
             DataContext = new FTPUtilityModel(mode,
@@ -49,6 +49,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility
             {
                 CheckboxVAR.IsChecked = true;
                 CheckboxVAR.IsEnabled = false;
+                BtnOpenAppInstaller.Visibility = Visibility.Hidden;
             }
             else
             {
@@ -57,7 +58,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility
                 CheckboxIO.IsChecked = true;
                 CheckboxIO.IsEnabled = false;
             }
+            __app_installer_property = app;
         }
+
+        private AppInstallerProperty __app_installer_property;
 
         public (VariableDictionary vd, ControllerConfiguration cc, ObjectDictionary od,
                     ProcessDataImage txdiag, ProcessDataImage txbit, ProcessDataImage txblk,
@@ -65,6 +69,11 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility
                     Miscellaneous misc) UploadResult
         {
             get; private set;
+        }
+        private void OpenAppInstaller_Click(object sender, RoutedEventArgs e)
+        {
+            OrbmentAppInstaller installer = new OrbmentAppInstaller(DataContext as FTPUtilityModel, __app_installer_property);
+            installer.ShowDialog();
         }
 
         private void Cancel_Click(object sender, RoutedEventArgs e)

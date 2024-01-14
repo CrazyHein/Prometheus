@@ -362,6 +362,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility
                         $"ftp://{SmartECATProperty.FTPTargetProperty.HostIPv4}:{SmartECATProperty.FTPTargetProperty.HostPort}{SmartECATProperty.InstallerProperty.BUILT_IN_MEMORY_PATH}",
                         SmartECATInstallerProperty.DEFAULT_LIC_NAME,
                         SmartECATProperty.FTPTargetProperty.User, SmartECATProperty.FTPTargetProperty.Password, 4096);
+                    InstallationState = "Done: Transfer SMART-ECAT License File.";
                 }
                 catch (Exception ex)
                 {
@@ -382,6 +383,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility
                         $"ftp://{SmartECATProperty.FTPTargetProperty.HostIPv4}:{SmartECATProperty.FTPTargetProperty.HostPort}{SmartECATProperty.InstallerProperty.ENI_PATH}",
                         SmartECATInstallerProperty.DEFAULT_ENI_NAME,
                         SmartECATProperty.FTPTargetProperty.User, SmartECATProperty.FTPTargetProperty.Password, 4096*16);
+                    InstallationState = "Done: Transfer EtherCAT Network Information File.";
                 }
                 catch(Exception ex)
                 {
@@ -413,6 +415,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility
                         SmartECATInstallerProperty.DEFAULT_ECAT_ALP_NAME,
                         SmartECATProperty.FTPTargetProperty.User, SmartECATProperty.FTPTargetProperty.Password, 4096 * 16);
                 }
+                InstallationState = "Done: Transfer SMART-ECAT Firmware File.";
             }
             catch (Exception ex)
             {
@@ -470,6 +473,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility
                         $"{SmartECATProperty.InstallerProperty.ToString()}" +
                         $"\",0,0,0,0,0,0)");
                 }
+                InstallationState = "Done: Transfer SMART-ECAT Configuration File(s).";
             }
             catch (Exception ex)
             {
