@@ -72,6 +72,14 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility
         }
         private void OpenAppInstaller_Click(object sender, RoutedEventArgs e)
         {
+            foreach (var u in InputsGrid.Children)
+            {
+                if ((u as SfTextInputLayout)?.HasError == true)
+                {
+                    MessageBox.Show("At least one user input is invalid.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
+            }
             OrbmentAppInstaller installer = new OrbmentAppInstaller(DataContext as FTPUtilityModel, __app_installer_property);
             installer.ShowDialog();
         }

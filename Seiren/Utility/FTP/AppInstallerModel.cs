@@ -90,33 +90,25 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility
 
         public ObservableCollection<System.IO.FileInfo> ApplicationFileCollection { get; private set; } = new ObservableCollection<System.IO.FileInfo>(); 
 
-        public void InstallApplication()
+        public (ConsistencyResult, IEnumerable<DeviceConfiguration>) ConfigurationConsistency()
+        {
+            InstallationState = "Hardware Configuration Consistency Check";
+            (var result, var notfound) = FTPUtilityModel.ConfigurationConsistency();
+            InstallationState = "Done: Hardware Configuration Consistency Check";
+            return (result, notfound);
+        }
+
+        public void InstallApplication(bool ignoreInconsistency)
         {
             try
             {
-                bool consistency = false;
-                InstallationState = "Hardware Configuration Consistency Check";
-                (ConsistencyResult ret, IEnumerable<DeviceConfiguration> notfound) = FTPUtilityModel.ConfigurationConsistency();
-                if (ret == ConsistencyResult.Exception)
+                if (ignoreInconsistency == false)
                 {
-                    var rsp = MessageBox.Show("Can not read hardware configuration file, so the consistency check is not performed.\nAre you sure you want to download IO List anyway?", "Question", MessageBoxButton.YesNo, MessageBoxImage.Question);
-                    if (rsp == MessageBoxResult.Yes)
-                        consistency = true;
+                    InstallationState = "Hardware Configuration Consistency Check";
+                    (ConsistencyResult ret, IEnumerable<DeviceConfiguration> notfound) = FTPUtilityModel.ConfigurationConsistency();
+                    if (ret != ConsistencyResult.Consistent)
+                        throw new InvalidOperationException($"Hardware configuration consistency check failure: {ret}.");
                 }
-                else if (ret == ConsistencyResult.Inconsistent)
-                {
-                    SimpleDeviceConfigurationViewer result = new SimpleDeviceConfigurationViewer("Consistency Check Result",
-                        "The following hardware configuration(s) in IO List file is(are) not found in the system hardware configuration(s).\nAre you sure you want to download IO List anyway?",
-                        notfound);
-
-                    if (result.ShowDialog() == true)
-                        consistency = true;
-                }
-                else
-                    consistency = true;
-
-                if (!consistency) 
-                    throw new InvalidOperationException("Hardware configuration consistency check failure.");
 
                 InstallationState = "Transfer Variable Dictionary and IO List";
                 FTPUtilityModel.Download(AppInstallerProperty.VariableDictionaryPath, AppInstallerProperty.IOListPath);

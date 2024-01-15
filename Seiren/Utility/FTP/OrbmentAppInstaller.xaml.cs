@@ -1,4 +1,5 @@
-﻿using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Console;
+﻿using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia;
+using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Console;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -62,17 +63,58 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility
 
         private async void BtnStartTransfer_Click(object sender, RoutedEventArgs e)
         {
+            if (__errors != 0)
+            {
+                MessageBox.Show("At least one user input is invalid.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+            
             AppInstallerModel model = DataContext as AppInstallerModel;
+            if (model.ApplicationFileCollection.Count == 0)
+            {
+                if (MessageBox.Show("You did not attach any application file, do you want to continue?", "Question", MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes)
+                    return;
+            }
             try
             {
                 model.IsBusy = true;
                 model.InstallationState = "Starting";
+                model.InstallationProgress = 0;
                 model.InstallationExceptionInfo = "N/A";
 
-                await Task.Run(() => model.InstallApplication());
-                await Task.Delay(1000);
+                ConsistencyResult ret = ConsistencyResult.Unknown;
+                IEnumerable<DeviceConfiguration> notfound = null;
+                bool consistency = false;
+                await Task.Run(() => (ret, notfound) = model.ConfigurationConsistency());
+                if (ret == ConsistencyResult.Exception)
+                {
+                    var rsp = MessageBox.Show("Can not read hardware configuration file, so the consistency check is not performed.\nAre you sure you want to download IO List anyway?", "Question", MessageBoxButton.YesNo, MessageBoxImage.Question);
+                    if (rsp == MessageBoxResult.Yes)
+                        consistency = true;
+                }
+                else if (ret == ConsistencyResult.Inconsistent)
+                {
+                    SimpleDeviceConfigurationViewer result = new SimpleDeviceConfigurationViewer("Consistency Check Result",
+                        "The following hardware configuration(s) in IO List file is(are) not found in the system hardware configuration(s).\nAre you sure you want to download IO List anyway?",
+                        notfound);
 
-                model.InstallationState = "Done";
+                    if (result.ShowDialog() == true)
+                        consistency = true;
+                }
+                else
+                    consistency = true;
+
+                if (consistency)
+                {
+                    await Task.Run(() => model.InstallApplication(true));
+                    await Task.Delay(1000);
+                    model.InstallationState = "Done";
+                }
+                else
+                {
+                    model.InstallationState = $"About: Hardware configuration consistency check failure.";
+                }
+  
                 model.InstallationProgress = 0;
                 model.IsBusy = false;
             }
@@ -88,6 +130,15 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility
             AppInstallerModel model = DataContext as AppInstallerModel;
             if(model.IsBusy)
                 e.Cancel = true;
+        }
+
+        private int __errors = 0;
+        private void Grid_Error(object sender, ValidationErrorEventArgs e)
+        {
+            if(e.Action == ValidationErrorEventAction.Added)
+                __errors ++;
+            else
+                __errors --;
         }
     }
 }

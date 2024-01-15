@@ -118,6 +118,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility
             {
                 model.IsBusy = true;
                 model.InstallationState = "Starting";
+                model.InstallationProgress = 0;
                 model.InstallationExceptionInfo = "N/A";
 
                 await Task.Run(() => model.TransferLicenseFile());
