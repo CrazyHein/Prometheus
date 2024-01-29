@@ -25,6 +25,11 @@
                     <x:Type TypeName="utility:SmartECATMainPort"/>
                 </ObjectDataProvider.MethodParameters>
             </ObjectDataProvider>
+            <ObjectDataProvider ObjectType="{x:Type sys:Enum}" MethodName="GetValues" x:Key="disconnectpd">
+                <ObjectDataProvider.MethodParameters>
+                    <x:Type TypeName="utility:SmartECATDisconnectProcessData"/>
+                </ObjectDataProvider.MethodParameters>
+            </ObjectDataProvider>
         </Grid.Resources>
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"/>
@@ -107,7 +112,7 @@
                                 <GroupBox.Header>
                                     <TextBlock Text="Platform"/>
                                 </GroupBox.Header>
-                                <UniformGrid Columns="3">
+                                <UniformGrid Columns="4">
                                     <sync:SfTextInputLayout Grid.Row="0" Hint="Platform Model"  HelperText="Select platform model here" FontSize="12" FontStyle="Italic" ContainerType="Filled" Margin="4,8,4,8">
                                         <ComboBox x:Name="PlatformCombo" FontStyle="Normal" ItemsSource="{Binding Source={StaticResource platforms}}" SelectedItem="{Binding SmartECATProperty.InstallerProperty.PlatformModel}" />
                                     </sync:SfTextInputLayout>
@@ -120,6 +125,7 @@
                                 </GroupBox.Header>
                                 <Grid>
                                     <Grid.ColumnDefinitions>
+                                        <ColumnDefinition/>
                                         <ColumnDefinition/>
                                         <ColumnDefinition/>
                                         <ColumnDefinition/>
@@ -140,6 +146,7 @@
                                         <ColumnDefinition/>
                                         <ColumnDefinition/>
                                         <ColumnDefinition/>
+                                        <ColumnDefinition/>
                                     </Grid.ColumnDefinitions>
                                     <Grid.RowDefinitions>
                                         <RowDefinition/>
@@ -154,6 +161,10 @@
                                     </sync:SfTextInputLayout>
                                     <sync:SfTextInputLayout Grid.Column="2" Hint="Number of Network Scan Reties" HelperText="Input number of network scan reties here" ContainerType="Filled" FontStyle="Italic" FontSize="12" Margin="4,8,4,8" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}">
                                         <TextBox Text="{Binding SmartECATProperty.InstallerProperty.NumOfNetworkScanReties, ValidatesOnExceptions=True, NotifyOnValidationError=True}" FontStyle="Normal"/>
+                                    </sync:SfTextInputLayout>
+
+                                    <sync:SfTextInputLayout Grid.Row="0" Grid.Column="3" Hint="Disconnect Process Data"  HelperText="CLEAR/HOLD" FontSize="12" FontStyle="Italic" ContainerType="Filled" Margin="4,8,4,8">
+                                        <ComboBox FontStyle="Normal" ItemsSource="{Binding Source={StaticResource disconnectpd}}" SelectedItem="{Binding SmartECATProperty.InstallerProperty.DisconnectProcessData}" />
                                     </sync:SfTextInputLayout>
 
                                     <sync:SfTextInputLayout Grid.Row="2" Grid.Column="0" IsEnabled="{Binding ElementName=PlatformCombo, Path=SelectedItem, Converter={StaticResource DualNetwortPort}}" Hint="Main Port"  HelperText="(R12CCPU_V/RD55UP12_V)Select main port here" FontSize="12" FontStyle="Italic" ContainerType="Filled" Margin="4,8,4,8">

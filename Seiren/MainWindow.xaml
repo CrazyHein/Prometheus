@@ -399,7 +399,7 @@
                     <Label HorizontalAlignment="Left" VerticalAlignment="Center" Content="Navigator" />
                 </DataTemplate>
             </sync:SfNavigationDrawer.ToggleButtonContentTemplate>
-            <sync:NavigationItem Header="Metadata Viewer" IsExpanded="True" ItemType="Tab">
+            <sync:NavigationItem Header="Metadata Viewer" IsExpanded="True" ItemType="Button">
                 <sync:NavigationItem.Icon>
                     <Image Source="imgs/meta.png"/>
                 </sync:NavigationItem.Icon>
@@ -414,7 +414,7 @@
                     </sync:NavigationItem.Icon>
                 </sync:NavigationItem>
             </sync:NavigationItem>
-            <sync:NavigationItem Header="IO List" ItemType="Tab" Visibility="{Binding IsOpened, Converter={StaticResource ModifiedConverter}}">
+            <sync:NavigationItem Header="IO List" ItemType="Button" Visibility="{Binding IsOpened, Converter={StaticResource ModifiedConverter}}">
                 <sync:NavigationItem.Icon>
                     <Image Source="imgs/list.png"/>
                 </sync:NavigationItem.Icon>
@@ -465,7 +465,7 @@
             </sync:NavigationItem>
             <sync:SfNavigationDrawer.FooterItems>
                 <sync:NavigationItem ItemType="Separator"/>
-                <sync:NavigationItem Header="Settings" ItemType="Tab" Uid="Settings" IsExpanded="True">
+                <sync:NavigationItem Header="Settings" ItemType="Button" IsExpanded="True">
                     <sync:NavigationItem.Icon>
                         <Image Source="imgs/setting.png"/>
                     </sync:NavigationItem.Icon>

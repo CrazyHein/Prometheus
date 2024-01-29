@@ -9,9 +9,9 @@
         xmlns:slmp="clr-namespace:AMEC.PCSoftware.CommunicationProtocol.CrazyHein.SLMP.Command;assembly=Gagharv"
         xmlns:sys="clr-namespace:System;assembly=mscorlib"
         mc:Ignorable="d"
-        Title="Remote Operation" Height="350" Width="300" WindowStartupLocation="CenterScreen" ResizeMode="NoResize" Closing="Window_Closing">
-    <DockPanel syncfusionskin:SfSkinManager.Theme="{syncfusionskin:SkinManagerExtension ThemeName=FluentLight}" LastChildFill="True" Margin="8,4,8,4">
-        <DockPanel.Resources>
+        Title="Remote Operation" Height="350" Width="500" WindowStartupLocation="CenterScreen" ResizeMode="NoResize" Closing="Window_Closing">
+    <Grid syncfusionskin:SfSkinManager.Theme="{syncfusionskin:SkinManagerExtension ThemeName=FluentLight}">
+        <Grid.Resources>
             <ObjectDataProvider ObjectType="{x:Type sys:Enum}" MethodName="GetValues" x:Key="remoteoperation">
                 <ObjectDataProvider.MethodParameters>
                     <x:Type TypeName="local:REMOTE_OPERATION_T"/>
@@ -31,26 +31,66 @@
             <local:RemoteOperationImage x:Key="RemoteOperationImage"/>
             <local:RemoteControlModeAvailable x:Key="RemoteControlModeAvailable"/>
             <local:RemoteClearModeAvailable x:Key="RemoteClearModeAvailable"/>
-        </DockPanel.Resources>
-        <sync:ButtonAdv Label="{Binding RemoteOperation}" IsEnabled="{Binding IsBusy, Converter={StaticResource InvertBoolean}}" Margin="0,0,0,4" Height="30" DockPanel.Dock="Bottom" 
+            <local:HEX16StringConverter x:Key="HEX16"/>
+            <ObjectDataProvider ObjectType="{x:Type sys:Enum}" MethodName="GetValues" x:Key="smecatcommand">
+                <ObjectDataProvider.MethodParameters>
+                    <x:Type TypeName="local:SMART_ECAT_COMMAND_T"/>
+                </ObjectDataProvider.MethodParameters>
+            </ObjectDataProvider>
+        </Grid.Resources>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        <sync:SfBusyIndicator IsBusy="{Binding IsBusy}" Grid.ColumnSpan="2"/>
+        <GroupBox Header="CPU" Margin="4">
+            <DockPanel LastChildFill="True" Margin="8,4,8,4">
+                <sync:ButtonAdv Label="{Binding RemoteOperation}" IsEnabled="{Binding IsBusy, Converter={StaticResource InvertBoolean}}" Margin="0,0,0,4" Height="30" DockPanel.Dock="Bottom" 
                         SmallIcon="{Binding RemoteOperation, Converter={StaticResource RemoteOperationImage}}"
                         Click="RemoteOperation_Click"/>
-        <Grid DockPanel.Dock="Top">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="auto"/>
-                <RowDefinition Height="auto"/>
-                <RowDefinition Height="auto"/>
-            </Grid.RowDefinitions>
-            <sync:SfBusyIndicator IsBusy="{Binding IsBusy}" Grid.RowSpan="4"/>
-            <sync:SfTextInputLayout Hint="Remote Control Mode"  FontSize="12" FontStyle="Italic" ContainerType="Filled" Margin="4" IsEnabled="{Binding IsBusy, Converter={StaticResource InvertBoolean}}">
-                <ComboBox FontStyle="Normal" ItemsSource="{Binding Source={StaticResource remoteoperation}}" SelectedItem="{Binding RemoteOperation}"/>
-            </sync:SfTextInputLayout>
-            <sync:SfTextInputLayout Hint="Remote Control Mode"  FontSize="12" FontStyle="Italic" ContainerType="Filled" Margin="4" Grid.Row="1" Visibility="{Binding RemoteOperation, Converter={StaticResource RemoteControlModeAvailable}}" IsEnabled="{Binding IsBusy, Converter={StaticResource InvertBoolean}}">
-                <ComboBox FontStyle="Normal" ItemsSource="{Binding Source={StaticResource remotecontrolmode}}" SelectedItem="{Binding RemoteControlMode}"/>
-            </sync:SfTextInputLayout>
-            <sync:SfTextInputLayout Hint="Remote Clear Mode"  FontSize="12" FontStyle="Italic" ContainerType="Filled" Margin="4" Grid.Row="2" Visibility="{Binding RemoteOperation, Converter={StaticResource RemoteClearModeAvailable}}" IsEnabled="{Binding IsBusy, Converter={StaticResource InvertBoolean}}">
-                <ComboBox FontStyle="Normal" ItemsSource="{Binding Source={StaticResource remoteclearmode}}" SelectedItem="{Binding RemoteClearMode}"/>
-            </sync:SfTextInputLayout>
-        </Grid>
-    </DockPanel>
+                <Grid DockPanel.Dock="Top">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="auto"/>
+                    </Grid.RowDefinitions>
+                    <sync:SfTextInputLayout Hint="Remote Operation"  FontSize="12" FontStyle="Italic" ContainerType="Filled" Margin="4" IsEnabled="{Binding IsBusy, Converter={StaticResource InvertBoolean}}">
+                        <ComboBox FontStyle="Normal" ItemsSource="{Binding Source={StaticResource remoteoperation}}" SelectedItem="{Binding RemoteOperation}"/>
+                    </sync:SfTextInputLayout>
+                    <sync:SfTextInputLayout Hint="Remote Control Mode"  FontSize="12" FontStyle="Italic" ContainerType="Filled" Margin="4" Grid.Row="1" Visibility="{Binding RemoteOperation, Converter={StaticResource RemoteControlModeAvailable}}" IsEnabled="{Binding IsBusy, Converter={StaticResource InvertBoolean}}">
+                        <ComboBox FontStyle="Normal" ItemsSource="{Binding Source={StaticResource remotecontrolmode}}" SelectedItem="{Binding RemoteControlMode}"/>
+                    </sync:SfTextInputLayout>
+                    <sync:SfTextInputLayout Hint="Remote Clear Mode"  FontSize="12" FontStyle="Italic" ContainerType="Filled" Margin="4" Grid.Row="2" Visibility="{Binding RemoteOperation, Converter={StaticResource RemoteClearModeAvailable}}" IsEnabled="{Binding IsBusy, Converter={StaticResource InvertBoolean}}">
+                        <ComboBox FontStyle="Normal" ItemsSource="{Binding Source={StaticResource remoteclearmode}}" SelectedItem="{Binding RemoteClearMode}"/>
+                    </sync:SfTextInputLayout>
+                </Grid>
+            </DockPanel>
+        </GroupBox>
+        <GroupBox Header="SMART-ECAT(RD55UP12-V)" Margin="3" Grid.Column="1">
+            <DockPanel syncfusionskin:SfSkinManager.Theme="{syncfusionskin:SkinManagerExtension ThemeName=FluentLight}" LastChildFill="True" Margin="8,4,8,4">
+                <sync:ButtonAdv Label="Post Request" IsEnabled="{Binding IsBusy, Converter={StaticResource InvertBoolean}}" Margin="0,0,0,4" Height="30" DockPanel.Dock="Bottom" 
+                        Click="ECATCommand_Click">
+                    <sync:ButtonAdv.SmallIcon>
+                        <BitmapImage  UriSource="../../imgs/reset.png"/>
+                    </sync:ButtonAdv.SmallIcon>
+                </sync:ButtonAdv>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="auto"/>
+                    </Grid.RowDefinitions>
+                    <sync:SfTextInputLayout Grid.Row="0" Hint="Command"  FontSize="12" Margin="4" FontStyle="Italic" ContainerType="Filled" IsEnabled="{Binding IsBusy, Converter={StaticResource InvertBoolean}}">
+                        <ComboBox FontStyle="Normal" ItemsSource="{Binding Source={StaticResource smecatcommand}}" SelectedItem="{Binding ECATCommand}"/>
+                    </sync:SfTextInputLayout>
+                    <sync:SfTextInputLayout Grid.Row="1" Hint="Module Address" ContainerType="Filled" FontStyle="Italic" FontSize="12" Margin="4" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}" Name="TxtInputECATModuleAddress" IsEnabled="{Binding IsBusy, Converter={StaticResource InvertBoolean}}">
+                        <TextBox Text="{Binding ECATModuleAddress, Converter={StaticResource HEX16}, ValidatesOnExceptions=True, NotifyOnValidationError=True}" FontStyle="Normal"/>
+                    </sync:SfTextInputLayout>
+                    <sync:SfTextInputLayout Grid.Row="2" Hint="Waiting Time" ContainerType="Filled" FontStyle="Italic" FontSize="12" Margin="4" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}" Name="TxtInputECATCommandWaiting" IsEnabled="{Binding IsBusy, Converter={StaticResource InvertBoolean}}">
+                        <TextBox Text="{Binding ECATCommandWaiting, ValidatesOnExceptions=True, NotifyOnValidationError=True}" FontStyle="Normal"/>
+                    </sync:SfTextInputLayout>
+                </Grid>
+            </DockPanel>
+        </GroupBox>
+    </Grid>
 </Window>

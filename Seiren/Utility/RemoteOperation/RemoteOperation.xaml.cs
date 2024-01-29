@@ -110,6 +110,75 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility
             }
         }
 
+        private async void ECATCommand_Click(object sender, RoutedEventArgs e)
+        {
+            if(TxtInputECATModuleAddress.HasError || TxtInputECATCommandWaiting.HasError)
+            {
+                MessageBox.Show("At least one user input is invalid.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+            SocketInterface com = null;
+            var ro = DataContext as RemoteOperationModel;
+            ro.IsBusy = true;
+            try
+            {
+                DESTINATION_ADDRESS_T destination = new DESTINATION_ADDRESS_T(
+                        __target.NetworkNumber, __target.StationNumber, __target.ModuleIONumber,
+                        __target.MultidropNumber, __target.ExtensionStationNumber);
+
+                if (__target.UDPTransportLayer == true)
+                {
+                    com = new UDP(new System.Net.IPEndPoint(__target.SourceIPv4, __target.SourcePort),
+                            new System.Net.IPEndPoint(__target.DestinationIPv4, __target.DestinationPort),
+                            __target.ReceiveBufferSize, __target.SendTimeoutValue, __target.ReceiveTimeoutValue);
+                }
+                else
+                {
+                    com = new TCP(new System.Net.IPEndPoint(__target.SourceIPv4, 0),
+                            new System.Net.IPEndPoint(__target.DestinationIPv4, __target.DestinationPort),
+                            __target.SendTimeoutValue, __target.ReceiveTimeoutValue);
+                    await Task.Run(() => (com as TCP).Connect());
+                }
+
+                var master = new DeviceAccessMaster(__target.FrameType, __target.DataCode, __target.R_DedicatedMessageFormat, com, ref destination,
+                        __target.SendBufferSize, __target.ReceiveBufferSize, null);
+
+                ushort end = 0;
+                end = await master.WriteModuleAccessDeviceInWordAsync(__target.MonitoringTimer, $"U{ro.ECATModuleAddress / 16:X3}", RemoteOperationModel.ECATCommandRequestRegister, 1, new ushort[1] { (ushort)ro.ECATCommand });
+                if (end != 0)
+                {
+                    MessageBox.Show(this, $"Post <{ro.ECATCommand}> operation command returns code : {end}(0x{end:X4})", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
+                    return;
+                }
+
+                await Task.Delay(ro.ECATCommandWaiting);
+
+                var rsp = new ushort[1];
+                end = await master.ReadModuleAccessDeviceInWordAsync(__target.MonitoringTimer, $"U{ro.ECATModuleAddress / 16:X3}", RemoteOperationModel.ECATCommandResponseRegister, 1, rsp);
+
+                if (end != 0)
+                {
+                    MessageBox.Show(this, $"Read <{ro.ECATCommand}> operation response returns code : {end}(0x{end:X4})", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
+                    return;
+                }
+                MessageBox.Show(this, $"<{ro.ECATCommand}> operation response is : {(SMART_ECAT_COMMAND_T)rsp[0]}({rsp[0]:X4})", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            catch (SLMPException ex)
+            {
+                MessageBox.Show(this, "At least one unexpected error occured while doing remote operation.\n" + ex.Message, "Error Message", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(this, "At least one unexpected error occured while doing remote operation.\n" + ex.Message, "Error Message", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            finally
+            {
+                ro.IsBusy = false;
+                if (com != null) com.Dispose();
+                com = null;
+            }
+        }
+
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             if ((DataContext as RemoteOperationModel).IsBusy == true)

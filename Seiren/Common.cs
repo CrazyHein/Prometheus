@@ -4,6 +4,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -682,6 +683,34 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         PAUSE,
         LATCH_CLEAR,
         READ_TYPE
+    }
+
+    internal enum SMART_ECAT_COMMAND_T: UInt16
+    {
+        RESET_REQUEST = 0x0000,
+        REQUEST_COMMUNICATION_STOP = 0x0001,
+        REQUEST_CLEAR_EVENT_INFO = 0x0002,
+        REQUEST_REBOOT = 0x0003
+    }
+
+    public class HEX16StringConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return ((ushort)value).ToString("X4");
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            try
+            {
+                return System.Convert.ToUInt16((string)value, 16);
+            }
+            catch(Exception ex)
+            { 
+                return ex ; 
+            }
+        }
     }
 
     public class RemoteOperationImage : IValueConverter

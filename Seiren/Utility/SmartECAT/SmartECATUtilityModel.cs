@@ -403,16 +403,16 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility
                 {
                     InstallationState = "Transfer SMART-ECAT RT NIC Driver File.";
                     __transfer_local_file(string.Join(null, __LOCAL_FIRMWARE_PATH, SmartECATInstallerProperty.DEFAULT_RT_NIC_DRIVER_NAME),
-                        $"ftp://{SmartECATProperty.FTPTargetProperty.HostIPv4}:{SmartECATProperty.FTPTargetProperty.HostPort}{SmartECATProperty.InstallerProperty.BUILT_IN_MEMORY_PATH}",
+                        $"ftp://{SmartECATProperty.FTPTargetProperty.HostIPv4}:{SmartECATProperty.FTPTargetProperty.HostPort}{SmartECATProperty.InstallerProperty.RT_NIC_DRIVER_PATH}",
                         SmartECATInstallerProperty.DEFAULT_RT_NIC_DRIVER_NAME,
                         SmartECATProperty.FTPTargetProperty.User, SmartECATProperty.FTPTargetProperty.Password, 4096 * 16);
                 }
                 if (SmartECATProperty.InstallerProperty.TransferAPP)
                 {
                     InstallationState = "Transfer SMART-ECAT Application File.";
-                    __transfer_local_file(string.Join(null, __LOCAL_FIRMWARE_PATH, SmartECATInstallerProperty.DEFAULT_ECAT_ALP_NAME),
-                        $"ftp://{SmartECATProperty.FTPTargetProperty.HostIPv4}:{SmartECATProperty.FTPTargetProperty.HostPort}{SmartECATProperty.InstallerProperty.BUILT_IN_MEMORY_PATH}",
-                        SmartECATInstallerProperty.DEFAULT_ECAT_ALP_NAME,
+                    __transfer_local_file(string.Join(null, __LOCAL_FIRMWARE_PATH, SmartECATInstallerProperty.DEFAULT_ECAT_APL_NAME),
+                        $"ftp://{SmartECATProperty.FTPTargetProperty.HostIPv4}:{SmartECATProperty.FTPTargetProperty.HostPort}{SmartECATProperty.InstallerProperty.ECAT_APL_PATH}",
+                        SmartECATInstallerProperty.DEFAULT_ECAT_APL_NAME,
                         SmartECATProperty.FTPTargetProperty.User, SmartECATProperty.FTPTargetProperty.Password, 4096 * 16);
                 }
                 InstallationState = "Done: Transfer SMART-ECAT Firmware File.";
@@ -456,7 +456,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility
                         SmartECATInstallerProperty.DEFAULT_SETTING_INI_NAME, SmartECATProperty.FTPTargetProperty.User, SmartECATProperty.FTPTargetProperty.Password))
                     using (StreamWriter sw = new StreamWriter(sm, Encoding.ASCII))
                     {
-                        sw.Write($"logFileSize={SmartECATProperty.InstallerProperty.LogFileSize * 1024}");
+                        sw.WriteLine($"logFileSize={SmartECATProperty.InstallerProperty.LogFileSize * 1024}");
+                        sw.WriteLine($"DisconnectPDhold={(int)SmartECATProperty.InstallerProperty.DisconnectProcessData}");
                     }
                 }
 
@@ -466,8 +467,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility
                     SmartECATInstallerProperty.DEFAULT_STARTUP_CMD_NAME, SmartECATProperty.FTPTargetProperty.User, SmartECATProperty.FTPTargetProperty.Password))
                 using (StreamWriter sw = new StreamWriter(sm, Encoding.ASCII))
                 {
-                    sw.WriteLine($"ld(1,0,\"{SmartECATProperty.InstallerProperty.BUILT_IN_MEMORY_PATH}{SmartECATInstallerProperty.DEFAULT_RT_NIC_DRIVER_NAME}\")");
-                    sw.WriteLine($"ld(1,0,\"{SmartECATProperty.InstallerProperty.BUILT_IN_MEMORY_PATH}{SmartECATInstallerProperty.DEFAULT_ECAT_ALP_NAME}\")");
+                    sw.WriteLine($"ld(1,0,\"{SmartECATProperty.InstallerProperty.RT_NIC_DRIVER_PATH}{SmartECATInstallerProperty.DEFAULT_RT_NIC_DRIVER_NAME}\")");
+                    sw.WriteLine($"ld(1,0,\"{SmartECATProperty.InstallerProperty.ECAT_APL_PATH}{SmartECATInstallerProperty.DEFAULT_ECAT_APL_NAME}\")");
                     sw.WriteLine("ts \"miiBusMonitor\"");
                     sw.WriteLine($"taskSpawn(\"tEcat\",10,0x1000000,40000,ecatMain,\"-f " +
                         $"{SmartECATProperty.InstallerProperty.ToString()}" +

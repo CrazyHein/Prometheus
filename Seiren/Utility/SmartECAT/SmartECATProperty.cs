@@ -27,6 +27,12 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility
         CH2,
     }
 
+    public enum SmartECATDisconnectProcessData:int
+    { 
+        CLEAR = 0,
+        HOLD = 1
+    }
+
     public class IsDualNetworkPortPlatform : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
@@ -156,7 +162,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility
         public const string DEFAULT_LIC_NAME = "EtherCAT.lic";
         public const string DEFAULT_ENI_NAME = "masterENI.xml";
         public const string DEFAULT_RT_NIC_DRIVER_NAME = "emllDW3504.out";
-        public const string DEFAULT_ECAT_ALP_NAME = "ecatAPL_ClassA.out";
+        public const string DEFAULT_ECAT_APL_NAME = "ecatAPL_ClassA.out";
         public const string DEFAULE_IDOL_INI_NAME = "idol.ini";
         public const string DEFAULT_RETRY_INI_NAME = "retry.ini";
         public const string DEFAULT_SETTING_INI_NAME = "setting.ini";
@@ -210,6 +216,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility
         }
 
         public SmartECATMainPort MainPort { get; set; } = SmartECATMainPort.CH1;
+        public SmartECATDisconnectProcessData DisconnectProcessData { get; set; } = SmartECATDisconnectProcessData.HOLD;
         public bool TransferNetworkInformation { get; set; } = true;
         public string LocalNetworkInformationFilePath { set; get; } = "";
 
@@ -329,5 +336,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility
         [JsonIgnore]
         public string LOG_PATH { get { return $"{SDCARD_PATH}Log/"; } }
 
+        [JsonIgnore]
+        public string ECAT_APL_PATH { get { return ENI_PATH; } }
+        [JsonIgnore]
+        public string RT_NIC_DRIVER_PATH { get { return ENI_PATH; } }
     }
 }

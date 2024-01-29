@@ -48,5 +48,29 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility
             get { return __remote_clear_mode; }
             set { __remote_clear_mode = value; OnPropertyChanged("RemoteClearMode"); }
         }
+
+        private SMART_ECAT_COMMAND_T __ecat_command = SMART_ECAT_COMMAND_T.RESET_REQUEST;
+        public SMART_ECAT_COMMAND_T ECATCommand
+        {
+            get { return __ecat_command; }
+            set { __ecat_command = value; OnPropertyChanged("ECATCommand"); }
+        }
+
+        private ushort __ecat_module_address = 0x0000;
+        public ushort ECATModuleAddress
+        {
+            get { return __ecat_module_address; }
+            set { __ecat_module_address = value; OnPropertyChanged("ECATModuleAddress"); }
+        }
+
+        private int __ecat_command_waiting = 2000;
+        public int ECATCommandWaiting
+        {
+            get { return __ecat_command_waiting; }
+            set { __ecat_command_waiting = value; OnPropertyChanged("ECATCommandWaiting"); }
+        }
+
+        public const ushort ECATCommandRequestRegister = 16400;
+        public const ushort ECATCommandResponseRegister = 32784;
     }
 }
