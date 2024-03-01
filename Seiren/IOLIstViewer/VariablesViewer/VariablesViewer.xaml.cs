@@ -4,6 +4,7 @@ using Syncfusion.UI.Xaml.Grid;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -15,7 +16,6 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
     /// </summary>
     public partial class VariablesViewer : UserControl
     {
-        private VariableModel __default_variable_model;
         public VariablesViewer(VariableDictionary dic, DataTypeCatalogue dtc, OperatingHistory history = null)
         {
             InitializeComponent();
@@ -28,6 +28,20 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         private bool __raw_viewer()
         {
             return MainViewer.GroupColumnDescriptions.Count == 0 && MainViewer.SortColumnDescriptions.Count == 0 && MainViewer.Columns.All(c => c.FilterPredicates.Count == 0);
+        }
+
+        private VariableModel? __DefaultVariableModel
+        {
+            get
+            {
+                if(Clipboard.ContainsText())
+                {
+                    string obj = Clipboard.GetText();
+                    return VariableModel.FromBinary(Encoding.UTF8.GetBytes(obj), (DataContext as VariablesModel).DataTypeCatalogue);
+                }
+                else
+                    return null;
+            }
         }
 
         private void OnMainViewer_Dropped(object sender, Syncfusion.UI.Xaml.Grid.GridRowDroppedEventArgs e)
@@ -69,7 +83,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         private void AddRecordCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             DataType dt = (DataContext as VariablesModel).DataTypeCatalogue.DataTypes.Values.FirstOrDefault();
-            VariableViewer wnd = new VariableViewer(DataContext as VariablesModel, __default_variable_model ?? new VariableModel() { DataType = dt }, InputDialogDisplayMode.Add);
+            VariableViewer wnd = new VariableViewer(DataContext as VariablesModel, __DefaultVariableModel ?? new VariableModel() { DataType = dt }, InputDialogDisplayMode.Add);
             wnd.WindowStartupLocation = WindowStartupLocation.CenterScreen;
             if (wnd.ShowDialog() == true)
             {
@@ -101,7 +115,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         private void InsertRecordCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             DataType dt = (DataContext as VariablesModel).DataTypeCatalogue.DataTypes.Values.FirstOrDefault();
-            VariableViewer wnd = new VariableViewer(DataContext as VariablesModel, __default_variable_model ?? new VariableModel() { DataType = dt }, InputDialogDisplayMode.Insert, MainViewer.SelectedIndex);
+            VariableViewer wnd = new VariableViewer(DataContext as VariablesModel, __DefaultVariableModel ?? new VariableModel() { DataType = dt }, InputDialogDisplayMode.Insert, MainViewer.SelectedIndex);
             wnd.WindowStartupLocation = WindowStartupLocation.CenterScreen;
             if (wnd.ShowDialog() == true)
             {
@@ -135,7 +149,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         private void DefaultRecordCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             var model = MainViewer.SelectedItem as VariableModel;
-            __default_variable_model = new VariableModel() { Unused = true, Name = model.Name, DataType = model.DataType, Unit = model.Unit, Comment = model.Comment };
+            //__default_variable_model = new VariableModel() { Unused = true, Name = model.Name, DataType = model.DataType, Unit = model.Unit, Comment = model.Comment };
+            Clipboard.SetText(Encoding.UTF8.GetString(model.ToBinary()));
         }
 
         private void MainViewer_CellDoubleTapped(object sender, GridCellDoubleTappedEventArgs e)

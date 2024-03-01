@@ -1,11 +1,17 @@
 ﻿using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia;
 using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Console;
+using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.DAQ;
+using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Debugger;
+using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Text;
+using System.Text.Json;
 
 namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
 {
@@ -282,6 +288,84 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         public override string ToString()
         {
             return String.Format("{{ Name = {0} ; Data Type = {1} ; Unit = {2} ; Comment = {3} }}", Name, DataType, Unit, Comment);
+        }
+
+        public byte[] ToBinary()
+        {
+            using var ms = new MemoryStream();
+            using var writer = new Utf8JsonWriter(ms, new JsonWriterOptions() { Indented = false });
+            writer.WriteStartObject();
+            writer.WriteString("Name", Name);
+            writer.WriteString("DataType", DataType.Name);
+            writer.WriteString("Unit", Unit);
+            writer.WriteString("Comment", Comment);
+            writer.WriteEndObject();
+            writer.Flush();
+            //Encoding.UTF8.GetString(ms.ToArray());
+
+            return ms.ToArray();
+        }
+
+        public static VariableModel? FromBinary(byte[] array, DataTypeCatalogue types)
+        {
+            try
+            {
+                var reader = new Utf8JsonReader(array, new JsonReaderOptions() { CommentHandling = JsonCommentHandling.Skip });
+                VariableModel v = new VariableModel();
+                v.Unused = true;
+                while (reader.Read())
+                {
+                    switch (reader.TokenType, reader.CurrentDepth)
+                    {
+                        case (JsonTokenType.PropertyName, 1):
+                            switch (reader.GetString())
+                            {
+                                case "Name":
+                                    reader.Read();
+                                    if (reader.TokenType == JsonTokenType.String)
+                                        v.Name = reader.GetString();
+                                    else
+                                        throw new ArgumentException("Invalid variable name");
+                                    break;
+                                case "DataType":
+                                    reader.Read();
+                                    if (reader.TokenType == JsonTokenType.String)
+                                    {
+                                        var typename = reader.GetString();
+                                        if (types.DataTypes.ContainsKey(typename))
+                                            v.DataType = types.DataTypes[typename];
+                                        else
+                                            throw new ArgumentException("Invalid variable data type");
+                                    }
+                                    else
+                                        throw new ArgumentException("Invalid variable data type");
+                                    break;
+                                case "Unit":
+                                    reader.Read();
+                                    if (reader.TokenType == JsonTokenType.String)
+                                        v.Unit = reader.GetString();
+                                    else
+                                        throw new ArgumentException("Invalid variable unit");
+                                    break;
+                                case "Comment":
+                                    reader.Read();
+                                    if (reader.TokenType == JsonTokenType.String)
+                                        v.Comment = reader.GetString();
+                                    else
+                                        throw new ArgumentException("Invalid variable comment");
+                                    break;
+                            }
+                            break;
+                        default:
+                            break;
+                    }
+                }
+                return v;
+            }
+            catch
+            { 
+                return null; 
+            }
         }
     }
 }

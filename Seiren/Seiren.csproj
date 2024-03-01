@@ -7,7 +7,7 @@
     <UseWindowsForms>true</UseWindowsForms>
     <RootNamespace>AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren</RootNamespace>
     <Nullable>annotations</Nullable>
-    <Version>0.22.4.6</Version>
+    <Version>0.22.5.6</Version>
     <Authors>CrazyHein</Authors>
     <Company>AMEC</Company>
     <ApplicationIcon>imgs\logo.ico</ApplicationIcon>
@@ -268,6 +268,24 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Metadata\SMART-ECAT\0_08_012\RD55UP12_V\emllDW3504.out">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Metadata\SMART-ECAT\0_08_0142\R12CCPU_V\ecatAPL_ClassA.out">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Metadata\SMART-ECAT\0_08_0142\R12CCPU_V\emllDW3504.out">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Metadata\SMART-ECAT\0_08_0142\RD55UP06_V\ecatAPL_ClassA.out">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Metadata\SMART-ECAT\0_08_0142\RD55UP06_V\emllDW3504.out">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Metadata\SMART-ECAT\0_08_0142\RD55UP12_V\ecatAPL_ClassA.out">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Metadata\SMART-ECAT\0_08_0142\RD55UP12_V\emllDW3504.out">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Metadata\SMART-ECAT\0_08_014\R12CCPU_V\ecatAPL_ClassA.out">

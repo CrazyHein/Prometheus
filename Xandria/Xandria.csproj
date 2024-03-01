@@ -143,6 +143,21 @@
     <None Update="Metadata\Orbment\20240109\vx_R2H_Task.out">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="Metadata\Orbment\20240209\vx_R2H_DLink.out">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Metadata\Orbment\20240209\vx_R2H_EthModule.out">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Metadata\Orbment\20240209\vx_R2H_ExtModule.out">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Metadata\Orbment\20240209\vx_R2H_ILink.out">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Metadata\Orbment\20240209\vx_R2H_Task.out">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>
