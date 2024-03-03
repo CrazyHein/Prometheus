@@ -13,10 +13,11 @@
         <CommandBinding Command="local:ConsoleControl.AddRecord" Executed="AddRecordCommand_Executed" CanExecute="AddRecordCommand_CanExecute"/>
         <CommandBinding Command="local:ConsoleControl.InsertRecord" Executed="InsertRecordCommand_Executed" CanExecute="InsertRecordCommand_CanExecute"/>
         <CommandBinding Command="local:ConsoleControl.EditRecord" Executed="EditRecordCommand_Executed" CanExecute="EditRecordCommand_CanExecute"/>
-        <CommandBinding Command="local:ConsoleControl.RemoveRecord" Executed="RemoveRecordCommand_Executed" CanExecute="EditRecordCommand_CanExecute"/>
-        <CommandBinding Command="local:ConsoleControl.DefaultRecord" Executed="DefaultRecordCommand_Executed" CanExecute="EditRecordCommand_CanExecute"/>
+        <CommandBinding Command="local:ConsoleControl.RemoveRecord" Executed="RemoveRecordCommand_Executed" CanExecute="RemoveRecordCommand_CanExecute"/>
+        <CommandBinding Command="local:ConsoleControl.DefaultRecord" Executed="DefaultRecordCommand_Executed" CanExecute="DefaultRecordCommand_CanExecute"/>
         <CommandBinding Command="local:ConsoleControl.RemoveUnused" Executed="RemoveUnusedCommand_Executed"/>
         <CommandBinding Command="local:ConsoleControl.RemoveAllUnused" Executed="RemoveAllUnusedCommand_Executed"/>
+        <CommandBinding Command="local:ConsoleControl.PasteRecord" Executed="PasteRecordCommand_Executed"/>
     </UserControl.CommandBindings>
     <UserControl.Resources>
         <ContextMenu x:Key="GridContextMenu">
@@ -72,6 +73,11 @@
     </UserControl.Resources>
     <DockPanel>
         <StackPanel DockPanel.Dock="Bottom" HorizontalAlignment="Right" Margin="4" Orientation="Horizontal">
+            <sync:ButtonAdv Label="Paste" VerticalAlignment="Center" Height="30" Width="128" Command="local:ConsoleControl.PasteRecord" Margin="4">
+                <sync:ButtonAdv.SmallIcon>
+                    <BitmapImage  UriSource="/imgs/add.png"/>
+                </sync:ButtonAdv.SmallIcon>
+            </sync:ButtonAdv>
             <sync:ButtonAdv Label="Add" VerticalAlignment="Center" Height="30" Width="128" Command="local:ConsoleControl.AddRecord" Margin="4">
                 <sync:ButtonAdv.SmallIcon>
                     <BitmapImage  UriSource="/imgs/add.png"/>
@@ -100,7 +106,8 @@
                      LiveDataUpdateMode="AllowDataShaping" ScrollMode="Async"
                      AllowDraggingRows="True" AllowDrop="True" RowDragDropTemplate="{StaticResource RecordDragDropTemplate}"
                      CellDoubleTapped="MainViewer_CellDoubleTapped" QueryRowHeight="MainViewer_QueryRowHeight"
-                     RecordContextMenu="{StaticResource GridContextMenu}"
+                     RecordContextMenu="{StaticResource GridContextMenu}" SelectionMode="Extended"
+                     GridCopyOption="CopyData" GridPasteOption="None"
                      >
             <!--sync:SfDataGrid.SortComparers>
                 <linq:SortComparer Comparer="{StaticResource DTComparer}" PropertyName="DataType" />

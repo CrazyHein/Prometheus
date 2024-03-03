@@ -1,13 +1,18 @@
 ﻿using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia;
+using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Console;
 using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility;
 using Syncfusion.UI.Xaml.Grid;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Xml;
+using System.Xml.Linq;
 
 namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
 {
@@ -34,13 +39,25 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         {
             get
             {
-                if(Clipboard.ContainsText())
+                try
                 {
-                    string obj = Clipboard.GetText();
-                    return VariableModel.FromBinary(Encoding.UTF8.GetBytes(obj), (DataContext as VariablesModel).DataTypeCatalogue);
+                    if (Clipboard.ContainsText())
+                    {
+                        XmlDocument xmlDoc = new XmlDocument();
+                        xmlDoc.LoadXml(Clipboard.GetText());
+
+                        XmlNode rootNode = xmlDoc.SelectSingleNode("/"+ typeof(VariableModel).FullName + "-" + Settings.SeirenVersion);
+                        foreach (XmlNode varNode in rootNode?.ChildNodes)
+                            return VariableModel.FromXml(varNode, (DataContext as VariablesModel).DataTypeCatalogue);
+                        return null;
+                    }
+                    else
+                        return null;
                 }
-                else
+                catch
+                {
                     return null;
+                }
             }
         }
 
@@ -68,7 +85,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
 
         private void OnMainViewer_DragStart(object sender, Syncfusion.UI.Xaml.Grid.GridRowDragStartEventArgs e)
         {
-            if (__raw_viewer() == false)
+            if (__raw_viewer() == false || MainViewer.SelectedItems.Count != 1)
                 e.Handled = true;
         }
         private void OnMainViewer_DragOver(object sender, Syncfusion.UI.Xaml.Grid.GridRowDragOverEventArgs e)
@@ -109,7 +126,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
 
         private void EditRecordCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = MainViewer != null && MainViewer.SelectedItem != null;
+            e.CanExecute = MainViewer != null && MainViewer.SelectedItem != null && MainViewer.SelectedItems.Count == 1;
         }
 
         private void InsertRecordCommand_Executed(object sender, ExecutedRoutedEventArgs e)
@@ -127,30 +144,131 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
 
         private void InsertRecordCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = MainViewer != null && MainViewer.SelectedItem != null && __raw_viewer();
+            e.CanExecute = MainViewer != null && MainViewer.SelectedItem != null && __raw_viewer() && MainViewer.SelectedItems.Count == 1;
         }
 
         private void RemoveRecordCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            string record = MainViewer.SelectedItem.ToString();
-            if (MessageBox.Show("Are you sure you want to remove the record :\n" + record, "Question", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+            string record = string.Empty;
+            if (MainViewer.SelectedItems.Count == 1)
+                record = MainViewer.SelectedItem.ToString();
+            else
             {
-                try
+                int i = 0;
+                for (i = 0; i < MainViewer.SelectedItems.Count; ++i)
                 {
-                    (DataContext as VariablesModel).Remove(MainViewer.SelectedItem as VariableModel);
+                    if (i >= 15)
+                        break;
+                    record += (MainViewer.SelectedItems[i] as VariableModel).ToString() + "\n";
                 }
-                catch (LombardiaException ex)
+                if (i != MainViewer.SelectedItems.Count)
                 {
-                    MessageBox.Show("At least one exception has occurred during the operation :\n" + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    record += "...\n";
+                    record += (MainViewer.SelectedItems[MainViewer.SelectedItems.Count - 1] as VariableModel).ToString() + "\n";
                 }
             }
+
+            if (MessageBox.Show("Are you sure you want to remove the record(s) :\n" + record, "Question", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.No)
+                return;
+
+            var list = MainViewer.SelectedItems.Select(r => r as VariableModel).ToList();
+            try
+            {
+                foreach(var i in list)
+                    (DataContext as VariablesModel).Remove(i);
+            }
+            catch (LombardiaException ex)
+            {
+                MessageBox.Show("At least one exception has occurred during the operation :\n" + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            
+        }
+
+        private void RemoveRecordCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = MainViewer != null && MainViewer.SelectedItem != null && MainViewer.SelectedItems.All(v => (v as VariableModel).Unused == true);
         }
 
         private void DefaultRecordCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            var model = MainViewer.SelectedItem as VariableModel;
-            //__default_variable_model = new VariableModel() { Unused = true, Name = model.Name, DataType = model.DataType, Unit = model.Unit, Comment = model.Comment };
-            Clipboard.SetText(Encoding.UTF8.GetString(model.ToBinary()));
+            try
+            {
+                XmlDocument xmlDoc = new XmlDocument();
+                XmlDeclaration decl = xmlDoc.CreateXmlDeclaration("1.0", "UTF-8", null);
+                xmlDoc.AppendChild(decl);
+
+                XmlElement root = xmlDoc.CreateElement(typeof(VariableModel).FullName + "-" + Settings.SeirenVersion);
+
+                foreach (VariableModel model in MainViewer.SelectedItems.Select(r => r as VariableModel).OrderBy(r => (DataContext as VariablesModel).IndexOf(r)))
+                    root.AppendChild(model.ToXml(xmlDoc));
+
+                xmlDoc.AppendChild(root);
+
+                StringBuilder sb = new StringBuilder();
+                StringWriter writer = new StringWriter(sb);
+                xmlDoc.Save(writer);
+
+                Clipboard.SetDataObject(sb.ToString());
+                DebugConsole.WriteInfo("Copy Variable(s) to clipboard");
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show("At least one exception has occurred during the operation :\n" + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                DebugConsole.WriteException(ex);
+            } 
+        }
+
+        private void DefaultRecordCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = MainViewer != null && MainViewer.SelectedItem != null;
+        }
+
+        private void PasteRecordCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            try
+            {
+                if (Clipboard.ContainsText())
+                {
+                    XmlDocument xmlDoc = new XmlDocument();
+                    xmlDoc.LoadXml(Clipboard.GetText());
+
+                    XmlNode rootNode = xmlDoc.SelectSingleNode("/" + typeof(VariableModel).FullName + "-" + Settings.SeirenVersion);
+                    MainViewer.SelectedItems.Clear();
+                    foreach (XmlNode varNode in rootNode?.ChildNodes)
+                    {
+                        var v = VariableModel.FromXml(varNode, (DataContext as VariablesModel).DataTypeCatalogue);
+                        if(v != null)
+                        {
+                            DebugConsole.WriteInfo($"Find variable: \"{v.Name}\" from clipboard");
+                            string originalName = v.Name.Trim();
+                            string revisedName = originalName;
+                            int i = 0;
+                            while ((DataContext as VariablesModel).Contains(revisedName))
+                            {
+                                revisedName = originalName + $"({i})";
+                                i++;
+                            }
+                            if (originalName != revisedName)
+                            {
+                                v.Name = revisedName;
+                                DebugConsole.WriteInfo($"Revise variable name to \"{revisedName}\"");
+                            }
+                            (DataContext as VariablesModel).Add(v);
+                            MainViewer.SelectedItems.Add(v);
+                        }
+                    }
+                    if (MainViewer.SelectedItems.Count != 0)
+                    {
+                        MainViewer.ScrollInView(new Syncfusion.UI.Xaml.ScrollAxis.RowColumnIndex(MainViewer.ResolveToRowIndex(MainViewer.SelectedItems.Last()),
+                            MainViewer.ResolveToStartColumnIndex()));
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                //MessageBox.Show("At least one exception has occurred during the operation :\n" + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                DebugConsole.WriteException(ex);
+            }
         }
 
         private void MainViewer_CellDoubleTapped(object sender, GridCellDoubleTappedEventArgs e)

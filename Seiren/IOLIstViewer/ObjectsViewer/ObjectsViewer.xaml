@@ -80,7 +80,7 @@
                     <CommandBinding Command="local:ConsoleControl.AddRecord" Executed="AddRecordCommand_Executed" CanExecute="AddRecordCommand_CanExecute"/>
                     <CommandBinding Command="local:ConsoleControl.InsertRecord" Executed="InsertRecordCommand_Executed" CanExecute="InsertRecordCommand_CanExecute"/>
                     <CommandBinding Command="local:ConsoleControl.EditRecord" Executed="EditRecordCommand_Executed" CanExecute="EditRecordCommand_CanExecute"/>
-                    <CommandBinding Command="local:ConsoleControl.RemoveRecord" Executed="RemoveRecordCommand_Executed" CanExecute="EditRecordCommand_CanExecute"/>
+                    <CommandBinding Command="local:ConsoleControl.RemoveRecord" Executed="RemoveRecordCommand_Executed" CanExecute="RemoveRecordCommand_CanExecute"/>
                     <CommandBinding Command="local:ConsoleControl.FindInProcessDataImage" Executed="FindInProcessDataImageCommand_Executed" CanExecute="FindInProcessDataImageCommand_CanExecute"/>
                     <CommandBinding Command="local:ConsoleControl.RemoveUnused" Executed="RemoveUnusedCommand_Executed"/>
                     <CommandBinding Command="local:ConsoleControl.RemoveAllUnused" Executed="RemoveAllUnusedCommand_Executed"/>

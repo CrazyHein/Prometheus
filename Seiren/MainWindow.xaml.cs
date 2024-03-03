@@ -146,19 +146,19 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
 
             try
             {
-                __data_type_catalogue = new DataTypeCatalogue(__settings.DataTypeCataloguePath);
-                __controller_model_catalogue = new ControllerModelCatalogue(__settings.ControllerModelCataloguePath);
-                __settings.DataTypeCatalogueHash = __data_type_catalogue.MD5Code;
-                __settings.ControllerModelCatalogueHash = __controller_model_catalogue.MD5Code;
+                __data_type_catalogue = new DataTypeCatalogue(Settings.DataTypeCataloguePath);
+                __controller_model_catalogue = new ControllerModelCatalogue(Settings.ControllerModelCataloguePath);
+                Settings.DataTypeCatalogueHash = __data_type_catalogue.MD5Code;
+                Settings.ControllerModelCatalogueHash = __controller_model_catalogue.MD5Code;
 
-                DebugConsole.WriteInfo($"Data Type Catalogue Path: {__settings.DataTypeCataloguePath}");
-                DebugConsole.WriteInfo($"Data Type Catalogue Hash: {string.Join("-", __settings.DataTypeCatalogueHash.Select(b => b.ToString("X2")))}");
-                DebugConsole.WriteInfo($"Controller Model Catalogue Path: {__settings.ControllerModelCataloguePath}");
-                DebugConsole.WriteInfo($"Controller Model Catalogue Hash: {string.Join("-", __settings.ControllerModelCatalogueHash.Select(b => b.ToString("X2")))}");
-                DebugConsole.WriteInfo($"Seiren Version: {__settings.SeirenVersion}");
-                DebugConsole.WriteInfo($"Lombardia Version: {__settings.LombardiaVersion}");
-                DebugConsole.WriteInfo($"Gagharv Version: {__settings.GagharvVersion}");
-                DebugConsole.WriteInfo($"Tirasweel Version: {__settings.TirasweelVersion}");
+                DebugConsole.WriteInfo($"Data Type Catalogue Path: {Settings.DataTypeCataloguePath}");
+                DebugConsole.WriteInfo($"Data Type Catalogue Hash: {string.Join("-", Settings.DataTypeCatalogueHash.Select(b => b.ToString("X2")))}");
+                DebugConsole.WriteInfo($"Controller Model Catalogue Path: {Settings.ControllerModelCataloguePath}");
+                DebugConsole.WriteInfo($"Controller Model Catalogue Hash: {string.Join("-", Settings.ControllerModelCatalogueHash.Select(b => b.ToString("X2")))}");
+                DebugConsole.WriteInfo($"Seiren Version: {Settings.SeirenVersion}");
+                DebugConsole.WriteInfo($"Lombardia Version: {Settings.LombardiaVersion}");
+                DebugConsole.WriteInfo($"Gagharv Version: {Settings.GagharvVersion}");
+                DebugConsole.WriteInfo($"Tirasweel Version: {Settings.TirasweelVersion}");
 
                 __data_types_viewer = new DataTypesViewer(__data_type_catalogue);
                 __device_models_viewer = new DeviceModelsViewer(__controller_model_catalogue);
@@ -179,9 +179,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                 __ecat_variable_datatype_converter = new EtherCATVaribleDataTypeConverter(__data_type_catalogue);
                 __cip_assembly_io_datatype_converter = new CIPAssemblyIODataTypeConverter(__data_type_catalogue);
 
-                if (!System.IO.Directory.Exists(__settings.UserSettingsPath))
+                if (!System.IO.Directory.Exists(Settings.UserSettingsPath))
                 {
-                    System.IO.Directory.CreateDirectory(__settings.UserSettingsPath);
+                    System.IO.Directory.CreateDirectory(Settings.UserSettingsPath);
                 }
             }
             catch (LombardiaException ex)
@@ -545,7 +545,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                 System.Windows.Forms.OpenFileDialog open = new System.Windows.Forms.OpenFileDialog();
                 open.Filter = "Seiren Configuration File(*.json)|*.json";
                 open.Multiselect = false;
-                open.InitialDirectory = System.IO.Path.Combine(System.Environment.CurrentDirectory, __settings.UserSettingsPath);
+                open.InitialDirectory = System.IO.Path.Combine(System.Environment.CurrentDirectory, Settings.UserSettingsPath);
                 if (open.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                 {
                     Settings s = new Settings(open.FileName);
@@ -556,7 +556,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             else if (e.Item.Header as string == "Export Settings")
             {
                 System.Windows.Forms.SaveFileDialog save = new System.Windows.Forms.SaveFileDialog() { DefaultExt = "json", AddExtension = true };
-                save.InitialDirectory = System.IO.Path.Combine(System.Environment.CurrentDirectory, __settings.UserSettingsPath);
+                save.InitialDirectory = System.IO.Path.Combine(System.Environment.CurrentDirectory, Settings.UserSettingsPath);
                 save.Filter = "Seiren Configuration File(*.json)|*.json";
                 if (save.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                 {

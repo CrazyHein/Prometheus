@@ -32,24 +32,24 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             PreferenceProperty = pref;
         }
 
-        public string Description { get; init; } = "A graphical user interface for [Foliage Ocean IO List]";
-        public string DataTypeCataloguePath { get; init; } = "Metadata/data_type_catalogue.xml";
-        public string ControllerModelCataloguePath { get; init; } = "Metadata/controller_model_catalogue.xml";
-        public string SettingsPath { get; init; } = "settings.json";
+        public static string Description { get; } = "A graphical user interface for [Foliage Ocean IO List]";
+        public static string DataTypeCataloguePath { get; } = "Metadata/data_type_catalogue.xml";
+        public static string ControllerModelCataloguePath { get; } = "Metadata/controller_model_catalogue.xml";
+        public static string SettingsPath { get; } = "settings.json";
 
-        public string UserSettingsPath { get; init; } = "USettings";
+        public static string UserSettingsPath { get; } = "USettings";
 
-        public byte[] DataTypeCatalogueHash { get; set; }
-        public byte[] ControllerModelCatalogueHash { get; set; }
+        public static byte[] DataTypeCatalogueHash { get; set; }
+        public static byte[] ControllerModelCatalogueHash { get; set; }
 
-        public string SeirenVersion { get; init; } = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
-        public string LombardiaVersion { get; init; } = System.Reflection.Assembly.GetAssembly(typeof(IOCelcetaHelper)).GetName().Version.ToString();
+        public static string SeirenVersion { get; } = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
+        public static string LombardiaVersion { get; } = System.Reflection.Assembly.GetAssembly(typeof(IOCelcetaHelper)).GetName().Version.ToString();
 
-        public uint SupporedFileFormatVersion { get; init; } = IOCelcetaHelper.SupportedFileFormatVersion;
-        public uint SupportedVariableFileFormatVersion { get; init; } = IOCelcetaHelper.SupportedVariableFileFormatVersion;
-        public uint SupportedIOFileFormatVersion { get; init; } = IOCelcetaHelper.SupportedIOFileFormatVersion;
-        public string GagharvVersion { get; init; } = System.Reflection.Assembly.GetAssembly(typeof(RemoteOperationMaster)).GetName().Version.ToString();
-        public string TirasweelVersion { get; init; } = System.Reflection.Assembly.GetAssembly(typeof(AMEC.PCSoftware.CommunicationProtocol.CrazyHein.OrbmentDAQ.Protocol.Master)).GetName().Version.ToString();
+        public static uint SupporedFileFormatVersion { get; } = IOCelcetaHelper.SupportedFileFormatVersion;
+        public static uint SupportedVariableFileFormatVersion { get; } = IOCelcetaHelper.SupportedVariableFileFormatVersion;
+        public static uint SupportedIOFileFormatVersion { get; } = IOCelcetaHelper.SupportedIOFileFormatVersion;
+        public static string GagharvVersion { get; } = System.Reflection.Assembly.GetAssembly(typeof(RemoteOperationMaster)).GetName().Version.ToString();
+        public static string TirasweelVersion { get; } = System.Reflection.Assembly.GetAssembly(typeof(AMEC.PCSoftware.CommunicationProtocol.CrazyHein.OrbmentDAQ.Protocol.Master)).GetName().Version.ToString();
 
         public SlmpTargetProperty SlmpTargetProperty { get; set; }
         public DAQTargetProperty DAQTargetProperty { get; set; }

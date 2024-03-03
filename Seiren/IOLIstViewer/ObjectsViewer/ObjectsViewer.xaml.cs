@@ -195,18 +195,42 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
 
         private void RemoveRecordCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            string record = MainViewer.SelectedItem.ToString();
-            if (MessageBox.Show("Are you sure you want to remove the record :\n" + record, "Question", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+            string record = string.Empty;
+            if (MainViewer.SelectedItems.Count == 1)
+                record = MainViewer.SelectedItem.ToString();
+            else
             {
-                try
+                int i = 0;
+                for (i = 0; i < MainViewer.SelectedItems.Count; ++i)
                 {
-                    (DataContext as ObjectsModel).Remove(MainViewer.SelectedItem as ObjectModel);
+                    if (i >= 7)
+                        break;
+                    record += (MainViewer.SelectedItems[i] as ObjectModel).ToString() + "\n";
                 }
-                catch (LombardiaException ex)
+                if (i != MainViewer.SelectedItems.Count)
                 {
-                    MessageBox.Show("At least one exception has occurred during the operation :\n" + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    record += "...\n";
+                    record += (MainViewer.SelectedItems[MainViewer.SelectedItems.Count - 1] as ObjectModel).ToString() + "\n";
                 }
             }
+            if (MessageBox.Show("Are you sure you want to remove the record(s) :\n" + record, "Question", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.No)
+                return;
+
+            var list = MainViewer.SelectedItems.Select(r => r as ObjectModel).ToList();
+            try
+            {
+                foreach (var i in list)
+                    (DataContext as ObjectsModel).Remove(i);
+            }
+            catch (LombardiaException ex)
+            {
+                MessageBox.Show("At least one exception has occurred during the operation :\n" + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void RemoveRecordCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = MainViewer != null && MainViewer.SelectedItem != null && MainViewer.SelectedItems.All(v => (v as ObjectModel).Unused == true);
         }
 
         public void UpdateBindingSource()

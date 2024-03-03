@@ -10,8 +10,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Text.Json;
+using System.Xml;
 
 namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
 {
@@ -290,81 +289,49 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             return String.Format("{{ Name = {0} ; Data Type = {1} ; Unit = {2} ; Comment = {3} }}", Name, DataType, Unit, Comment);
         }
 
-        public byte[] ToBinary()
+        public XmlElement ToXml(XmlDocument doc)
         {
-            using var ms = new MemoryStream();
-            using var writer = new Utf8JsonWriter(ms, new JsonWriterOptions() { Indented = false });
-            writer.WriteStartObject();
-            writer.WriteString("Name", Name);
-            writer.WriteString("DataType", DataType.Name);
-            writer.WriteString("Unit", Unit);
-            writer.WriteString("Comment", Comment);
-            writer.WriteEndObject();
-            writer.Flush();
-            //Encoding.UTF8.GetString(ms.ToArray());
+            XmlElement variableModel = doc.CreateElement("VariableModel");
 
-            return ms.ToArray();
+            XmlElement sub = doc.CreateElement("Name");
+            sub.AppendChild(doc.CreateTextNode(Name.Trim()));
+            variableModel.AppendChild(sub);
+
+            sub = doc.CreateElement("DataType");
+            sub.AppendChild(doc.CreateTextNode(DataType.Name));
+            variableModel.AppendChild(sub);
+
+            sub = doc.CreateElement("Unit");
+            sub.AppendChild(doc.CreateTextNode(Unit.Trim()));
+            variableModel.AppendChild(sub);
+
+            sub = doc.CreateElement("Comment");
+            sub.AppendChild(doc.CreateTextNode(Comment));
+            variableModel.AppendChild(sub);
+
+            return variableModel;
         }
 
-        public static VariableModel? FromBinary(byte[] array, DataTypeCatalogue types)
+        public static VariableModel? FromXml(XmlNode node, DataTypeCatalogue types)
         {
             try
             {
-                var reader = new Utf8JsonReader(array, new JsonReaderOptions() { CommentHandling = JsonCommentHandling.Skip });
-                VariableModel v = new VariableModel();
-                v.Unused = true;
-                while (reader.Read())
+                if(node.NodeType == XmlNodeType.Element && node.Name == "VariableModel")
                 {
-                    switch (reader.TokenType, reader.CurrentDepth)
-                    {
-                        case (JsonTokenType.PropertyName, 1):
-                            switch (reader.GetString())
-                            {
-                                case "Name":
-                                    reader.Read();
-                                    if (reader.TokenType == JsonTokenType.String)
-                                        v.Name = reader.GetString();
-                                    else
-                                        throw new ArgumentException("Invalid variable name");
-                                    break;
-                                case "DataType":
-                                    reader.Read();
-                                    if (reader.TokenType == JsonTokenType.String)
-                                    {
-                                        var typename = reader.GetString();
-                                        if (types.DataTypes.ContainsKey(typename))
-                                            v.DataType = types.DataTypes[typename];
-                                        else
-                                            throw new ArgumentException("Invalid variable data type");
-                                    }
-                                    else
-                                        throw new ArgumentException("Invalid variable data type");
-                                    break;
-                                case "Unit":
-                                    reader.Read();
-                                    if (reader.TokenType == JsonTokenType.String)
-                                        v.Unit = reader.GetString();
-                                    else
-                                        throw new ArgumentException("Invalid variable unit");
-                                    break;
-                                case "Comment":
-                                    reader.Read();
-                                    if (reader.TokenType == JsonTokenType.String)
-                                        v.Comment = reader.GetString();
-                                    else
-                                        throw new ArgumentException("Invalid variable comment");
-                                    break;
-                            }
-                            break;
-                        default:
-                            break;
-                    }
+                    VariableModel v = new VariableModel();
+                    v.Unused = true;
+                    v.Name = node.SelectSingleNode("Name").FirstChild?.Value.Trim();
+                    v.DataType = types.DataTypes[node.SelectSingleNode("DataType").FirstChild?.Value];
+                    v.Unit = node.SelectSingleNode("Unit").FirstChild.Value?.Trim();
+                    v.Comment = node.SelectSingleNode("Comment").FirstChild?.Value;
+                    return v;
                 }
-                return v;
+                else
+                    return null;
             }
-            catch
-            { 
-                return null; 
+            catch (Exception)
+            {
+                return null;
             }
         }
     }
