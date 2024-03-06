@@ -10,7 +10,7 @@ using System.Xml;
 
 namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
 {
-    public class ControllerConfigurationModel : RecordContainerModel
+    public class ControllerConfigurationModel : RecordContainerModel, IDeSerializableRecordModel<DeviceConfigurationModel>
     {
         private ControllerConfiguration __controller_configuration_collection;
         public ControllerModelCatalogue ControllerModelCatalogue { get; private set; }
@@ -317,9 +317,47 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                     break;
             }
         }
+
+        public DeviceConfigurationModel? FromXml(XmlNode node)
+        {
+            try
+            {
+                if (node.NodeType == XmlNodeType.Element && node.Name == "DeviceConfigurationModel")
+                {
+                    DeviceConfigurationModel d = new DeviceConfigurationModel();
+                    d.Unused = true;
+
+                    d.Switch = Convert.ToUInt32(node.SelectSingleNode("Switch").FirstChild.Value, 16);
+                    d.LocalAddress = Convert.ToUInt16(node.SelectSingleNode("Address").FirstChild.Value, 16);
+                    d.IPv4 = node.SelectSingleNode("IP").FirstChild.Value;
+                    d.Port = Convert.ToUInt16(node.SelectSingleNode("Port").FirstChild.Value, 10);
+                    d.ReferenceName = node.SelectSingleNode("ReferenceName").FirstChild.Value;
+
+                    ushort id = Convert.ToUInt16(node.SelectSingleNode("ID").FirstChild.Value, 16);
+                    string name = node.SelectSingleNode("Name").FirstChild.Value;
+                    if (ControllerModelCatalogue.LocalExtensionModels.ContainsKey(id) && ControllerModelCatalogue.LocalExtensionModels[id].Name == name)
+                    {
+                        d.DeviceModel = ControllerModelCatalogue.LocalExtensionModels[id];
+                        return d;
+                    }
+                    else if (ControllerModelCatalogue.RemoteEthernetModels.ContainsKey(id) && ControllerModelCatalogue.RemoteEthernetModels[id].Name == name)
+                    {
+                        d.DeviceModel = ControllerModelCatalogue.RemoteEthernetModels[id];
+                        return d;
+                    }
+                    return null;
+                }
+                else
+                    return null;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
     }
 
-    public class DeviceConfigurationModel : IEquatable<DeviceConfigurationModel>, INotifyPropertyChanged
+    public class DeviceConfigurationModel : IEquatable<DeviceConfigurationModel>, INotifyPropertyChanged, ISerializableRecordModel
     {
         public event PropertyChangedEventHandler? PropertyChanged;
         protected void _notify_property_changed([CallerMemberName] String propertyName = null)
@@ -358,6 +396,41 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             return DeviceModel == other.DeviceModel && Switch == other.Switch && 
                 LocalAddress == other.LocalAddress && IPv4 == other.IPv4 && Port == other.Port && 
                 ReferenceName == other.ReferenceName;
+        }
+
+        public XmlElement ToXml(XmlDocument doc)
+        {
+            XmlElement deviceModel = doc.CreateElement("DeviceConfigurationModel");
+
+            XmlElement sub = doc.CreateElement("ID");
+            sub.AppendChild(doc.CreateTextNode($"0x{ID:X4}"));
+            deviceModel.AppendChild(sub);
+
+            sub = doc.CreateElement("Switch");
+            sub.AppendChild(doc.CreateTextNode($"0x{Switch:X8}"));
+            deviceModel.AppendChild(sub);
+
+            sub = doc.CreateElement("Name");
+            sub.AppendChild(doc.CreateTextNode(Name));
+            deviceModel.AppendChild(sub);
+
+            sub = doc.CreateElement("Address");
+            sub.AppendChild(doc.CreateTextNode($"0x{LocalAddress:X4}"));
+            deviceModel.AppendChild(sub);
+
+            sub = doc.CreateElement("IP");
+            sub.AppendChild(doc.CreateTextNode(IPv4));
+            deviceModel.AppendChild(sub);
+
+            sub = doc.CreateElement("Port");
+            sub.AppendChild(doc.CreateTextNode(Port.ToString()));
+            deviceModel.AppendChild(sub);
+
+            sub = doc.CreateElement("ReferenceName");
+            sub.AppendChild(doc.CreateTextNode(ReferenceName));
+            deviceModel.AppendChild(sub);
+
+            return deviceModel;
         }
     }
 }

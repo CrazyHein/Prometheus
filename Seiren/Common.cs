@@ -76,7 +76,6 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         public static RoutedUICommand StopBackgroundDAQ { get; private set; }
         public static RoutedUICommand BrowseCIPAssemblyIOs { get; private set; }
         public static RoutedUICommand SmartECATUtility { get; private set; }
-        public static RoutedUICommand PasteRecord { get; private set; }
 
         static ConsoleControl()
         {
@@ -278,12 +277,6 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                 new KeyGesture(Key.F12, ModifierKeys.Control, "Ctrl+F12")
             };
             SmartECATUtility = new RoutedUICommand("SMART-ECAT Utility", "Open SMART-ECAT Utility Window", typeof(ConsoleControl), gestureSmartECATUtility);
-
-            InputGestureCollection gesturePasteRecord = new InputGestureCollection
-            {
-                new KeyGesture(Key.D, ModifierKeys.Control|ModifierKeys.Shift, "Ctrl+Shift+D")
-            };
-            PasteRecord = new RoutedUICommand("Paste", "Paste Record", typeof(ConsoleControl), gesturePasteRecord);
         }
     }
 

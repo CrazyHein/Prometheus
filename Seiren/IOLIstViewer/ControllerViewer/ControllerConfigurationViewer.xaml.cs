@@ -1,4 +1,5 @@
 ﻿using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia;
+using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Console;
 using Syncfusion.UI.Xaml.Grid;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -22,6 +23,13 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             MainViewer.RowDragDropController.DragOver += OnMainViewer_DragOver;
         }
 
+        private DeviceConfigurationModel? __DefaultDeviceConfigurationModel
+        {
+            get
+            {
+                return RecordUtility.DefaultRecord<ControllerConfigurationModel, DeviceConfigurationModel>(DataContext as ControllerConfigurationModel);
+            }
+        }
         private void OnMainViewer_Dropped(object sender, Syncfusion.UI.Xaml.Grid.GridRowDroppedEventArgs e)
         {
             if (e.DropPosition != DropPosition.None)
@@ -56,7 +64,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         private void AddRecordCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             LocalExtensionModel m = (DataContext as ControllerConfigurationModel).ControllerModelCatalogue.LocalExtensionModels.Values.FirstOrDefault();
-            DeviceConfigurationViewer wnd = new DeviceConfigurationViewer(DataContext as ControllerConfigurationModel, new DeviceConfigurationModel() { DeviceModel = m}, InputDialogDisplayMode.Add);
+            DeviceConfigurationViewer wnd = new DeviceConfigurationViewer(DataContext as ControllerConfigurationModel, __DefaultDeviceConfigurationModel??new DeviceConfigurationModel() { DeviceModel = m}, InputDialogDisplayMode.Add);
             wnd.WindowStartupLocation = WindowStartupLocation.CenterScreen;
             if (wnd.ShowDialog() == true)
             {
@@ -74,7 +82,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         private void InsertRecordCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             LocalExtensionModel m = (DataContext as ControllerConfigurationModel).ControllerModelCatalogue.LocalExtensionModels.Values.FirstOrDefault();
-            DeviceConfigurationViewer wnd = new DeviceConfigurationViewer(DataContext as ControllerConfigurationModel, new DeviceConfigurationModel() { DeviceModel = m }, InputDialogDisplayMode.Insert, MainViewer.SelectedIndex);
+            DeviceConfigurationViewer wnd = new DeviceConfigurationViewer(DataContext as ControllerConfigurationModel, __DefaultDeviceConfigurationModel??new DeviceConfigurationModel() { DeviceModel = m }, InputDialogDisplayMode.Insert, MainViewer.SelectedIndex);
             wnd.WindowStartupLocation = WindowStartupLocation.CenterScreen;
             if (wnd.ShowDialog() == true)
             {
@@ -100,6 +108,11 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         private void EditRecordCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
             e.CanExecute = MainViewer != null && MainViewer.SelectedItem != null;
+        }
+
+        private void RemoveRecordCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = MainViewer != null && MainViewer.SelectedItem != null && (MainViewer.SelectedItem as DeviceConfigurationModel).Unused == true;
         }
 
         private void MainViewer_CellDoubleTapped(object sender, GridCellDoubleTappedEventArgs e)
@@ -146,6 +159,98 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                     MessageBox.Show("At least one exception has occurred during the operation :\n" + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
                 MainViewer.View.EndInit();
+            }
+        }
+
+        private void DefaultRecordCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            var ex = RecordUtility.CopyRecords(MainViewer.SelectedItems.Select(r => r as DeviceConfigurationModel).OrderBy(r => (DataContext as ControllerConfigurationModel).IndexOf(r)));
+            if (ex != null)
+            {
+                MessageBox.Show("At least one exception has occurred during the operation :\n" + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                DebugConsole.WriteException(ex);
+            }
+        }
+
+        private void DefaultRecordCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = MainViewer != null && MainViewer.SelectedItem != null;
+        }
+
+        private int __unique_index = 1;
+        public string __unique_naming(string name)
+        {
+            string originalName = name;
+            string revisedName = originalName;
+
+            while ((DataContext as ControllerConfigurationModel).Contains(revisedName))
+            {
+                revisedName = originalName + $"({__unique_index})";
+                __unique_index++;
+            }
+            return revisedName;
+        }
+
+        private void AddRecordExCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            var records = RecordUtility.PasteAllRecords<ControllerConfigurationModel, DeviceConfigurationModel>(DataContext as ControllerConfigurationModel);
+            if (records.Count != 0)
+            {
+                MainViewer.ClearSelections(false);
+                foreach (var r in records)
+                {
+                    string revisedName = __unique_naming(r.ReferenceName);
+                    if (r.ReferenceName != revisedName)
+                    {
+                        DebugConsole.WriteInfo($"Module reference name [{r.ReferenceName}] -> [{revisedName}]");
+                        r.ReferenceName = revisedName;
+                    }
+                    try
+                    {
+                        (DataContext as ControllerConfigurationModel).Add(r);
+                    }
+                    catch (LombardiaException ex)
+                    {
+                        DebugConsole.WriteException(ex);
+                        continue;
+                    }
+                    MainViewer.SelectedItems.Add(r);
+                }
+                MainViewer.ScrollInView(new Syncfusion.UI.Xaml.ScrollAxis.RowColumnIndex(
+                               MainViewer.ResolveToRowIndex(MainViewer.SelectedItems.First()),
+                               MainViewer.ResolveToStartColumnIndex()));
+            }
+        }
+
+        private void InsertRecordExCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            var records = RecordUtility.PasteAllRecords<ControllerConfigurationModel, DeviceConfigurationModel>(DataContext as ControllerConfigurationModel);
+            int insertPos = MainViewer.SelectedIndex;
+            if (records.Count != 0)
+            {
+                MainViewer.ClearSelections(false);
+                foreach (var r in records.Reverse<DeviceConfigurationModel>())
+                {
+                    string revisedName = __unique_naming(r.ReferenceName);
+                    if (r.ReferenceName != revisedName)
+                    {
+                        DebugConsole.WriteInfo($"Module reference name [{r.ReferenceName}] -> [{revisedName}]");
+                        r.ReferenceName = revisedName;
+                    }
+                    try
+                    {
+                        (DataContext as ControllerConfigurationModel).Insert(insertPos, r);
+                    }
+                    catch (LombardiaException ex)
+                    {
+                        DebugConsole.WriteException(ex);
+                        continue;
+                    }
+                    MainViewer.SelectedItems.Add(r);
+                }
+                MainViewer.ScrollInView(new Syncfusion.UI.Xaml.ScrollAxis.RowColumnIndex(
+                               MainViewer.ResolveToRowIndex(MainViewer.SelectedItems.First()),
+                               MainViewer.ResolveToStartColumnIndex()));
             }
         }
 

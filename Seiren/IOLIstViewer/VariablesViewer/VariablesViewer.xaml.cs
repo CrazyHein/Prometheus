@@ -35,29 +35,13 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             return MainViewer.GroupColumnDescriptions.Count == 0 && MainViewer.SortColumnDescriptions.Count == 0 && MainViewer.Columns.All(c => c.FilterPredicates.Count == 0);
         }
 
+
+
         private VariableModel? __DefaultVariableModel
         {
             get
             {
-                try
-                {
-                    if (Clipboard.ContainsText())
-                    {
-                        XmlDocument xmlDoc = new XmlDocument();
-                        xmlDoc.LoadXml(Clipboard.GetText());
-
-                        XmlNode rootNode = xmlDoc.SelectSingleNode("/"+ typeof(VariableModel).FullName + "-" + Settings.SeirenVersion);
-                        foreach (XmlNode varNode in rootNode?.ChildNodes)
-                            return VariableModel.FromXml(varNode, (DataContext as VariablesModel).DataTypeCatalogue);
-                        return null;
-                    }
-                    else
-                        return null;
-                }
-                catch
-                {
-                    return null;
-                }
+                return RecordUtility.DefaultRecord<VariablesModel, VariableModel>(DataContext as VariablesModel);
             }
         }
 
@@ -191,31 +175,12 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
 
         private void DefaultRecordCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            try
-            {
-                XmlDocument xmlDoc = new XmlDocument();
-                XmlDeclaration decl = xmlDoc.CreateXmlDeclaration("1.0", "UTF-8", null);
-                xmlDoc.AppendChild(decl);
-
-                XmlElement root = xmlDoc.CreateElement(typeof(VariableModel).FullName + "-" + Settings.SeirenVersion);
-
-                foreach (VariableModel model in MainViewer.SelectedItems.Select(r => r as VariableModel).OrderBy(r => (DataContext as VariablesModel).IndexOf(r)))
-                    root.AppendChild(model.ToXml(xmlDoc));
-
-                xmlDoc.AppendChild(root);
-
-                StringBuilder sb = new StringBuilder();
-                StringWriter writer = new StringWriter(sb);
-                xmlDoc.Save(writer);
-
-                Clipboard.SetDataObject(sb.ToString());
-                DebugConsole.WriteInfo("Copy Variable(s) to clipboard");
-            }
-            catch(Exception ex)
+            var ex = RecordUtility.CopyRecords(MainViewer.SelectedItems.Select(r => r as VariableModel).OrderBy(r => (DataContext as VariablesModel).IndexOf(r)));
+            if(ex != null)
             {
                 MessageBox.Show("At least one exception has occurred during the operation :\n" + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 DebugConsole.WriteException(ex);
-            } 
+            }
         }
 
         private void DefaultRecordCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
@@ -223,51 +188,81 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             e.CanExecute = MainViewer != null && MainViewer.SelectedItem != null;
         }
 
-        private void PasteRecordCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        private int __unique_index = 1;
+        public string __unique_naming(string name)
         {
-            try
-            {
-                if (Clipboard.ContainsText())
-                {
-                    XmlDocument xmlDoc = new XmlDocument();
-                    xmlDoc.LoadXml(Clipboard.GetText());
+            string originalName = name;
+            string revisedName = originalName;
 
-                    XmlNode rootNode = xmlDoc.SelectSingleNode("/" + typeof(VariableModel).FullName + "-" + Settings.SeirenVersion);
-                    MainViewer.SelectedItems.Clear();
-                    foreach (XmlNode varNode in rootNode?.ChildNodes)
-                    {
-                        var v = VariableModel.FromXml(varNode, (DataContext as VariablesModel).DataTypeCatalogue);
-                        if(v != null)
-                        {
-                            DebugConsole.WriteInfo($"Find variable: \"{v.Name}\" from clipboard");
-                            string originalName = v.Name.Trim();
-                            string revisedName = originalName;
-                            int i = 0;
-                            while ((DataContext as VariablesModel).Contains(revisedName))
-                            {
-                                revisedName = originalName + $"({i})";
-                                i++;
-                            }
-                            if (originalName != revisedName)
-                            {
-                                v.Name = revisedName;
-                                DebugConsole.WriteInfo($"Revise variable name to \"{revisedName}\"");
-                            }
-                            (DataContext as VariablesModel).Add(v);
-                            MainViewer.SelectedItems.Add(v);
-                        }
-                    }
-                    if (MainViewer.SelectedItems.Count != 0)
-                    {
-                        MainViewer.ScrollInView(new Syncfusion.UI.Xaml.ScrollAxis.RowColumnIndex(MainViewer.ResolveToRowIndex(MainViewer.SelectedItems.Last()),
-                            MainViewer.ResolveToStartColumnIndex()));
-                    }
-                }
-            }
-            catch (Exception ex)
+            while ((DataContext as VariablesModel).Contains(revisedName))
             {
-                //MessageBox.Show("At least one exception has occurred during the operation :\n" + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                DebugConsole.WriteException(ex);
+                revisedName = originalName + $"({__unique_index})";
+                __unique_index++;
+            }
+            return revisedName;
+        }
+
+
+        private void AddRecordExCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            var records = RecordUtility.PasteAllRecords<VariablesModel, VariableModel>(DataContext as VariablesModel);
+            if(records.Count != 0)
+            {
+                MainViewer.ClearSelections(false);
+                foreach (var r in records)
+                {
+                    string revisedName = __unique_naming(r.Name);
+                    if (r.Name != revisedName)
+                    {
+                        DebugConsole.WriteInfo($"Variable name [{r.Name}] -> [{revisedName}]");
+                        r.Name = revisedName;
+                    }
+                    try
+                    {
+                        (DataContext as VariablesModel).Add(r);
+                    }
+                    catch (LombardiaException ex)
+                    {
+                        DebugConsole.WriteException(ex);
+                        continue;
+                    }
+                    MainViewer.SelectedItems.Add(r);
+                }
+                MainViewer.ScrollInView(new Syncfusion.UI.Xaml.ScrollAxis.RowColumnIndex(
+                               MainViewer.ResolveToRowIndex(MainViewer.SelectedItems.First()),
+                               MainViewer.ResolveToStartColumnIndex()));
+            }
+        }
+
+        private void InsertRecordExCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            var records = RecordUtility.PasteAllRecords<VariablesModel, VariableModel>(DataContext as VariablesModel);
+            int insertPos = MainViewer.SelectedIndex;
+            if (records.Count != 0)
+            {
+                MainViewer.ClearSelections(false);
+                foreach (var r in records.Reverse<VariableModel>())
+                {
+                    string revisedName = __unique_naming(r.Name);
+                    if (r.Name != revisedName)
+                    {
+                        DebugConsole.WriteInfo($"Variable name [{r.Name}] -> [{revisedName}]");
+                        r.Name = revisedName;
+                    }
+                    try
+                    {
+                        (DataContext as VariablesModel).Insert(insertPos, r);
+                    }
+                    catch (LombardiaException ex)
+                    {
+                        DebugConsole.WriteException(ex);
+                        continue;
+                    }
+                    MainViewer.SelectedItems.Add(r);
+                }
+                MainViewer.ScrollInView(new Syncfusion.UI.Xaml.ScrollAxis.RowColumnIndex(
+                               MainViewer.ResolveToRowIndex(MainViewer.SelectedItems.First()),
+                               MainViewer.ResolveToStartColumnIndex()));
             }
         }
 

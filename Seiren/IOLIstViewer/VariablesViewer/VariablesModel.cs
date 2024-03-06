@@ -14,7 +14,7 @@ using System.Xml;
 
 namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
 {
-    public class VariablesModel : RecordContainerModel
+    public class VariablesModel : RecordContainerModel, IDeSerializableRecordModel<VariableModel>
     {
         private VariableDictionary __variable_dictionary;
         public DataTypeCatalogue DataTypeCatalogue { get; private set; }
@@ -256,9 +256,32 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                     break;
             }
         }
+
+        public VariableModel? FromXml(XmlNode node)
+        {
+            try
+            {
+                if (node.NodeType == XmlNodeType.Element && node.Name == "VariableModel")
+                {
+                    VariableModel v = new VariableModel();
+                    v.Unused = true;
+                    v.Name = node.SelectSingleNode("Name").FirstChild.Value;
+                    v.DataType = DataTypeCatalogue.DataTypes[node.SelectSingleNode("DataType").FirstChild.Value];
+                    v.Unit = node.SelectSingleNode("Unit").FirstChild.Value;
+                    v.Comment = node.SelectSingleNode("Comment").FirstChild.Value;
+                    return v;
+                }
+                else
+                    return null;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
     }
 
-    public class VariableModel : IEquatable<VariableModel>, INotifyPropertyChanged
+    public class VariableModel : IEquatable<VariableModel>, INotifyPropertyChanged, ISerializableRecordModel
     {
         public event PropertyChangedEventHandler? PropertyChanged;
         protected void _notify_property_changed([CallerMemberName] String propertyName = null)
@@ -274,9 +297,12 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             set { __unused = value; _notify_property_changed(); }
         }
 
-        public string Name { get; set; } = "unnamed";
+        private string __name = "unnamed";
+        public string Name { get { return __name; } set { __name = value.Trim(); } } 
         public DataType DataType { get; set; } = new DataType();
-        public string Unit { get; set; } = "N/A";
+
+        private string __unit = "N/A";
+        public string Unit { get { return __unit; } set { __unit = value.Trim(); } }
         public string Comment { get; set; } = "N/A";
 
         public bool Equals(VariableModel? other)
@@ -294,7 +320,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             XmlElement variableModel = doc.CreateElement("VariableModel");
 
             XmlElement sub = doc.CreateElement("Name");
-            sub.AppendChild(doc.CreateTextNode(Name.Trim()));
+            sub.AppendChild(doc.CreateTextNode(Name));
             variableModel.AppendChild(sub);
 
             sub = doc.CreateElement("DataType");
@@ -302,7 +328,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             variableModel.AppendChild(sub);
 
             sub = doc.CreateElement("Unit");
-            sub.AppendChild(doc.CreateTextNode(Unit.Trim()));
+            sub.AppendChild(doc.CreateTextNode(Unit));
             variableModel.AppendChild(sub);
 
             sub = doc.CreateElement("Comment");
@@ -310,29 +336,6 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             variableModel.AppendChild(sub);
 
             return variableModel;
-        }
-
-        public static VariableModel? FromXml(XmlNode node, DataTypeCatalogue types)
-        {
-            try
-            {
-                if(node.NodeType == XmlNodeType.Element && node.Name == "VariableModel")
-                {
-                    VariableModel v = new VariableModel();
-                    v.Unused = true;
-                    v.Name = node.SelectSingleNode("Name").FirstChild?.Value.Trim();
-                    v.DataType = types.DataTypes[node.SelectSingleNode("DataType").FirstChild?.Value];
-                    v.Unit = node.SelectSingleNode("Unit").FirstChild.Value?.Trim();
-                    v.Comment = node.SelectSingleNode("Comment").FirstChild?.Value;
-                    return v;
-                }
-                else
-                    return null;
-            }
-            catch (Exception)
-            {
-                return null;
-            }
         }
     }
 }

@@ -17,10 +17,11 @@
         <CommandBinding Command="local:ConsoleControl.DefaultRecord" Executed="DefaultRecordCommand_Executed" CanExecute="DefaultRecordCommand_CanExecute"/>
         <CommandBinding Command="local:ConsoleControl.RemoveUnused" Executed="RemoveUnusedCommand_Executed"/>
         <CommandBinding Command="local:ConsoleControl.RemoveAllUnused" Executed="RemoveAllUnusedCommand_Executed"/>
-        <CommandBinding Command="local:ConsoleControl.PasteRecord" Executed="PasteRecordCommand_Executed"/>
+        <CommandBinding Command="local:ConsoleControl.AddRecordEx" Executed="AddRecordExCommand_Executed" CanExecute="AddRecordCommand_CanExecute"/>
+        <CommandBinding Command="local:ConsoleControl.InsertRecordEx" Executed="InsertRecordExCommand_Executed" CanExecute="InsertRecordCommand_CanExecute"/>
     </UserControl.CommandBindings>
     <UserControl.Resources>
-        <ContextMenu x:Key="GridContextMenu">
+        <ContextMenu x:Key="GridRecordContextMenu">
             <MenuItem Command="local:ConsoleControl.EditRecord">
                 <MenuItem.Icon>
                     <Image Source="/imgs/edit.png" Height="20" Margin="4"/>
@@ -31,18 +32,30 @@
                     <Image Source="/imgs/insert.png" Height="20" Margin="4"/>
                 </MenuItem.Icon>
             </MenuItem>
+            <MenuItem Command="local:ConsoleControl.InsertRecordEx" Header="Insert(Clipboard)" ToolTip="Paste record(s) from clipboard">
+                <MenuItem.Icon>
+                    <Image Source="/imgs/insert.png" Height="20" Margin="4"/>
+                </MenuItem.Icon>
+            </MenuItem>
             <MenuItem Command="local:ConsoleControl.RemoveRecord">
                 <MenuItem.Icon>
                     <Image Source="/imgs/remove.png" Height="20" Margin="4"/>
                 </MenuItem.Icon>
             </MenuItem>
-            <MenuItem Command="local:ConsoleControl.DefaultRecord">
+            <MenuItem Command="local:ConsoleControl.DefaultRecord" ToolTip="Copy selected record(s) to clipboard">
                 <MenuItem.Icon>
                     <Image Source="/imgs/copy.png" Height="20" Margin="4"/>
                 </MenuItem.Icon>
             </MenuItem>
             <MenuItem Command="local:ConsoleControl.RemoveUnused" ToolTip="Remove variable which is not used in &lt;Object Dictionary Area&gt;"/>
             <MenuItem Command="local:ConsoleControl.RemoveAllUnused" ToolTip="Remove all variables which are not used in &lt;Object Dictionary Area&gt;"/>
+        </ContextMenu>
+        <ContextMenu x:Key="GridContextMenu">
+            <MenuItem Command="local:ConsoleControl.AddRecordEx" Header="Add(Clipboard)" ToolTip="Paste record(s) from clipboard">
+                <MenuItem.Icon>
+                    <Image Source="/imgs/add.png" Height="20" Margin="4"/>
+                </MenuItem.Icon>
+            </MenuItem>
         </ContextMenu>
         <local:DataTypeComparer x:Key="DTComparer"/>
         <local:DataTypeStringConverter x:Key="DTConverter"/>
@@ -73,11 +86,6 @@
     </UserControl.Resources>
     <DockPanel>
         <StackPanel DockPanel.Dock="Bottom" HorizontalAlignment="Right" Margin="4" Orientation="Horizontal">
-            <sync:ButtonAdv Label="Paste" VerticalAlignment="Center" Height="30" Width="128" Command="local:ConsoleControl.PasteRecord" Margin="4">
-                <sync:ButtonAdv.SmallIcon>
-                    <BitmapImage  UriSource="/imgs/add.png"/>
-                </sync:ButtonAdv.SmallIcon>
-            </sync:ButtonAdv>
             <sync:ButtonAdv Label="Add" VerticalAlignment="Center" Height="30" Width="128" Command="local:ConsoleControl.AddRecord" Margin="4">
                 <sync:ButtonAdv.SmallIcon>
                     <BitmapImage  UriSource="/imgs/add.png"/>
@@ -106,8 +114,8 @@
                      LiveDataUpdateMode="AllowDataShaping" ScrollMode="Async"
                      AllowDraggingRows="True" AllowDrop="True" RowDragDropTemplate="{StaticResource RecordDragDropTemplate}"
                      CellDoubleTapped="MainViewer_CellDoubleTapped" QueryRowHeight="MainViewer_QueryRowHeight"
-                     RecordContextMenu="{StaticResource GridContextMenu}" SelectionMode="Extended"
-                     GridCopyOption="CopyData" GridPasteOption="None"
+                     RecordContextMenu="{StaticResource GridRecordContextMenu}" SelectionMode="Extended"
+                     GridCopyOption="CopyData" GridPasteOption="None" ContextMenu="{StaticResource GridContextMenu}"
                      >
             <!--sync:SfDataGrid.SortComparers>
                 <linq:SortComparer Comparer="{StaticResource DTComparer}" PropertyName="DataType" />
