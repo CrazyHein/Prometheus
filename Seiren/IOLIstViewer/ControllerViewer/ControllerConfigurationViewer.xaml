@@ -97,6 +97,16 @@
                     <BitmapImage  UriSource="/imgs/import_p.png"/>
                 </sync:ButtonAdv.SmallIcon>
             </sync:ButtonAdv>
+            <sync:ButtonAdv Label="Add(Paste)" VerticalAlignment="Center" Height="30" Width="128" Command="local:ConsoleControl.AddRecordEx" Margin="4">
+                <sync:ButtonAdv.SmallIcon>
+                    <BitmapImage  UriSource="/imgs/add.png"/>
+                </sync:ButtonAdv.SmallIcon>
+            </sync:ButtonAdv>
+            <sync:ButtonAdv Label="Insert(Paste)" VerticalAlignment="Center" Height="30" Width="128" Command="local:ConsoleControl.InsertRecordEx" Margin="4">
+                <sync:ButtonAdv.SmallIcon>
+                    <BitmapImage  UriSource="/imgs/insert.png"/>
+                </sync:ButtonAdv.SmallIcon>
+            </sync:ButtonAdv>
             <sync:ButtonAdv Label="Add" VerticalAlignment="Center" Height="30" Width="128" Command="local:ConsoleControl.AddRecord" Margin="4">
                 <sync:ButtonAdv.SmallIcon>
                     <BitmapImage  UriSource="/imgs/add.png"/>

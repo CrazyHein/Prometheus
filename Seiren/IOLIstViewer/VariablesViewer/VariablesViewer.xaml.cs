@@ -223,12 +223,15 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                     }
                     catch (LombardiaException ex)
                     {
-                        DebugConsole.WriteException(ex);
-                        continue;
+                        if (MessageBox.Show($"At least one exception has occurred when adding the following record:\n{r.ToString()}\n{ex.Message}\nDo you want to continue?", "Question", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes)
+                            continue;
+                        else
+                            break;
                     }
                     MainViewer.SelectedItems.Add(r);
                 }
-                MainViewer.ScrollInView(new Syncfusion.UI.Xaml.ScrollAxis.RowColumnIndex(
+                if (MainViewer.SelectedItems.Count > 0)
+                    MainViewer.ScrollInView(new Syncfusion.UI.Xaml.ScrollAxis.RowColumnIndex(
                                MainViewer.ResolveToRowIndex(MainViewer.SelectedItems.First()),
                                MainViewer.ResolveToStartColumnIndex()));
             }
@@ -255,12 +258,15 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                     }
                     catch (LombardiaException ex)
                     {
-                        DebugConsole.WriteException(ex);
-                        continue;
+                        if (MessageBox.Show($"At least one exception has occurred when inserting the following record:\n{r.ToString()}\n{ex.Message}\nDo you want to continue?", "Question", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes)
+                            continue;
+                        else
+                            break;
                     }
                     MainViewer.SelectedItems.Add(r);
                 }
-                MainViewer.ScrollInView(new Syncfusion.UI.Xaml.ScrollAxis.RowColumnIndex(
+                if (MainViewer.SelectedItems.Count > 0)
+                    MainViewer.ScrollInView(new Syncfusion.UI.Xaml.ScrollAxis.RowColumnIndex(
                                MainViewer.ResolveToRowIndex(MainViewer.SelectedItems.First()),
                                MainViewer.ResolveToStartColumnIndex()));
             }

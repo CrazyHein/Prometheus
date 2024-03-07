@@ -63,6 +63,23 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
 
     public class RecordUtility
     {
+        public static bool ContainsRecord<T>() where T : ISerializableRecordModel
+        {
+            try
+            {
+                XmlDocument xmlDoc = new XmlDocument();
+                xmlDoc.LoadXml(Clipboard.GetText().Trim());
+                XmlNode rootNode = xmlDoc.SelectSingleNode("/" + typeof(T).FullName);
+                return rootNode.Attributes["Version"].Value == Settings.SeirenVersion &&
+                    rootNode.Attributes["DataType"].Value == Settings.DataTypeCatalogueHashString &&
+                    rootNode.Attributes["Controller"].Value == Settings.ControllerModelCatalogueHashString;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
         public static Exception? CopyRecords<T>(IEnumerable<T> records) where T : ISerializableRecordModel
         {
             try
@@ -71,7 +88,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                 XmlDeclaration decl = xmlDoc.CreateXmlDeclaration("1.0", "UTF-8", null);
                 xmlDoc.AppendChild(decl);
 
-                XmlElement root = xmlDoc.CreateElement(typeof(T).FullName + "-" + Settings.SeirenVersion);
+                XmlElement root = xmlDoc.CreateElement(typeof(T).FullName);
+                root.SetAttribute("Version", Settings.SeirenVersion);
+                root.SetAttribute("DataType", Settings.DataTypeCatalogueHashString);
+                root.SetAttribute("Controller", Settings.ControllerModelCatalogueHashString);
 
                 foreach (var model in records)
                     root.AppendChild(model.ToXml(xmlDoc));
@@ -92,17 +112,19 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             }
         }
 
-        public static List<R> PasteAllRecords<C, R>(C Container) where C : IDeSerializableRecordModel<R>
+        public static List<R> PasteAllRecords<C, R>(C Container) where C : IDeSerializableRecordModel<R> where R : ISerializableRecordModel
         {
             List<R> records = new List<R>();
+            if(ContainsRecord<R>() == false)
+                return records;
             try
             {
                 if (Clipboard.ContainsText())
                 {
                     XmlDocument xmlDoc = new XmlDocument();
-                    xmlDoc.LoadXml(Clipboard.GetText());
+                    xmlDoc.LoadXml(Clipboard.GetText().Trim());
 
-                    XmlNode rootNode = xmlDoc.SelectSingleNode("/" + typeof(R).FullName + "-" + Settings.SeirenVersion);
+                    XmlNode rootNode = xmlDoc.SelectSingleNode("/" + typeof(R).FullName);
 
                     foreach (XmlNode varNode in rootNode?.ChildNodes)
                     {
@@ -129,16 +151,18 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             }
         }
 
-        public static R? DefaultRecord<C, R>(C Container) where C : IDeSerializableRecordModel<R>
+        public static R? DefaultRecord<C, R>(C Container) where C : IDeSerializableRecordModel<R> where R : ISerializableRecordModel
         {
+            if (ContainsRecord<R>() == false)
+                return default(R);
             try
             {
                 if (Clipboard.ContainsText())
                 {
                     XmlDocument xmlDoc = new XmlDocument();
-                    xmlDoc.LoadXml(Clipboard.GetText());
+                    xmlDoc.LoadXml(Clipboard.GetText().Trim());
 
-                    XmlNode rootNode = xmlDoc.SelectSingleNode("/" + typeof(R).FullName + "-" + Settings.SeirenVersion);
+                    XmlNode rootNode = xmlDoc.SelectSingleNode("/" + typeof(R).FullName);
                     foreach (XmlNode varNode in rootNode?.ChildNodes)
                         return Container.FromXml(varNode);
                     return default(R);

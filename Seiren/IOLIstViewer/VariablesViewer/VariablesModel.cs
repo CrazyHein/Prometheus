@@ -261,14 +261,14 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         {
             try
             {
-                if (node.NodeType == XmlNodeType.Element && node.Name == "VariableModel")
+                if (node.NodeType == XmlNodeType.Element && node.Name == typeof(VariableModel).Name)
                 {
                     VariableModel v = new VariableModel();
                     v.Unused = true;
                     v.Name = node.SelectSingleNode("Name").FirstChild.Value;
                     v.DataType = DataTypeCatalogue.DataTypes[node.SelectSingleNode("DataType").FirstChild.Value];
-                    v.Unit = node.SelectSingleNode("Unit").FirstChild.Value;
-                    v.Comment = node.SelectSingleNode("Comment").FirstChild.Value;
+                    v.Unit = node.SelectSingleNode("Unit").FirstChild?.Value;
+                    v.Comment = node.SelectSingleNode("Comment").FirstChild?.Value;
                     return v;
                 }
                 else
@@ -317,7 +317,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
 
         public XmlElement ToXml(XmlDocument doc)
         {
-            XmlElement variableModel = doc.CreateElement("VariableModel");
+            XmlElement variableModel = doc.CreateElement(typeof(VariableModel).Name);
 
             XmlElement sub = doc.CreateElement("Name");
             sub.AppendChild(doc.CreateTextNode(Name));

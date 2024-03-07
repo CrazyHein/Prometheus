@@ -6,11 +6,14 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+using System.Text;
 using System.Xml;
+using System.Xml.Linq;
 
 namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
 {
-    public class ObjectsModel : RecordContainerModel
+    public class ObjectsModel : RecordContainerModel, IDeSerializableRecordModel<ObjectModel>
     {
         private ObjectDictionary __object_dictionary;
         private VariablesModel __varialble_model_source;
@@ -28,15 +31,15 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         public InterlockCollectionModel? InterlockLogics { get; set; }
 
         private bool __subs_modified = false;
-        public bool SubsModified 
-        { 
+        public bool SubsModified
+        {
             get => __subs_modified;
-            set 
+            set
             {
                 __subs_modified = value;
                 OnPropertyChanged("SubsModified");
                 OnPropertyChanged("ContentModified");
-            } 
+            }
         }
 
         public new bool Modified
@@ -74,7 +77,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             Name = "Object Dictionary";
         }
 
-        protected (uint Index, string VariableName, string BindingDeviceName, string BindingChannelName, uint BindingChannelIndex, 
+        public VariablesModel VariableModelSource { get { return __varialble_model_source; } }
+        public ControllerConfigurationModel ControllerConfigurationModel { get { return __controller_configuration_model_source; } }
+
+        protected (uint Index, string VariableName, string BindingDeviceName, string BindingChannelName, uint BindingChannelIndex,
             ValueRange Range, ValueConverter Converter) _process_object_property(ObjectModel model)
         {
             return (model.Index, model.VariableName, model.EnableBinding == true ? model.BindingDeviceName : null,
@@ -198,7 +204,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             var op = new OperatingRecord() { Host = this, Operation = Operation.Insert, OriginaPos = -1, NewPos = index, OriginalValue = null, NewValue = model };
             var p = _process_object_property(model);
             try
-            {              
+            {
                 __object_dictionary.Add(p.Index, p.VariableName,
                     p.BindingDeviceName, p.BindingChannelName, p.BindingChannelIndex,
                     p.Range, p.Converter);
@@ -214,7 +220,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                 OperatingHistory.PushOperatingRecord(op);
             DebugConsole.WriteOperatingRecord(op);
             __varialble_model_source.ReEvaluate(model.VariableName);
-            if(model.EnableBinding)
+            if (model.EnableBinding)
                 __controller_configuration_model_source.ReEvaluate(model.BindingDeviceName);
         }
 
@@ -366,7 +372,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         }
         public void UpdateVariable(string origin)
         {
-            for(int i = 0; i < __objects.Count; ++i)
+            for (int i = 0; i < __objects.Count; ++i)
             {
                 if (__objects[i].VariableName == origin)
                 {
@@ -446,9 +452,73 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                     break;
             }
         }
+
+        public ObjectModel? FromXml(XmlNode node)
+        {
+            try
+            {
+                if (node.NodeType == XmlNodeType.Element && node.Name == typeof(ObjectModel).Name)
+                {
+                    ObjectModel o = new ObjectModel();
+                    o.Unused = true;
+
+                    o.VariableName = node.SelectSingleNode("VariableName").FirstChild.Value;
+                    o.EnableBinding = node.SelectSingleNode("EnableBinding") != null;
+                    o.EnableValueRange = node.SelectSingleNode("EnableValueRange") != null;
+                    o.EnableValueConverter = node.SelectSingleNode("EnableValueConverter") != null;
+
+                    if (Variables.Variables.ContainsKey(o.VariableName))
+                    {
+                        o.VariableDataType = Variables.Variables[o.VariableName].Type.Name;
+                        o.VariableUnit = Variables.Variables[o.VariableName].Unit;
+                        o.VariableComment = Variables.Variables[o.VariableName].Comment;
+                    }
+                    else
+                        return null;
+
+                    XmlNode sub = null;
+                    if(o.EnableBinding)
+                    {
+                        sub = node.SelectSingleNode("EnableBinding");
+                        o.BindingDeviceName = sub.SelectSingleNode("BindingDeviceName").FirstChild.Value;
+                        o.BindingChannelName = sub.SelectSingleNode("BindingChannelName").FirstChild.Value;
+                        o.BindingChannelIndex = Convert.ToUInt32(sub.SelectSingleNode("BindingChannelIndex").FirstChild.Value);
+
+                        if (ControllerConfiguration.Configurations[o.BindingDeviceName].DeviceModel.RxVariables.ContainsKey(o.BindingChannelName) == false &&
+                            ControllerConfiguration.Configurations[o.BindingDeviceName].DeviceModel.TxVariables.ContainsKey(o.BindingChannelName) == false)
+                            return null;
+                    }
+
+                    if(o.EnableValueRange)
+                    {
+                        sub = node.SelectSingleNode("EnableValueRange");
+                        o.ValueRangeDown = sub.SelectSingleNode("ValueRangeDown").FirstChild.Value;
+                        o.ValueRangeUp = sub.SelectSingleNode("ValueRangeUp").FirstChild.Value;
+                    }
+
+                    if(o.EnableValueConverter)
+                    {
+                        sub = node.SelectSingleNode("EnableValueConverter");
+
+                        byte[] value = sub.SelectSingleNode("ValueConverterDown").FirstChild.Value.Split('-').Select(s => Convert.ToByte(s, 16)).ToArray();
+                        o.ValueConverterDown = MemoryMarshal.Read<double>(value);
+
+                        value = sub.SelectSingleNode("ValueConverterUp").FirstChild.Value.Split('-').Select(s => Convert.ToByte(s, 16)).ToArray();
+                        o.ValueConverterUp = MemoryMarshal.Read<double>(value);
+                    }
+                    return o;
+                }
+                else
+                    return null;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
     }
 
-    public class ObjectModel : INotifyPropertyChanged, IEquatable<ObjectModel>
+    public class ObjectModel : INotifyPropertyChanged, IEquatable<ObjectModel>, ISerializableRecordModel
     {
         public event PropertyChangedEventHandler? PropertyChanged;
         protected void _notify_property_changed([CallerMemberName] String propertyName = null)
@@ -618,6 +688,71 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             bool range = EnableValueRange ? (EnableValueRange == other.EnableValueRange && ValueRangeInfo == other.ValueRangeInfo) : (EnableValueRange == other.EnableValueRange);
             bool converter = EnableValueConverter ? (EnableValueConverter == other.EnableValueConverter && ValueConverterInfo == other.ValueConverterInfo) : (EnableValueConverter == other.EnableValueConverter);
             return Index == other.Index && VariableName == other.VariableName && binding && range && converter;
+        }
+
+        public XmlElement ToXml(XmlDocument doc)
+        {
+            XmlElement objectModel = doc.CreateElement(typeof(ObjectModel).Name);
+
+            XmlElement sub = doc.CreateElement("VariableName");
+            sub.AppendChild(doc.CreateTextNode(VariableName));
+            objectModel.AppendChild(sub);
+
+            XmlElement ssub = null;
+            if (EnableBinding)
+            {
+                sub = doc.CreateElement("EnableBinding");
+                
+                ssub = doc.CreateElement("BindingDeviceName");
+                ssub.AppendChild(doc.CreateTextNode(BindingDeviceName));
+                sub.AppendChild(ssub);
+
+                ssub = doc.CreateElement("BindingChannelName");
+                ssub.AppendChild(doc.CreateTextNode(BindingChannelName));
+                sub.AppendChild(ssub);
+
+                ssub = doc.CreateElement("BindingChannelIndex");
+                ssub.AppendChild(doc.CreateTextNode(BindingChannelIndex.ToString()));
+                sub.AppendChild(ssub);
+
+                objectModel.AppendChild(sub);
+            }
+
+            if(EnableValueRange)
+            {
+                sub = doc.CreateElement("EnableValueRange");
+                
+                ssub = doc.CreateElement("ValueRangeDown");
+                ssub.AppendChild(doc.CreateTextNode(ValueRangeDown));
+                sub.AppendChild(ssub);
+
+                ssub = doc.CreateElement("ValueRangeUp");
+                ssub.AppendChild(doc.CreateTextNode(ValueRangeUp));
+                sub.AppendChild(ssub);
+
+                objectModel.AppendChild(sub);
+            }
+
+            if(EnableValueConverter)
+            {
+                sub = doc.CreateElement("EnableValueConverter");
+
+                byte[] storage = new byte[sizeof(double)];
+                double value = ValueConverterDown;
+                ssub = doc.CreateElement("ValueConverterDown");
+                MemoryMarshal.Write<double>(storage, ref value);
+                ssub.AppendChild(doc.CreateTextNode(string.Join("-", storage.Select(d => d.ToString("X2")))));
+                sub.AppendChild(ssub);
+
+                value = ValueConverterUp;
+                ssub = doc.CreateElement("ValueConverterUp");
+                MemoryMarshal.Write<double>(storage, ref value);
+                ssub.AppendChild(doc.CreateTextNode(string.Join("-", storage.Select(d => d.ToString("X2")))));
+                sub.AppendChild(ssub);
+
+                objectModel.AppendChild(sub);
+            }
+            return objectModel;
         }
     }
 }

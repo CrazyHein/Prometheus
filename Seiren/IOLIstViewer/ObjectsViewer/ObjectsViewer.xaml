@@ -84,9 +84,12 @@
                     <CommandBinding Command="local:ConsoleControl.FindInProcessDataImage" Executed="FindInProcessDataImageCommand_Executed" CanExecute="FindInProcessDataImageCommand_CanExecute"/>
                     <CommandBinding Command="local:ConsoleControl.RemoveUnused" Executed="RemoveUnusedCommand_Executed"/>
                     <CommandBinding Command="local:ConsoleControl.RemoveAllUnused" Executed="RemoveAllUnusedCommand_Executed"/>
+                    <CommandBinding Command="local:ConsoleControl.DefaultRecord" Executed="DefaultRecordCommand_Executed" CanExecute="DefaultRecordCommand_CanExecute"/>
+                    <CommandBinding Command="local:ConsoleControl.AddRecordEx" Executed="AddRecordExCommand_Executed" CanExecute="AddRecordCommand_CanExecute"/>
+                    <CommandBinding Command="local:ConsoleControl.InsertRecordEx" Executed="InsertRecordExCommand_Executed" CanExecute="InsertRecordCommand_CanExecute"/>
                 </DockPanel.CommandBindings>
                 <DockPanel.Resources>
-                    <ContextMenu x:Key="GridContextMenu">
+                    <ContextMenu x:Key="GridRecordContextMenu">
                         <MenuItem Command="local:ConsoleControl.EditRecord">
                             <MenuItem.Icon>
                                 <Image Source="/imgs/edit.png" Height="20" Margin="4"/>
@@ -97,9 +100,19 @@
                                 <Image Source="/imgs/insert.png" Height="20" Margin="4"/>
                             </MenuItem.Icon>
                         </MenuItem>
+                        <MenuItem Command="local:ConsoleControl.InsertRecordEx" Header="Insert(Clipboard)" ToolTip="Paste record(s) from clipboard">
+                            <MenuItem.Icon>
+                                <Image Source="/imgs/insert.png" Height="20" Margin="4"/>
+                            </MenuItem.Icon>
+                        </MenuItem>
                         <MenuItem Command="local:ConsoleControl.RemoveRecord">
                             <MenuItem.Icon>
                                 <Image Source="/imgs/remove.png" Height="20" Margin="4"/>
+                            </MenuItem.Icon>
+                        </MenuItem>
+                        <MenuItem Command="local:ConsoleControl.DefaultRecord" ToolTip="Copy selected record(s) to clipboard">
+                            <MenuItem.Icon>
+                                <Image Source="/imgs/copy.png" Height="20" Margin="4"/>
                             </MenuItem.Icon>
                         </MenuItem>
                         <MenuItem Header="Find In ...">
@@ -117,6 +130,13 @@
                         </MenuItem>
                         <MenuItem Command="local:ConsoleControl.RemoveUnused" ToolTip="Remove object which is not used in &lt;Process Data Image Area&gt;"/>
                         <MenuItem Command="local:ConsoleControl.RemoveAllUnused" ToolTip="Remove all objects which are not used in &lt;Process Data Image Area&gt;"/>
+                    </ContextMenu>
+                    <ContextMenu x:Key="GridContextMenu">
+                        <MenuItem Command="local:ConsoleControl.AddRecordEx" Header="Add(Clipboard)" ToolTip="Paste record(s) from clipboard">
+                            <MenuItem.Icon>
+                                <Image Source="/imgs/add.png" Height="20" Margin="4"/>
+                            </MenuItem.Icon>
+                        </MenuItem>
                     </ContextMenu>
                     <DataTemplate x:Key="RecordDragDropTemplate">
                         <Border Padding="4" Background="#ececec" BorderBrush="#c8c8c8" BorderThickness="1.2">
@@ -156,6 +176,16 @@
                     </DataTemplate>
                 </DockPanel.Resources>
                 <StackPanel DockPanel.Dock="Bottom" HorizontalAlignment="Right" Margin="4" Orientation="Horizontal">
+                    <sync:ButtonAdv Label="Add(Paste)" VerticalAlignment="Center" Height="30" Width="128" Command="local:ConsoleControl.AddRecordEx" Margin="4">
+                        <sync:ButtonAdv.SmallIcon>
+                            <BitmapImage  UriSource="/imgs/add.png"/>
+                        </sync:ButtonAdv.SmallIcon>
+                    </sync:ButtonAdv>
+                    <sync:ButtonAdv Label="Insert(Paste)" VerticalAlignment="Center" Height="30" Width="128" Command="local:ConsoleControl.InsertRecordEx" Margin="4">
+                        <sync:ButtonAdv.SmallIcon>
+                            <BitmapImage  UriSource="/imgs/insert.png"/>
+                        </sync:ButtonAdv.SmallIcon>
+                    </sync:ButtonAdv>
                     <sync:ButtonAdv Label="Add" VerticalAlignment="Center" Height="30" Width="128" Command="local:ConsoleControl.AddRecord" Margin="4">
                         <sync:ButtonAdv.SmallIcon>
                             <BitmapImage  UriSource="/imgs/add.png"/>
@@ -186,7 +216,7 @@
                              ShowSortNumbers="True" ShowRowHeader="True" 
                              LiveDataUpdateMode="AllowDataShaping" ScrollMode="Async"
                              CellDoubleTapped="MainViewer_CellDoubleTapped" 
-                             RecordContextMenu="{StaticResource GridContextMenu}">
+                             RecordContextMenu="{StaticResource GridRecordContextMenu}" ContextMenu="{StaticResource GridContextMenu}">
                     <sync:SfDataGrid.Resources>
                         <local:BooleanValueIndicator False="Transparent" True="LightGoldenrodYellow" x:Key="converter"/>
                         <Style TargetType="sync:VirtualizingCellsControl">

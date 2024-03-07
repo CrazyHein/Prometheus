@@ -322,7 +322,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         {
             try
             {
-                if (node.NodeType == XmlNodeType.Element && node.Name == "DeviceConfigurationModel")
+                if (node.NodeType == XmlNodeType.Element && node.Name == typeof(DeviceConfigurationModel).Name)
                 {
                     DeviceConfigurationModel d = new DeviceConfigurationModel();
                     d.Unused = true;
@@ -400,7 +400,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
 
         public XmlElement ToXml(XmlDocument doc)
         {
-            XmlElement deviceModel = doc.CreateElement("DeviceConfigurationModel");
+            XmlElement deviceModel = doc.CreateElement(typeof(DeviceConfigurationModel).Name);
 
             XmlElement sub = doc.CreateElement("ID");
             sub.AppendChild(doc.CreateTextNode($"0x{ID:X4}"));

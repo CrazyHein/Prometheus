@@ -4,10 +4,13 @@ using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Console;
 using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.DAQ;
 using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Debugger;
 using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility;
+using Spire.Pdf.Widget;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.IO;
 using System.Linq;
+using System.Security.RightsManagement;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -39,8 +42,28 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
 
         public static string UserSettingsPath { get; } = "USettings";
 
-        public static byte[] DataTypeCatalogueHash { get; set; }
-        public static byte[] ControllerModelCatalogueHash { get; set; }
+        private static byte[] _DataTypeCatalogueHash;
+        public static string DataTypeCatalogueHashString { get; private set; }
+        public static byte[] DataTypeCatalogueHash 
+        { 
+            get { return _DataTypeCatalogueHash; }
+            set 
+            { 
+                _DataTypeCatalogueHash = value;
+                DataTypeCatalogueHashString = String.Join("-", Settings._DataTypeCatalogueHash.Select(h => h.ToString("X2")));
+            }
+        }
+        private static byte[] _ControllerModelCatalogueHash;
+        public static string ControllerModelCatalogueHashString { get; private set; }
+        public static byte[] ControllerModelCatalogueHash
+        {
+            get { return _ControllerModelCatalogueHash; }
+            set
+            {
+                _ControllerModelCatalogueHash = value;
+                ControllerModelCatalogueHashString = String.Join("-", Settings._ControllerModelCatalogueHash.Select(h => h.ToString("X2")));
+            }
+        }
 
         public static string SeirenVersion { get; } = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
         public static string LombardiaVersion { get; } = System.Reflection.Assembly.GetAssembly(typeof(IOCelcetaHelper)).GetName().Version.ToString();

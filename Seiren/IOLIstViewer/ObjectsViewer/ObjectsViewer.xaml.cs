@@ -1,4 +1,5 @@
 ﻿using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia;
+using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Console;
 using Syncfusion.UI.Xaml.Grid;
 using Syncfusion.Windows.Shared;
 using Syncfusion.Windows.Tools.Controls;
@@ -89,6 +90,39 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             return MainViewer.GroupColumnDescriptions.Count == 0 && MainViewer.SortColumnDescriptions.Count == 0 && MainViewer.Columns.All(c => c.FilterPredicates.Count == 0);
         }
 
+        private ObjectModel? __default_object_model(uint index)
+        {
+            if(RecordUtility.ContainsRecord<ObjectModel>() )
+            {
+                ObjectModel o = RecordUtility.DefaultRecord<ObjectsModel, ObjectModel>(DataContext as ObjectsModel);
+                if (o != null)
+                {
+                    o.Index = index;
+                    return o;
+                }
+            }
+            else if (RecordUtility.ContainsRecord<VariableModel>())
+            {
+                VariableModel v = RecordUtility.DefaultRecord<VariablesModel, VariableModel>((DataContext as ObjectsModel).VariableModelSource);
+                if (v != null && (DataContext as ObjectsModel).VariableModelSource.Contains(v.Name))
+                {
+                    return new ObjectModel()
+                    {
+                        Index = index,
+                        Unused = true,
+                        VariableName = v.Name,
+                        VariableDataType = (DataContext as ObjectsModel).Variables.Variables[v.Name].Type.Name,
+                        VariableUnit = (DataContext as ObjectsModel).Variables.Variables[v.Name].Unit,
+                        VariableComment = (DataContext as ObjectsModel).Variables.Variables[v.Name].Comment,
+                        EnableBinding = false,
+                        EnableValueRange = false,
+                        EnableValueConverter = false,
+                    };
+                }
+            }
+            return null;
+        }
+
         private void OnMainViewer_DragStart(object sender, GridRowDragStartEventArgs e)
         {
             if (__raw_viewer() == false || MainViewer.SelectedItems.Count != 1)
@@ -146,7 +180,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         private void AddRecordCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             uint mindex = (DataContext as ObjectsModel).Objects.Count == 0 ? 0 : (DataContext as ObjectsModel).Objects.AsParallel().Max(o => o.Index) + 1;
-            ObjectViewer wnd = new ObjectViewer(DataContext as ObjectsModel, new ObjectModel() { Index = mindex }, InputDialogDisplayMode.Add);
+            ObjectViewer wnd = new ObjectViewer(DataContext as ObjectsModel, __default_object_model(mindex)?? new ObjectModel() { Index = mindex }, InputDialogDisplayMode.Add);
             wnd.WindowStartupLocation = WindowStartupLocation.CenterScreen;
             if (wnd.ShowDialog() == true)
             {
@@ -165,7 +199,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         private void InsertRecordCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             uint mindex = (DataContext as ObjectsModel).Objects.Count == 0 ? 0 : (DataContext as ObjectsModel).Objects.AsParallel().Max(o => o.Index) + 1;
-            ObjectViewer wnd = new ObjectViewer(DataContext as ObjectsModel, new ObjectModel() { Index = mindex }, InputDialogDisplayMode.Insert, MainViewer.SelectedIndex);
+            ObjectViewer wnd = new ObjectViewer(DataContext as ObjectsModel, __default_object_model(mindex)??new ObjectModel() { Index = mindex }, InputDialogDisplayMode.Insert, MainViewer.SelectedIndex);
             wnd.WindowStartupLocation = WindowStartupLocation.CenterScreen;
             if (wnd.ShowDialog() == true)
             {
@@ -231,6 +265,172 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         private void RemoveRecordCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
             e.CanExecute = MainViewer != null && MainViewer.SelectedItem != null && MainViewer.SelectedItems.All(v => (v as ObjectModel).Unused == true);
+        }
+
+        private void DefaultRecordCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            var ex = RecordUtility.CopyRecords(MainViewer.SelectedItems.Select(r => r as ObjectModel).OrderBy(r => (DataContext as ObjectsModel).IndexOf(r)));
+            if (ex != null)
+            {
+                MessageBox.Show("At least one exception has occurred during the operation :\n" + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                DebugConsole.WriteException(ex);
+            }
+        }
+
+        private void DefaultRecordCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = MainViewer != null && MainViewer.SelectedItem != null;
+        }
+
+        private void AddRecordExCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            if(RecordUtility.ContainsRecord<ObjectModel>())
+            {
+                var records = RecordUtility.PasteAllRecords<ObjectsModel, ObjectModel>(DataContext as ObjectsModel);
+                if (records.Count != 0)
+                {
+                    uint mindex = (DataContext as ObjectsModel).Objects.Count == 0 ? 0 : (DataContext as ObjectsModel).Objects.AsParallel().Max(o => o.Index) + 1;
+                    MainViewer.ClearSelections(false);
+                    foreach (var r in records)
+                    {
+                        DebugConsole.WriteInfo($"Apply object index [{mindex}]");
+                        r.Index = mindex;
+
+                        try
+                        {
+                            (DataContext as ObjectsModel).Add(r);
+                        }
+                        catch (LombardiaException ex)
+                        {
+                            if(MessageBox.Show($"At least one exception has occurred when adding the following record:\n{r.ToString()}\n{ex.Message}\nDo you want to continue?", "Question", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes)
+                                continue;
+                            else
+                                break;
+                        }
+                        MainViewer.SelectedItems.Add(r);
+                        mindex++;
+                    }
+                }
+            }
+            else if(RecordUtility.ContainsRecord<VariableModel>())
+            {
+                var records = RecordUtility.PasteAllRecords<VariablesModel, VariableModel>((DataContext as ObjectsModel).VariableModelSource);
+                if (records.Count != 0 && records.All(r => (DataContext as ObjectsModel).VariableModelSource.Contains(r.Name)))
+                {
+                    uint mindex = (DataContext as ObjectsModel).Objects.Count == 0 ? 0 : (DataContext as ObjectsModel).Objects.AsParallel().Max(o => o.Index) + 1;
+                    MainViewer.ClearSelections(false);
+                    foreach (var r in records)
+                    {
+                        DebugConsole.WriteInfo($"Apply object index [{mindex}]");
+                        ObjectModel o = null;
+                        try
+                        {
+                            o = new ObjectModel()
+                            {
+                                Index = mindex,
+                                Unused = true,
+                                VariableName = r.Name,
+                                VariableDataType = (DataContext as ObjectsModel).Variables.Variables[r.Name].Type.Name,
+                                VariableUnit = (DataContext as ObjectsModel).Variables.Variables[r.Name].Unit,
+                                VariableComment = (DataContext as ObjectsModel).Variables.Variables[r.Name].Comment,
+                                EnableBinding = false,
+                                EnableValueRange = false,
+                                EnableValueConverter = false,
+                            };
+                            (DataContext as ObjectsModel).Add(o);
+                        }
+                        catch (LombardiaException ex)
+                        {
+                            if (MessageBox.Show($"At least one exception has occurred when adding the following record:\n{o.ToString()}\n{ex.Message}\nDo you want to continue?", "Question", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes)
+                                continue;
+                            else
+                                break;
+                        }
+                        MainViewer.SelectedItems.Add(o);
+                        mindex++;
+                    }
+                }
+            }
+            if(MainViewer.SelectedItems.Count > 0)
+                MainViewer.ScrollInView(new Syncfusion.UI.Xaml.ScrollAxis.RowColumnIndex(
+                   MainViewer.ResolveToRowIndex(MainViewer.SelectedItems.First()),
+                   MainViewer.ResolveToStartColumnIndex()));
+        }
+
+        private void InsertRecordExCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            int insertPos = MainViewer.SelectedIndex;
+            if (RecordUtility.ContainsRecord<ObjectModel>())
+            {
+                var records = RecordUtility.PasteAllRecords<ObjectsModel, ObjectModel>(DataContext as ObjectsModel);
+                if (records.Count != 0)
+                {
+                    uint mindex = (DataContext as ObjectsModel).Objects.Count == 0 ? 0 : (DataContext as ObjectsModel).Objects.AsParallel().Max(o => o.Index) + 1;
+                    MainViewer.ClearSelections(false);
+                    foreach (var r in records.Reverse<ObjectModel>())
+                    {
+                        DebugConsole.WriteInfo($"Apply object index [{mindex}]");
+                        r.Index = mindex;
+
+                        try
+                        {
+                            (DataContext as ObjectsModel).Insert(insertPos, r);
+                        }
+                        catch (LombardiaException ex)
+                        {
+                            if (MessageBox.Show($"At least one exception has occurred when inserting the following record:\n{r.ToString()}\n{ex.Message}\nDo you want to continue?", "Question", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes)
+                                continue;
+                            else
+                                break;
+                        }
+                        MainViewer.SelectedItems.Add(r);
+                        mindex++;
+                    }
+                }
+            }
+            else if (RecordUtility.ContainsRecord<VariableModel>())
+            {
+                var records = RecordUtility.PasteAllRecords<VariablesModel, VariableModel>((DataContext as ObjectsModel).VariableModelSource);
+                if (records.Count != 0 && records.All(r => (DataContext as ObjectsModel).VariableModelSource.Contains(r.Name)))
+                {
+                    uint mindex = (DataContext as ObjectsModel).Objects.Count == 0 ? 0 : (DataContext as ObjectsModel).Objects.AsParallel().Max(o => o.Index) + 1;
+                    MainViewer.ClearSelections(false);
+                    foreach (var r in records.Reverse<VariableModel>())
+                    {
+                        DebugConsole.WriteInfo($"Apply object index [{mindex}]");
+                        ObjectModel o = null;
+                        try
+                        {
+                            o = new ObjectModel()
+                            {
+                                Index = mindex,
+                                Unused = true,
+                                VariableName = r.Name,
+                                VariableDataType = (DataContext as ObjectsModel).Variables.Variables[r.Name].Type.Name,
+                                VariableUnit = (DataContext as ObjectsModel).Variables.Variables[r.Name].Unit,
+                                VariableComment = (DataContext as ObjectsModel).Variables.Variables[r.Name].Comment,
+                                EnableBinding = false,
+                                EnableValueRange = false,
+                                EnableValueConverter = false,
+                            };
+                            (DataContext as ObjectsModel).Insert(insertPos, o);
+                        }
+                        catch (LombardiaException ex)
+                        {
+                            if (MessageBox.Show($"At least one exception has occurred when inserting the following record:\n{o.ToString()}\n{ex.Message}\nDo you want to continue?", "Question", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes)
+                                continue;
+                            else
+                                break;
+                        }
+                        MainViewer.SelectedItems.Add(o);
+                        mindex++;
+                    }
+                }
+            }
+            if (MainViewer.SelectedItems.Count > 0)
+                MainViewer.ScrollInView(new Syncfusion.UI.Xaml.ScrollAxis.RowColumnIndex(
+                   MainViewer.ResolveToRowIndex(MainViewer.SelectedItems.Last()),
+                   MainViewer.ResolveToStartColumnIndex()));
         }
 
         public void UpdateBindingSource()
