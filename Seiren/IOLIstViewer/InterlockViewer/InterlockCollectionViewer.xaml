@@ -23,6 +23,7 @@
                 <CommandBinding Command="local:ConsoleControl.RemoveRecord" Executed="RemoveRecordCommand_Executed" CanExecute="RemoveRecordCommand_CanExecute"/>
                 <CommandBinding Command="local:ConsoleControl.MoveUpRecord" Executed="MoveUpRecordCommand_Executed" CanExecute="MoveUpRecordCommand_CanExecute"/>
                 <CommandBinding Command="local:ConsoleControl.MoveDownRecord" Executed="MoveDownRecordCommand_Executed" CanExecute="MoveDownRecordCommand_CanExecute"/>
+                <CommandBinding Command="local:ConsoleControl.DefaultRecord" Executed="DefaultRecordCommand_Executed" CanExecute="EditRecordCommand_CanExecute"/>
             </DockPanel.CommandBindings>
             <DockPanel.Resources>
                 <ContextMenu x:Key="ListContextMenu">
@@ -34,6 +35,11 @@
                     <MenuItem Command="local:ConsoleControl.EditRecord">
                         <MenuItem.Icon>
                             <Image Source="/imgs/edit.png" Height="20" Margin="4"/>
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem Command="local:ConsoleControl.DefaultRecord">
+                        <MenuItem.Icon>
+                            <Image Source="/imgs/copy.png" Height="20" Margin="4"/>
                         </MenuItem.Icon>
                     </MenuItem>
                     <MenuItem Command="local:ConsoleControl.RemoveRecord">
@@ -209,6 +215,11 @@
             <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0" IsEnabled="{Binding IsOffline}">
                 <CheckBox VerticalAlignment="Center" Content="Exclusive" Margin="4,0,16,0" Name="InputInterlockLogicIsExclusive"/>
                 <CheckBox VerticalAlignment="Center" Content="Hardware" Margin="4,0,16,0" Name="InputInterlockLogicIsHardware"/>
+                <sync:ButtonAdv Label="Paste" VerticalAlignment="Center" Height="30" Width="64" Click="ButtonPaste_Click">
+                    <sync:ButtonAdv.SmallIcon>
+                        <BitmapImage  UriSource="/imgs/add.png"/>
+                    </sync:ButtonAdv.SmallIcon>
+                </sync:ButtonAdv>
                 <sync:ButtonAdv Label="Cancel" VerticalAlignment="Center" Height="30" Width="128" Command="local:ConsoleControl.Cancel" Margin="4">
                     <sync:ButtonAdv.SmallIcon>
                         <BitmapImage  UriSource="/imgs/cancel.png"/>

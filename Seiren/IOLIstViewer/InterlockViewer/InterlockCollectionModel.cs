@@ -486,7 +486,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         } 
     }
 
-    public class InterlockLogicModel
+    public class InterlockLogicModel: ISerializableRecordModel
     {
         public List<LogicTargetModel> Targets { get; private set; }
         public LogicExpressionModel Statement { get; private set; }
@@ -577,6 +577,29 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         public override string ToString()
         {
             return Title;
+        }
+
+        public XmlElement ToXml(XmlDocument doc)
+        {
+            XmlElement intlkModel = doc.CreateElement(typeof(InterlockLogicModel).Name);
+
+            XmlElement sub = doc.CreateElement("Name");
+            sub.AppendChild(doc.CreateTextNode(Logic.Name));
+            intlkModel.AppendChild(sub);
+
+            sub = doc.CreateElement("Attr");
+            sub.AppendChild(doc.CreateTextNode(Logic.Attr.ToString("X8")));
+            intlkModel.AppendChild(sub);
+
+            sub = doc.CreateElement("Target");
+            sub.AppendChild(doc.CreateTextNode(string.Join("\r\n", Logic.Targets.Select(t => t.ProcessObject.Index.ToString("X8")))));
+            intlkModel.AppendChild(sub);
+
+            sub = doc.CreateElement("Statement");
+            sub.AppendChild(doc.CreateTextNode(Logic.Statement.Serialize()));
+            intlkModel.AppendChild(sub);
+
+            return intlkModel;
         }
     }
 

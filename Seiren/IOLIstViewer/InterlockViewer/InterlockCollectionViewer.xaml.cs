@@ -14,6 +14,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Xml;
 
 namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
 {
@@ -63,13 +64,14 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
 
         private void AddRecordCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
+            var defaultValue = __DefaultInterlockLogicModel;
             InterlockLogicContainer.IsEnabled = false;
-            InputInterlockLogicIsHardware.IsChecked = false;
-            InputInterlockLogicIsExclusive.IsChecked = false;
-            __attribute = 0;
-            InputInterlockLogicName.Text = String.Empty;
-            InputInterlockLogicTargets.Text = String.Empty;
-            InputInterlockLogicStatement.Text = String.Empty;
+            InputInterlockLogicIsHardware.IsChecked = (defaultValue.attr & (uint)InterlockAttribute.Hardware) != 0;
+            InputInterlockLogicIsExclusive.IsChecked = (defaultValue.attr & (uint)InterlockAttribute.Exclusive) != 0; ;
+            __attribute = defaultValue.attr;
+            InputInterlockLogicName.Text = defaultValue.name;
+            InputInterlockLogicTargets.Text = defaultValue.target;
+            InputInterlockLogicStatement.Text = defaultValue.statement;
             InputArea.IsEnabled = true;
             __display_mode = InputDialogDisplayMode.Add;
         }
@@ -81,13 +83,14 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
 
         private void InsertRecordCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
+            var defaultValue = __DefaultInterlockLogicModel;
             InterlockLogicContainer.IsEnabled = false;
-            InputInterlockLogicIsHardware.IsChecked = false;
-            InputInterlockLogicIsExclusive.IsChecked = false;
-            __attribute = 0;
-            InputInterlockLogicName.Text = String.Empty;
-            InputInterlockLogicTargets.Text = String.Empty;
-            InputInterlockLogicStatement.Text = String.Empty;
+            InputInterlockLogicIsHardware.IsChecked = (defaultValue.attr & (uint)InterlockAttribute.Hardware) != 0;
+            InputInterlockLogicIsExclusive.IsChecked = (defaultValue.attr & (uint)InterlockAttribute.Exclusive) != 0;
+            __attribute = defaultValue.attr; ;
+            InputInterlockLogicName.Text = defaultValue.name;
+            InputInterlockLogicTargets.Text = defaultValue.target;
+            InputInterlockLogicStatement.Text = defaultValue.statement;
             InputArea.IsEnabled = true;
             __display_mode = InputDialogDisplayMode.Insert;
         }
@@ -186,6 +189,67 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         private void CancelCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
             e.CanExecute = true;
+        }
+
+        private void DefaultRecordCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            var ex = RecordUtility.CopyRecords(new List<InterlockLogicModel>() { InterlockLogicList.SelectedItem as InterlockLogicModel });
+            if (ex != null)
+            {
+                MessageBox.Show("At least one exception has occurred during the operation :\n" + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private (bool vailid, uint attr, string name, string target, string statement) __DefaultInterlockLogicModel
+        {
+            get
+            {
+                try
+                {
+                    if (Clipboard.ContainsText())
+                    {
+                        XmlDocument xmlDoc = new XmlDocument();
+                        xmlDoc.LoadXml(Clipboard.GetText().Trim());
+
+                        XmlNode rootNode = xmlDoc.SelectSingleNode("/" + typeof(InterlockLogicModel).FullName);
+                        if (rootNode.NodeType != XmlNodeType.Element ||
+                            rootNode.Attributes["Version"].Value != Settings.SeirenVersion ||
+                            rootNode.Attributes["DataType"].Value != Settings.DataTypeCatalogueHashString ||
+                            rootNode.Attributes["Controller"].Value != Settings.ControllerModelCatalogueHashString)
+                            return (false, 0, string.Empty, string.Empty, string.Empty);
+                        XmlNode node  = rootNode.SelectSingleNode(typeof(InterlockLogicModel).Name);
+                        if (node.NodeType == XmlNodeType.Element)
+                        {
+                            uint attr = Convert.ToUInt32(node.SelectSingleNode("Attr").FirstChild.Value, 16);
+                            string name = node.SelectSingleNode("Name").FirstChild.Value;
+                            string target = node.SelectSingleNode("Target").FirstChild.Value;
+                            string statement = node.SelectSingleNode("Statement").FirstChild.Value;
+                            return (true, attr, name, target, statement);
+                        }
+                        return (false, 0, string.Empty, string.Empty, string.Empty);
+                    }
+                    else
+                        return (false, 0, string.Empty, string.Empty, string.Empty);
+                }
+                catch
+                {
+                    return (false, 0, string.Empty, string.Empty, string.Empty);
+                }
+            }
+        }
+
+        private void ButtonPaste_Click(object sender, RoutedEventArgs e)
+        {
+            var defaultValue = __DefaultInterlockLogicModel;
+            if (defaultValue.vailid)
+            {
+                InputInterlockLogicIsHardware.IsChecked = (defaultValue.attr & (uint)InterlockAttribute.Hardware) != 0;
+                InputInterlockLogicIsExclusive.IsChecked = (defaultValue.attr & (uint)InterlockAttribute.Exclusive) != 0;
+                __attribute = defaultValue.attr; ;
+                InputInterlockLogicName.Text = defaultValue.name;
+                InputInterlockLogicTargets.Text = defaultValue.target;
+                InputInterlockLogicStatement.Text = defaultValue.statement;
+            }
         }
     }
 }

@@ -108,6 +108,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             }
             catch (Exception ex)
             {
+                DebugConsole.WriteException(ex);
                 return ex;
             }
         }
