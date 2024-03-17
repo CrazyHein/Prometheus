@@ -33,6 +33,13 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             ProcessDataImageGrid.RowDragDropController.DragStart += OnMainViewer_DragStart;
             ProcessDataImageGrid.RowDragDropController.DragOver += OnMainViewer_DragOver;
             ProcessDataImageGrid.RowDragDropController.Dropped += OnMainViewer_Dropped;
+            ProcessDataImageGrid.RowDragDropController.Drop += OnMainViewer_Drop;
+        }
+
+        private void OnMainViewer_Drop(object? sender, GridRowDropEventArgs e)
+        {
+            if(e.IsFromOutSideSource)
+                e.Handled = true;
         }
 
         private void OnMainViewer_DragStart(object sender, GridRowDragStartEventArgs e)

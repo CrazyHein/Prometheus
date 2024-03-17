@@ -21,6 +21,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             DataContext = new ControllerConfigurationModel(cc, cmc, history);
             MainViewer.RowDragDropController.Dropped += OnMainViewer_Dropped;
             MainViewer.RowDragDropController.DragOver += OnMainViewer_DragOver;
+            MainViewer.RowDragDropController.Drop += OnMainViewer_Drop;
         }
 
         private DeviceConfigurationModel? __DefaultDeviceConfigurationModel
@@ -29,6 +30,12 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             {
                 return RecordUtility.DefaultRecord<ControllerConfigurationModel, DeviceConfigurationModel>(DataContext as ControllerConfigurationModel);
             }
+        }
+
+        private void OnMainViewer_Drop(object? sender, GridRowDropEventArgs e)
+        {
+            if (e.IsFromOutSideSource)
+                e.Handled = true;
         }
         private void OnMainViewer_Dropped(object sender, Syncfusion.UI.Xaml.Grid.GridRowDroppedEventArgs e)
         {
@@ -69,8 +76,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             if (wnd.ShowDialog() == true)
             {
                 MainViewer.SelectedItem = wnd.Result;
-                MainViewer.ScrollInView(new Syncfusion.UI.Xaml.ScrollAxis.RowColumnIndex(
-                    MainViewer.ResolveToRowIndex(MainViewer.SelectedItem), MainViewer.ResolveToStartColumnIndex()));
+                var line = MainViewer.ResolveToRowIndex(MainViewer.SelectedItem);
+                if(line != -1)
+                    MainViewer.ScrollInView(new Syncfusion.UI.Xaml.ScrollAxis.RowColumnIndex(line, MainViewer.ResolveToStartColumnIndex()));
             }
         }
 
@@ -87,8 +95,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             if (wnd.ShowDialog() == true)
             {
                 MainViewer.SelectedItem = wnd.Result;
-                MainViewer.ScrollInView(new Syncfusion.UI.Xaml.ScrollAxis.RowColumnIndex(
-                    MainViewer.ResolveToRowIndex(MainViewer.SelectedItem), MainViewer.ResolveToStartColumnIndex()));
+                var line = MainViewer.ResolveToRowIndex(MainViewer.SelectedItem);
+                if (line != -1 )
+                    MainViewer.ScrollInView(new Syncfusion.UI.Xaml.ScrollAxis.RowColumnIndex(line, MainViewer.ResolveToStartColumnIndex()));
             }
         }
 
@@ -218,9 +227,11 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                     MainViewer.SelectedItems.Add(r);
                 }
                 if (MainViewer.SelectedItems.Count > 0)
-                    MainViewer.ScrollInView(new Syncfusion.UI.Xaml.ScrollAxis.RowColumnIndex(
-                               MainViewer.ResolveToRowIndex(MainViewer.SelectedItems.First()),
-                               MainViewer.ResolveToStartColumnIndex()));
+                {
+                    var line = MainViewer.ResolveToRowIndex(MainViewer.SelectedItems.First());
+                    if(line != -1)
+                        MainViewer.ScrollInView(new Syncfusion.UI.Xaml.ScrollAxis.RowColumnIndex(line, MainViewer.ResolveToStartColumnIndex()));
+                }
             }
         }
 
@@ -253,9 +264,11 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                     MainViewer.SelectedItems.Add(r);
                 }
                 if (MainViewer.SelectedItems.Count > 0)
-                    MainViewer.ScrollInView(new Syncfusion.UI.Xaml.ScrollAxis.RowColumnIndex(
-                               MainViewer.ResolveToRowIndex(MainViewer.SelectedItems.First()),
-                               MainViewer.ResolveToStartColumnIndex()));
+                {
+                    var line = MainViewer.ResolveToRowIndex(MainViewer.SelectedItems.Last());
+                    if(line != -1)
+                        MainViewer.ScrollInView(new Syncfusion.UI.Xaml.ScrollAxis.RowColumnIndex(line, MainViewer.ResolveToStartColumnIndex()));
+                }
             }
         }
 

@@ -28,6 +28,13 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             MainViewer.RowDragDropController.DragStart += OnMainViewer_DragStart;
             MainViewer.RowDragDropController.Dropped += OnMainViewer_Dropped;
             MainViewer.RowDragDropController.DragOver += OnMainViewer_DragOver;
+            MainViewer.RowDragDropController.Drop += OnMainViewer_Drop;
+        }
+
+        private void OnMainViewer_Drop(object? sender, GridRowDropEventArgs e)
+        {
+            if(e.IsFromOutSideSource)
+                e.Handled = true;
         }
 
         private bool __raw_viewer()
@@ -89,9 +96,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             if (wnd.ShowDialog() == true)
             {
                 MainViewer.SelectedItem = wnd.Result;
-                if (__raw_viewer() == true)
-                    MainViewer.ScrollInView(new Syncfusion.UI.Xaml.ScrollAxis.RowColumnIndex(
-                        MainViewer.ResolveToRowIndex(MainViewer.SelectedItem), MainViewer.ResolveToStartColumnIndex()));
+                var line = MainViewer.ResolveToRowIndex(MainViewer.SelectedItem);
+                if (line != -1)
+                    MainViewer.ScrollInView(new Syncfusion.UI.Xaml.ScrollAxis.RowColumnIndex(line, MainViewer.ResolveToStartColumnIndex()));
             }
         }
 
@@ -121,8 +128,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             if (wnd.ShowDialog() == true)
             {
                 MainViewer.SelectedItem = wnd.Result;
-                MainViewer.ScrollInView(new Syncfusion.UI.Xaml.ScrollAxis.RowColumnIndex(
-                    MainViewer.ResolveToRowIndex(MainViewer.SelectedItem), MainViewer.ResolveToStartColumnIndex()));
+                var line = MainViewer.ResolveToRowIndex(MainViewer.SelectedItem);
+                if(line != -1)
+                    MainViewer.ScrollInView(new Syncfusion.UI.Xaml.ScrollAxis.RowColumnIndex(line, MainViewer.ResolveToStartColumnIndex()));
             }
         }
 
@@ -230,9 +238,11 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                     MainViewer.SelectedItems.Add(r);
                 }
                 if (MainViewer.SelectedItems.Count > 0)
-                    MainViewer.ScrollInView(new Syncfusion.UI.Xaml.ScrollAxis.RowColumnIndex(
-                               MainViewer.ResolveToRowIndex(MainViewer.SelectedItems.First()),
-                               MainViewer.ResolveToStartColumnIndex()));
+                {
+                    var line = MainViewer.ResolveToRowIndex(MainViewer.SelectedItems.First());
+                    if(line != -1)
+                        MainViewer.ScrollInView(new Syncfusion.UI.Xaml.ScrollAxis.RowColumnIndex(line, MainViewer.ResolveToStartColumnIndex()));
+                }
             }
         }
 
@@ -265,9 +275,11 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                     MainViewer.SelectedItems.Add(r);
                 }
                 if (MainViewer.SelectedItems.Count > 0)
-                    MainViewer.ScrollInView(new Syncfusion.UI.Xaml.ScrollAxis.RowColumnIndex(
-                               MainViewer.ResolveToRowIndex(MainViewer.SelectedItems.First()),
-                               MainViewer.ResolveToStartColumnIndex()));
+                {
+                    var line = MainViewer.ResolveToRowIndex(MainViewer.SelectedItems.Last());
+                    if(line != -1)
+                        MainViewer.ScrollInView(new Syncfusion.UI.Xaml.ScrollAxis.RowColumnIndex(line, MainViewer.ResolveToStartColumnIndex()));
+                }
             }
         }
 
