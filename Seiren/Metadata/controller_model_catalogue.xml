@@ -519,6 +519,33 @@
 				<RWw>2048</RWw>
 			</RX>
 		</ExtensionModel>
+		<ExtensionModel>
+			<ID>0x0110</ID>
+			<Name>GENERAL_MOTION_CONTROLLER</Name>
+			<BitSize>0x20</BitSize>
+			<TX>
+				<MotionSystemVersion>1</MotionSystemVersion>
+				<NumberOfAxis>1</NumberOfAxis>
+				<NumberOfGroup>1</NumberOfGroup>
+				<AxisPosition>256</AxisPosition>
+				<AxisVelocity>256</AxisVelocity>
+				<AxisTorque>256</AxisTorque>
+				<AxisFollowingError>256</AxisFollowingError>
+				<AxisStatus>256</AxisStatus>
+				<AxisAcknowledge>256</AxisAcknowledge>
+				<GroupAcknowledge>256</GroupAcknowledge>
+				<AxisReturnCode>256</AxisReturnCode>
+				<GroupReturnCode>256</GroupReturnCode>
+				<AxisMonitor>4294967295</AxisMonitor>
+				<GroupMonitor>4294967295</GroupMonitor>
+			</TX>
+			<RX>
+				<AxisCommand>256</AxisCommand>
+				<GroupCommand>256</GroupCommand>
+				<AxisParameter>4294967295</AxisParameter>
+				<GroupParameter>4294967295</GroupParameter>
+			</RX>
+		</ExtensionModel>
 	</ExtensionModels>
 	<EthernetModels ConfigurationFields = "Timeout;Timer;Interval;Priority;InputDataOffset;InputDataSize;OutputDataOffset;OutputDataSize;">
 		<EthernetModel>

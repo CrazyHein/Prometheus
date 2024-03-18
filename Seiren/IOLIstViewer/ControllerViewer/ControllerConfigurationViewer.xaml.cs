@@ -39,7 +39,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         }
         private void OnMainViewer_Dropped(object sender, Syncfusion.UI.Xaml.Grid.GridRowDroppedEventArgs e)
         {
-            if (e.DropPosition != DropPosition.None)
+            if (e.DropPosition != DropPosition.None && e.IsFromOutSideSource == false)
             {
                 ObservableCollection<object> draggingRecords = e.Data.GetData("Records") as ObservableCollection<object>;
                 var controllerConfiguration = DataContext as ControllerConfigurationModel;
