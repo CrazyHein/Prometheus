@@ -31,6 +31,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
 
         private InputDialogDisplayMode __display_mode;
         private uint __attribute;
+        private int __selected_index;
 
         private void EditRecordCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
@@ -55,6 +56,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             InputInterlockLogicStatement.Text = logic.Statement.Serialize();
             InputArea.IsEnabled = true;
             __display_mode = InputDialogDisplayMode.Edit;
+            __selected_index = InterlockLogicList.SelectedIndex;
         }
 
         private void AddRecordCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
@@ -93,6 +95,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             InputInterlockLogicStatement.Text = defaultValue.statement;
             InputArea.IsEnabled = true;
             __display_mode = InputDialogDisplayMode.Insert;
+            __selected_index = InterlockLogicList.SelectedIndex;
         }
 
         private void RemoveRecordCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
@@ -149,7 +152,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
 
         private void ConfirmCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            int index = InterlockLogicList.SelectedIndex;
+            int index = __selected_index;
             if (InputInterlockLogicIsHardware.IsChecked == true)
                 __attribute |= (uint)InterlockAttribute.Hardware;
             else
@@ -163,7 +166,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                 switch (__display_mode)
                 {
                     case InputDialogDisplayMode.Edit:
-                        (DataContext as InterlockCollectionModel).Replace(InterlockLogicList.SelectedIndex, __attribute,
+                        (DataContext as InterlockCollectionModel).Replace(index, __attribute,
                             InputInterlockLogicName.Text, InputInterlockLogicTargets.Text, InputInterlockLogicStatement.Text);
                         break;
                     case InputDialogDisplayMode.Add:
@@ -171,7 +174,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                         index = (DataContext as InterlockCollectionModel).InterlockLogicModels.Count - 1;
                         break;
                     case InputDialogDisplayMode.Insert:
-                        (DataContext as InterlockCollectionModel).Insert(InterlockLogicList.SelectedIndex, __attribute,
+                        (DataContext as InterlockCollectionModel).Insert(index, __attribute,
                             InputInterlockLogicName.Text, InputInterlockLogicTargets.Text, InputInterlockLogicStatement.Text);
                         break;
                 }

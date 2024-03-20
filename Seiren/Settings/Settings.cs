@@ -27,11 +27,12 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             Restore(path);
         }
 
-        public Settings(SlmpTargetProperty slmp, DAQTargetProperty daq, FTPTargetProperty ftp, PreferenceProperty pref )
+        public Settings(SlmpTargetProperty slmp, DAQTargetProperty daq, FTPTargetProperty ftp, AppInstallerProperty app, PreferenceProperty pref )
         {
             SlmpTargetProperty = slmp;
             DAQTargetProperty = daq;
             FTPTargetProperty = ftp;
+            AppInstallerProperty = app;
             PreferenceProperty = pref;
         }
 
@@ -216,6 +217,32 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         public string NonHardwareInterlocksAlias { get; set; } = "Software";
         public string ExclusiveInterlocksAlias { get; set; } = "Exclusive";
         public string NonExclusiveInterlocksAlias { get; set; } = "General";
+        public bool EnableDebugConsole { get; set; } = true;
+        public bool EnableDebugLog { get; set; } = true;
+        private int __debug_log_size_limit = 1024;
+        public int DebugLogSizeLimit
+        {
+            get { return __debug_log_size_limit; }
+            set
+            {
+                if (value < 1024)
+                    throw new ArgumentOutOfRangeException("The setting value should be greater than or equal to 1024(k).");
+                else
+                    __debug_log_size_limit = value;
+            }
+        }
+        private int __debug_log_buffer_size = 4;
+        public int DebugLogBufferSize
+        {
+            get { return __debug_log_buffer_size; }
+            set
+            {
+                if (value < 4)
+                    throw new ArgumentOutOfRangeException("The setting value should be greater than or equal to 4(k).");
+                else
+                    __debug_log_buffer_size = value;
+            }
+        }
 
         private static JsonSerializerOptions __JSON_OPTION = new JsonSerializerOptions
         {

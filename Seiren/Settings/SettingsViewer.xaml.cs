@@ -152,6 +152,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                         Settings s = new Settings(DebuggerSettings.DataContext as SlmpTargetProperty,
                             DAQSettings.DataContext as DAQTargetProperty,
                             FTPSettings.DataContext as FTPTargetProperty,
+                            AppInstallerSettings.DataContext as AppInstallerProperty,
                             PreferenceSettings.DataContext as PreferenceProperty);
                         s.Save(save.FileName);
                     }

@@ -122,6 +122,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             InitializeComponent();
             this.Loaded += OnLoaded;
 
+            DebugConsole.CreateConsole(__settings.PreferenceProperty.EnableDebugConsole, __settings.PreferenceProperty.EnableDebugLog,
+                                        __settings.PreferenceProperty.DebugLogSizeLimit * 1024, __settings.PreferenceProperty.DebugLogBufferSize * 1024);
+            DebugConsole.WriteInfo($"The configuration file will be loaded from the path: {Settings.SettingsPath}");
+
             __operating_history = new OperatingHistory(__settings.PreferenceProperty.RecordOperatingUndoQueueDepth);
             __main_model.UndoOperatingRecords = __operating_history.UndoOperatingRecords;
             __main_model.RedoOperatingRecords = __operating_history.RedoOperatingRecords;
@@ -132,7 +136,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
 
         static MainWindow()
         {
-            DebugConsole.CreateConsole();
+            
         }
         /// <summary>
         /// Called when [loaded].
@@ -159,6 +163,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                 DebugConsole.WriteInfo($"Lombardia Version: {Settings.LombardiaVersion}");
                 DebugConsole.WriteInfo($"Gagharv Version: {Settings.GagharvVersion}");
                 DebugConsole.WriteInfo($"Tirasweel Version: {Settings.TirasweelVersion}");
+                DebugConsole.Flush();
 
                 __data_types_viewer = new DataTypesViewer(__data_type_catalogue);
                 __device_models_viewer = new DeviceModelsViewer(__controller_model_catalogue);
@@ -1294,7 +1299,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
 
         private void Window_Closed(object sender, EventArgs e)
         {
-            __recently_opened.Flush(); 
+            __recently_opened.Flush();
+            DebugConsole.WriteInfo("Window has been closed.");
+            DebugConsole.Flush();
         }
 
         private void RecentlyOpened_Click(object sender, RoutedEventArgs e)

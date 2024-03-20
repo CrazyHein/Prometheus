@@ -29,6 +29,7 @@
                     </Style.Triggers>
                 </Style>
                 <sync:BoolNegationConverter x:Key="boolnegation"/>
+                <local:HEX32StringConverter x:Key="hex32string"/>
             </TabControl.Resources>
             <TabItem Header="Debugger" Width="135" Name="DebuggerSettingsTab">
                 <Grid d:DataContext="{d:DesignInstance Type=debugger:SlmpTargetProperty}" x:Name="DebuggerSettings" Validation.Error="DebuggerSettings_Error">
@@ -262,13 +263,13 @@
                         <TextBox Text="{Binding BootTaskName, ValidatesOnExceptions=True, NotifyOnValidationError=True}" FontStyle="Normal"/>
                     </sync:SfTextInputLayout>
                     <sync:SfTextInputLayout Grid.Column="1" Hint="Boot Task Stack Size" HelperText="Input boot task stack size(bytes) here" ContainerType="Filled" FontStyle="Italic" FontSize="12" Margin="4,8,4,8" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}">
-                        <TextBox Text="{Binding BootTaskStackSize, StringFormat={}0x{0:X8}, ValidatesOnExceptions=True, NotifyOnValidationError=True}" FontStyle="Normal"/>
+                        <TextBox Text="{Binding BootTaskStackSize, ValidatesOnExceptions=True, NotifyOnValidationError=True}" FontStyle="Normal"/>
                     </sync:SfTextInputLayout>
                     <sync:SfTextInputLayout Grid.Row="1" Hint="Boot Task Priority" HelperText="Input boot task priority(0-255) here" ContainerType="Filled" FontStyle="Italic" FontSize="12" Margin="4,8,4,8" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}">
                         <TextBox Text="{Binding BootTaskPriority, ValidatesOnExceptions=True, NotifyOnValidationError=True}" FontStyle="Normal"/>
                     </sync:SfTextInputLayout>
-                    <sync:SfTextInputLayout Grid.Row="1" Grid.Column="1" Hint="Boot Task Spawn Flag" HelperText="Input boot task spawn flag here" ContainerType="Filled" FontStyle="Italic" FontSize="12" Margin="4,8,4,8" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}">
-                        <TextBox Text="{Binding BootTaskSpawnFlag, StringFormat={}0x{0:X8}, ValidatesOnExceptions=True, NotifyOnValidationError=True}" FontStyle="Normal"/>
+                    <sync:SfTextInputLayout Grid.Row="1" Grid.Column="1" Hint="Boot Task Spawn Flag(32-bit hexadecimal)" HelperText="Input boot task spawn flag here" ContainerType="Filled" FontStyle="Italic" FontSize="12" Margin="4,8,4,8" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}">
+                        <TextBox Text="{Binding BootTaskSpawnFlag, Converter={StaticResource hex32string}, ValidatesOnExceptions=True, NotifyOnValidationError=True}" FontStyle="Normal"/>
                     </sync:SfTextInputLayout>
                 </Grid>
             </TabItem>
@@ -276,6 +277,7 @@
                 <ScrollViewer>
                     <Grid Validation.Error="DebuggerSettings_Error">
                         <Grid.RowDefinitions>
+                            <RowDefinition Height="auto" />
                             <RowDefinition Height="auto" />
                             <RowDefinition Height="auto" />
                             <RowDefinition Height="auto" />
@@ -362,6 +364,27 @@
                                     </UniformGrid>
                                 </GroupBox>
                                 
+                            </Grid>
+                        </GroupBox>
+                        <GroupBox Header="Developer Options" Padding="3,8,3,8" Margin="0,4,0,0" Grid.Row="5">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="auto"/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                </Grid.ColumnDefinitions>
+                                <CheckBox Content="Enable Debug Console" Margin="4" IsChecked="{Binding EnableDebugConsole}"/>
+                                <CheckBox x:Name="EnableDebugLog" Grid.Row="1" Content="Enable Debug Log" Margin="4" IsChecked="{Binding EnableDebugLog}"/>
+                                <sync:SfTextInputLayout Grid.Row="1" Grid.Column="1" IsEnabled="{Binding ElementName=EnableDebugLog, Path=IsChecked}" Hint="File Size Limit (kbyte per file)" HelperText="The log file size limit should be at least 1024kbytes."  FontSize="12" FontStyle="Italic" ContainerType="Filled" Margin="4" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}">
+                                    <TextBox FontStyle="Normal" Text="{Binding DebugLogSizeLimit, ValidatesOnExceptions=True, NotifyOnValidationError=True}" />
+                                </sync:SfTextInputLayout>
+                                <sync:SfTextInputLayout Grid.Row="1" Grid.Column="2" IsEnabled="{Binding ElementName=EnableDebugLog, Path=IsChecked}" Hint="Buffer Size (kbyte)"  HelperText="The buffer size should be at least 4kbytes." FontSize="12" FontStyle="Italic" ContainerType="Filled" Margin="4" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}">
+                                    <TextBox FontStyle="Normal" Text="{Binding DebugLogBufferSize, ValidatesOnExceptions=True, NotifyOnValidationError=True}" />
+                                </sync:SfTextInputLayout>
                             </Grid>
                         </GroupBox>
                     </Grid>

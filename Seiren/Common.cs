@@ -713,6 +713,26 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         }
     }
 
+    public class HEX32StringConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return ((uint)value).ToString("X8");
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            try
+            {
+                return System.Convert.ToUInt32((string)value, 16);
+            }
+            catch (Exception ex)
+            {
+                return ex;
+            }
+        }
+    }
+
     public class RemoteOperationImage : IValueConverter
     {
         static System.Windows.Media.Imaging.BitmapImage RUN = new System.Windows.Media.Imaging.BitmapImage(new Uri("/imgs/startdebugging.png", UriKind.Relative));
