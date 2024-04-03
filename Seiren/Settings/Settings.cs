@@ -217,8 +217,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         public string NonHardwareInterlocksAlias { get; set; } = "Software";
         public string ExclusiveInterlocksAlias { get; set; } = "Exclusive";
         public string NonExclusiveInterlocksAlias { get; set; } = "General";
-        public bool EnableDebugConsole { get; set; } = true;
-        public bool EnableDebugLog { get; set; } = true;
+        public bool EnableDebugConsole { get; set; } = false;
+        public bool EnableDebugLog { get; set; } = false;
         private int __debug_log_size_limit = 1024;
         public int DebugLogSizeLimit
         {

@@ -177,6 +177,14 @@
 			</RX>
 		</ExtensionModel>
 		<ExtensionModel>
+			<ID>0x0013</ID>
+			<Name>RX40NC6S_TS_S</Name>
+			<BitSize>0x20</BitSize>
+			<TX>
+				<Bit>16</Bit>
+			</TX>
+		</ExtensionModel>
+		<ExtensionModel>
 			<ID>0x0020</ID>
 			<Name>R60AD4</Name>
 			<BitSize>0x10</BitSize>
@@ -541,7 +549,9 @@
 			</TX>
 			<RX>
 				<AxisCommand>256</AxisCommand>
+				<AxisTimeout>256</AxisTimeout>
 				<GroupCommand>256</GroupCommand>
+				<GroupTimeout>256</GroupTimeout>
 				<AxisParameter>4294967295</AxisParameter>
 				<GroupParameter>4294967295</GroupParameter>
 			</RX>

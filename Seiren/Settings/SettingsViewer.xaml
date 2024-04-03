@@ -366,7 +366,7 @@
                                 
                             </Grid>
                         </GroupBox>
-                        <GroupBox Header="Developer Options" Padding="3,8,3,8" Margin="0,4,0,0" Grid.Row="5">
+                        <GroupBox Header="Developer Options (Restarting the application to put the change in effect)" Padding="3,8,3,8" Margin="0,4,0,0" Grid.Row="5">
                             <Grid>
                                 <Grid.RowDefinitions>
                                     <RowDefinition/>

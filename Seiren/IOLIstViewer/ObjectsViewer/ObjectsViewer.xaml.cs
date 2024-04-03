@@ -293,7 +293,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                     MainViewer.ClearSelections(false);
                     foreach (var r in records)
                     {
-                        DebugConsole.WriteInfo($"Apply object index [{mindex}]");
+                        DebugConsole.WriteInfo($"Apply object index [0x{mindex:X8}]");
                         r.Index = mindex;
 
                         try
@@ -321,7 +321,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                     MainViewer.ClearSelections(false);
                     foreach (var r in records)
                     {
-                        DebugConsole.WriteInfo($"Apply object index [{mindex}]");
+                        DebugConsole.WriteInfo($"Apply object index [0x{mindex:X8}]");
                         ObjectModel o = null;
                         try
                         {
@@ -371,7 +371,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                     MainViewer.ClearSelections(false);
                     foreach (var r in records.Reverse<ObjectModel>())
                     {
-                        DebugConsole.WriteInfo($"Apply object index [{mindex}]");
+                        DebugConsole.WriteInfo($"Apply object index [0x{mindex:X8}]");
                         r.Index = mindex;
 
                         try
@@ -399,7 +399,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                     MainViewer.ClearSelections(false);
                     foreach (var r in records.Reverse<VariableModel>())
                     {
-                        DebugConsole.WriteInfo($"Apply object index [{mindex}]");
+                        DebugConsole.WriteInfo($"Apply object index [0x{mindex:X8}]");
                         ObjectModel o = null;
                         try
                         {

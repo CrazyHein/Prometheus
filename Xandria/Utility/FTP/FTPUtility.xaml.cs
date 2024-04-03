@@ -143,7 +143,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Xandria.Utility
                         model.TransferState = "Download r2h_task_user_parameters file";
                         await Task.Run(() => model.Download());
 
-                        model.TransferState = "Download the feferenced file(s)";
+                        model.TransferState = "Download the referenced file(s)";
                         foreach (var device in __original_helper.LocalHardwareCollection)
                         {
                             foreach (var field in device.CustomFields)
