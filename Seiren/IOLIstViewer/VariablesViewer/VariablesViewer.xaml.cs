@@ -21,10 +21,12 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
     /// </summary>
     public partial class VariablesViewer : UserControl
     {
+        OperatingHistory __operating_history;
         public VariablesViewer(VariableDictionary dic, DataTypeCatalogue dtc, OperatingHistory history = null)
         {
             InitializeComponent();
             DataContext = new VariablesModel(dic, dtc, history);
+            __operating_history = history;
             MainViewer.RowDragDropController.DragStart += OnMainViewer_DragStart;
             MainViewer.RowDragDropController.Dropped += OnMainViewer_Dropped;
             MainViewer.RowDragDropController.DragOver += OnMainViewer_DragOver;
@@ -164,6 +166,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                 return;
 
             var list = MainViewer.SelectedItems.Select(r => r as VariableModel).ToList();
+            if(list.Count > 1)
+                __operating_history.EnterBatchOperating();
             try
             {
                 foreach(var i in list)
@@ -173,7 +177,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             {
                 MessageBox.Show("At least one exception has occurred during the operation :\n" + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
-            
+            if(list.Count > 1)
+                __operating_history.ExitBatchOperating();
+
         }
 
         private void RemoveRecordCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
@@ -216,6 +222,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             if(records.Count != 0)
             {
                 MainViewer.ClearSelections(false);
+                if(records.Count > 1)
+                    __operating_history.EnterBatchOperating();
                 foreach (var r in records)
                 {
                     string revisedName = __unique_naming(r.Name);
@@ -237,6 +245,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                     }
                     MainViewer.SelectedItems.Add(r);
                 }
+                if (records.Count > 1)
+                    __operating_history.ExitBatchOperating();
                 if (MainViewer.SelectedItems.Count > 0)
                 {
                     var line = MainViewer.ResolveToRowIndex(MainViewer.SelectedItems.First());
@@ -253,6 +263,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             if (records.Count != 0)
             {
                 MainViewer.ClearSelections(false);
+                if (records.Count > 1)
+                    __operating_history.EnterBatchOperating();
                 foreach (var r in records.Reverse<VariableModel>())
                 {
                     string revisedName = __unique_naming(r.Name);
@@ -274,6 +286,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                     }
                     MainViewer.SelectedItems.Add(r);
                 }
+                if (records.Count > 1)
+                    __operating_history.ExitBatchOperating();
                 if (MainViewer.SelectedItems.Count > 0)
                 {
                     var line = MainViewer.ResolveToRowIndex(MainViewer.SelectedItems.Last());
@@ -341,6 +355,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                 MessageBox.Show("There's no record that fits the criteria.", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
                 return;
             }
+            if (unused.Count > 1)
+                __operating_history.EnterBatchOperating();
             foreach (var v in unused)
             {
                 var res = MessageBox.Show("Are you sure you want to remove the record :\n" + v.ToString(), "Question", MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
@@ -358,6 +374,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                 else if (res == MessageBoxResult.Cancel)
                     break;
             }
+            if (unused.Count > 1)
+                __operating_history.ExitBatchOperating();
         }
 
         private void RemoveAllUnusedCommand_Executed(object sender, ExecutedRoutedEventArgs e)
@@ -394,6 +412,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             }
             if (MessageBox.Show("Are you sure you want to remove the " + unused.Count.ToString() + " record(s) :\n" + record, "Question", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.No)
                 return;
+            if (unused.Count > 1)
+                __operating_history.EnterBatchOperating();
             foreach (var v in unused)
             {
                 try
@@ -406,6 +426,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                     break;
                 }
             }
+            if (unused.Count > 1)
+                __operating_history.ExitBatchOperating();
         }
 
         public void AddEtherCATVariable(EtherCATVariableInfo info, EtherCATVaribleDataTypeConverter types)
@@ -438,6 +460,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             int i = 0;
             try
             {
+                __operating_history.EnterBatchOperating();
                 foreach (var info in infos)
                 {
                     originalName = info.VariableName.Trim();
@@ -466,6 +489,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             {
                 MessageBox.Show("At least one exception has occurred during the operation :\n" + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
+            }
+            finally
+            {
+                __operating_history.ExitBatchOperating();
             }
         }
 
@@ -505,6 +532,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
 
             try
             {
+                __operating_history.EnterBatchOperating();
                 foreach (var info in infos)
                 {
                     uint bits = info.SubEntryBitSize != null ? info.SubEntryBitSize.Value : info.EntryBitSize;
@@ -531,6 +559,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             {
                 MessageBox.Show("At least one exception has occurred during the operation :\n" + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
+            }
+            finally
+            {
+                __operating_history.ExitBatchOperating();
             }
         }
     }

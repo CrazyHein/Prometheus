@@ -21,10 +21,12 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         private ProcessDataImageAccess __process_data_access;
         private ProcessDataImageLayout __process_data_layout;
         private ObjectsModel __objects_model;
+        OperatingHistory __operating_history;
         public ProcessDataImageViewer(ProcessDataImage pdi, ObjectDictionary od, SfDataGrid source, ObjectsModel objects, OperatingHistory history)
         {
             InitializeComponent();
             DataContext = new ProcessDataImageModel(pdi, od, source.DataContext as ObjectsModel, history);
+            __operating_history = history;
             __process_data_access = pdi.Access;
             __process_data_layout = pdi.Layout;
             __object_source = source;
@@ -113,6 +115,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                         //ProcessDataImageGrid.View.BeginInit();
 
                         ProcessDataImageGrid.SelectedItems.Clear(); //= new ObservableCollection<object>();
+                        if (__object_source.SelectedItems.Count > 1)
+                            __operating_history.EnterBatchOperating();
                         foreach (var o in os)
                         {
                             ProcessDataModel p = new ProcessDataModel(__object_dictionary.ProcessObjects[o.Index], __process_data_access, __process_data_layout, false);
@@ -143,6 +147,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                                             __object_source.ResolveToStartColumnIndex()));
                             }
                         }
+                        if (__object_source.SelectedItems.Count > 1)
+                            __operating_history.ExitBatchOperating();
                     }
                 }
 
@@ -193,6 +199,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
 
                         int index = ProcessDataImageGrid.SelectedIndex;
                         ProcessDataImageGrid.SelectedItems.Clear();
+                        if (__object_source.SelectedItems.Count > 1)
+                            __operating_history.EnterBatchOperating();
                         foreach (var o in os)
                         {
                             ProcessDataModel p = new ProcessDataModel(__object_dictionary.ProcessObjects[o.Index], __process_data_access, __process_data_layout, false);
@@ -223,6 +231,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                                             __object_source.ResolveToStartColumnIndex()));
                             }
                         }
+                        if (__object_source.SelectedItems.Count > 1)
+                            __operating_history.ExitBatchOperating();
                     }
                 }
             }
@@ -279,6 +289,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                 return;
 
             var indexes = ProcessDataImageGrid.SelectedItems.Select(r => r as ProcessDataModel).ToList();
+            if (indexes.Count > 1 || (DataContext as ProcessDataImageModel).DirectModeOperation)
+                __operating_history.EnterBatchOperating();
             try
             {
                 foreach (var i in indexes)
@@ -292,6 +304,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             {
                 MessageBox.Show("At least one exception has occurred during the operation :\n" + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
+            if (indexes.Count > 1 || (DataContext as ProcessDataImageModel).DirectModeOperation)
+                __operating_history.ExitBatchOperating();
         }
 
         private void RemoveRecordCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
@@ -305,12 +319,16 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             var dataImage = DataContext as ProcessDataImageModel;
 
             var indexes = ProcessDataImageGrid.SelectedItems.Select(r => r as ProcessDataModel).OrderBy(r => dataImage.IndexOf(r)).ToList();
-            foreach(var i in indexes)
+            if (indexes.Count > 1)
+                __operating_history.EnterBatchOperating();
+            foreach (var i in indexes)
             {
                 int sourceIndex = dataImage.IndexOf(i);
                 int targetIndex = sourceIndex - 1;
                 dataImage.Move(sourceIndex, targetIndex);
             }
+            if (indexes.Count > 1)
+                __operating_history.ExitBatchOperating();
             ProcessDataImageGrid.SelectedItems = new ObservableCollection<object>(indexes);
             ProcessDataImageGrid.ScrollInView(new Syncfusion.UI.Xaml.ScrollAxis.RowColumnIndex(
                  ProcessDataImageGrid.ResolveToRowIndex(indexes[0]),
@@ -332,12 +350,16 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             var dataImage = DataContext as ProcessDataImageModel;
 
             var indexes = ProcessDataImageGrid.SelectedItems.Select(r => r as ProcessDataModel).OrderByDescending(r => dataImage.IndexOf(r)).ToList();
+            if (indexes.Count > 1)
+                __operating_history.EnterBatchOperating();
             foreach (var i in indexes)
             {
                 int sourceIndex = dataImage.IndexOf(i);
                 int targetIndex = sourceIndex + 1;
                 dataImage.Move(sourceIndex, targetIndex);
             }
+            if (indexes.Count > 1)
+                __operating_history.ExitBatchOperating();
             ProcessDataImageGrid.SelectedItems = new ObservableCollection<object>(indexes);
             ProcessDataImageGrid.ScrollInView(new Syncfusion.UI.Xaml.ScrollAxis.RowColumnIndex(
                  ProcessDataImageGrid.ResolveToRowIndex(indexes[0]),
@@ -374,21 +396,29 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         private void SetDAQFlagCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             ProcessDataImageModel pdi = DataContext as ProcessDataImageModel;
-            foreach(ProcessDataModel pd in ProcessDataImageGrid.SelectedItems)
+            if (ProcessDataImageGrid.SelectedItems.Count > 1)
+                __operating_history.EnterBatchOperating();
+            foreach (ProcessDataModel pd in ProcessDataImageGrid.SelectedItems)
             {
                 int pos = pdi.IndexOf(pd);
                 pdi.SetDAQ(pos, true);
             }
+            if (ProcessDataImageGrid.SelectedItems.Count > 1)
+                __operating_history.ExitBatchOperating();
         }
 
         private void ResetDAQFlagCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             ProcessDataImageModel pdi = DataContext as ProcessDataImageModel;
+            if (ProcessDataImageGrid.SelectedItems.Count > 1)
+                __operating_history.EnterBatchOperating();
             foreach (ProcessDataModel pd in ProcessDataImageGrid.SelectedItems)
             {
                 int pos = pdi.IndexOf(pd);
                 pdi.SetDAQ(pos, false);
             }
+            if (ProcessDataImageGrid.SelectedItems.Count > 1)
+                __operating_history.ExitBatchOperating();
         }
 
         public void UpdateBindingSource()

@@ -27,6 +27,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         private ProcessDataImageViewer __rx_block_area_viewer;
         private InterlockCollectionViewer __interlock_viewer;
         private UserControl[] __process_data_image_controls;
+        OperatingHistory __operating_history;
 
         public ObjectsViewer(ObjectDictionary od, VariableDictionary vd, ControllerConfiguration cmc, VariablesModel vmodels, ControllerConfigurationModel cmodels,
             ProcessDataImage txdiagnostic, ProcessDataImage txbit, ProcessDataImage txblock,
@@ -35,6 +36,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         {
             InitializeComponent();
             DataContext = new ObjectsModel(od, vd, cmc, vmodels, cmodels, history);
+            __operating_history = history;
             MainViewer.RowDragDropController.DragStart += OnMainViewer_DragStart;
             MainViewer.RowDragDropController.DragOver += OnMainViewer_DragOver;
             MainViewer.RowDragDropController.Drop += OnMainViewer_Drop;
@@ -252,6 +254,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                 return;
 
             var list = MainViewer.SelectedItems.Select(r => r as ObjectModel).ToList();
+            if(list.Count > 1)
+                __operating_history.EnterBatchOperating();
             try
             {
                 foreach (var i in list)
@@ -261,6 +265,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             {
                 MessageBox.Show("At least one exception has occurred during the operation :\n" + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
+            if (list.Count > 1)
+                __operating_history.ExitBatchOperating();
         }
 
         private void RemoveRecordCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
@@ -291,6 +297,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                 {
                     uint mindex = (DataContext as ObjectsModel).Objects.Count == 0 ? 0 : (DataContext as ObjectsModel).Objects.AsParallel().Max(o => o.Index) + 1;
                     MainViewer.ClearSelections(false);
+                    if (records.Count > 1)
+                        __operating_history.EnterBatchOperating();
                     foreach (var r in records)
                     {
                         DebugConsole.WriteInfo($"Apply object index [0x{mindex:X8}]");
@@ -310,6 +318,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                         MainViewer.SelectedItems.Add(r);
                         mindex++;
                     }
+                    if (records.Count > 1)
+                        __operating_history.ExitBatchOperating();
                 }
             }
             else if(RecordUtility.ContainsRecord<VariableModel>())
@@ -319,6 +329,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                 {
                     uint mindex = (DataContext as ObjectsModel).Objects.Count == 0 ? 0 : (DataContext as ObjectsModel).Objects.AsParallel().Max(o => o.Index) + 1;
                     MainViewer.ClearSelections(false);
+                    if (records.Count > 1)
+                        __operating_history.EnterBatchOperating();
                     foreach (var r in records)
                     {
                         DebugConsole.WriteInfo($"Apply object index [0x{mindex:X8}]");
@@ -349,6 +361,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                         MainViewer.SelectedItems.Add(o);
                         mindex++;
                     }
+                    if (records.Count > 1)
+                        __operating_history.ExitBatchOperating();
                 }
             }
             if (MainViewer.SelectedItems.Count > 0)
@@ -369,6 +383,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                 {
                     uint mindex = (DataContext as ObjectsModel).Objects.Count == 0 ? 0 : (DataContext as ObjectsModel).Objects.AsParallel().Max(o => o.Index) + 1;
                     MainViewer.ClearSelections(false);
+                    if (records.Count > 1)
+                        __operating_history.EnterBatchOperating();
                     foreach (var r in records.Reverse<ObjectModel>())
                     {
                         DebugConsole.WriteInfo($"Apply object index [0x{mindex:X8}]");
@@ -388,6 +404,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                         MainViewer.SelectedItems.Add(r);
                         mindex++;
                     }
+                    if (records.Count > 1)
+                        __operating_history.ExitBatchOperating();
                 }
             }
             else if (RecordUtility.ContainsRecord<VariableModel>())
@@ -397,6 +415,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                 {
                     uint mindex = (DataContext as ObjectsModel).Objects.Count == 0 ? 0 : (DataContext as ObjectsModel).Objects.AsParallel().Max(o => o.Index) + 1;
                     MainViewer.ClearSelections(false);
+                    if (records.Count > 1)
+                        __operating_history.EnterBatchOperating();
                     foreach (var r in records.Reverse<VariableModel>())
                     {
                         DebugConsole.WriteInfo($"Apply object index [0x{mindex:X8}]");
@@ -427,6 +447,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                         MainViewer.SelectedItems.Add(o);
                         mindex++;
                     }
+                    if (records.Count > 1)
+                        __operating_history.ExitBatchOperating();
                 }
             }
             if (MainViewer.SelectedItems.Count > 0)
@@ -584,6 +606,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                 MessageBox.Show("There's no record that fits the criteria.", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
                 return;
             }
+            if(unused.Count > 1)
+                __operating_history.EnterBatchOperating();
             foreach (var o in unused)
             {
                 var res = MessageBox.Show("Are you sure you want to remove the record :\n" + o.ToString(), "Question", MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
@@ -601,6 +625,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                 else if (res == MessageBoxResult.Cancel)
                     break;
             }
+            if (unused.Count > 1)
+                __operating_history.ExitBatchOperating();
         }
 
         private void RemoveAllUnusedCommand_Executed(object sender, ExecutedRoutedEventArgs e)
@@ -637,6 +663,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             }
             if (MessageBox.Show("Are you sure you want to remove the " + unused.Count.ToString() + " record(s) :\n" + record, "Question", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.No)
                 return;
+            if (unused.Count > 1)
+                __operating_history.EnterBatchOperating();
             foreach (var o in unused)
             {
                 try
@@ -648,7 +676,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                     MessageBox.Show("At least one exception has occurred during the operation :\n" + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                     break;
                 }
-            }  
+            }
+            if (unused.Count > 1)
+                __operating_history.ExitBatchOperating();
         }
     }
 }

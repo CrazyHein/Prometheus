@@ -15,10 +15,12 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
     /// </summary>
     public partial class ControllerConfigurationViewer : UserControl
     {
+        OperatingHistory __operating_history;
         public ControllerConfigurationViewer(ControllerConfiguration cc, ControllerModelCatalogue cmc, OperatingHistory history = null)
         {
             InitializeComponent();
             DataContext = new ControllerConfigurationModel(cc, cmc, history);
+            __operating_history = history;
             MainViewer.RowDragDropController.Dropped += OnMainViewer_Dropped;
             MainViewer.RowDragDropController.DragOver += OnMainViewer_DragOver;
             MainViewer.RowDragDropController.Drop += OnMainViewer_Drop;
@@ -305,6 +307,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                 MessageBox.Show("There's no record that fits the criteria.", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
                 return;
             }
+            if (unused.Count > 1)
+                __operating_history.EnterBatchOperating();
             foreach (var d in unused)
             {
                 var res = MessageBox.Show("Are you sure you want to remove the record :\n" + d.ToString(), "Question", MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
@@ -322,6 +326,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                 else if (res == MessageBoxResult.Cancel)
                     break;
             }
+            if (unused.Count > 1)
+                __operating_history.ExitBatchOperating();
         }
 
         private void RemoveAllUnusedCommand_Executed(object sender, ExecutedRoutedEventArgs e)
@@ -358,6 +364,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             }
             if (MessageBox.Show("Are you sure you want to remove the " + unused.Count.ToString() + " record(s) :\n" + record, "Question", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.No)
                 return;
+            if (unused.Count > 1)
+                __operating_history.EnterBatchOperating();
             foreach (var d in unused)
             {
                 try
@@ -370,6 +378,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                     break;
                 }
             }
+            if (unused.Count > 1)
+                __operating_history.ExitBatchOperating();
         }
     }
 }

@@ -122,6 +122,13 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             set { SetProperty(ref __debugger_heartbeat, value); }
         }
 
+        private string __debugger_target = "N/A";
+        public string DebuggerTarget
+        {
+            get { return __debugger_target; }
+            set { SetProperty(ref __debugger_target, value); }
+        }
+
         private string __daq_unit_exception_message = "N/A";
         public string DAQUnitExceptionMessage
         {
@@ -155,6 +162,13 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         {
             get { return __daq_unit_status; }
             set { SetProperty(ref __daq_unit_status, value); }
+        }
+
+        private string __daq_unit_target = "N/A";
+        public string DAQUnitTarget
+        {
+            get { return __daq_unit_target; }
+            set { SetProperty(ref __daq_unit_target, value); }
         }
 
         private IReadOnlyList<OperatingRecord> __undo_operating_records;

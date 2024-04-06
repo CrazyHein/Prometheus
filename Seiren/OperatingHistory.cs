@@ -1,9 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Drawing;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Data;
+using System.Windows.Media;
 
 namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
 {
@@ -24,6 +28,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         public int NewPos { get; init; }
         public object OriginalValue { get; init; }
         public object NewValue { get; init; }
+
+        public char Marker { get; set; } = OperatingRecordMarker.DefaultMarker;
 
         public override string ToString()
         {
@@ -49,12 +55,48 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             }
         }
     }
+    public class OperatingRecordMarker : IValueConverter
+    {
+        public const char DefaultMarker = '\x20';
+        public const char EvenBatchMarker = '0';
+        public const char OddBatchMarker = '1';
+
+        private static SolidColorBrush DefaultBrush = new SolidColorBrush(Colors.LightYellow);
+        private static SolidColorBrush EvenBatchBrush = new SolidColorBrush(Colors.Black);
+        private static SolidColorBrush OddBatchBrush = new SolidColorBrush(Colors.Red);
+
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            char marker = (char)value;
+            switch(marker)
+            {
+                case DefaultMarker:
+                    return DefaultBrush;
+                case EvenBatchMarker:
+                    return EvenBatchBrush;
+                case OddBatchMarker: 
+                    return OddBatchBrush;
+                default:
+                    return DefaultBrush;
+            }
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
     public class OperatingHistory
     {
         private OperatingRecord[] __operating_records;
         private int __deep = -1;
         private int __bottom_record_index = -1;
         private int __top_record_index = -1;
+        private char[] __markers = new char[] { OperatingRecordMarker.EvenBatchMarker, OperatingRecordMarker.OddBatchMarker };
+        private int __batch_marker_index = 0;
+        private bool __batch_operating = false;
+        private bool __batch_marker_used = false;
         private ObservableCollection<OperatingRecord> __undo_operating_records;
         private ObservableCollection<OperatingRecord> __redo_operating_records;
         public IReadOnlyList<OperatingRecord> UndoOperatingRecords { get; init; }
@@ -143,6 +185,11 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             }
             if(__undo_operating_records.Count == __operating_records.Length)
                 __undo_operating_records.RemoveAt(__undo_operating_records.Count - 1);
+            if(__batch_operating)
+            {
+                __batch_marker_used = true;
+                r.Marker = __markers[__batch_marker_index % 2];
+            }
             __undo_operating_records.Insert(0, r);
             __redo_operating_records.Clear();
         }
@@ -157,6 +204,21 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                     return __top_record_index - __bottom_record_index + 1;
                 else
                     return __top_record_index - __bottom_record_index + 1 + __operating_records.Length;
+            }
+        }
+
+        public void EnterBatchOperating()
+        {
+            __batch_operating = true;
+        }
+
+        public void ExitBatchOperating()
+        {
+            __batch_operating = false;
+            if (__batch_marker_used)
+            {
+                __batch_marker_used = false;
+                __batch_marker_index++;
             }
         }
     }

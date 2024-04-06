@@ -38,6 +38,7 @@
     <Window.Resources>
         <local:InvertBooleanValue x:Key="InvertBoolean"/>
         <local:CanOpenOrNew x:Key="CanOpenOrNew"/>
+        <local:OperatingRecordMarker x:Key="OperatingRecordMarker"/>
     </Window.Resources>
     <Grid syncfusionskin:SfSkinManager.Theme="{syncfusionskin:SkinManagerExtension ThemeName=FluentLight}">
         <Grid.Resources>
@@ -77,7 +78,13 @@
                 <sync:DropDownMenuGroup ItemsSource="{Binding UndoOperatingRecords}" ScrollBarVisibility="Auto">
                     <sync:DropDownMenuGroup.ItemTemplate>
                         <DataTemplate>
-                            <sync:MenuItemAdv Command="local:ConsoleControl.RecordUndo" Header="{Binding Info}" Margin="2" CommandParameter="{Binding}" Click="UndoMenuItemAdv_Click" ToolTipService.ShowDuration="300000">
+                            <sync:MenuItemAdv Command="local:ConsoleControl.RecordUndo" Margin="2" CommandParameter="{Binding}" Click="UndoMenuItemAdv_Click" ToolTipService.ShowDuration="300000">
+                                <sync:MenuItemAdv.Header>
+                                    <StackPanel Orientation="Horizontal">
+                                        <Rectangle Fill="{Binding Marker, Converter={StaticResource OperatingRecordMarker}}" Width="4" Height="12" Margin="0,0,8,0"/>
+                                        <TextBlock Text="{Binding Info}"/>
+                                    </StackPanel>
+                                </sync:MenuItemAdv.Header>
                                 <sync:MenuItemAdv.ToolTip>
                                     <TextBlock Text="{Binding DetailedDescription}" FontSize="14" FontStyle="Italic"/>
                                 </sync:MenuItemAdv.ToolTip>
@@ -93,7 +100,13 @@
                 <sync:DropDownMenuGroup ItemsSource="{Binding RedoOperatingRecords}" ScrollBarVisibility="Auto">
                     <sync:DropDownMenuGroup.ItemTemplate>
                         <DataTemplate>
-                            <sync:MenuItemAdv Command="local:ConsoleControl.RecordRedo" Header="{Binding Info}" Margin="2" CommandParameter="{Binding}" Click="RedoMenuItemAdv_Click" ToolTipService.ShowDuration="300000">
+                            <sync:MenuItemAdv Command="local:ConsoleControl.RecordRedo" Margin="2" CommandParameter="{Binding}" Click="RedoMenuItemAdv_Click" ToolTipService.ShowDuration="300000">
+                                <sync:MenuItemAdv.Header>
+                                    <StackPanel Orientation="Horizontal">
+                                        <Rectangle Fill="{Binding Marker, Converter={StaticResource OperatingRecordMarker}}" Width="4" Height="12" Margin="0,0,8,0"/>
+                                        <TextBlock Text="{Binding Info}"/>
+                                    </StackPanel>
+                                </sync:MenuItemAdv.Header>
                                 <sync:MenuItemAdv.ToolTip>
                                     <TextBlock Text="{Binding DetailedDescription}" FontSize="14" FontStyle="Italic"/>
                                 </sync:MenuItemAdv.ToolTip>
@@ -177,6 +190,8 @@
             <Separator/>
             <TextBlock Text="{Binding DebuggerState}" Width="80" ToolTip="{Binding DebuggerExceptionMessage}"/>
             <Separator/>
+            <TextBlock Text="{Binding DebuggerTarget}" Width="120"/>
+            <Separator/>
             <TextBlock Text="{Binding DebuggerPollingInterval}" Width="80"/>
             <Separator/>
             <TextBlock Width="80">
@@ -192,6 +207,8 @@
             <TextBlock Text="{Binding DAQUnitHeartbeat, Converter={StaticResource HeartbeatIndicator}}" Width="20"/>
             <Separator/>
             <TextBlock Text="{Binding DAQUnitState}" Width="80" ToolTip="{Binding DAQUnitExceptionMessage}"/>
+            <Separator/>
+            <TextBlock Text="{Binding DAQUnitTarget}" Width="120"/>
             <Separator/>
             <TextBlock Text="{Binding DAQUnitDiskWriteInterval}" Width="80"/>
             <Separator/>

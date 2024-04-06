@@ -310,6 +310,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
 
         private void __startup_debugger(DataSyncMode rxbit, DataSyncMode rxblock, DataSyncMode rxcotrol)
         {
+            if (MessageBox.Show($"Establish communication(SLMP) with the controller: {__settings.SlmpTargetProperty.DestinationIPv4String}:{__settings.SlmpTargetProperty.DestinationPort} ?", "Question", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.No)
+                return;
             DebugConsole.WriteInfo("Startup Debugger");
             (__objects_viewer.DataContext as ObjectsModel).TxDiagnosticObjects.ResetProcessDataValue();
             (__objects_viewer.DataContext as ObjectsModel).TxBitObjects.ResetProcessDataValue();
@@ -381,6 +383,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             __main_model.DebuggerState =  DataSynchronizerState.Ready;
             __main_model.DebuggerPollingInterval = 0;
             __main_model.DebuggerHeartbeat = 0;
+            __main_model.DebuggerTarget = $"{__settings.SlmpTargetProperty.DestinationIPv4String}:{__settings.SlmpTargetProperty.DestinationPort}";
 
             __user_interface_synchronizer.Startup(__settings.SlmpTargetProperty.PollingInterval);
             CommandManager.InvalidateRequerySuggested();
@@ -417,6 +420,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             __main_model.IsOffline = true;
             __main_model.DebuggerPollingInterval = 0;
             __main_model.DebuggerHeartbeat = 0;
+            __main_model.DebuggerTarget = "N/A";
             if (__main_model.DebuggerState != DataSynchronizerState.Exception)
                 __main_model.DebuggerState = DataSynchronizerState.Ready;
             CommandManager.InvalidateRequerySuggested();
@@ -452,6 +456,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
 
         private void __startup_daq_unit()
         {
+            if (MessageBox.Show($"Establish communication(DAQ) with the controller: {__settings.DAQTargetProperty.DestinationIPv4String}:{__settings.DAQTargetProperty.DestinationPort} ?", "Question", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.No)
+                return;
             DebugConsole.WriteInfo("Startup Data Acquisition");
             __data_acquisition_unit = new DataAcquisitionUnit();
             __main_model.IsBusy = true;
@@ -474,6 +480,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             __main_model.DAQUnitDiskWriteInterval = 0;
             __main_model.DAQUnitHeartbeat = 0;
             __main_model.DAQUnitStatus = new AcquisitionUnitStatus();
+            __main_model.DAQUnitTarget = $"{__settings.DAQTargetProperty.DestinationIPv4String}:{__settings.DAQTargetProperty.DestinationPort}";
 
             __user_interface_acquisition_unit.Startup(__settings.DAQTargetProperty.ExpectedDiskWriteInterval);
             CommandManager.InvalidateRequerySuggested();
@@ -499,6 +506,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             __main_model.IsDataAcquisiting = false;
             __main_model.DAQUnitDiskWriteInterval = 0;
             __main_model.DAQUnitHeartbeat = 0;
+            __main_model.DAQUnitTarget = "N/A";
             if (__main_model.DAQUnitState != AcquisitionUnitState.Exception)
                 __main_model.DAQUnitState = AcquisitionUnitState.Idle;
             CommandManager.InvalidateRequerySuggested();
