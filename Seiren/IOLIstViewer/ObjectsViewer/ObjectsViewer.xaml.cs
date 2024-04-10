@@ -12,6 +12,8 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Xml;
 
+#pragma warning disable SYSLIB0011
+
 namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
 {
     /// <summary>
@@ -509,13 +511,15 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
 
         private LoadingIndicator __loading_dialog;
         public bool LayoutFinished { get; private set; } = false;
-        private void DockingManager_Loaded(object sender, RoutedEventArgs e)
+        private void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
             if (__loading_dialog != null)
             {
                 __loading_dialog.CloseIndicator(new Action<object>(__initialize_layout_state), null);
                 __loading_dialog = null;
             }
+            else
+                __initialize_layout_state(null);
         }
 
         private void __initialize_layout_state(object parameter)
@@ -524,9 +528,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             LayoutFinished = true;
         }
 
-        private void DockingManager_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
+        private void UserControl_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
-            if ((bool)e.NewValue == true && __loading_dialog == null && DockingManager.IsLoaded == false)
+            if ((bool)e.NewValue == true && __loading_dialog == null && IsLoaded == false)
             {
                 __loading_dialog = new LoadingIndicator();
                 __loading_dialog.ShowIndicator();

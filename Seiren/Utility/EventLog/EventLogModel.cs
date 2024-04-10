@@ -15,6 +15,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.ListView;
 
+#pragma warning disable SYSLIB0014
+
 namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility
 {
     public class EventLogModel : INotifyPropertyChanged

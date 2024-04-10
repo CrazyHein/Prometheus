@@ -6,11 +6,11 @@
              xmlns:local="clr-namespace:AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren" 
              xmlns:sync="http://schemas.syncfusion.com/wpf"
              mc:Ignorable="d" 
-             d:DesignHeight="1080" d:DesignWidth="1500">
+             d:DesignHeight="1080" d:DesignWidth="1500" Loaded="UserControl_Loaded" IsVisibleChanged="UserControl_IsVisibleChanged">
     <UserControl.CommandBindings>
         <CommandBinding Command="local:ConsoleControl.FindInInterlock" Executed="FindInInterlockCommand_Executed" CanExecute="FindInInterlockCommand_CanExecute"/>
     </UserControl.CommandBindings>
-    <sync:DockingManager x:Name="DockingManager" UseDocumentContainer="True" EnableDocumentToFloatOnDoubleClick="True" Loaded="DockingManager_Loaded" IsVisibleChanged="DockingManager_IsVisibleChanged">
+    <sync:DockingManager x:Name="DockingManager" UseDocumentContainer="True" EnableDocumentToFloatOnDoubleClick="True">
         <sync:DockingManager.Resources>
             <local:ModifiedIndicatorToColor x:Key="ModifiedConverter" Unchanged="Transparent"/>
         </sync:DockingManager.Resources>

@@ -2,11 +2,11 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net5.0-windows</TargetFramework>
+    <TargetFramework>net8.0-windows7.0</TargetFramework>
     <UseWPF>true</UseWPF>
     <UseWindowsForms>true</UseWindowsForms>
     <RootNamespace>AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Xandria</RootNamespace>
-    <Version>0.4.0.2</Version>
+    <Version>0.5.0.0</Version>
     <Company>AMEC</Company>
     <Authors>CrazyHein</Authors>
     <ApplicationIcon>imgs\logo.ico</ApplicationIcon>
@@ -55,37 +55,37 @@
   
   <ItemGroup>
     <Reference Include="Syncfusion.Data.WPF">
-      <HintPath>C:\Program Files (x86)\Syncfusion\Essential Studio\WPF\19.2.0.44\precompiledassemblies\net5.0\Syncfusion.Data.WPF.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Syncfusion\Essential Studio\WPF\25.1.35\precompiledassemblies\net6.0\Syncfusion.Data.WPF.dll</HintPath>
     </Reference>
     <Reference Include="Syncfusion.SfBusyIndicator.WPF">
-      <HintPath>C:\Program Files (x86)\Syncfusion\Essential Studio\WPF\19.2.0.44\precompiledassemblies\net5.0\Syncfusion.SfBusyIndicator.WPF.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Syncfusion\Essential Studio\WPF\25.1.35\precompiledassemblies\net6.0\Syncfusion.SfBusyIndicator.WPF.dll</HintPath>
     </Reference>
     <Reference Include="Syncfusion.SfChart.WPF">
-      <HintPath>C:\Program Files (x86)\Syncfusion\Essential Studio\WPF\19.2.0.44\precompiledassemblies\net5.0\Syncfusion.SfChart.WPF.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Syncfusion\Essential Studio\WPF\25.1.35\precompiledassemblies\net6.0\Syncfusion.SfChart.WPF.dll</HintPath>
     </Reference>
     <Reference Include="Syncfusion.SfDiagram.WPF">
-      <HintPath>C:\Program Files (x86)\Syncfusion\Essential Studio\WPF\19.2.0.44\precompiledassemblies\net5.0\Syncfusion.SfDiagram.WPF.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Syncfusion\Essential Studio\WPF\25.1.35\precompiledassemblies\net6.0\Syncfusion.SfDiagram.WPF.dll</HintPath>
     </Reference>
     <Reference Include="Syncfusion.SfGrid.WPF">
-      <HintPath>C:\Program Files (x86)\Syncfusion\Essential Studio\WPF\19.2.0.44\precompiledassemblies\net5.0\Syncfusion.SfGrid.WPF.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Syncfusion\Essential Studio\WPF\25.1.35\precompiledassemblies\net6.0\Syncfusion.SfGrid.WPF.dll</HintPath>
     </Reference>
     <Reference Include="Syncfusion.SfInput.Wpf">
-      <HintPath>C:\Program Files (x86)\Syncfusion\Essential Studio\WPF\19.2.0.44\precompiledassemblies\net5.0\Syncfusion.SfInput.WPF.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Syncfusion\Essential Studio\WPF\25.1.35\precompiledassemblies\net6.0\Syncfusion.SfInput.WPF.dll</HintPath>
     </Reference>
     <Reference Include="Syncfusion.SfSkinManager.WPF">
-      <HintPath>C:\Program Files (x86)\Syncfusion\Essential Studio\WPF\19.2.0.44\precompiledassemblies\net5.0\Syncfusion.SfSkinManager.WPF.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Syncfusion\Essential Studio\WPF\25.1.35\precompiledassemblies\net6.0\Syncfusion.SfSkinManager.WPF.dll</HintPath>
     </Reference>
     <Reference Include="Syncfusion.SfTextInputLayout.WPF">
-      <HintPath>C:\Program Files (x86)\Syncfusion\Essential Studio\WPF\19.2.0.44\precompiledassemblies\net5.0\Syncfusion.SfTextInputLayout.WPF.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Syncfusion\Essential Studio\WPF\25.1.35\precompiledassemblies\net6.0\Syncfusion.SfTextInputLayout.WPF.dll</HintPath>
     </Reference>
     <Reference Include="Syncfusion.Shared.WPF">
-      <HintPath>C:\Program Files (x86)\Syncfusion\Essential Studio\WPF\19.2.0.44\precompiledassemblies\net5.0\Syncfusion.Shared.WPF.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Syncfusion\Essential Studio\WPF\25.1.35\precompiledassemblies\net6.0\Syncfusion.Shared.WPF.dll</HintPath>
     </Reference>
     <Reference Include="Syncfusion.Themes.FluentLight.WPF">
-      <HintPath>C:\Program Files (x86)\Syncfusion\Essential Studio\WPF\19.2.0.44\precompiledassemblies\net5.0\Syncfusion.Themes.FluentLight.Wpf.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Syncfusion\Essential Studio\WPF\25.1.35\precompiledassemblies\net6.0\Syncfusion.Themes.FluentLight.WPF.dll</HintPath>
     </Reference>
     <Reference Include="Syncfusion.Tools.Wpf">
-      <HintPath>C:\Program Files (x86)\Syncfusion\Essential Studio\WPF\19.2.0.44\precompiledassemblies\net5.0\Syncfusion.Tools.WPF.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Syncfusion\Essential Studio\WPF\25.1.35\precompiledassemblies\net6.0\Syncfusion.Tools.WPF.dll</HintPath>
     </Reference>
   </ItemGroup>
 

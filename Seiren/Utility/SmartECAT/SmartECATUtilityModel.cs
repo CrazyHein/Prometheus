@@ -15,10 +15,11 @@ using System.Windows.Shapes;
 using System.Xml.Linq;
 using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Console;
 using System.Threading;
-using Spire.Pdf.Exporting.XPS.Schema;
 using Microsoft.VisualBasic.ApplicationServices;
 using System.Windows.Controls;
 using Syncfusion.UI.Xaml.Grid;
+
+#pragma warning disable SYSLIB0014
 
 namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility
 {

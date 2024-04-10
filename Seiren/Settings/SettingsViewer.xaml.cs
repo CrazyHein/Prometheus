@@ -27,6 +27,7 @@ using System.Threading;
 using System.Runtime.InteropServices;
 using System.Runtime;
 using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Console;
+using System.Diagnostics;
 
 namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
 {
@@ -283,6 +284,26 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                     if (com != null) com.Dispose();
                     com = null;
                 }
+            }
+        }
+
+        private void OpenLogsFolder_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (!System.IO.Directory.Exists("DebugConsole"))
+                    System.IO.Directory.CreateDirectory("DebugConsole");
+
+                ProcessStartInfo startInfo = new ProcessStartInfo
+                {
+                    Arguments = "DebugConsole",
+                    FileName = "explorer.exe"
+                };
+                Process.Start(startInfo);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(this, $"At least one unexpected error occured while opening directory : 'DebugConsole'.\n{ex.Message}", "Error Message", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
     }

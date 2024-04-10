@@ -1,6 +1,5 @@
 ﻿using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia;
 using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Console;
-using Spire.Pdf.Interactive.DigitalSignatures;
 using Syncfusion.UI.Xaml.Grid;
 using System;
 using System.Collections.Generic;
@@ -570,14 +569,14 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                     if (value == true && (data & bitpos) == 0)
                     {
                         data |= bitpos;
-                        MemoryMarshal.Write<ushort>(__data_storage, ref data);
+                        MemoryMarshal.Write<ushort>(__data_storage, in data);
                         _notify_property_changed("DataBooleanValue");
                         __rx_pending = true;
                     }
                     else if (value == false && (data & bitpos) != 0)
                     {
                         data &= (ushort)(~bitpos);
-                        MemoryMarshal.Write<ushort>(__data_storage, ref data);
+                        MemoryMarshal.Write<ushort>(__data_storage, in data);
                         _notify_property_changed("DataBooleanValue");
                         __rx_pending = true;
                     }
@@ -667,7 +666,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                             try
                             {
                                 storage.byteData = Convert.ToByte(value, (int)__dispaly_format);
-                                MemoryMarshal.Write<byte>(__data_storage, ref storage.byteData);
+                                MemoryMarshal.Write<byte>(__data_storage, in storage.byteData);
                                 res = true;
                             }
                             catch
@@ -679,7 +678,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                             try
                             {
                                 storage.sbyteData = Convert.ToSByte(value, (int)__dispaly_format);
-                                MemoryMarshal.Write<sbyte>(__data_storage, ref storage.sbyteData);
+                                MemoryMarshal.Write<sbyte>(__data_storage, in storage.sbyteData);
                                 res = true;
                             }
                             catch
@@ -691,7 +690,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                             try
                             {
                                 storage.ushortData = Convert.ToUInt16(value, (int)__dispaly_format);
-                                MemoryMarshal.Write<ushort>(__data_storage, ref storage.ushortData);
+                                MemoryMarshal.Write<ushort>(__data_storage, in storage.ushortData);
                                 res = true;
                             }
                             catch
@@ -703,7 +702,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                             try
                             {
                                 storage.shortData = Convert.ToInt16(value, (int)__dispaly_format);
-                                MemoryMarshal.Write<short>(__data_storage, ref storage.shortData);
+                                MemoryMarshal.Write<short>(__data_storage, in storage.shortData);
                                 res = true;
                             }
                             catch
@@ -715,7 +714,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                             try
                             {
                                 storage.uintData = Convert.ToUInt32(value, (int)__dispaly_format);
-                                MemoryMarshal.Write<uint>(__data_storage, ref storage.uintData);
+                                MemoryMarshal.Write<uint>(__data_storage, in storage.uintData);
                                 res = true;
                             }
                             catch
@@ -727,7 +726,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                             try
                             {
                                 storage.intData = Convert.ToInt32(value, (int)__dispaly_format);
-                                MemoryMarshal.Write<int>(__data_storage, ref storage.intData);
+                                MemoryMarshal.Write<int>(__data_storage, in storage.intData);
                                 res = true;
                             }
                             catch
@@ -740,7 +739,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                             try
                             {
                                 storage.ulongData = Convert.ToUInt64(value, (int)__dispaly_format);
-                                MemoryMarshal.Write<ulong>(__data_storage, ref storage.ulongData);
+                                MemoryMarshal.Write<ulong>(__data_storage, in storage.ulongData);
                                 res = true;
                             }
                             catch
@@ -752,7 +751,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                             try
                             {
                                 storage.longData = Convert.ToInt64(value, (int)__dispaly_format);
-                                MemoryMarshal.Write<long>(__data_storage, ref storage.longData);
+                                MemoryMarshal.Write<long>(__data_storage, in storage.longData);
                                 res = true;
                             }
                             catch
@@ -763,19 +762,19 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                         case "FLOAT":
                             res = float.TryParse(value, out storage.floatData);
                             if (res)
-                                MemoryMarshal.Write<float>(__data_storage, ref storage.floatData);
+                                MemoryMarshal.Write<float>(__data_storage, in storage.floatData);
                             break;
                         case "DOUBLE":
                             res = double.TryParse(value, out storage.doubleData);
                             if (res)
-                                MemoryMarshal.Write<double>(__data_storage, ref storage.doubleData);
+                                MemoryMarshal.Write<double>(__data_storage, in storage.doubleData);
                             break;
                         case "FIXEDPOINT3201":
                             res = double.TryParse(value, out storage.doubleData);
                             if (res)
                             {
                                 storage.intData = (int)(storage.doubleData * 10);
-                                MemoryMarshal.Write<int>(__data_storage, ref storage.intData);
+                                MemoryMarshal.Write<int>(__data_storage, in storage.intData);
                             }
                             break;
                         case "FIXEDPOINT3202":
@@ -783,7 +782,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                             if (res)
                             {
                                 storage.intData = (int)(storage.doubleData * 100);
-                                MemoryMarshal.Write<int>(__data_storage, ref storage.intData);
+                                MemoryMarshal.Write<int>(__data_storage, in storage.intData);
                             }
                             break;
                         case "FIXEDPOINT6401":
@@ -791,7 +790,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                             if (res)
                             {
                                 storage.longData = (long)(storage.doubleData * 10);
-                                MemoryMarshal.Write<long>(__data_storage, ref storage.longData);
+                                MemoryMarshal.Write<long>(__data_storage, in storage.longData);
                             }
                             break;
                         case "FIXEDPOINT6402":
@@ -799,7 +798,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                             if (res)
                             {
                                 storage.longData = (long)(storage.doubleData * 100);
-                                MemoryMarshal.Write<long>(__data_storage, ref storage.longData);
+                                MemoryMarshal.Write<long>(__data_storage, in storage.longData);
                             }
                             break;
                         case "FIXEDPOINT6404":
@@ -807,7 +806,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                             if (res)
                             {
                                 storage.longData = (long)(storage.doubleData * 10000);
-                                MemoryMarshal.Write<long>(__data_storage, ref storage.longData);
+                                MemoryMarshal.Write<long>(__data_storage, in storage.longData);
                             }
                             break;
                         case "FINGERPRINT":
@@ -868,13 +867,13 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                         {
 
                             data |= bitpos;
-                            MemoryMarshal.Write<ushort>(__data_storage.AsSpan(), ref data);
+                            MemoryMarshal.Write<ushort>(__data_storage.AsSpan(), in data);
                             _notify_property_changed("DataBooleanValue");
                         }
                         else if ((dataSource[Bit / 16] & bitpos) == 0 && (data & bitpos) != 0)
                         {
                             data &= (ushort)(~bitpos);
-                            MemoryMarshal.Write<ushort>(__data_storage.AsSpan(), ref data);
+                            MemoryMarshal.Write<ushort>(__data_storage.AsSpan(), in data);
                             _notify_property_changed("DataBooleanValue");
                         }
                         break;
@@ -902,13 +901,13 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                             {
 
                                 data |= bitpos;
-                                MemoryMarshal.Write<ushort>(__data_storage.AsSpan(), ref data);
+                                MemoryMarshal.Write<ushort>(__data_storage.AsSpan(), in data);
                                 _notify_property_changed("DataBooleanValue");
                             }
                             else if ((dataSource[Bit / 16] & bitpos) == 0 && (data & bitpos) != 0)
                             {
                                 data &= (ushort)(~bitpos);
-                                MemoryMarshal.Write<ushort>(__data_storage.AsSpan(), ref data);
+                                MemoryMarshal.Write<ushort>(__data_storage.AsSpan(), in data);
                                 _notify_property_changed("DataBooleanValue");
                             }
                             break;

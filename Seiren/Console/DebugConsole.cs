@@ -1,5 +1,4 @@
 ﻿using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia;
-using Spire.Pdf.Annotations;
 using Syncfusion.Windows.Controls.Input;
 using System;
 using System.Collections.Generic;

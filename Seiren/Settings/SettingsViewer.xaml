@@ -376,6 +376,7 @@
                                     <ColumnDefinition Width="auto"/>
                                     <ColumnDefinition/>
                                     <ColumnDefinition/>
+                                    <ColumnDefinition Width="auto"/>
                                 </Grid.ColumnDefinitions>
                                 <CheckBox Content="Enable Debug Console" Margin="4" IsChecked="{Binding EnableDebugConsole}"/>
                                 <CheckBox x:Name="EnableDebugLog" Grid.Row="1" Content="Enable Debug Log" Margin="4" IsChecked="{Binding EnableDebugLog}"/>
@@ -385,6 +386,7 @@
                                 <sync:SfTextInputLayout Grid.Row="1" Grid.Column="2" IsEnabled="{Binding ElementName=EnableDebugLog, Path=IsChecked}" Hint="Buffer Size (kbyte)"  HelperText="The buffer size should be at least 4kbytes." FontSize="12" FontStyle="Italic" ContainerType="Filled" Margin="4" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}">
                                     <TextBox FontStyle="Normal" Text="{Binding DebugLogBufferSize, ValidatesOnExceptions=True, NotifyOnValidationError=True}" />
                                 </sync:SfTextInputLayout>
+                                <Button Content="Open Logs Folder" Grid.Row="1" Grid.Column="3" Margin="4" Width="120" Height="40" Click="OpenLogsFolder_Click"/>
                             </Grid>
                         </GroupBox>
                     </Grid>

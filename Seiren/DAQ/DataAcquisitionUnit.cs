@@ -257,8 +257,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.DAQ
             DAQ_SERVER_INFO_T info = new DAQ_SERVER_INFO_T();
             ReadOnlyMemory<byte> data = null;
             int txframesize = 0, rxframesize = 0;
-            int txtimepos = 0, txdiagpos = 0, txbitpos = 0, txblkpos = 0, rxtimepos = 0, rxctrlpos = 0, rxbitpos = 0, rxblkpos = 0;
-            byte[] txframedata = null, rxframedata = null;
+            int txtimepos = 0, txdiagpos = 0, txbitpos = 0, txblkpos = 0, rxctrlpos = 0, rxbitpos = 0, rxblkpos = 0;
+            byte[] txframedata = null;
             int rxreceived = 0, rxresidual = 0, rxcorrupted = 0, txreceived = 0, txresidual = 0, txcorrupted = 0, expected = 0;
             ushort trans = 0;
             bool negotiation = true;

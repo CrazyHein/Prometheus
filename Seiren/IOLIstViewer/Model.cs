@@ -1,6 +1,5 @@
 ﻿using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia;
 using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Console;
-using Spire.Pdf.Widget;
 using Syncfusion.Windows.Shared;
 using System;
 using System.Collections.Generic;

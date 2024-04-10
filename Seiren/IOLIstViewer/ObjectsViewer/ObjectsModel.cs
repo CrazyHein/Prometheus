@@ -740,13 +740,13 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                 byte[] storage = new byte[sizeof(double)];
                 double value = ValueConverterDown;
                 ssub = doc.CreateElement("ValueConverterDown");
-                MemoryMarshal.Write<double>(storage, ref value);
+                MemoryMarshal.Write<double>(storage, in value);
                 ssub.AppendChild(doc.CreateTextNode(string.Join("-", storage.Select(d => d.ToString("X2")))));
                 sub.AppendChild(ssub);
 
                 value = ValueConverterUp;
                 ssub = doc.CreateElement("ValueConverterUp");
-                MemoryMarshal.Write<double>(storage, ref value);
+                MemoryMarshal.Write<double>(storage, in value);
                 ssub.AppendChild(doc.CreateTextNode(string.Join("-", storage.Select(d => d.ToString("X2")))));
                 sub.AppendChild(ssub);
 
