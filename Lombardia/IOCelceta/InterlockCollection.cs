@@ -90,6 +90,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
             InterlockLogic logic = new InterlockLogic(attr, name, target, statement, __object_dictionary, __tx_process_data_image, __rx_process_data_image);
             logic.AddSubscription();
             __logics.Add(logic);
+            __reference_find_pos = 0;
             return logic;
         }
 
@@ -98,6 +99,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
             InterlockLogic logic = new InterlockLogic(attr, name, target, statement, __object_dictionary, __tx_process_data_image, __rx_process_data_image);
             logic.AddSubscription();
             __logics.Insert(index, logic);
+            __reference_find_pos = 0;
             return logic;
         }
 
@@ -112,6 +114,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
                 origin.RemoveSubscription();
                 logic.AddSubscription();
             }
+            __reference_find_pos = 0;
             return logic;
         }
 
@@ -120,6 +123,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
             var i = __logics[index];
             i.RemoveSubscription();
             __logics.RemoveAt(index);
+            __reference_find_pos = 0;
             return i;
         }
 
@@ -443,7 +447,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
             if (__logics.Count == 0)
                 return -1;
 
-            if (__reference_found == null || __reference_found != index)
+            if (__reference_found == null || __reference_found != index || __reference_find_pos >= __logics.Count)
                 __reference_find_pos = 0;
 
             int pos = __reference_find_pos;

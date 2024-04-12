@@ -165,7 +165,7 @@
                          LiveDataUpdateMode="AllowDataShaping" ScrollMode="Async"
                          AllowDrop="True" AllowDraggingRows="True"
                          RecordContextMenu="{StaticResource GridContextMenu}" RowDragDropTemplate="{StaticResource RecordDragDropTemplate}" d:DataContext="{d:DesignInstance Type=local:ProcessDataModel}"
-                             CellDoubleTapped="ProcessDataImageGrid_CellDoubleTapped" SelectionMode="Extended"
+                             CellDoubleTapped="ProcessDataImageGrid_CellDoubleTapped" SelectionMode="Extended" Loaded="ProcessDataImageGrid_Loaded"
                              >
             <sync:SfDataGrid.Resources>
                 <local:HideBooleanValueColumn x:Key="HideBooleanValueColumn"/>

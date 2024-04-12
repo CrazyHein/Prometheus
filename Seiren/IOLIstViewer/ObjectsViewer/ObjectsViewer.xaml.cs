@@ -582,8 +582,11 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                     DockingManager.ActiveWindow = w;
                     ProcessDataImageViewer viewer = w.Content as ProcessDataImageViewer;
                     viewer.ProcessDataImageGrid.SelectedIndex = pos;
-                    viewer.ProcessDataImageGrid.ScrollInView(new Syncfusion.UI.Xaml.ScrollAxis.RowColumnIndex(
-                            viewer.ProcessDataImageGrid.ResolveToRowIndex(viewer.ProcessDataImageGrid.SelectedItem), viewer.ProcessDataImageGrid.ResolveToStartColumnIndex()));
+                    var line = viewer.ProcessDataImageGrid.ResolveToRowIndex(viewer.ProcessDataImageGrid.SelectedItem);
+                    if (line != -1)
+                        viewer.ProcessDataImageGrid.ScrollInView(new Syncfusion.UI.Xaml.ScrollAxis.RowColumnIndex(line, viewer.ProcessDataImageGrid.ResolveToStartColumnIndex()));
+                    else
+                        viewer.ScrollSelectedInViewRequest = true;
                     return;
                 }
             }

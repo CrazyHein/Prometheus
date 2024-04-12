@@ -22,6 +22,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         private ProcessDataImageLayout __process_data_layout;
         private ObjectsModel __objects_model;
         OperatingHistory __operating_history;
+        public bool ScrollSelectedInViewRequest = false;
         public ProcessDataImageViewer(ProcessDataImage pdi, ObjectDictionary od, SfDataGrid source, ObjectsModel objects, OperatingHistory history)
         {
             InitializeComponent();
@@ -458,6 +459,18 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                 ObjectViewer wnd = new ObjectViewer(__objects_model, o, InputDialogDisplayMode.Edit);
                 wnd.WindowStartupLocation = WindowStartupLocation.CenterScreen;
                 wnd.ShowDialog();
+            }
+        }
+
+
+        private void ProcessDataImageGrid_Loaded(object sender, RoutedEventArgs e)
+        {
+            if (ScrollSelectedInViewRequest)
+            {
+                var line = ProcessDataImageGrid.ResolveToRowIndex(ProcessDataImageGrid.SelectedItem);
+                if (line != -1)
+                    ProcessDataImageGrid.ScrollInView(new Syncfusion.UI.Xaml.ScrollAxis.RowColumnIndex(line, ProcessDataImageGrid.ResolveToStartColumnIndex()));
+                ScrollSelectedInViewRequest = false;
             }
         }
     }
