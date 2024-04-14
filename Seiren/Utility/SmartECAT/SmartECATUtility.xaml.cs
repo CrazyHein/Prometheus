@@ -1,4 +1,5 @@
 ﻿using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Console;
+using Syncfusion.UI.Xaml.Diagram;
 using Syncfusion.UI.Xaml.Grid;
 using Syncfusion.UI.Xaml.TextInputLayout;
 using System;
@@ -95,6 +96,18 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility
             if (__ftp_settings_errors != 0 || __installer_settings_error != 0)
             {
                 MessageBox.Show("At least one user input is invalid.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            if (model.SmartECATProperty.InstallerProperty.TransferLicense && System.IO.File.Exists(model.SmartECATProperty.InstallerProperty.LocalLicenseFilePath) == false)
+            {
+                MessageBox.Show($"The LIC file: \"{model.SmartECATProperty.InstallerProperty.LocalLicenseFilePath}\" does not exist.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            if (model.SmartECATProperty.InstallerProperty.TransferNetworkInformation && System.IO.File.Exists(model.SmartECATProperty.InstallerProperty.LocalNetworkInformationFilePath) == false)
+            {
+                MessageBox.Show($"The ENI file: \"{model.SmartECATProperty.InstallerProperty.LocalNetworkInformationFilePath}\" does not exist.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
 
