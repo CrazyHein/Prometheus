@@ -177,7 +177,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             {
                 MessageBox.Show("At least one exception has occurred during the operation :\n" + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
-            if(list.Count > 1)
+            if(__operating_history.IsBatchOperating)
                 __operating_history.ExitBatchOperating();
 
         }
@@ -245,7 +245,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                     }
                     MainViewer.SelectedItems.Add(r);
                 }
-                if (records.Count > 1)
+                if (__operating_history.IsBatchOperating)
                     __operating_history.ExitBatchOperating();
                 if (MainViewer.SelectedItems.Count > 0)
                 {
@@ -286,7 +286,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                     }
                     MainViewer.SelectedItems.Add(r);
                 }
-                if (records.Count > 1)
+                if (__operating_history.IsBatchOperating)
                     __operating_history.ExitBatchOperating();
                 if (MainViewer.SelectedItems.Count > 0)
                 {
@@ -374,7 +374,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                 else if (res == MessageBoxResult.Cancel)
                     break;
             }
-            if (unused.Count > 1)
+            if (__operating_history.IsBatchOperating)
                 __operating_history.ExitBatchOperating();
         }
 
@@ -426,7 +426,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                     break;
                 }
             }
-            if (unused.Count > 1)
+            if (__operating_history.IsBatchOperating)
                 __operating_history.ExitBatchOperating();
         }
 

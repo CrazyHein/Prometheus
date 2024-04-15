@@ -148,7 +148,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                                             __object_source.ResolveToStartColumnIndex()));
                             }
                         }
-                        if (__object_source.SelectedItems.Count > 1)
+                        if (__operating_history.IsBatchOperating)
                             __operating_history.ExitBatchOperating();
                     }
                 }
@@ -232,7 +232,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                                             __object_source.ResolveToStartColumnIndex()));
                             }
                         }
-                        if (__object_source.SelectedItems.Count > 1)
+                        if (__operating_history.IsBatchOperating)
                             __operating_history.ExitBatchOperating();
                     }
                 }
@@ -305,7 +305,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             {
                 MessageBox.Show("At least one exception has occurred during the operation :\n" + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
-            if (indexes.Count > 1 || (DataContext as ProcessDataImageModel).DirectModeOperation)
+            if (__operating_history.IsBatchOperating)
                 __operating_history.ExitBatchOperating();
         }
 
@@ -328,7 +328,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                 int targetIndex = sourceIndex - 1;
                 dataImage.Move(sourceIndex, targetIndex);
             }
-            if (indexes.Count > 1)
+            if (__operating_history.IsBatchOperating)
                 __operating_history.ExitBatchOperating();
             ProcessDataImageGrid.SelectedItems = new ObservableCollection<object>(indexes);
             ProcessDataImageGrid.ScrollInView(new Syncfusion.UI.Xaml.ScrollAxis.RowColumnIndex(
@@ -359,7 +359,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                 int targetIndex = sourceIndex + 1;
                 dataImage.Move(sourceIndex, targetIndex);
             }
-            if (indexes.Count > 1)
+            if (__operating_history.IsBatchOperating)
                 __operating_history.ExitBatchOperating();
             ProcessDataImageGrid.SelectedItems = new ObservableCollection<object>(indexes);
             ProcessDataImageGrid.ScrollInView(new Syncfusion.UI.Xaml.ScrollAxis.RowColumnIndex(
@@ -404,7 +404,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                 int pos = pdi.IndexOf(pd);
                 pdi.SetDAQ(pos, true);
             }
-            if (ProcessDataImageGrid.SelectedItems.Count > 1)
+            if (__operating_history.IsBatchOperating)
                 __operating_history.ExitBatchOperating();
         }
 
@@ -418,7 +418,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                 int pos = pdi.IndexOf(pd);
                 pdi.SetDAQ(pos, false);
             }
-            if (ProcessDataImageGrid.SelectedItems.Count > 1)
+            if (__operating_history.IsBatchOperating)
                 __operating_history.ExitBatchOperating();
         }
 

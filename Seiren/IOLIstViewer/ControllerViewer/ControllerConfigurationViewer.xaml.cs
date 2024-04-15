@@ -326,7 +326,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                 else if (res == MessageBoxResult.Cancel)
                     break;
             }
-            if (unused.Count > 1)
+            if (__operating_history.IsBatchOperating)
                 __operating_history.ExitBatchOperating();
         }
 
@@ -378,7 +378,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                     break;
                 }
             }
-            if (unused.Count > 1)
+            if (__operating_history.IsBatchOperating)
                 __operating_history.ExitBatchOperating();
         }
     }

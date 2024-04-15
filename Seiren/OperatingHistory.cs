@@ -221,5 +221,6 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                 __batch_marker_index++;
             }
         }
+        public bool IsBatchOperating { get { return __batch_operating == true; } }
     }
 }
