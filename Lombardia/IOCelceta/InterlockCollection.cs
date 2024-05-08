@@ -468,7 +468,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
 
     public abstract class LogicElement : IComparable<LogicElement>
     {
-        public LogicElementType Type { get; private set; }
+        public abstract LogicElementType Type { get; }
         public LogicExpression? Root { get; private set; }
         public int Layer { get; private set; }
 
@@ -492,9 +492,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
             }
         }
 
-        public LogicElement(LogicElementType type, LogicExpression root)
+        public LogicElement(LogicExpression root)
         {
-            Type = type;
             Root = root;
             if (root == null)
                 Layer = 0;
@@ -514,7 +513,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
     public class LogicOperand : LogicElement
     {
         public ProcessData Operand { get; private set; }
-        public LogicOperand(ProcessData data, LogicExpression root) : base(LogicElementType.OPERAND, root)
+
+        public override LogicElementType Type => LogicElementType.OPERAND;
+
+        public LogicOperand(ProcessData data, LogicExpression root) : base(root)
         {
             Operand = data;
         }
@@ -553,7 +555,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
     {
         public List<LogicElement> Elements { get; private set; }
         public LogicOperator Operator { get; private set; }
-        public LogicExpression(LogicOperator op, LogicExpression root) : base(LogicElementType.EXPRESSION, root)
+
+        public override LogicElementType Type => LogicElementType.EXPRESSION;
+
+        public LogicExpression(LogicOperator op, LogicExpression root) : base(root)
         {
             Operator = op;
             Elements = new List<LogicElement>();
