@@ -1,0 +1,170 @@
+﻿<Window x:Class="AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK"
+        xmlns:common="clr-namespace:AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Controls.Common"
+        xmlns:nap="clr-namespace:AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Napishtim"
+        xmlns:sync="http://schemas.syncfusion.com/wpf"
+        xmlns:syncfusionskin ="clr-namespace:Syncfusion.SfSkinManager;assembly=Syncfusion.SfSkinManager.WPF"
+        xmlns:treeViewEngine="clr-namespace:Syncfusion.UI.Xaml.TreeView.Engine;assembly=Syncfusion.SfTreeView.WPF"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="1080" Width="1920" WindowState="Maximized"
+        syncfusionskin:SfSkinManager.Theme="{syncfusionskin:SkinManagerExtension ThemeName=FluentDark}" Closing="Window_Closing">
+    <Window.CommandBindings>
+        <CommandBinding Command="common:Command.About" Executed="AboutCommand_Executed"/>
+        <CommandBinding Command="common:Command.New" Executed="NewCommand_Executed" CanExecute="NewCommand_CanExecute"/>
+        <CommandBinding Command="common:Command.Open" Executed="OpenCommand_Executed" CanExecute="OpenCommand_CanExecute"/>
+        <CommandBinding Command="common:Command.Save" Executed="SaveCommand_Executed" CanExecute="SaveCommand_CanExecute"/>
+        <CommandBinding Command="common:Command.SaveAs" Executed="SaveAsCommand_Executed" CanExecute="SaveAsCommand_CanExecute"/>
+        <CommandBinding Command="common:Command.ApplyChanges" Executed="ApplyChangesCommand_Executed" CanExecute="ApplyChangesCommand_CanExecute"/>
+        <CommandBinding Command="common:Command.DiscardChanges" Executed="DiscardChangesCommand_Executed" CanExecute="DiscardChangesCommand_CanExecute"/>
+        <CommandBinding Command="common:Command.Summary" Executed="SummaryCommand_Executed" CanExecute="SummaryCommand_CanExecute"/>
+        <CommandBinding Command="common:Command.Build" Executed="BuildCommand_Executed" CanExecute="BuildCommand_CanExecute"/>
+    </Window.CommandBindings>
+    <Grid>
+        <Grid.Resources>
+            <common:BooleanValueBrush TrueBrush="Red" FalseBrush="White" x:Key="BooleanValueBrush"/>
+            <common:CollectionControlIsDirtyBrush DirtyBrush="Red" CleanBrush="White" x:Key="CollectionControlIsDirtyBrush"/>
+        </Grid.Resources>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition />
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="120" MinHeight="30"/>
+            <RowDefinition Height="auto"/>
+        </Grid.RowDefinitions>
+        <sync:MenuAdv Grid.Row="0" PopUpAnimationType="Fade" Margin="0">
+            <sync:MenuItemAdv  Header="_File" Margin="2">
+                <sync:MenuItemAdv Command="common:Command.New" Icon="{StaticResource IconNew}" Height="25" Width="200" >
+                </sync:MenuItemAdv>
+                <sync:MenuItemAdv Command="common:Command.Open" Icon="{StaticResource IconOpen}" Height="25" Width="200">
+                </sync:MenuItemAdv>
+                <sync:MenuItemSeparator/>
+                <sync:MenuItemAdv Header="_Recent" ItemsSource="{Binding RecentlyOpenedFiles}" sync:MenuItemAdv.Click="RecentlyOpened_Click" x:Name="RecentlyOpenedMenu" Icon="{StaticResource IconRecentlyOpen}" Height="25" Width="200">
+                    <sync:MenuItemAdv.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal">
+                                <Path Fill="White" Stretch="Uniform" Margin="0,0,4,0"  Height="25" Width="25">
+                                    <Path.Data>
+                                        M213.333333 128h85.333334v85.333333H213.333333v213.333334a85.333333 85.333333 0 0 1-85.333333 85.333333 85.333333 85.333333 0 0 1 85.333333 85.333333v213.333334h85.333334v85.333333H213.333333c-45.653333-11.52-85.333333-38.4-85.333333-85.333333v-170.666667a85.333333 85.333333 0 0 0-85.333333-85.333333H0v-85.333334h42.666667a85.333333 85.333333 0 0 0 85.333333-85.333333V213.333333a85.333333 85.333333 0 0 1 85.333333-85.333333m597.333334 0a85.333333 85.333333 0 0 1 85.333333 85.333333v170.666667a85.333333 85.333333 0 0 0 85.333333 85.333333h42.666667v85.333334h-42.666667a85.333333 85.333333 0 0 0-85.333333 85.333333v170.666667a85.333333 85.333333 0 0 1-85.333333 85.333333h-85.333334v-85.333333h85.333334v-213.333334a85.333333 85.333333 0 0 1 85.333333-85.333333 85.333333 85.333333 0 0 1-85.333333-85.333333V213.333333h-85.333334V128h85.333334m-298.666667 512a42.666667 42.666667 0 0 1 42.666667 42.666667 42.666667 42.666667 0 0 1-42.666667 42.666666 42.666667 42.666667 0 0 1-42.666667-42.666666 42.666667 42.666667 0 0 1 42.666667-42.666667m-170.666667 0a42.666667 42.666667 0 0 1 42.666667 42.666667 42.666667 42.666667 0 0 1-42.666667 42.666666 42.666667 42.666667 0 0 1-42.666666-42.666666 42.666667 42.666667 0 0 1 42.666666-42.666667m341.333334 0a42.666667 42.666667 0 0 1 42.666666 42.666667 42.666667 42.666667 0 0 1-42.666666 42.666666 42.666667 42.666667 0 0 1-42.666667-42.666666 42.666667 42.666667 0 0 1 42.666667-42.666667z
+                                    </Path.Data>
+                                </Path>
+                                <TextBlock Text="{Binding}" VerticalAlignment="Center" FontStyle="Italic"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </sync:MenuItemAdv.ItemTemplate>
+                </sync:MenuItemAdv>
+                <sync:MenuItemSeparator/>
+                <sync:MenuItemAdv Icon="{StaticResource IconClose}" Height="25" Width="200">
+                </sync:MenuItemAdv>
+                <sync:MenuItemSeparator/>
+                <sync:MenuItemAdv Command="common:Command.Save" Icon="{StaticResource IconSave}" Height="25" Width="200">
+                </sync:MenuItemAdv>
+                <sync:MenuItemAdv Command="common:Command.SaveAs" Icon="{StaticResource IconSaveAs}" Height="25" Width="200">
+                </sync:MenuItemAdv>
+                <sync:MenuItemSeparator/>
+                <sync:MenuItemAdv Icon="{StaticResource IconQuit}" Height="25" Width="200">
+                </sync:MenuItemAdv>
+            </sync:MenuItemAdv>
+            <sync:MenuItemAdv  Header="_Build" Margin="2">
+                <sync:MenuItemAdv  Command="common:Command.Build" Header="Build Script" Icon="{StaticResource IconBuild}" Height="25" Width="200">
+                </sync:MenuItemAdv>
+            </sync:MenuItemAdv>
+            <sync:MenuItemAdv  Header="_Utility" Margin="2">
+                <sync:MenuItemAdv Header="Script Viewer" Height="25" Width="200" Click="MenuOpenScriptViewer_Click">
+                </sync:MenuItemAdv>
+            </sync:MenuItemAdv>
+            <sync:MenuItemAdv  Header="_Help" Margin="2">
+                <sync:MenuItemAdv Command="common:Command.About" Icon="{StaticResource IconAbout}" Height="25" Width="200">
+                </sync:MenuItemAdv>
+            </sync:MenuItemAdv>
+        </sync:MenuAdv>
+        <sync:ToolBarAdv Grid.Row="1" Margin="2">
+            <sync:ButtonAdv SizeMode="Small" Command="common:Command.New" IconTemplate="{StaticResource IconNewTemplate}" Margin="2" IconHeight="25" IconWidth="25" Height="36" Width="36"/>
+            <sync:ButtonAdv SizeMode="Small" Command="common:Command.Open" IconTemplate="{StaticResource IconOpenTemplate}"  Margin="2" IconHeight="25" IconWidth="25" Height="36" Width="36"/>
+            <Separator/>
+            <sync:ButtonAdv SizeMode="Small" Command="common:Command.Save" IconTemplate="{StaticResource IconSaveTemplate}"  Margin="2" IconHeight="25" IconWidth="25" Height="36" Width="36"/>
+            <sync:ButtonAdv SizeMode="Small" Command="common:Command.SaveAs" IconTemplate="{StaticResource IconSaveAsTemplate}"  Margin="2" IconHeight="25" IconWidth="25" Height="36" Width="36"/>
+            <Separator/>
+            <sync:ButtonAdv SizeMode="Small" Command="common:Command.Build" IconTemplate="{StaticResource IconBuildTemplate}"  Margin="2" IconHeight="25" IconWidth="25" Height="36" Width="36"/>
+        </sync:ToolBarAdv>
+        <sync:SfGridSplitter Height="2" HorizontalAlignment="Stretch" Grid.Row="3" ResizeBehavior="PreviousAndNext" Margin="2"/>
+        <TabControl Grid.Row="4" Margin="2" TabStripPlacement="Bottom">
+            <TabItem Header="Outputs" Width="120">
+                <ListBox ItemsSource="{Binding Outputs}" BorderThickness="1"/>
+            </TabItem>
+        </TabControl>
+        <StatusBar Grid.Row="5" HorizontalAlignment="Left" Margin="2,4,2,0">
+            <Separator/>
+            <TextBlock Text="{Binding FileOpened}" Margin="4,2"/>
+            <Separator/>
+        </StatusBar>
+        <Grid Grid.Row="2" Margin="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="300"/>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <sync:SfGridSplitter Width="auto" Grid.Column="1" ResizeBehavior="PreviousAndNext" Margin="0,4,0,4"/>
+            <TabControl Grid.Column="0" TabStripPlacement="Left" Margin="2" SelectionChanged="TabControl_SelectionChanged">
+                <TabItem Width="150" Name="ContextManager" Padding="2" Tag="ContextManager">
+                    <TabItem.LayoutTransform>
+                        <TransformGroup>
+                            <RotateTransform Angle="90"/>
+                        </TransformGroup>
+                    </TabItem.LayoutTransform>
+                    <TabItem.Header>
+                        <StackPanel Orientation="Horizontal">
+                            <ContentControl Content="{StaticResource IconContext}" Width="25" Height="25" Margin="2"/>
+                            <TextBlock Text="Context" VerticalAlignment="Center" Margin="6,0,0,0"/>
+                        </StackPanel>
+                    </TabItem.Header>
+                </TabItem>
+                <TabItem Width="150" Name="GlobalEventManager"  Padding="2" Tag="GlobalEventManager">
+                    <TabItem.LayoutTransform>
+                        <TransformGroup>
+                            <RotateTransform Angle="90"/>
+                        </TransformGroup>
+                    </TabItem.LayoutTransform>
+                    <TabItem.Header>
+                        <StackPanel Orientation="Horizontal">
+                            <ContentControl Content="{StaticResource IconGlobalEvents}" Width="25" Height="25" Margin="2"/>
+                            <TextBlock Text="Global Events" VerticalAlignment="Center" Margin="6,0,0,0" Foreground="{Binding GlobalEventManager.IsDirty, Converter={StaticResource BooleanValueBrush}}"/>
+                        </StackPanel>
+                    </TabItem.Header>
+                </TabItem>
+                <TabItem Width="150" Name="ControlBlockManager" Padding="2" Tag="ControlBlockManager">
+                    <TabItem.LayoutTransform>
+                        <TransformGroup>
+                            <RotateTransform Angle="90"/>
+                        </TransformGroup>
+                    </TabItem.LayoutTransform>
+                    <TabItem.Header>
+                        <StackPanel Orientation="Horizontal">
+                            <ContentControl Content="{StaticResource IconControlBlocks}" Width="25" Height="25" Margin="2"/>
+                            <TextBlock Text="Control Blocks" VerticalAlignment="Center" Margin="6,0,0,0" Foreground="{Binding ControlBlockManager.IsDirty, Converter={StaticResource BooleanValueBrush}}"/>
+                        </StackPanel>
+                    </TabItem.Header>
+                </TabItem>
+            </TabControl>
+            <DockPanel Grid.Column="2" LastChildFill="True" Margin="2">
+                <UniformGrid Columns="2" DockPanel.Dock="Bottom">
+                    <sync:ButtonAdv Label="Apply Changes" Command="common:Command.ApplyChanges" Height="30" Margin="4,2,4,2">
+                        <sync:ButtonAdv.SmallIcon>
+                            <BitmapImage  UriSource="/imgs/apply.png"/>
+                        </sync:ButtonAdv.SmallIcon>
+                    </sync:ButtonAdv>
+                    <sync:ButtonAdv Label="Discard Changes" Command="common:Command.DiscardChanges" Height="30" Margin="4,2,4,2">
+                        <sync:ButtonAdv.SmallIcon>
+                            <BitmapImage  UriSource="/imgs/discard.png"/>
+                        </sync:ButtonAdv.SmallIcon>
+                    </sync:ButtonAdv>
+                </UniformGrid>
+                <ContentControl x:Name="ContentControl" Margin="2,0,2,4"></ContentControl>
+            </DockPanel>
+        </Grid>
+    </Grid>
+</Window>

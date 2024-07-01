@@ -329,6 +329,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia
             try
             {
                 Workbook xlsxWorkbook = new Workbook();
+                xlsxWorkbook.Version = ExcelVersion.Version2007;
                 xlsxWorkbook.Protect(workbookOpenProtectionPassword, true, true);
                 if (workbookWriteProtectionPassword != null && workbookWriteProtectionPassword != "")
                     xlsxWorkbook.SetWriteProtectionPassword(workbookWriteProtectionPassword);

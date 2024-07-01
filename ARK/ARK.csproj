@@ -1,0 +1,175 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+    <RootNamespace>AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK</RootNamespace>
+    <Version>0.1.0.0</Version>
+    <Authors>CrazyHein</Authors>
+    <Company>AMEC</Company>
+    <UseWindowsForms>True</UseWindowsForms>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="imgs\about.png" />
+    <None Remove="imgs\add.png" />
+    <None Remove="imgs\apply.png" />
+    <None Remove="imgs\blank.png" />
+    <None Remove="imgs\build.png" />
+    <None Remove="imgs\build_expression.png" />
+    <None Remove="imgs\close.png" />
+    <None Remove="imgs\context.png" />
+    <None Remove="imgs\control_blocks.png" />
+    <None Remove="imgs\copy.png" />
+    <None Remove="imgs\discard.png" />
+    <None Remove="imgs\edit.png" />
+    <None Remove="imgs\global_events.png" />
+    <None Remove="imgs\insert-before.png" />
+    <None Remove="imgs\insert_before.png" />
+    <None Remove="imgs\json.png" />
+    <None Remove="imgs\labels.png" />
+    <None Remove="imgs\loop.png" />
+    <None Remove="imgs\modified.png" />
+    <None Remove="imgs\new.png" />
+    <None Remove="imgs\open.png" />
+    <None Remove="imgs\paste.png" />
+    <None Remove="imgs\propagate.png" />
+    <None Remove="imgs\quite.png" />
+    <None Remove="imgs\recent.png" />
+    <None Remove="imgs\remove.png" />
+    <None Remove="imgs\save.png" />
+    <None Remove="imgs\save_as.png" />
+    <None Remove="imgs\seq.png" />
+    <None Remove="imgs\shell.png" />
+    <None Remove="imgs\step.png" />
+    <None Remove="imgs\summary.png" />
+    <None Remove="imgs\switch.png" />
+    <None Remove="imgs\switch_blk.png" />
+    <None Remove="imgs\tag.png" />
+    <None Remove="imgs\validated.png" />
+    <None Remove="splash.jpg" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="imgs\about.png" />
+    <Resource Include="imgs\build.png" />
+    <Resource Include="imgs\build_expression.png" />
+    <Resource Include="imgs\close.png" />
+    <Resource Include="imgs\context.png" />
+    <Resource Include="imgs\edit.png" />
+    <Resource Include="imgs\insert_before.png" />
+    <Resource Include="imgs\json.png" />
+    <Resource Include="imgs\labels.png" />
+    <Resource Include="imgs\open.png" />
+    <Resource Include="imgs\propagate.png" />
+    <Resource Include="imgs\quite.png" />
+    <Resource Include="imgs\recent.png" />
+    <Resource Include="imgs\save.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Lombardia\Lombardia.csproj" />
+    <ProjectReference Include="..\Napishtim\Napishtim.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Gagharv">
+      <HintPath>..\..\Weltuna\Gagharv\bin\Release\net5.0\Gagharv.dll</HintPath>
+    </Reference>
+    <Reference Include="Syncfusion.Data.WPF">
+      <HintPath>C:\Program Files (x86)\Syncfusion\Essential Studio\WPF\25.1.35\precompiledassemblies\net6.0\Syncfusion.Data.WPF.dll</HintPath>
+    </Reference>
+    <Reference Include="Syncfusion.SfBusyIndicator.WPF">
+      <HintPath>C:\Program Files (x86)\Syncfusion\Essential Studio\WPF\25.1.35\precompiledassemblies\net6.0\Syncfusion.SfBusyIndicator.WPF.dll</HintPath>
+    </Reference>
+    <Reference Include="Syncfusion.SfGrid.WPF">
+      <HintPath>C:\Program Files (x86)\Syncfusion\Essential Studio\WPF\25.1.35\precompiledassemblies\net6.0\Syncfusion.SfGrid.WPF.dll</HintPath>
+    </Reference>
+    <Reference Include="Syncfusion.SfGridCommon.WPF">
+      <HintPath>C:\Program Files (x86)\Syncfusion\Essential Studio\WPF\25.1.35\precompiledassemblies\net6.0\Syncfusion.SfGridCommon.WPF.dll</HintPath>
+    </Reference>
+    <Reference Include="Syncfusion.SfInput.Wpf">
+      <HintPath>C:\Program Files (x86)\Syncfusion\Essential Studio\WPF\25.1.35\precompiledassemblies\net6.0\Syncfusion.SfInput.WPF.dll</HintPath>
+    </Reference>
+    <Reference Include="Syncfusion.SfShared.Wpf">
+      <HintPath>C:\Program Files (x86)\Syncfusion\Essential Studio\WPF\25.1.35\precompiledassemblies\net6.0\Syncfusion.SfShared.WPF.dll</HintPath>
+    </Reference>
+    <Reference Include="Syncfusion.SfSkinManager.WPF">
+      <HintPath>C:\Program Files (x86)\Syncfusion\Essential Studio\WPF\25.1.35\precompiledassemblies\net6.0\Syncfusion.SfSkinManager.WPF.dll</HintPath>
+    </Reference>
+    <Reference Include="Syncfusion.SfTextInputLayout.WPF">
+      <HintPath>C:\Program Files (x86)\Syncfusion\Essential Studio\WPF\25.1.35\precompiledassemblies\net6.0\Syncfusion.SfTextInputLayout.WPF.dll</HintPath>
+    </Reference>
+    <Reference Include="Syncfusion.SfTreeView.WPF">
+      <HintPath>C:\Program Files (x86)\Syncfusion\Essential Studio\WPF\25.1.35\precompiledassemblies\net6.0\Syncfusion.SfTreeView.WPF.dll</HintPath>
+    </Reference>
+    <Reference Include="Syncfusion.Shared.Windows">
+      <HintPath>C:\Program Files (x86)\Syncfusion\Essential Studio\WPF\25.1.35\precompiledassemblies\net6.0\Syncfusion.Shared.Windows.dll</HintPath>
+    </Reference>
+    <Reference Include="Syncfusion.Shared.WPF">
+      <HintPath>C:\Program Files (x86)\Syncfusion\Essential Studio\WPF\25.1.35\precompiledassemblies\net6.0\Syncfusion.Shared.WPF.dll</HintPath>
+    </Reference>
+    <Reference Include="Syncfusion.Themes.FluentDark.WPF">
+      <HintPath>C:\Program Files (x86)\Syncfusion\Essential Studio\WPF\25.1.35\precompiledassemblies\net6.0\Syncfusion.Themes.FluentDark.WPF.dll</HintPath>
+    </Reference>
+    <Reference Include="Syncfusion.Tools.Wpf">
+      <HintPath>C:\Program Files (x86)\Syncfusion\Essential Studio\WPF\25.1.35\precompiledassemblies\net6.0\Syncfusion.Tools.WPF.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="imgs\add.png" />
+    <Resource Include="imgs\apply.png" />
+    <Resource Include="imgs\blank.png" />
+    <Resource Include="imgs\control_blocks.png" />
+    <Resource Include="imgs\copy.png" />
+    <Resource Include="imgs\discard.png" />
+    <Resource Include="imgs\global_events.png" />
+    <Resource Include="imgs\loop.png" />
+    <Resource Include="imgs\modified.png" />
+    <Resource Include="imgs\new.png" />
+    <Resource Include="imgs\paste.png" />
+    <Resource Include="imgs\remove.png" />
+    <Resource Include="imgs\save_as.png" />
+    <Resource Include="imgs\seq.png" />
+    <Resource Include="imgs\shell.png" />
+    <Resource Include="imgs\step.png" />
+    <Resource Include="imgs\summary.png" />
+    <Resource Include="imgs\switch.png" />
+    <Resource Include="imgs\switch_blk.png" />
+    <Resource Include="imgs\tag.png" />
+    <Resource Include="imgs\validated.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <SplashScreen Include="splash.jpg" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="About.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Controls\Common\BusyDialog.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Controls\ControlBlock\SwitchControl.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Controls\ControlBlock\LoopControl.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Metadata\controller_model_catalogue.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Metadata\data_type_catalogue.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>

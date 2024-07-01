@@ -1,0 +1,125 @@
+﻿<UserControl x:Class="AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Controls.GlobalEventManager"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Controls"
+             xmlns:nap="clr-namespace:AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Napishtim"
+             xmlns:common="clr-namespace:AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Controls.Common"
+             xmlns:sync="http://schemas.syncfusion.com/wpf"
+             xmlns:syncfusionskin ="clr-namespace:Syncfusion.SfSkinManager;assembly=Syncfusion.SfSkinManager.WPF"
+             xmlns:treeViewEngine="clr-namespace:Syncfusion.UI.Xaml.TreeView.Engine;assembly=Syncfusion.SfTreeView.WPF"
+             mc:Ignorable="d" 
+             d:DesignHeight="800" d:DesignWidth="450"
+             syncfusionskin:SfSkinManager.Theme="{syncfusionskin:SkinManagerExtension ThemeName=FluentDark}">
+    <UserControl.CommandBindings>
+        <CommandBinding Command="common:Command.Add" Executed="AddCommand_Executed" CanExecute="AddCommand_CanExecute"/>
+        <CommandBinding Command="common:Command.Insert" Executed="InsertCommand_Executed" CanExecute="InsertCommand_CanExecute"/>
+        <CommandBinding Command="common:Command.PasteBefore" Executed="PasteBeforeCommand_Executed" CanExecute="PasteBeforeCommand_CanExecute"/>
+        <CommandBinding Command="common:Command.Remove" Executed="RemoveCommand_Executed" CanExecute="RemoveCommand_CanExecute"/>
+        <CommandBinding Command="common:Command.Copy" Executed="CopyCommand_Executed" CanExecute="CopyCommand_CanExecute"/>
+        <CommandBinding Command="common:Command.Paste" Executed="PasteCommand_Executed" CanExecute="PasteCommand_CanExecute"/>
+    </UserControl.CommandBindings>
+    <UserControl.Resources>
+        <ContextMenu x:Key="GlobalEventRecordContextMenu">
+            <MenuItem Header="Global Event Record Menu" IsEnabled="False"/>
+            <Separator/>
+            <MenuItem Command="common:Command.Insert" CommandParameter="{Binding}">
+                <MenuItem.Icon>
+                    <Image Source="/imgs/insert_before.png" Height="20" Margin="4"/>
+                </MenuItem.Icon>
+            </MenuItem>
+            <MenuItem Command="common:Command.Remove" CommandParameter="{Binding}">
+                <MenuItem.Icon>
+                    <Image Source="/imgs/remove.png" Height="20" Margin="4"/>
+                </MenuItem.Icon>
+            </MenuItem>
+            <Separator/>
+            <MenuItem Command="common:Command.Copy" CommandParameter="{Binding}">
+                <MenuItem.Icon>
+                    <Image Source="/imgs/copy.png" Height="20" Margin="4"/>
+                </MenuItem.Icon>
+            </MenuItem>
+            <MenuItem Command="common:Command.PasteBefore" CommandParameter="{Binding}">
+                <MenuItem.Icon>
+                    <Image Source="/imgs/paste.png" Height="20" Margin="4"/>
+                </MenuItem.Icon>
+            </MenuItem>
+        </ContextMenu>
+        <ContextMenu x:Key="GlobalEventManagerContextMenu">
+            <MenuItem Header="Global Events Collection Menu" IsEnabled="False"/>
+            <Separator/>
+            <MenuItem Command="common:Command.Add" CommandParameter="{Binding}">
+                <MenuItem.Icon>
+                    <Image Source="/imgs/add.png" Height="20" Margin="4"/>
+                </MenuItem.Icon>
+            </MenuItem>
+            <Separator/>
+            <MenuItem Command="common:Command.Paste" CommandParameter="{Binding}">
+                <MenuItem.Icon>
+                    <Image Source="/imgs/paste.png" Height="20" Margin="4"/>
+                </MenuItem.Icon>
+            </MenuItem>
+        </ContextMenu>
+    </UserControl.Resources>
+    <DockPanel LastChildFill="True" ContextMenu="{StaticResource GlobalEventManagerContextMenu}" ContextMenuOpening="GlobalEventManager_ContextMenuOpening">
+        <DockPanel.Resources>
+            <common:ComponentStateVisibility x:Key="ComponentStateVisibility"/>
+            <common:ComponentStateImage x:Key="ComponentStateImage"/>
+        </DockPanel.Resources>
+        <UniformGrid DockPanel.Dock="Bottom" Columns="4">
+            <sync:ButtonAdv Label="Add" Height="30" Margin="0,2,4,0" Command="common:Command.Add">
+                <sync:ButtonAdv.SmallIcon>
+                    <BitmapImage  UriSource="/imgs/add.png"/>
+                </sync:ButtonAdv.SmallIcon>
+            </sync:ButtonAdv>
+            <sync:ButtonAdv Label="Insert Before" Height="30" Margin="4,2,4,0" Command="common:Command.Insert">
+                <sync:ButtonAdv.SmallIcon>
+                    <BitmapImage  UriSource="/imgs/insert_before.png"/>
+                </sync:ButtonAdv.SmallIcon>
+            </sync:ButtonAdv>
+            <sync:ButtonAdv Label="Remove"  Height="30" Margin="4,2,2,0" Command="common:Command.Remove">
+                <sync:ButtonAdv.SmallIcon>
+                    <BitmapImage  UriSource="/imgs/remove.png"/>
+                </sync:ButtonAdv.SmallIcon>
+            </sync:ButtonAdv>
+            <sync:ButtonAdv Label="Summary"  Height="30" Margin="4,2,2,0" Command="common:Command.Summary">
+                <sync:ButtonAdv.SmallIcon>
+                    <BitmapImage  UriSource="/imgs/summary.png"/>
+                </sync:ButtonAdv.SmallIcon>
+            </sync:ButtonAdv>
+        </UniformGrid>
+        <sync:SfTreeView Name="sfGlobalEventsTreeView" ItemHeight="30" SelectionChanged="sfGlobalEventsTreeView_SelectionChanged" SelectionChanging="sfGlobalEventsTreeView_SelectionChanging" Margin="0,0,2,6" 
+                         AllowDragging="True" AllowDrop="True" 
+                         ItemDropped="sfGlobalEventsTreeView_ItemDropped" ItemDropping="sfGlobalEventsTreeView_ItemDropping"
+                         ItemContextMenu="{StaticResource GlobalEventRecordContextMenu}" ItemContextMenuOpening="sfGlobalEventsTreeView_ItemContextMenuOpening" SelectionMode="SingleDeselect">
+            <sync:SfTreeView.ItemTemplate>
+                <DataTemplate>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="25"/>
+                            <ColumnDefinition Width="auto"/>
+                            <ColumnDefinition Width="auto"/>
+                        </Grid.ColumnDefinitions>
+                        <Image Source="{Binding ImageIcon}"  VerticalAlignment="Center" HorizontalAlignment="Center" Height="25"/>
+                        <TextBlock Grid.Column="1" Text="{Binding Header}" VerticalAlignment="Center" Margin="8,0,0,0"/>
+                        <Image Grid.Column="2" Width="20" Margin="16,0,0,0">
+                            <Image.Visibility>
+                                <MultiBinding Converter="{StaticResource ComponentStateVisibility}">
+                                    <Binding Path="Modified"/>
+                                    <Binding Path="Validated"/>
+                                </MultiBinding>
+                            </Image.Visibility>
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ComponentStateImage}">
+                                    <Binding Path="Modified"/>
+                                    <Binding Path="Validated"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </Grid>
+                </DataTemplate>
+            </sync:SfTreeView.ItemTemplate>
+        </sync:SfTreeView>
+    </DockPanel>
+</UserControl>

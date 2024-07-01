@@ -1,0 +1,150 @@
+﻿<UserControl x:Class="AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Controls.ControlBlockManager"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Controls"
+             xmlns:nap="clr-namespace:AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Napishtim"
+             xmlns:rcp="clr-namespace:AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.ControlBlock;assembly=Napishtim"
+             xmlns:common="clr-namespace:AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Controls.Common"
+             xmlns:sync="http://schemas.syncfusion.com/wpf"
+             xmlns:syncfusionskin ="clr-namespace:Syncfusion.SfSkinManager;assembly=Syncfusion.SfSkinManager.WPF"
+             xmlns:treeViewEngine="clr-namespace:Syncfusion.UI.Xaml.TreeView.Engine;assembly=Syncfusion.SfTreeView.WPF"
+             mc:Ignorable="d" 
+             d:DesignHeight="800" d:DesignWidth="450"
+             syncfusionskin:SfSkinManager.Theme="{syncfusionskin:SkinManagerExtension ThemeName=FluentDark}">
+    <UserControl.CommandBindings>
+        <CommandBinding Command="common:Command.Add" Executed="AddItemCommand_Executed" CanExecute="AddItemCommand_CanExecute"/>
+        <CommandBinding Command="common:Command.Insert" Executed="InsertItemCommand_Executed" CanExecute="InsertItemCommand_CanExecute"/>
+        <CommandBinding Command="common:Command.Remove" Executed="RemoveItemCommand_Executed" CanExecute="RemoveItemCommand_CanExecute"/>
+        <CommandBinding Command="common:Command.Copy" Executed="CopyItemCommand_Executed" CanExecute="CopyItemCommand_CanExecute"/>
+        <CommandBinding Command="common:Command.Paste" Executed="PasteItemCommand_Executed" CanExecute="PasteItemCommand_CanExecute"/>
+        <CommandBinding Command="common:Command.PasteBefore" Executed="PasteBeforeItemCommand_Executed" CanExecute="PasteBeforeItemCommand_CanExecute"/>
+    </UserControl.CommandBindings>
+    <UserControl.Resources>
+        <ContextMenu x:Key="ControlBlockRecordContextMenu">
+            <MenuItem Header="Control Block Record Menu" IsEnabled="False"/>
+            <Separator/>
+            <MenuItem Header="Block Type">
+                <MenuItem.Icon>
+                    <Image Source="/imgs/switch_blk.png" Height="20" Margin="4"/>
+                </MenuItem.Icon>
+                <MenuItem Command="common:Command.SwitchControlBlockType" CommandParameter="{x:Type rcp:Sequential_S}" Header="Sequential">
+                    <MenuItem.Icon>
+                        <Image Source="/imgs/seq.png" Height="20" Margin="4"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Command="common:Command.SwitchControlBlockType" CommandParameter="{x:Type rcp:Loop_S}" Header="Loop">
+                    <MenuItem.Icon>
+                        <Image Source="/imgs/loop.png" Height="20" Margin="4"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Command="common:Command.SwitchControlBlockType" CommandParameter="{x:Type rcp:Switch_S}" Header="Switch">
+                    <MenuItem.Icon>
+                        <Image Source="/imgs/switch.png" Height="20" Margin="4"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+            </MenuItem>
+            <Separator/>
+            <MenuItem Command="common:Command.Add" CommandParameter="{Binding}">
+                <MenuItem.Icon>
+                    <Image Source="/imgs/add.png" Height="20" Margin="4"/>
+                </MenuItem.Icon>
+            </MenuItem>
+            <MenuItem Command="common:Command.Insert" CommandParameter="{Binding}">
+                <MenuItem.Icon>
+                    <Image Source="/imgs/insert_before.png" Height="20" Margin="4"/>
+                </MenuItem.Icon>
+            </MenuItem>
+            <MenuItem Command="common:Command.Remove" CommandParameter="{Binding}">
+                <MenuItem.Icon>
+                    <Image Source="/imgs/remove.png" Height="20" Margin="4"/>
+                </MenuItem.Icon>
+            </MenuItem>
+            <Separator/>
+            <MenuItem Command="common:Command.Copy" CommandParameter="{Binding}">
+                <MenuItem.Icon>
+                    <Image Source="/imgs/copy.png" Height="20" Margin="4"/>
+                </MenuItem.Icon>
+            </MenuItem>
+            <MenuItem Command="common:Command.Paste" CommandParameter="{Binding}">
+                <MenuItem.Icon>
+                    <Image Source="/imgs/paste.png" Height="20" Margin="4"/>
+                </MenuItem.Icon>
+            </MenuItem>
+            <MenuItem Command="common:Command.PasteBefore" CommandParameter="{Binding}">
+                <MenuItem.Icon>
+                    <Image Source="/imgs/paste.png" Height="20" Margin="4"/>
+                </MenuItem.Icon>
+            </MenuItem>
+        </ContextMenu>
+        <ContextMenu x:Key="ControlBlockManagerContextMenu">
+            <MenuItem Header="Control Blocks Collection Menu" IsEnabled="False"/>
+            <Separator/>
+            <MenuItem Command="common:Command.Add" CommandParameter="{Binding}">
+                <MenuItem.Icon>
+                    <Image Source="/imgs/add.png" Height="20" Margin="4"/>
+                </MenuItem.Icon>
+            </MenuItem>
+            <Separator/>
+            <MenuItem Command="common:Command.Paste" CommandParameter="{Binding}">
+                <MenuItem.Icon>
+                    <Image Source="/imgs/paste.png" Height="20" Margin="4"/>
+                </MenuItem.Icon>
+            </MenuItem>
+        </ContextMenu>
+    </UserControl.Resources>
+    <DockPanel LastChildFill="True" ContextMenu="{StaticResource ControlBlockManagerContextMenu}" ContextMenuOpening="ControlBlockManager_ContextMenuOpening">
+        <DockPanel.Resources>
+            <common:ComponentStateVisibility x:Key="ComponentStateVisibility"/>
+            <common:ComponentStateImage x:Key="ComponentStateImage"/>
+        </DockPanel.Resources>
+        <UniformGrid DockPanel.Dock="Bottom" Columns="1">
+            <!--sync:ButtonAdv Label="Add" Height="30" Margin="0,2,4,0">
+                <sync:ButtonAdv.SmallIcon>
+                    <BitmapImage  UriSource="/imgs/add.png"/>
+                </sync:ButtonAdv.SmallIcon>
+            </sync:ButtonAdv-->
+            <sync:ButtonAdv Label="Summary"  Height="30" Margin="0,2,2,0" Command="common:Command.Summary">
+                <sync:ButtonAdv.SmallIcon>
+                    <BitmapImage  UriSource="/imgs/summary.png"/>
+                </sync:ButtonAdv.SmallIcon>
+            </sync:ButtonAdv>
+        </UniformGrid>
+        <sync:SfTreeView Name="sfControlBlocksTreeView" Margin="0,0,2,6"  ItemHeight="30" IsAnimationEnabled="True" AutoExpandMode="AllNodes" SelectionChanged="sfControlBlocksTreeView_SelectionChanged" SelectionChanging="sfControlBlocksTreeView_SelectionChanging"
+                         ItemContextMenu="{StaticResource ControlBlockRecordContextMenu}" ItemContextMenuOpening="sfControlBlocksTreeView_ItemContextMenuOpening" SelectionMode="SingleDeselect">
+            <sync:SfTreeView.HierarchyPropertyDescriptors>
+                <treeViewEngine:HierarchyPropertyDescriptor TargetType="{x:Type nap:SequentialModel}" ChildPropertyName="SubSteps"/>
+                <treeViewEngine:HierarchyPropertyDescriptor TargetType="{x:Type nap:LoopModel}" ChildPropertyName="LoopBody"/>
+                <treeViewEngine:HierarchyPropertyDescriptor TargetType="{x:Type nap:SwitchModel}" ChildPropertyName="BranchActions"/>
+            </sync:SfTreeView.HierarchyPropertyDescriptors>
+            <sync:SfTreeView.ItemTemplate>
+                <DataTemplate>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="25"/>
+                            <ColumnDefinition Width="auto"/>
+                            <ColumnDefinition Width="auto"/>
+                        </Grid.ColumnDefinitions>
+                        <Image Source="{Binding ImageIcon}"  VerticalAlignment="Center" HorizontalAlignment="Center" Height="25"/>
+                        <TextBlock Grid.Column="1" Text="{Binding Header}" VerticalAlignment="Center" Margin="8,0,0,0"/>
+                        <Image Grid.Column="2" Width="20" Margin="16,0,0,0">
+                            <Image.Visibility>
+                                <MultiBinding Converter="{StaticResource ComponentStateVisibility}">
+                                    <Binding Path="Modified"/>
+                                    <Binding Path="Validated"/>
+                                </MultiBinding>
+                            </Image.Visibility>
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ComponentStateImage}">
+                                    <Binding Path="Modified"/>
+                                    <Binding Path="Validated"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </Grid>
+                </DataTemplate>
+            </sync:SfTreeView.ItemTemplate>
+        </sync:SfTreeView>
+    </DockPanel>
+</UserControl>

@@ -1,0 +1,41 @@
+﻿<Window x:Class="AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Controls.Common.ControlBlockTypeSelector"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Controls.Common"
+        xmlns:sync="http://schemas.syncfusion.com/wpf"
+        xmlns:syncfusionskin ="clr-namespace:Syncfusion.SfSkinManager;assembly=Syncfusion.SfSkinManager.WPF"
+        syncfusionskin:SfSkinManager.Theme="{syncfusionskin:SkinManagerExtension ThemeName=FluentDark}"
+        mc:Ignorable="d"
+        Title="Select Control Block Type" Height="280" Width="600" ResizeMode="NoResize" WindowStartupLocation="CenterScreen">
+    <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        <sync:ButtonAdv Label="" Height="160" Width="160" Margin="8" SizeMode="Large" IconStretch="Uniform" IconHeight="100" IconWidth="100" Click="SequentialButtonAdv_Click">
+            <sync:ButtonAdv.LargeIcon>
+                <BitmapImage  UriSource="/imgs/seq.png"/>
+            </sync:ButtonAdv.LargeIcon>
+        </sync:ButtonAdv>
+        <sync:ButtonAdv Grid.Column="1" Label="" Height="160" Width="160" Margin="8" SizeMode="Large" IconStretch="Uniform" IconHeight="100" IconWidth="100" Click="LoopButtonAdv_Click">
+            <sync:ButtonAdv.LargeIcon>
+                <BitmapImage  UriSource="/imgs/loop.png"/>
+            </sync:ButtonAdv.LargeIcon>
+        </sync:ButtonAdv>
+        <sync:ButtonAdv Grid.Column="2" Label="" Height="160" Width="160" Margin="8" SizeMode="Large" IconStretch="Uniform" IconHeight="100" IconWidth="100" Click="SwitchButtonAdv_Click">
+            <sync:ButtonAdv.LargeIcon>
+                <BitmapImage  UriSource="/imgs/switch.png"/>
+            </sync:ButtonAdv.LargeIcon>
+        </sync:ButtonAdv>
+        <TextBlock Grid.Row="1" Text="Sequential" TextAlignment="Center" FontSize="25"/>
+        <TextBlock Grid.Row="1" Grid.Column="1" Text="Loop" TextAlignment="Center" FontSize="25"/>
+        <TextBlock Grid.Row="1" Grid.Column="2" Text="Switch" TextAlignment="Center" FontSize="25"/>
+    </Grid>
+</Window>

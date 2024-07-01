@@ -1,0 +1,305 @@
+﻿<UserControl x:Class="AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Controls.StepControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK"
+             xmlns:common="clr-namespace:AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Controls.Common"
+             xmlns:napishtim="clr-namespace:AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Napishtim"
+             xmlns:syncfusionskin ="clr-namespace:Syncfusion.SfSkinManager;assembly=Syncfusion.SfSkinManager.WPF"
+             xmlns:sync="http://schemas.syncfusion.com/wpf"
+             mc:Ignorable="d" 
+             d:DesignHeight="1000" d:DesignWidth="800"
+             syncfusionskin:SfSkinManager.Theme="{syncfusionskin:SkinManagerExtension ThemeName=FluentDark}">
+    <TabControl>
+        <TabControl.Resources>
+            <common:ComponentStateVisibility x:Key="ComponentStateVisibility"/>
+            <common:ComponentStateImage x:Key="ComponentStateImage"/>
+            <common:BooleanValueBrush x:Key="ShaderIsValid" TrueBrush="Transparent" FalseBrush="Red"/>
+            <ContextMenu x:Key="RecordContextMenu">
+                <MenuItem Command="common:Command.Insert" CommandParameter="{Binding}">
+                    <MenuItem.Icon>
+                        <Image Source="/imgs/insert_before.png" Height="20" Margin="4"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Command="common:Command.Remove" CommandParameter="{Binding}">
+                    <MenuItem.Icon>
+                        <Image Source="/imgs/remove.png" Height="20" Margin="4"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <Separator/>
+                <MenuItem Command="common:Command.PasteBefore" CommandParameter="{Binding}">
+                    <MenuItem.Icon>
+                        <Image Source="/imgs/paste.png" Height="20" Margin="4"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <Separator/>
+                <MenuItem Command="common:Command.ExpressionHelper" CommandParameter="{Binding}">
+                    <MenuItem.Icon>
+                        <Image Source="/imgs/build_expression.png" Height="20" Margin="4"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+            </ContextMenu>
+            <ContextMenu x:Key="LocalEventParametersContextMenu">
+                <MenuItem Command="common:Command.ExpressionHelper" CommandParameter="{Binding}">
+                    <MenuItem.Icon>
+                        <Image Source="/imgs/build_expression.png" Height="20" Margin="4"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+            </ContextMenu>
+        </TabControl.Resources>
+        <TabItem Width="150">
+            <TabItem.Header>
+                <StackPanel Orientation="Horizontal">
+                    <Image Source="/imgs/step.png" Width="25" Margin="2"/>
+                    <TextBlock Text="Step" VerticalAlignment="Center" Margin="6,0,0,0"/>
+                    <Image Width="20" Margin="16,0,0,0">
+                        <Image.Visibility>
+                            <MultiBinding Converter="{StaticResource ComponentStateVisibility}">
+                                <Binding Path="Modified"/>
+                                <Binding Path="Validated"/>
+                            </MultiBinding>
+                        </Image.Visibility>
+                        <Image.Source>
+                            <MultiBinding Converter="{StaticResource ComponentStateImage}">
+                                <Binding Path="Modified"/>
+                                <Binding Path="Validated"/>
+                            </MultiBinding>
+                        </Image.Source>
+                    </Image>
+                </StackPanel>
+            </TabItem.Header>
+            <Grid>
+                <Grid.CommandBindings>
+                    <CommandBinding Command="common:Command.Add" Executed="AddCommand_Executed" CanExecute="AddCommand_CanExecute"/>
+                    <CommandBinding Command="common:Command.Insert" Executed="InsertCommand_Executed" CanExecute="InsertCommand_CanExecute"/>
+                    <CommandBinding Command="common:Command.Remove" Executed="RemoveCommand_Executed" CanExecute="RemoveCommand_CanExecute"/>
+                    <CommandBinding Command="common:Command.ExpressionHelper" Executed="ExpressionHelperCommand_Executed" CanExecute="ExpressionHelperCommand_CanExecute"/>
+                    <CommandBinding Command="common:Command.PasteBefore" Executed="PasteBeforeCommand_Executed" CanExecute="PasteBeforeCommand_CanExecute"/>
+                    <CommandBinding Command="common:Command.Propagate" Executed="PropagateCommand_Executed" CanExecute="PropagateCommand_CanExecute"/>
+                </Grid.CommandBindings>
+                <Grid.Resources>
+                    <common:InvertBooleanValue x:Key="InvertBoolean"/>
+                </Grid.Resources>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="2*"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                
+                <GroupBox Margin="0,4,2,4">
+                    <GroupBox.Header>
+                        <TextBlock Text="Step Information" FontSize="16"/>
+                    </GroupBox.Header>
+                    <Grid Margin="2,8,2,2">
+                        <sync:SfTextInputLayout Hint="Step Name" FontSize="12" FontStyle="Italic" ContainerType="Filled" Margin="4" HelperText="Input step name here." HorizontalAlignment="Stretch">
+                            <TextBox x:Name="txtStepName" FontStyle="Normal" Text="{Binding Name}"/>
+                        </sync:SfTextInputLayout>
+                    </Grid>
+                </GroupBox>
+
+                <GroupBox Margin="2,4,0,4"  Grid.Column="2">
+                    <GroupBox.Header>
+                        <CheckBox Content="Enable Step Timeout" FontSize="16"  IsChecked="{Binding WithTimeout}" Name="chkEnableTimeout"/>
+                    </GroupBox.Header>
+                    <StackPanel Margin="2,8,2,2" Orientation="Horizontal" IsEnabled="{Binding ElementName=chkEnableTimeout, Path=IsChecked}">
+                        <CheckBox IsChecked="{Binding SpecifyTimeoutDirectly}"  Name="chkSpecifyTimeout">
+                            <sync:SfTextInputLayout Hint="Timeout Value" FontSize="12" FontStyle="Italic" ContainerType="Filled" Margin="4" HelperText="Input timeout value directly here.">
+                                <sync:IntegerTextBox x:Name="txtStepTimeout" Width="240" MinValue="0" MaxValue="2147483647" FontStyle="Normal" Value="{Binding TimeoutValue}" ValueValidation="OnKeyPress" IsEnabled="{Binding ElementName=chkSpecifyTimeout, Path=IsChecked}"/>
+                            </sync:SfTextInputLayout>
+                        </CheckBox>
+
+                        <CheckBox Name="chkTakeTimeToTimeout" Margin="32,0,0,0" IsChecked="{Binding ElementName=chkSpecifyTimeout, Path=IsChecked, Converter={StaticResource InvertBoolean}}">
+                            <sync:SfTextInputLayout Hint="Time to Timeout of" FontSize="12" FontStyle="Italic" ContainerType="Filled" Margin="4" HelperText="Take the time to timeout of previous step.">
+                                <ComboBox Width="240"  IsEditable="False" DisplayMemberPath="Header" SelectedItem="{Binding StepTimeToTimeout}" ItemsSource="{Binding StepTimeToTimeoutCollection}" IsReadOnly="True" IsEnabled="{Binding ElementName=chkTakeTimeToTimeout, Path=IsChecked}"/>
+                            </sync:SfTextInputLayout>
+                        </CheckBox>
+                    </StackPanel>
+                </GroupBox>
+                <GroupBox Margin="0,4,2,4" Grid.Row="1">
+                    <GroupBox.CommandBindings>
+                        <CommandBinding Command="common:Command.Paste2" Executed="PasteLocalEventCommand_Executed" CanExecute="PasteLocalEventCommand_CanExecute"/>
+                    </GroupBox.CommandBindings>
+                    <GroupBox.Resources>
+                        <DataTemplate x:Key="LocalEventDetailToolTip">
+                            <TextBlock Text="{Binding Comment}" FontSize="16"/>
+                        </DataTemplate>
+                        <DataTemplate x:Key="LocalEventDetails">
+                            <sync:SfDataGrid ItemsSource="{Binding Data.Event.EventParameters}" AllowSorting="False" AllowResizingColumns="True" AutoGenerateColumns="False" ColumnSizer="Auto" RecordContextMenu="{StaticResource LocalEventParametersContextMenu}">
+                                <sync:SfDataGrid.Columns>
+                                    <sync:GridTextColumn MappingName="Name" HeaderText="Parameter" ShowToolTip="True" ToolTipTemplate="{StaticResource LocalEventDetailToolTip}"/>
+                                    <sync:GridTextColumn MappingName="Value" HeaderText="Value" AllowEditing="True"/>
+                                    <sync:GridTextColumn MappingName="ValueWithTags" HeaderText="Tags"/>
+                                    <sync:GridCheckBoxColumn MappingName="Required" HeaderText="Required"/>
+                                </sync:SfDataGrid.Columns>
+                            </sync:SfDataGrid>
+                        </DataTemplate>
+                    </GroupBox.Resources>
+                    <GroupBox.Header>
+                        <TextBlock Text="Local Events" FontSize="16"/>
+                    </GroupBox.Header>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition/>
+                            <RowDefinition Height="auto"/>
+                        </Grid.RowDefinitions>
+                        <sync:SfDataGrid x:Name="sfLocalEventsViewer" ItemsSource="{Binding LocalEvents}" Margin="2,8,2,2" AllowSorting="False" AllowResizingColumns="True" AutoGenerateColumns="False"  ColumnSizer="AutoLastColumnFill" ShowRowHeader="True"
+                                         RecordContextMenu="{StaticResource RecordContextMenu}" SelectionUnit="Row" SelectionMode="Extended"
+                                         GridCopyContent="CopyLocalEvent" GridPasteOption="None">
+                            <sync:SfDataGrid.DetailsViewDefinition>
+                                <sync:TemplateViewDefinition  RowTemplate="{StaticResource LocalEventDetails}"/>
+                            </sync:SfDataGrid.DetailsViewDefinition>
+                            <sync:SfDataGrid.Columns>
+                                <sync:GridTextColumn MappingName="Index" HeaderText="Index" AllowEditing="True"/>
+                                <sync:GridTextColumn MappingName="Name" HeaderText="Name" AllowEditing="True"/>
+                                <sync:GridComboBoxColumn ItemsSource="{x:Static napishtim:EventModel.EventTypes}" ValueBinding="{Binding Event.Type}" HeaderText="Type" AllowEditing="True" MinimumWidth="80"/>
+                                <sync:GridTextColumn DisplayBinding="{Binding Event.Info}" HeaderText="Event"/>
+                            </sync:SfDataGrid.Columns>
+                        </sync:SfDataGrid>
+                        <UniformGrid Grid.Row="1" Columns="3">
+                            <sync:ButtonAdv Label="Add" Height="30" Margin="2,2,4,0" Command="common:Command.Add" CommandParameter="{Binding LocalEvents}">
+                                <sync:ButtonAdv.SmallIcon>
+                                    <BitmapImage  UriSource="/imgs/add.png"/>
+                                </sync:ButtonAdv.SmallIcon>
+                            </sync:ButtonAdv>
+                            <sync:ButtonAdv Label="Insert Before" Height="30" Margin="4,2,4,0" Command="common:Command.Insert" CommandParameter="{Binding LocalEvents}">
+                                <sync:ButtonAdv.SmallIcon>
+                                    <BitmapImage  UriSource="/imgs/insert_before.png"/>
+                                </sync:ButtonAdv.SmallIcon>
+                            </sync:ButtonAdv>
+                            <sync:ButtonAdv Label="Remove"  Height="30" Margin="4,2,2,0" Command="common:Command.Remove" CommandParameter="{Binding LocalEvents}">
+                                <sync:ButtonAdv.SmallIcon>
+                                    <BitmapImage  UriSource="/imgs/remove.png"/>
+                                </sync:ButtonAdv.SmallIcon>
+                            </sync:ButtonAdv>
+                        </UniformGrid>
+                    </Grid>
+                </GroupBox>
+                <GroupBox Grid.Row="3" Margin="0,4,2,0">
+                    <GroupBox.CommandBindings>
+                        <CommandBinding Command="common:Command.Paste2" Executed="PasteShaderCommand_Executed" CanExecute="PasteShaderCommand_CanExecute"/>
+                    </GroupBox.CommandBindings>
+                    <GroupBox.Header>
+                        <TextBlock Text="Step Actions" FontSize="16"/>
+                    </GroupBox.Header>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition/>
+                            <RowDefinition Height="auto"/>
+                        </Grid.RowDefinitions>
+                        <sync:SfDataGrid x:Name="sfStepActionsViewer" ItemsSource="{Binding Shaders}" Margin="2,8,2,2" AllowSorting="False" AllowResizingColumns="True" AutoGenerateColumns="False" ColumnSizer="AutoLastColumnFill" ShowRowHeader="True"
+                                         RecordContextMenu="{StaticResource RecordContextMenu}" SelectionUnit="Row" SelectionMode="Extended"
+                                         GridCopyContent="CopyShader" GridPasteOption="None">
+                            <sync:SfDataGrid.Resources>
+                                <Style TargetType="sync:GridCell" BasedOn="{StaticResource SyncfusionGridCellStyle}">
+                                    <Setter Property="Background" Value="{Binding Path=IsValid, Converter={StaticResource ShaderIsValid}}" />
+                                </Style>
+                            </sync:SfDataGrid.Resources>
+                            <sync:SfDataGrid.Columns>
+                                <sync:GridCheckBoxColumn MappingName="CanBeOmitted" HeaderText="Omitted" AllowEditing="False"/>
+                                <sync:GridTextColumn MappingName="Name" HeaderText="Name" AllowEditing="True"/>
+                                <sync:GridTextColumn MappingName="LeftValue" HeaderText="Operand" AllowEditing="True"/>
+                                <sync:GridTextColumn MappingName="RightValue" HeaderText="Expression" AllowEditing="True"/>
+                                <sync:GridTextColumn MappingName="Representation" HeaderText="Representation"/>
+                            </sync:SfDataGrid.Columns>
+                        </sync:SfDataGrid>
+                        <UniformGrid Grid.Row="1" Columns="4">
+                            <sync:ButtonAdv Label="Add" Height="30" Margin="2,2,4,0" Command="common:Command.Add" CommandParameter="{Binding Shaders}">
+                                <sync:ButtonAdv.SmallIcon>
+                                    <BitmapImage  UriSource="/imgs/add.png"/>
+                                </sync:ButtonAdv.SmallIcon>
+                            </sync:ButtonAdv>
+                            <sync:ButtonAdv Label="Insert Before" Height="30" Margin="4,2,4,0" Command="common:Command.Insert" CommandParameter="{Binding Shaders}">
+                                <sync:ButtonAdv.SmallIcon>
+                                    <BitmapImage  UriSource="/imgs/insert_before.png"/>
+                                </sync:ButtonAdv.SmallIcon>
+                            </sync:ButtonAdv>
+                            <sync:ButtonAdv Label="Remove"  Height="30" Margin="4,2,4,0" Command="common:Command.Remove"  CommandParameter="{Binding Shaders}">
+                                <sync:ButtonAdv.SmallIcon>
+                                    <BitmapImage  UriSource="/imgs/remove.png"/>
+                                </sync:ButtonAdv.SmallIcon>
+                            </sync:ButtonAdv>
+                            <sync:ButtonAdv Label="Propagate"  Height="30" Margin="4,2,2,0" Command="common:Command.Propagate"  CommandParameter="{Binding Shaders}">
+                                <sync:ButtonAdv.SmallIcon>
+                                    <BitmapImage  UriSource="/imgs/propagate.png"/>
+                                </sync:ButtonAdv.SmallIcon>
+                            </sync:ButtonAdv>
+                        </UniformGrid>
+                    </Grid>
+                </GroupBox>
+                <GroupBox Grid.Column="2" Grid.Row="1" Margin="2,4,0,4">
+                    <GroupBox.Header>
+                        <TextBlock Text="Termination Condition" FontSize="16"/>
+                    </GroupBox.Header>
+                    <TextBox x:Name="txtTerminationCondition" Text="{Binding TerminationCondition}" Margin="2,8,2,2" VerticalContentAlignment="Top" Padding="4" AcceptsReturn="True" VerticalScrollBarVisibility="Auto"/>
+                </GroupBox>
+                <GroupBox Grid.Column="2" Grid.Row="3" Margin="2,4,0,0">
+                    <GroupBox.CommandBindings>
+                        <CommandBinding Command="common:Command.Paste2" Executed="PastePostShaderCommand_Executed" CanExecute="PastePostShaderCommand_CanExecute"/>
+                    </GroupBox.CommandBindings>
+                    <GroupBox.Header>
+                        <TextBlock Text="Execute the followings before moving to the next step" FontSize="16"/>
+                    </GroupBox.Header>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition/>
+                            <RowDefinition Height="auto"/>
+                        </Grid.RowDefinitions>
+                        <sync:SfDataGrid x:Name="sfPostStepActionsViewer" ItemsSource="{Binding PostShaders}" Margin="2,8,2,2" AllowSorting="False" AllowResizingColumns="True" AutoGenerateColumns="False" ColumnSizer="AutoLastColumnFill" ShowRowHeader="True"
+                                         RecordContextMenu="{StaticResource RecordContextMenu}" SelectionUnit="Row" SelectionMode="Extended"
+                                         GridCopyContent="CopyShader" GridPasteOption="None">
+                            <sync:SfDataGrid.Resources>
+                                <Style TargetType="sync:GridCell" BasedOn="{StaticResource SyncfusionGridCellStyle}">
+                                    <Setter Property="Background" Value="{Binding Path=IsValid, Converter={StaticResource ShaderIsValid}}" />
+                                </Style>
+                            </sync:SfDataGrid.Resources>
+                            <sync:SfDataGrid.Columns>
+                                <sync:GridCheckBoxColumn MappingName="CanBeOmitted" HeaderText="Omitted" AllowEditing="False"/>
+                                <sync:GridTextColumn MappingName="Name" HeaderText="Name" AllowEditing="True"/>
+                                <sync:GridTextColumn MappingName="LeftValue" HeaderText="Operand" AllowEditing="True"/>
+                                <sync:GridTextColumn MappingName="RightValue" HeaderText="Expression" AllowEditing="True"/>
+                                <sync:GridTextColumn MappingName="Representation" HeaderText="Representation"/>
+                            </sync:SfDataGrid.Columns>
+                        </sync:SfDataGrid>
+                        <UniformGrid Grid.Row="1" Columns="3">
+                            <sync:ButtonAdv Label="Add" Height="30" Margin="2,2,4,0" Command="common:Command.Add" CommandParameter="{Binding PostShaders}">
+                                <sync:ButtonAdv.SmallIcon>
+                                    <BitmapImage  UriSource="/imgs/add.png"/>
+                                </sync:ButtonAdv.SmallIcon>
+                            </sync:ButtonAdv>
+                            <sync:ButtonAdv Label="Insert Before" Height="30" Margin="4,2,4,0" Command="common:Command.Insert" CommandParameter="{Binding PostShaders}">
+                                <sync:ButtonAdv.SmallIcon>
+                                    <BitmapImage  UriSource="/imgs/insert_before.png"/>
+                                </sync:ButtonAdv.SmallIcon>
+                            </sync:ButtonAdv>
+                            <sync:ButtonAdv Label="Remove"  Height="30" Margin="4,2,2,0" Command="common:Command.Remove" CommandParameter="{Binding PostShaders}">
+                                <sync:ButtonAdv.SmallIcon>
+                                    <BitmapImage  UriSource="/imgs/remove.png"/>
+                                </sync:ButtonAdv.SmallIcon>
+                            </sync:ButtonAdv>
+                        </UniformGrid>
+                    </Grid>
+                </GroupBox>
+                <GridSplitter Grid.Column="1" Grid.Row="0"  Width="2" Grid.RowSpan="4" VerticalAlignment="Stretch" HorizontalAlignment="Center" Margin="2,0"/>
+                <GridSplitter Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="3" Height="2" HorizontalAlignment="Stretch" Margin="0,2"/>
+            </Grid>
+        </TabItem>
+        <TabItem Width="150">
+            <TabItem.Header>
+                <StackPanel Orientation="Horizontal">
+                    <Image Source="/imgs/summary.png" Width="25" Margin="2"/>
+                    <TextBlock Text="Summary" VerticalAlignment="Center" Margin="6,0,0,0"/>
+                </StackPanel>
+            </TabItem.Header>
+            <ScrollViewer Padding="4" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+                <TextBlock Text="{Binding Summary}" FontSize="16"/>
+            </ScrollViewer>
+        </TabItem>
+    </TabControl>
+</UserControl>

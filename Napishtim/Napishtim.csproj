@@ -1,0 +1,28 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim</RootNamespace>
+    <Version>0.1.0.0</Version>
+    <Authors>CrazyHein</Authors>
+    <Company>AMEC</Company>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Recipe\ControlBlock\ControlBlock.cs~RF1ede996e.TMP" />
+    <None Remove="Recipe\ControlBlock\Process\BranchStep.cs~RF48ba280.TMP" />
+    <None Remove="Recipe\ControlBlock\Process\ProcessShader.cs~RF57b6653.TMP" />
+    <None Remove="Recipe\ControlBlock\Process\SimpleStepWithTimeout.cs~RF13006ebd.TMP" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Lombardia\Lombardia.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Recipe\FunctionBlock\" />
+  </ItemGroup>
+
+</Project>

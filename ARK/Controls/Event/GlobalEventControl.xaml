@@ -1,0 +1,79 @@
+﻿<UserControl x:Class="AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Controls.GlobalEventControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK"
+             xmlns:event="clr-namespace:AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.EventMechansim;assembly=Napishtim"
+             xmlns:sync="http://schemas.syncfusion.com/wpf"
+             xmlns:syncfusionskin ="clr-namespace:Syncfusion.SfSkinManager;assembly=Syncfusion.SfSkinManager.WPF"
+             xmlns:common="clr-namespace:AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Controls.Common"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800"
+             syncfusionskin:SfSkinManager.Theme="{syncfusionskin:SkinManagerExtension ThemeName=FluentDark}">
+    <TabControl>
+        <TabControl.Resources>
+            <common:ComponentStateVisibility x:Key="ComponentStateVisibility"/>
+            <common:ComponentStateImage x:Key="ComponentStateImage"/>
+            <common:InvertBooleanValue x:Key="InvertBooleanValue"/>
+        </TabControl.Resources>
+        <TabItem Width="150">
+            <TabItem.Header>
+                <StackPanel Orientation="Horizontal">
+                    <Image Source="/imgs/tag.png" Width="25" Margin="2"/>
+                    <TextBlock Text="GEVENT" VerticalAlignment="Center" Margin="6,0,0,0"/>
+                    <Image Width="20" Margin="16,0,0,0">
+                        <Image.Visibility>
+                            <MultiBinding Converter="{StaticResource ComponentStateVisibility}">
+                                <Binding Path="Modified"/>
+                                <Binding Path="Validated"/>
+                            </MultiBinding>
+                        </Image.Visibility>
+                        <Image.Source>
+                            <MultiBinding Converter="{StaticResource ComponentStateImage}">
+                                <Binding Path="Modified"/>
+                                <Binding Path="Validated"/>
+                            </MultiBinding>
+                        </Image.Source>
+                    </Image>
+                </StackPanel>
+            </TabItem.Header>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                <GroupBox>
+                    <GroupBox.Header>
+                        <TextBlock Text="Global Event Supplement" FontSize="16"/>
+                    </GroupBox.Header>
+                    <Grid Margin="0,12,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="3*"/>
+                        </Grid.ColumnDefinitions>
+                        <sync:SfTextInputLayout Hint="Index" FontSize="12" FontStyle="Italic" ContainerType="Filled" Margin="4" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}" HelperText="Global Event index.">
+                            <sync:IntegerTextBox FontStyle="Normal" Value="{Binding Index}" MinValue="0" MaxValue="2147483647"/>
+                        </sync:SfTextInputLayout>
+                        <sync:SfTextInputLayout Grid.Column="1" Hint="Name" FontSize="12" FontStyle="Italic" ContainerType="Filled" Margin="4" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}" HelperText="Input Global Event friendly name here.">
+                            <TextBox FontStyle="Normal" Text="{Binding Name}" Name="txtGlobalEventName"/>
+                        </sync:SfTextInputLayout>
+                    </Grid>
+                </GroupBox>
+                <ContentControl x:Name="EventControl" Grid.ColumnSpan="2" Grid.Row="1" Margin="0,6,0,0"/>
+            </Grid>
+        </TabItem>
+        <TabItem Width="150">
+            <TabItem.Header>
+                <StackPanel Orientation="Horizontal">
+                    <Image Source="/imgs/summary.png" Width="25" Margin="2"/>
+                    <TextBlock Text="Summary" VerticalAlignment="Center" Margin="6,0,0,0"/>
+                </StackPanel>
+            </TabItem.Header>
+            <ScrollViewer Padding="4" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+                <TextBlock Text="{Binding Summary}" FontSize="16"/>
+            </ScrollViewer>
+        </TabItem>
+    </TabControl>
+
+</UserControl>
