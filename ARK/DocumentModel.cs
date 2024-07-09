@@ -36,13 +36,35 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK
             }
         }
 
-        public ControlBlockModelCollection? __control_block_manager;
-        public ControlBlockModelCollection? ControlBlockManager
+        private ContextModel? __context_manager;
+        public ContextModel? ContextManager
         {
-            get { return __control_block_manager; }
+            get { return __context_manager; }
             set
             {
-                __control_block_manager = value;
+                __context_manager = value;
+                _notify_property_changed();
+            }
+        }
+
+        public ControlBlockModelCollection? __regular_control_block_manager;
+        public ControlBlockModelCollection? RegularControlBlockManager
+        {
+            get { return __regular_control_block_manager; }
+            set
+            {
+                __regular_control_block_manager = value;
+                _notify_property_changed();
+            }
+        }
+
+        public ControlBlockModelCollection? __exception_control_block_manager;
+        public ControlBlockModelCollection? ExceptionControlBlockManager
+        {
+            get { return __exception_control_block_manager; }
+            set
+            {
+                __exception_control_block_manager = value;
                 _notify_property_changed();
             }
         }
@@ -64,9 +86,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK
             }
         }
 
-        public bool FileSaved => __file_opened?.Length > 0 && __global_event_manager.IsDirty == false && __control_block_manager.IsDirty == false;
+        public bool FileSaved => __file_opened?.Length > 0 && __global_event_manager.IsDirty == false && __regular_control_block_manager.IsDirty == false && __exception_control_block_manager.IsDirty == false && __context_manager.IsDirty == false;
         public bool IsTemporaryFile => __file_opened?.Length == 0;
-        public bool UnsavedChanges => __file_opened?.Length == 0 || __global_event_manager?.IsDirty == true || __control_block_manager?.IsDirty == true;
+        public bool UnsavedChanges => __file_opened?.Length == 0 || __global_event_manager?.IsDirty == true || __regular_control_block_manager?.IsDirty == true || __exception_control_block_manager?.IsDirty == true || __context_manager?.IsDirty == true;
         public bool IsOpened => __file_opened != null;
 
         public IEnumerable<string> RecentlyOpenedFiles => __recently_opened_manager.PathCollection;

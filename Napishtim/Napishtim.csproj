@@ -12,9 +12,9 @@
 
   <ItemGroup>
     <None Remove="Recipe\ControlBlock\ControlBlock.cs~RF1ede996e.TMP" />
-    <None Remove="Recipe\ControlBlock\Process\BranchStep.cs~RF48ba280.TMP" />
-    <None Remove="Recipe\ControlBlock\Process\ProcessShader.cs~RF57b6653.TMP" />
-    <None Remove="Recipe\ControlBlock\Process\SimpleStepWithTimeout.cs~RF13006ebd.TMP" />
+    <None Remove="Recipe\Process\BranchStep.cs~RF48ba280.TMP" />
+    <None Remove="Recipe\Process\ProcessShader.cs~RF57b6653.TMP" />
+    <None Remove="Recipe\Process\SimpleStepWithTimeout.cs~RF13006ebd.TMP" />
   </ItemGroup>
 
   <ItemGroup>

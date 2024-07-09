@@ -37,6 +37,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Controls
             //OriginalStepModel = step;
             //__container = step.Container;
             DataContext = step;
+            LocalEventCollection.DataSource = (step as SimpleStepModel).LocalEvents;
         }
 
         public void ResetDataModel(StepModel step)
@@ -44,6 +45,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Controls
             //OriginalStepModel = step;
             //__container = step.Container;
             DataContext = step;
+            LocalEventCollection.DataSource = (step as SimpleStepModel).LocalEvents;
         }
 
         public void UpdateBindingSource()
@@ -54,6 +56,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Controls
             binding = txtTerminationCondition.GetBindingExpression(TextBox.TextProperty);
             binding.UpdateSource();
 
+            binding = txtAbortCondition.GetBindingExpression(TextBox.TextProperty);
+            binding.UpdateSource();
+
             binding = txtStepTimeout.GetBindingExpression(IntegerTextBox.ValueProperty);
             binding.UpdateSource();
         }
@@ -62,17 +67,17 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Controls
         {
             try
             {
-                if(e.Parameter == (DataContext as SimpleStepModel).LocalEvents)
-                {
-                    (DataContext as SimpleStepModel).AddLocalEvent();
-                }
-                else if(e.Parameter == (DataContext as SimpleStepModel).Shaders)
+                if(e.Parameter == (DataContext as SimpleStepModel).Shaders)
                 {
                     (DataContext as SimpleStepModel).AddStepAction();
                 }
                 else if (e.Parameter == (DataContext as SimpleStepModel).PostShaders)
                 {
                     (DataContext as SimpleStepModel).AddPostStepAction();
+                }
+                else if (e.Parameter == (DataContext as SimpleStepModel).AbortShaders)
+                {
+                    (DataContext as SimpleStepModel).AddAbortStepAction();
                 }
             }
             catch (Exception ex)
@@ -90,11 +95,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Controls
         {
             try
             {
-                if (e.Parameter == (DataContext as SimpleStepModel).LocalEvents)
-                {
-                    (DataContext as SimpleStepModel).InsertLocalEvent(sfLocalEventsViewer.SelectedIndex);
-                }
-                else if (e.Parameter == (DataContext as SimpleStepModel).Shaders)
+                if (e.Parameter == (DataContext as SimpleStepModel).Shaders)
                 {
                     (DataContext as SimpleStepModel).InsertStepAction(sfStepActionsViewer.SelectedIndex);
                 }
@@ -102,15 +103,19 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Controls
                 {
                     (DataContext as SimpleStepModel).InsertPostStepAction(sfPostStepActionsViewer.SelectedIndex);
                 }
+                else if (e.Parameter == (DataContext as SimpleStepModel).AbortShaders)
+                {
+                    (DataContext as SimpleStepModel).InsertAbortStepAction(sfAbortStepActionsViewer.SelectedIndex);
+                }
                 else if (e.Parameter is GridRecordContextMenuInfo)
                 {
                     object dataContext = (e.Parameter as GridRecordContextMenuInfo).DataGrid.ItemsSource;
-                    if (dataContext == (DataContext as SimpleStepModel).LocalEvents)
-                        (DataContext as SimpleStepModel).InsertLocalEvent(sfLocalEventsViewer.SelectedIndex);
-                    else if(dataContext == (DataContext as SimpleStepModel).Shaders)
+                    if(dataContext == (DataContext as SimpleStepModel).Shaders)
                         (DataContext as SimpleStepModel).InsertStepAction(sfStepActionsViewer.SelectedIndex);
                     else if (dataContext == (DataContext as SimpleStepModel).PostShaders)
                         (DataContext as SimpleStepModel).InsertPostStepAction(sfPostStepActionsViewer.SelectedIndex);
+                    else if (dataContext == (DataContext as SimpleStepModel).AbortShaders)
+                        (DataContext as SimpleStepModel).InsertAbortStepAction(sfAbortStepActionsViewer.SelectedIndex);
                 }
             }
             catch (Exception ex)
@@ -124,36 +129,20 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Controls
         {
             if (DataContext == null)
                 e.CanExecute = false;
-            else if (e.Parameter == (DataContext as SimpleStepModel).LocalEvents)
-                e.CanExecute = sfLocalEventsViewer.SelectedItems?.Count() == 1;
             else if (e.Parameter == (DataContext as SimpleStepModel).Shaders)
                 e.CanExecute = sfStepActionsViewer.SelectedItems?.Count() == 1;
             else if (e.Parameter == (DataContext as SimpleStepModel).PostShaders)
                 e.CanExecute = sfPostStepActionsViewer.SelectedItems?.Count() == 1;
+            else if (e.Parameter == (DataContext as SimpleStepModel).AbortShaders)
+                e.CanExecute = sfAbortStepActionsViewer.SelectedItems?.Count() == 1;
             else if (e.Parameter is GridRecordContextMenuInfo)
                 e.CanExecute = (e.Parameter as GridRecordContextMenuInfo).DataGrid.SelectedItems?.Count() == 1;
         }
 
-        private string __selected_itmes(object e)
+        private string __selected_items(object e)
         {
             string prompt = null;
-            if (e == (DataContext as SimpleStepModel).LocalEvents)
-            {
-                if (sfLocalEventsViewer.SelectedItems.Count() == 1)
-                    prompt = (sfLocalEventsViewer.SelectedItem as LocalEventModel).Summary;
-                else if (sfLocalEventsViewer.SelectedItems.Count() <= 5)
-                    prompt = String.Join("\n", sfLocalEventsViewer.SelectedItems.OrderBy(x => (DataContext as SimpleStepModel).LocalEvents.IndexOf(x)).Select(x => (x as LocalEventModel).Name));
-                else
-                {
-                    StringBuilder sb = new StringBuilder();
-                    foreach (var s in sfLocalEventsViewer.SelectedItems.OrderBy(x => (DataContext as SimpleStepModel).LocalEvents.IndexOf(x)).Take(3))
-                        sb.AppendLine((s as LocalEventModel).Name);
-                    sb.AppendLine("...");
-                    sb.AppendLine((sfLocalEventsViewer.SelectedItems.OrderBy(x => (DataContext as SimpleStepModel).LocalEvents.IndexOf(x)).Last() as LocalEventModel).Name);
-                    prompt = sb.ToString();
-                }
-            }
-            else if (e == (DataContext as SimpleStepModel).Shaders)
+            if (e == (DataContext as SimpleStepModel).Shaders)
             {
                 if (sfStepActionsViewer.SelectedItems.Count() == 1)
                     prompt = (sfStepActionsViewer.SelectedItem as ShaderModel).Summary;
@@ -185,6 +174,22 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Controls
                     prompt = sb.ToString();
                 }
             }
+            else if (e == (DataContext as SimpleStepModel).AbortShaders)
+            {
+                if (sfAbortStepActionsViewer.SelectedItems.Count() == 1)
+                    prompt = (sfAbortStepActionsViewer.SelectedItem as ShaderModel).Summary;
+                else if (sfAbortStepActionsViewer.SelectedItems.Count() <= 5)
+                    prompt = String.Join("\n", sfAbortStepActionsViewer.SelectedItems.OrderBy(x => (DataContext as SimpleStepModel).Shaders.IndexOf(x)).Select(x => (x as ShaderModel).Name));
+                else
+                {
+                    StringBuilder sb = new StringBuilder();
+                    foreach (var s in sfAbortStepActionsViewer.SelectedItems.OrderBy(x => (DataContext as SimpleStepModel).Shaders.IndexOf(x)).Take(3))
+                        sb.AppendLine((s as ShaderModel).Name);
+                    sb.AppendLine("...");
+                    sb.AppendLine((sfAbortStepActionsViewer.SelectedItems.OrderBy(x => (DataContext as SimpleStepModel).Shaders.IndexOf(x)).Last() as ShaderModel).Name);
+                    prompt = sb.ToString();
+                }
+            }
             else
                 prompt = string.Empty;
             return prompt;
@@ -195,21 +200,21 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Controls
             try
             {
                 object itemsource = e.Parameter is GridRecordContextMenuInfo ? (e.Parameter as GridRecordContextMenuInfo).DataGrid.ItemsSource : e.Parameter;
-                if (MessageBox.Show($"Are you sure you want to remove the following item(s):\n{__selected_itmes(itemsource)}", 
+                if (MessageBox.Show($"Are you sure you want to remove the following item(s):\n{__selected_items(itemsource)}", 
                     "Question", MessageBoxButton.YesNo, MessageBoxImage.Question)== MessageBoxResult.No)
                     return;
 
-                if (itemsource == (DataContext as SimpleStepModel).LocalEvents)
-                {
-                    (DataContext as SimpleStepModel).RemoveLocalEvents(sfLocalEventsViewer.SelectedItems.Cast<LocalEventModel>());
-                }
-                else if (itemsource == (DataContext as SimpleStepModel).Shaders)
+                if (itemsource == (DataContext as SimpleStepModel).Shaders)
                 {
                     (DataContext as SimpleStepModel).RemoveStepActions(sfStepActionsViewer.SelectedItems.Cast<ShaderModel>());
                 }
                 else if (itemsource == (DataContext as SimpleStepModel).PostShaders)
                 {
                     (DataContext as SimpleStepModel).RemovePostStepActions(sfPostStepActionsViewer.SelectedItems.Cast<ShaderModel>());
+                }
+                else if (itemsource == (DataContext as SimpleStepModel).AbortShaders)
+                {
+                    (DataContext as SimpleStepModel).RemoveAbortStepActions(sfAbortStepActionsViewer.SelectedItems.Cast<ShaderModel>());
                 }
             }
             catch (Exception ex)
@@ -223,12 +228,12 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Controls
         {
             if (DataContext == null)
                 e.CanExecute = false;
-            else if (e.Parameter == (DataContext as SimpleStepModel).LocalEvents)
-                e.CanExecute = sfLocalEventsViewer.SelectedItem != null;
             else if (e.Parameter == (DataContext as SimpleStepModel).Shaders)
                 e.CanExecute = sfStepActionsViewer.SelectedItem != null;
             else if (e.Parameter == (DataContext as SimpleStepModel).PostShaders)
                 e.CanExecute = sfPostStepActionsViewer.SelectedItem != null;
+            else if (e.Parameter == (DataContext as SimpleStepModel).AbortShaders)
+                e.CanExecute = sfAbortStepActionsViewer.SelectedItem != null;
             else if (e.Parameter is GridRecordContextMenuInfo)
                 e.CanExecute = (e.Parameter as GridRecordContextMenuInfo).DataGrid.SelectedItem != null;
         }
@@ -271,7 +276,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Controls
             SfDataGrid dataGrid = (e.Parameter as GridRecordContextMenuInfo).DataGrid;
             string header = dataGrid.CurrentColumn.HeaderText;
 
-            e.CanExecute = dataGrid.SelectedItems?.Count() == 1 && (header == "Value" || header == "Operand" || header == "Expression");
+            e.CanExecute = dataGrid.SelectedItems?.Count() == 1 && (header == "Operand" || header == "Expression");
         }
 
         private void PasteBeforeCommand_Executed(object sender, ExecutedRoutedEventArgs e)
@@ -290,11 +295,11 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Controls
                     if (components != null)
                         (DataContext as SimpleStepModel).InsertPostStepActions((e.Parameter as GridRecordContextMenuInfo).DataGrid.SelectedIndex, components);
                 }
-                else if ((e.Parameter as GridRecordContextMenuInfo).DataGrid.ItemsSource == (DataContext as SimpleStepModel).LocalEvents)
+                else if ((e.Parameter as GridRecordContextMenuInfo).DataGrid.ItemsSource == (DataContext as SimpleStepModel).AbortShaders)
                 {
                     var components = JsonNode.Parse(Clipboard.GetText()).AsArray();
                     if (components != null)
-                        (DataContext as SimpleStepModel).InsertLocalEvents((e.Parameter as GridRecordContextMenuInfo).DataGrid.SelectedIndex, components);
+                        (DataContext as SimpleStepModel).InsertAbortStepActions((e.Parameter as GridRecordContextMenuInfo).DataGrid.SelectedIndex, components);
                 }
             }
             catch (Exception ex)
@@ -368,45 +373,6 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Controls
             e.Handled = true;
         }
 
-        private void CopyLocalEvent(object sender, GridCopyPasteEventArgs e)
-        {
-            try
-            {
-                SfDataGrid dataGrid = e.OriginalSender as SfDataGrid;
-                IEnumerable<LocalEventModel> shaders = (e.OriginalSender as SfDataGrid).ItemsSource as IEnumerable<LocalEventModel>;
-                JsonArray o = new JsonArray();
-                foreach (var s in dataGrid.SelectedItems.OrderBy(x => shaders.IndexOf(x)).Cast<LocalEventModel>())
-                    o.Add(s.ToJson());
-                Clipboard.SetDataObject(o.ToJsonString());
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"An exception has occurred during operation:\n{ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-            e.Handled = true;
-        }
-
-        private void PasteLocalEventCommand_Executed(object sender, ExecutedRoutedEventArgs e)
-        {
-            try
-            {
-                var components = JsonNode.Parse(Clipboard.GetText()).AsArray();
-                if (components != null)
-                    (DataContext as SimpleStepModel).AddLocalEvents(components);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"An exception has occurred during operation:\n{ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-            e.Handled = true;
-        }
-
-        private void PasteLocalEventCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
-        {
-            var components = Component.COMPONENT_ARRAY_IN_CLIPBOARD();
-            if (components != null && components.Value.type == typeof(LocalEventModel))
-                e.CanExecute = true;
-        }
 
         private void PasteShaderCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
@@ -446,6 +412,28 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Controls
         }
 
         private void PastePostShaderCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            var components = Component.COMPONENT_ARRAY_IN_CLIPBOARD();
+            if (components != null && components.Value.type == typeof(ShaderModel))
+                e.CanExecute = true;
+        }
+
+        private void PasteAbortShaderCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            try
+            {
+                var components = JsonNode.Parse(Clipboard.GetText()).AsArray();
+                if (components != null)
+                    (DataContext as SimpleStepModel).AddAbortStepActions(components);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"An exception has occurred during operation:\n{ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            e.Handled = true;
+        }
+
+        private void PasteAbortShaderCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
             var components = Component.COMPONENT_ARRAY_IN_CLIPBOARD();
             if (components != null && components.Value.type == typeof(ShaderModel))

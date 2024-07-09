@@ -38,19 +38,25 @@
         </Grid.RowDefinitions>
         <sync:MenuAdv Grid.Row="0" PopUpAnimationType="Fade" Margin="0">
             <sync:MenuItemAdv  Header="_File" Margin="2">
-                <sync:MenuItemAdv Command="common:Command.New" Icon="{StaticResource IconNew}" Height="25" Width="200" >
+                <sync:MenuItemAdv Command="common:Command.New" Height="25" Width="200">
+                    <sync:MenuItemAdv.Icon>
+                        <Path Data="{StaticResource IconNew}" Fill="White" Stretch="Uniform"/>
+                    </sync:MenuItemAdv.Icon>
                 </sync:MenuItemAdv>
-                <sync:MenuItemAdv Command="common:Command.Open" Icon="{StaticResource IconOpen}" Height="25" Width="200">
+                <sync:MenuItemAdv Command="common:Command.Open" Height="25" Width="200">
+                    <sync:MenuItemAdv.Icon>
+                        <Path Data="{StaticResource IconOpen}" Fill="White" Stretch="Uniform"/>
+                    </sync:MenuItemAdv.Icon>
                 </sync:MenuItemAdv>
                 <sync:MenuItemSeparator/>
-                <sync:MenuItemAdv Header="_Recent" ItemsSource="{Binding RecentlyOpenedFiles}" sync:MenuItemAdv.Click="RecentlyOpened_Click" x:Name="RecentlyOpenedMenu" Icon="{StaticResource IconRecentlyOpen}" Height="25" Width="200">
+                <sync:MenuItemAdv Header="_Recent" ItemsSource="{Binding RecentlyOpenedFiles}" sync:MenuItemAdv.Click="RecentlyOpened_Click" x:Name="RecentlyOpenedMenu" Height="25" Width="200">
+                    <sync:MenuItemAdv.Icon>
+                        <Path Data="{StaticResource IconRecentlyOpen}" Fill="White" Stretch="Uniform"/>
+                    </sync:MenuItemAdv.Icon>
                     <sync:MenuItemAdv.ItemTemplate>
                         <DataTemplate>
                             <StackPanel Orientation="Horizontal">
-                                <Path Fill="White" Stretch="Uniform" Margin="0,0,4,0"  Height="25" Width="25">
-                                    <Path.Data>
-                                        M213.333333 128h85.333334v85.333333H213.333333v213.333334a85.333333 85.333333 0 0 1-85.333333 85.333333 85.333333 85.333333 0 0 1 85.333333 85.333333v213.333334h85.333334v85.333333H213.333333c-45.653333-11.52-85.333333-38.4-85.333333-85.333333v-170.666667a85.333333 85.333333 0 0 0-85.333333-85.333333H0v-85.333334h42.666667a85.333333 85.333333 0 0 0 85.333333-85.333333V213.333333a85.333333 85.333333 0 0 1 85.333333-85.333333m597.333334 0a85.333333 85.333333 0 0 1 85.333333 85.333333v170.666667a85.333333 85.333333 0 0 0 85.333333 85.333333h42.666667v85.333334h-42.666667a85.333333 85.333333 0 0 0-85.333333 85.333333v170.666667a85.333333 85.333333 0 0 1-85.333333 85.333333h-85.333334v-85.333333h85.333334v-213.333334a85.333333 85.333333 0 0 1 85.333333-85.333333 85.333333 85.333333 0 0 1-85.333333-85.333333V213.333333h-85.333334V128h85.333334m-298.666667 512a42.666667 42.666667 0 0 1 42.666667 42.666667 42.666667 42.666667 0 0 1-42.666667 42.666666 42.666667 42.666667 0 0 1-42.666667-42.666666 42.666667 42.666667 0 0 1 42.666667-42.666667m-170.666667 0a42.666667 42.666667 0 0 1 42.666667 42.666667 42.666667 42.666667 0 0 1-42.666667 42.666666 42.666667 42.666667 0 0 1-42.666666-42.666666 42.666667 42.666667 0 0 1 42.666666-42.666667m341.333334 0a42.666667 42.666667 0 0 1 42.666666 42.666667 42.666667 42.666667 0 0 1-42.666666 42.666666 42.666667 42.666667 0 0 1-42.666667-42.666666 42.666667 42.666667 0 0 1 42.666667-42.666667z
-                                    </Path.Data>
+                                <Path Fill="White" Stretch="Uniform" Margin="0,0,4,0"  Height="25" Width="25" Data="{StaticResource IconJsonFile}">
                                 </Path>
                                 <TextBlock Text="{Binding}" VerticalAlignment="Center" FontStyle="Italic"/>
                             </StackPanel>
@@ -58,19 +64,34 @@
                     </sync:MenuItemAdv.ItemTemplate>
                 </sync:MenuItemAdv>
                 <sync:MenuItemSeparator/>
-                <sync:MenuItemAdv Icon="{StaticResource IconClose}" Height="25" Width="200">
+                <sync:MenuItemAdv Height="25" Width="200">
+                    <sync:MenuItemAdv.Icon>
+                        <Path Data="{StaticResource IconClose}" Fill="White" Stretch="Uniform"/>
+                    </sync:MenuItemAdv.Icon>
                 </sync:MenuItemAdv>
                 <sync:MenuItemSeparator/>
-                <sync:MenuItemAdv Command="common:Command.Save" Icon="{StaticResource IconSave}" Height="25" Width="200">
+                <sync:MenuItemAdv Command="common:Command.Save" Height="25" Width="200">
+                    <sync:MenuItemAdv.Icon>
+                        <Path Data="{StaticResource IconSave}" Fill="White" Stretch="Uniform"/>
+                    </sync:MenuItemAdv.Icon>
                 </sync:MenuItemAdv>
-                <sync:MenuItemAdv Command="common:Command.SaveAs" Icon="{StaticResource IconSaveAs}" Height="25" Width="200">
+                <sync:MenuItemAdv Command="common:Command.SaveAs" Height="25" Width="200">
+                    <sync:MenuItemAdv.Icon>
+                        <Path Data="{StaticResource IconSaveAs}" Fill="White" Stretch="Uniform"/>
+                    </sync:MenuItemAdv.Icon>
                 </sync:MenuItemAdv>
                 <sync:MenuItemSeparator/>
-                <sync:MenuItemAdv Icon="{StaticResource IconQuit}" Height="25" Width="200">
+                <sync:MenuItemAdv Height="25" Width="200">
+                    <sync:MenuItemAdv.Icon>
+                        <Path Data="{StaticResource IconQuit}" Fill="White" Stretch="Uniform"/>
+                    </sync:MenuItemAdv.Icon>
                 </sync:MenuItemAdv>
             </sync:MenuItemAdv>
             <sync:MenuItemAdv  Header="_Build" Margin="2">
-                <sync:MenuItemAdv  Command="common:Command.Build" Header="Build Script" Icon="{StaticResource IconBuild}" Height="25" Width="200">
+                <sync:MenuItemAdv  Command="common:Command.Build" Header="Build Script" Height="25" Width="200">
+                    <sync:MenuItemAdv.Icon>
+                        <Path Data="{StaticResource IconBuild}" Fill="White" Stretch="Uniform"/>
+                    </sync:MenuItemAdv.Icon>
                 </sync:MenuItemAdv>
             </sync:MenuItemAdv>
             <sync:MenuItemAdv  Header="_Utility" Margin="2">
@@ -78,7 +99,10 @@
                 </sync:MenuItemAdv>
             </sync:MenuItemAdv>
             <sync:MenuItemAdv  Header="_Help" Margin="2">
-                <sync:MenuItemAdv Command="common:Command.About" Icon="{StaticResource IconAbout}" Height="25" Width="200">
+                <sync:MenuItemAdv Command="common:Command.About" Height="25" Width="200">
+                    <sync:MenuItemAdv.Icon>
+                        <Path Data="{StaticResource IconAbout}" Fill="White" Stretch="Uniform"/>
+                    </sync:MenuItemAdv.Icon>
                 </sync:MenuItemAdv>
             </sync:MenuItemAdv>
         </sync:MenuAdv>
@@ -118,8 +142,14 @@
                     </TabItem.LayoutTransform>
                     <TabItem.Header>
                         <StackPanel Orientation="Horizontal">
-                            <ContentControl Content="{StaticResource IconContext}" Width="25" Height="25" Margin="2"/>
-                            <TextBlock Text="Context" VerticalAlignment="Center" Margin="6,0,0,0"/>
+                            <ContentControl Width="25" Height="25" Margin="2">
+                                <Path Data="{StaticResource IconContext}" Fill="White" Stretch="Uniform">
+                                    <Path.LayoutTransform>
+                                        <RotateTransform Angle="-90"/>
+                                    </Path.LayoutTransform>
+                                </Path>
+                            </ContentControl>
+                            <TextBlock Text="Context" VerticalAlignment="Center" Margin="6,0,0,0" Foreground="{Binding ContextManager.IsDirty, Converter={StaticResource BooleanValueBrush}}"/>
                         </StackPanel>
                     </TabItem.Header>
                 </TabItem>
@@ -131,12 +161,18 @@
                     </TabItem.LayoutTransform>
                     <TabItem.Header>
                         <StackPanel Orientation="Horizontal">
-                            <ContentControl Content="{StaticResource IconGlobalEvents}" Width="25" Height="25" Margin="2"/>
+                            <ContentControl Width="25" Height="25" Margin="2">
+                                <Path Data="{StaticResource IconGlobalEvents}" Fill="White" Stretch="Uniform">
+                                    <Path.LayoutTransform>
+                                        <RotateTransform Angle="-90"/>
+                                    </Path.LayoutTransform>
+                                </Path>
+                            </ContentControl>
                             <TextBlock Text="Global Events" VerticalAlignment="Center" Margin="6,0,0,0" Foreground="{Binding GlobalEventManager.IsDirty, Converter={StaticResource BooleanValueBrush}}"/>
                         </StackPanel>
                     </TabItem.Header>
                 </TabItem>
-                <TabItem Width="150" Name="ControlBlockManager" Padding="2" Tag="ControlBlockManager">
+                <TabItem Width="150" Name="RegularControlBlockManager" Padding="2" Tag="RegularControlBlockManager">
                     <TabItem.LayoutTransform>
                         <TransformGroup>
                             <RotateTransform Angle="90"/>
@@ -144,8 +180,33 @@
                     </TabItem.LayoutTransform>
                     <TabItem.Header>
                         <StackPanel Orientation="Horizontal">
-                            <ContentControl Content="{StaticResource IconControlBlocks}" Width="25" Height="25" Margin="2"/>
-                            <TextBlock Text="Control Blocks" VerticalAlignment="Center" Margin="6,0,0,0" Foreground="{Binding ControlBlockManager.IsDirty, Converter={StaticResource BooleanValueBrush}}"/>
+                            <ContentControl Width="25" Height="25" Margin="2">
+                                <Path Data="{StaticResource IconRegularControlBlocks}" Fill="White" Stretch="Uniform">
+                                    <Path.LayoutTransform>
+                                        <RotateTransform Angle="-90"/>
+                                    </Path.LayoutTransform>
+                                </Path>
+                            </ContentControl>
+                            <TextBlock Text="Regular Control" VerticalAlignment="Center" Margin="6,0,0,0" Foreground="{Binding RegularControlBlockManager.IsDirty, Converter={StaticResource BooleanValueBrush}}"/>
+                        </StackPanel>
+                    </TabItem.Header>
+                </TabItem>
+                <TabItem Width="150" Name="ExceptionControlBlockManager" Padding="2" Tag="ExceptionControlBlockManager">
+                    <TabItem.LayoutTransform>
+                        <TransformGroup>
+                            <RotateTransform Angle="90"/>
+                        </TransformGroup>
+                    </TabItem.LayoutTransform>
+                    <TabItem.Header>
+                        <StackPanel Orientation="Horizontal">
+                            <ContentControl Width="25" Height="25" Margin="2">
+                                <Path Data="{StaticResource IconExceptionControlBlocks}" Fill="White" Stretch="Uniform">
+                                    <Path.LayoutTransform>
+                                        <RotateTransform Angle="-90"/>
+                                    </Path.LayoutTransform>
+                                </Path>
+                            </ContentControl>
+                            <TextBlock Text="Exception Handling" VerticalAlignment="Center" Margin="6,0,0,0" Foreground="{Binding ExceptionControlBlockManager.IsDirty, Converter={StaticResource BooleanValueBrush}}"/>
                         </StackPanel>
                     </TabItem.Header>
                 </TabItem>

@@ -7,7 +7,6 @@ using System.Text;
 using System.Text.Json.Nodes;
 using System.Threading;
 using System.Threading.Tasks;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.EventMechansim
 {
@@ -46,7 +45,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ev
                     ("FEEDBACK", FEEDBACK.ToString()),
                     ("POSITIVE_TOLERANCE", POSITIVE_TOLERANCE.HasValue?POSITIVE_TOLERANCE.Value.ToString():string.Empty),
                     ("NEGATIVE_TOLERANCE", NEGATIVE_TOLERANCE.HasValue?NEGATIVE_TOLERANCE.Value.ToString():string.Empty),
-                    ("INITIAL_VALUE", (INITIAL_VALUE.HasValue&&INITIAL_VALUE == true)?1.0.ToString():string.Empty),
+                    ("INITIAL_VALUE", Event.BooleanParameterValue(INITIAL_VALUE)),
                     ("ON_DELAY", ON_DELAY!=null?ON_DELAY._TIMEOUT_STRING:string.Empty),
                     ("OFF_DELAY", OFF_DELAY!=null?OFF_DELAY._TIMEOUT_STRING:string.Empty),
                 };

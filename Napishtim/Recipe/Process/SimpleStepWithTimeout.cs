@@ -12,10 +12,10 @@ using System.Text.Json.Nodes;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Numerics;
-using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.ControlBlock.Process;
 using System.ComponentModel;
+using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.ControlBlock;
 
-namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.ControlBlock
+namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Process
 {
     public class SimpleStepWithTimeout_S : ProcessStepSource
     {
@@ -23,23 +23,24 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
         //public Expression? TimeToTimeout { get; set; }
 
         private int __timeout;
-        public int Timeout 
+        public int Timeout
         {
             get { return __timeout; }
             set
             {
                 if (value < 0)
-                    throw new NaposhtimDocumentException(NaposhtimExceptionCode.CONTROL_BLOCK_ARGUMENTS_ERROR, $"The timeout period({value}) must be a positive integer.");
+                    throw new NaposhtimDocumentException(NaposhtimExceptionCode.PROCESS_COMPONENT_ARGUMENTS_ERROR, $"The timeout period({value}) must be a positive integer.");
                 __timeout = value;
-            } 
+            }
         }
 
-        public override IEnumerable<ProcessShader> Shaders { 
-            get 
-            { 
-                if(_step.TryGetPropertyValue("SHADERS", out var shaders))
+        public override IEnumerable<ProcessShader> Shaders
+        {
+            get
+            {
+                if (_step.TryGetPropertyValue("SHADERS", out var shaders))
                 {
-                    return _step["SHADERS"].AsArray().Select(x => new ProcessShader(ProcessStepSource.DEFAULT_NAME(x["NAME"]), new Shader(x["OBJECT"].GetValue<string>(), x["VALUE"].GetValue<string>())));
+                    return _step["SHADERS"].AsArray().Select(x => new ProcessShader(DEFAULT_NAME(x["NAME"]), new Shader(x["OBJECT"].GetValue<string>(), x["VALUE"].GetValue<string>())));
                 }
                 else
                     return Enumerable.Empty<ProcessShader>();
@@ -52,7 +53,20 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
             {
                 if (_step["END_POINTS"][1].AsObject().TryGetPropertyValue("POST_SHADERS", out var shaders))
                 {
-                    return shaders.AsArray().Select(x => new ProcessShader(ProcessStepSource.DEFAULT_NAME(x["NAME"]), new Shader(x["OBJECT"].GetValue<string>(), x["VALUE"].GetValue<string>())));
+                    return shaders.AsArray().Select(x => new ProcessShader(DEFAULT_NAME(x["NAME"]), new Shader(x["OBJECT"].GetValue<string>(), x["VALUE"].GetValue<string>())));
+                }
+                else
+                    return Enumerable.Empty<ProcessShader>();
+            }
+        }
+
+        public override IEnumerable<ProcessShader> AbortShaders
+        {
+            get
+            {
+                if (_step["END_POINTS"].AsArray().Count == 3 && _step["END_POINTS"][2].AsObject().TryGetPropertyValue("POST_SHADERS", out var shaders))
+                {
+                    return shaders.AsArray().Select(x => new ProcessShader(DEFAULT_NAME(x["NAME"]), new Shader(x["OBJECT"].GetValue<string>(), x["VALUE"].GetValue<string>())));
                 }
                 else
                     return Enumerable.Empty<ProcessShader>();
@@ -65,7 +79,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
             {
                 if (_step.TryGetPropertyValue("EVENTS", out var locals))
                 {
-                    return locals.AsArray().Select(x => KeyValuePair.Create(x["ID"].GetValue<uint>(), (ProcessStepSource.DEFAULT_NAME(x["NAME"]), Event.MAKE(x["EVENT"]))));
+                    return locals.AsArray().Select(x => KeyValuePair.Create(x["ID"].GetValue<uint>(), (DEFAULT_NAME(x["NAME"]), Event.MAKE(x["EVENT"]))));
                 }
                 else
                     return Enumerable.Empty<KeyValuePair<uint, (string name, Event evt)>>();
@@ -81,7 +95,18 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
             }
         }
 
-        public SimpleStepWithTimeout_S(string name, IReadOnlyDictionary<uint, (string name, Event evt)>? locals, ProcessShaders? shaders, int timeout, JsonArray completionCondition, ProcessShaders? postShaders = null): base(name)
+        public string AbortCondition
+        {
+            get
+            {
+                if (_step["END_POINTS"].AsArray().Count == 3)
+                    return string.Join('\n', _step["END_POINTS"][2]["TRIGGER"].AsArray().Select(x => x.GetValue<string>()));
+                else
+                    return string.Empty;
+            }
+        }
+
+        public SimpleStepWithTimeout_S(string name, IReadOnlyDictionary<uint, (string name, Event evt)>? locals, ProcessShaders? shaders, int timeout, JsonArray completionCondition, ProcessShaders? postShaders = null, JsonArray? abortCondition = null, ProcessShaders? abortShaders = null) : base(name)
         {
             Timeout = timeout;
             if (locals != null && locals.Count > 0)
@@ -110,16 +135,28 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
 
             _step["END_POINTS"] = new JsonArray() { timeoutBranch, defaultBranch };
 
+            if (abortCondition != null && abortCondition.Count > 0)
+            {
+                JsonObject abortBranch = new JsonObject();
+                abortBranch["TRIGGER"] = abortCondition.DeepClone();
+                if (abortShaders != null)
+                    abortBranch["POST_SHADERS"] = abortShaders.ToJson();
+                _step["END_POINTS"].AsArray().Add(abortBranch);
+            }
+
             StepFootprint = 1;
             UserVariableFootprint = 1;
             AddGlobalEventRefernce(completionCondition);
+            AddGlobalEventRefernce(abortCondition);
             if (shaders != null)
                 AddShaderUserVariablesUsage(shaders.Shaders.SelectMany(x => x.Shader.UserVariablesUsage));
             if (postShaders != null)
                 AddShaderUserVariablesUsage(postShaders.Shaders.SelectMany(x => x.Shader.UserVariablesUsage));
+            if (abortShaders != null)
+                AddShaderUserVariablesUsage(abortShaders.Shaders.SelectMany(x => x.Shader.UserVariablesUsage));
         }
 
-        public SimpleStepWithTimeout_S(string name, IReadOnlyDictionary<uint, (string name, Event evt)>? locals, ProcessShaders? shaders, SimpleStepWithTimeout_S timeout, JsonArray completionCondition, ProcessShaders? postShaders = null) : base(name)
+        public SimpleStepWithTimeout_S(string name, IReadOnlyDictionary<uint, (string name, Event evt)>? locals, ProcessShaders? shaders, SimpleStepWithTimeout_S timeout, JsonArray completionCondition, ProcessShaders? postShaders = null, JsonArray? abortCondition = null, ProcessShaders? abortShaders = null) : base(name)
         {
             EmployPreceding = timeout;
             if (locals != null && locals.Count > 0)
@@ -145,16 +182,28 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
             defaultBranch["TRIGGER"] = completionCondition.DeepClone();
             if (postShaders != null)
                 defaultBranch["POST_SHADERS"] = postShaders.ToJson();
-            
+
             _step["END_POINTS"] = new JsonArray() { timeoutBranch, defaultBranch };
+
+            if (abortCondition != null && abortCondition.Count > 0)
+            {
+                JsonObject abortBranch = new JsonObject();
+                abortBranch["TRIGGER"] = abortCondition.DeepClone();
+                if (abortShaders != null)
+                    abortBranch["POST_SHADERS"] = abortShaders.ToJson();
+                _step["END_POINTS"].AsArray().Add(abortBranch);
+            }
 
             StepFootprint = 1;
             UserVariableFootprint = 1;
             AddGlobalEventRefernce(completionCondition);
+            AddGlobalEventRefernce(abortCondition);
             if (shaders != null)
                 AddShaderUserVariablesUsage(shaders.Shaders.SelectMany(x => x.Shader.UserVariablesUsage));
             if (postShaders != null)
                 AddShaderUserVariablesUsage(postShaders.Shaders.SelectMany(x => x.Shader.UserVariablesUsage));
+            if (abortShaders != null)
+                AddShaderUserVariablesUsage(abortShaders.Shaders.SelectMany(x => x.Shader.UserVariablesUsage));
         }
 
         private SimpleStepWithTimeout_S(JsonObject node, Sequential_S container) : base(node["NAME"].GetValue<string>())
@@ -165,6 +214,14 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
                 AddShaderUserVariablesUsage(_step["SHADERS"].AsArray());
             if (_step["END_POINTS"][1].AsObject().ContainsKey("POST_SHADERS"))
                 AddShaderUserVariablesUsage(_step["END_POINTS"][1]["POST_SHADERS"].AsArray());
+
+            if (_step["END_POINTS"].AsArray().Count == 3)
+            {
+                AddGlobalEventRefernce(_step["END_POINTS"][2]["TRIGGER"].AsArray());
+                if (_step["END_POINTS"][2].AsObject().ContainsKey("POST_SHADERS"))
+                    AddShaderUserVariablesUsage(_step["END_POINTS"][2]["POST_SHADERS"].AsArray());
+            }
+
             StepFootprint = 1;
             UserVariableFootprint = 1;
             if (node.TryGetPropertyValue("TIMEOUT", out var timeout))
@@ -174,25 +231,45 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
                 int index = preceding.GetValue<int>();
                 ProcessStepSource? step = container.ProcessStepAt(index);
                 if (step == null || !(step is SimpleStepWithTimeout_S))
-                    throw new NaposhtimDocumentException(NaposhtimExceptionCode.CONTROL_BLOCK_ARGUMENTS_ERROR, "Can not find the referenced SimpleStepWithTimeout_S in the 'Sequential' Control Block.");
+                    throw new NaposhtimDocumentException(NaposhtimExceptionCode.PROCESS_COMPONENT_ARGUMENTS_ERROR, "Can not find the referenced SimpleStepWithTimeout_S in the 'Sequential' Control Block.");
                 EmployPreceding = step as SimpleStepWithTimeout_S;
             }
             else
-                throw new NaposhtimDocumentException(NaposhtimExceptionCode.CONTROL_BLOCK_ARGUMENTS_ERROR, $"Can not restore SimpleStepWithTimeout_S object from node:\n{node.ToString()}");
+                throw new NaposhtimDocumentException(NaposhtimExceptionCode.PROCESS_COMPONENT_ARGUMENTS_ERROR, $"Can not restore SimpleStepWithTimeout_S object from node:\n{node.ToString()}");
         }
 
-        public override ProcessStepObject ResolveTarget(uint next, Context context, IReadOnlyDictionary<uint, Event> globals, ReadOnlyMemory<uint> stepLinkMapping, ReadOnlyMemory<uint> userVariableMapping, Sequential_S container, Dictionary<uint, string> stepNameMapping)
+        public override ProcessStepObject ResolveTarget(uint next, uint abort, Context context, IReadOnlyDictionary<uint, Event> globals, ReadOnlyMemory<uint> stepLinkMapping, ReadOnlyMemory<uint> userVariableMapping, Sequential_S container, Dictionary<uint, string> stepNameMapping)
         {
             JsonObject chewed;
             chewed = _step.DeepClone().AsObject();
 
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            List<ProcessShader> abortShaderObjectDirectAssignments = AbortShaderObjectDirectAssignments.ToList();
             List<ProcessShader> postShaderObjectDirectAssignments = PostShaderObjectDirectAssignments.ToList();
             List<ProcessShader> shaderObjectDirectAssignments = ShaderObjectDirectAssignments.ToList();
             int pos = container.IndexOf(this);
 
+            var abortShaderSearchRange = container.OriginalProcessSteps.Take(pos).SelectMany(x => x.ShaderObjectDirectAssignments.Concat(x.PostShaderObjectDirectAssignments)).Concat(ShaderObjectDirectAssignments).Reverse();
             var postShaderSearchRange = container.OriginalProcessSteps.Take(pos).SelectMany(x => x.ShaderObjectDirectAssignments.Concat(x.PostShaderObjectDirectAssignments)).Concat(ShaderObjectDirectAssignments).Reverse();
             var shaderSearchRange = container.OriginalProcessSteps.Take(pos).SelectMany(x => x.ShaderObjectDirectAssignments.Concat(x.PostShaderObjectDirectAssignments)).Reverse();
+
+            if (abortShaderObjectDirectAssignments.Count() != 0)
+            {
+                var tempShaders = AbortShaderObjectDirectAssignments.ToList();
+                foreach (var assign in abortShaderObjectDirectAssignments)
+                {
+                    if (assign.Shader.Expr.IsImmediateOperand && assign.Shader.Operand is ObjectReference)
+                    {
+                        var ret = abortShaderSearchRange.FirstOrDefault(x => x.Shader.Operand.Equals(assign.Shader.Operand));
+                        if (ret != null && ret.Shader.Expr.Equals(assign.Shader.Expr))
+                            tempShaders.Remove(assign);
+                    }
+                }
+                if (tempShaders.Count() != 0)
+                    chewed["END_POINTS"][2]["POST_SHADERS"] = new JsonArray(tempShaders.Select(x => x.ToJson()).ToArray());
+                else
+                    chewed["END_POINTS"][2].AsObject().Remove("POST_SHADERS");
+            }
 
             if (postShaderObjectDirectAssignments.Count() != 0)
             {
@@ -201,7 +278,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
                 {
                     if (assign.Shader.Expr.IsImmediateOperand && assign.Shader.Operand is ObjectReference)
                     {
-                        var ret = postShaderSearchRange.FirstOrDefault(x => (x.Shader.Operand).Equals(assign.Shader.Operand));
+                        var ret = postShaderSearchRange.FirstOrDefault(x => x.Shader.Operand.Equals(assign.Shader.Operand));
                         if (ret != null && ret.Shader.Expr.Equals(assign.Shader.Expr))
                             tempShaders.Remove(assign);
                     }
@@ -211,8 +288,6 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
                 else
                     chewed["END_POINTS"][1].AsObject().Remove("POST_SHADERS");
             }
-            else
-                chewed["END_POINTS"][1].AsObject().Remove("POST_SHADERS");
 
             if (shaderObjectDirectAssignments.Count() != 0)
             {
@@ -221,7 +296,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
                 {
                     if (assign.Shader.Expr.IsImmediateOperand && assign.Shader.Operand is ObjectReference)
                     {
-                        var ret = shaderSearchRange.FirstOrDefault(x => (x.Shader.Operand).Equals(assign.Shader.Operand));
+                        var ret = shaderSearchRange.FirstOrDefault(x => x.Shader.Operand.Equals(assign.Shader.Operand));
                         if (ret != null && ret.Shader.Expr.Equals(assign.Shader.Expr))
                             tempShaders.Remove(assign);
                     }
@@ -231,8 +306,6 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
                 else
                     chewed.Remove("SHADERS");
             }
-            else
-                chewed.Remove("SHADERS");
 
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -242,7 +315,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
             JsonObject postShader = new JsonObject();
             postShader["OBJECT"] = $"&USER{userVariableMapping.Span[0]}";
             //postShader["VALUE"] = $"{Timeout}-&STDURA";
-            if(container.TimeToTimeout.ContainsKey(this) == false)
+            if (container.TimeToTimeout.ContainsKey(this) == false)
                 container.TimeToTimeout[this] = new Expression(postShader["OBJECT"].GetValue<string>(), null);
             if (chewed["END_POINTS"][1].AsObject().TryGetPropertyValue("POST_SHADERS", out _))
                 chewed["END_POINTS"][1]["POST_SHADERS"].AsArray().Add(postShader);
@@ -255,6 +328,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
             chewed["ID"] = stepLinkMapping.Span[0];
             chewed["END_POINTS"][0]["TARGET"] = next;
             chewed["END_POINTS"][1]["TARGET"] = next;
+            if (chewed["END_POINTS"].AsArray().Count == 3)
+                chewed["END_POINTS"][2]["TARGET"] = abort;
             stepNameMapping[stepLinkMapping.Span[0]] = Name;
 
             return new SimpleStepWithTimeout_O(Name, chewed, StepFootprint, UserVariableFootprint, EmployPreceding, Timeout);
@@ -263,13 +338,13 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
         public override JsonObject SaveAsJson(Sequential_S container)
         {
             JsonObject node = new JsonObject();
-            node["ASSEMBLY"] = this.GetType().FullName;
+            node["ASSEMBLY"] = GetType().FullName;
             node["NAME"] = Name;
             node["STEP"] = _step.DeepClone();
             //node["GLOBAL_REF"] = new JsonArray();
             //foreach (var r in GlobalEventReference)
-                //node["GLOBAL_REF"].AsArray().Add(r);
-            if(EmployPreceding == null)
+            //node["GLOBAL_REF"].AsArray().Add(r);
+            if (EmployPreceding == null)
                 node["TIMEOUT"] = Timeout;
             else
                 node["TIMEOUT_REF"] = container.IndexOf(EmployPreceding);
@@ -281,13 +356,13 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
             try
             {
                 if (node["ASSEMBLY"].GetValue<string>() != typeof(SimpleStepWithTimeout_S).FullName)
-                    throw new NaposhtimDocumentException(NaposhtimExceptionCode.CONTROL_BLOCK_ARGUMENTS_ERROR, $"Assmebly name mismatch: {node["ASSEMBLY"].GetValue<string>()} vs {typeof(SimpleStepWithTimeout_S).FullName}.");
+                    throw new NaposhtimDocumentException(NaposhtimExceptionCode.PROCESS_COMPONENT_ARGUMENTS_ERROR, $"Assmebly name mismatch: {node["ASSEMBLY"].GetValue<string>()} vs {typeof(SimpleStepWithTimeout_S).FullName}.");
 
                 return new SimpleStepWithTimeout_S(node, container);
             }
             catch (Exception ex)
             {
-                throw new NaposhtimDocumentException(NaposhtimExceptionCode.CONTROL_BLOCK_ARGUMENTS_ERROR, $"Can not restore SimpleStepWithTimeout_S object from node:\n{node.ToString()}", ex);
+                throw new NaposhtimDocumentException(NaposhtimExceptionCode.PROCESS_COMPONENT_ARGUMENTS_ERROR, $"Can not restore SimpleStepWithTimeout_S object from node:\n{node.ToString()}", ex);
             }
         }
 
@@ -317,13 +392,13 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
             {
                 sb.Append("\nLocal Events:");
                 foreach (var evt in localEvents.AsArray())
-                    sb.Append($"\n\t{evt["ID"].GetValue<uint>():D10} {ProcessStepSource.DEFAULT_NAME(evt["NAME"])}: {evt["EVENT"].ToJsonString()}");
+                    sb.Append($"\n\t{evt["ID"].GetValue<uint>():D10} {DEFAULT_NAME(evt["NAME"])}: {evt["EVENT"].ToJsonString()}");
             }
             if (_step.TryGetPropertyValue("SHADERS", out var shaders))
             {
                 sb.Append("\nActions:");
                 foreach (var s in shaders.AsArray())
-                    sb.Append($"\n\t{ProcessStepSource.DEFAULT_NAME(s["NAME"])}: {s["OBJECT"].GetValue<string>()} := {s["VALUE"].GetValue<string>()}");
+                    sb.Append($"\n\t{DEFAULT_NAME(s["NAME"])}: {s["OBJECT"].GetValue<string>()} := {s["VALUE"].GetValue<string>()}");
             }
             sb.Append("\nTermination conditions:");
 
@@ -340,7 +415,23 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
             {
                 sb.Append($"\n\t\tThen:");
                 foreach (var s in post.AsArray())
-                    sb.Append($"\n\t\t\t{ProcessStepSource.DEFAULT_NAME(s["NAME"])}: {s["OBJECT"].GetValue<string>()} := {s["VALUE"].GetValue<string>()}");
+                    sb.Append($"\n\t\t\t{DEFAULT_NAME(s["NAME"])}: {s["OBJECT"].GetValue<string>()} := {s["VALUE"].GetValue<string>()}");
+            }
+
+            if (_step["END_POINTS"].AsArray().Count == 3)
+            {
+                sb.Append("\nAbort conditions:");
+                JsonObject abortBranch = _step["END_POINTS"][2].AsObject();
+                sb.Append($"\n\tPriority 0:\n\t\tIf:");
+
+                foreach (var line in abortBranch["TRIGGER"].AsArray())
+                    sb.Append($"\n\t\t\t{line.GetValue<string>()}");
+                if (abortBranch.TryGetPropertyValue("POST_SHADERS", out var abort))
+                {
+                    sb.Append($"\n\t\tThen:");
+                    foreach (var s in abort.AsArray())
+                        sb.Append($"\n\t\t\t{DEFAULT_NAME(s["NAME"])}: {s["OBJECT"].GetValue<string>()} := {s["VALUE"].GetValue<string>()}");
+                }
             }
 
             return sb.ToString();
@@ -348,7 +439,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
 
         public override string ToString()
         {
-            return ToString( null );
+            return ToString(null);
         }
     }
 
@@ -367,11 +458,11 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
 
         public override Step Build(Context context, IReadOnlyDictionary<uint, Event> globals, Sequential_O container)
         {
-            JsonObject chewed = _step.DeepClone().AsObject(); 
+            JsonObject chewed = _step.DeepClone().AsObject();
             if (EmployPreceding != null)
             {
                 if (container.TimeToTimeout.ContainsKey(EmployPreceding) == false)
-                    throw new NaposhtimDocumentException(NaposhtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, "Can not get the remaining time EXPRESSION of the specific 'SimpleStepWithTimeout'.");
+                    throw new NaposhtimDocumentException(NaposhtimExceptionCode.PROCESS_COMPONENT_INVALID_OPERATION, "Can not get the remaining time EXPRESSION of the specific 'SimpleStepWithTimeout'.");
                 else
                 {
                     var node = new TIM("TIM", ("TIMEOUT", container.TimeToTimeout[EmployPreceding]));
@@ -381,7 +472,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
             }
             else
             {
-                chewed["END_POINTS"][0]["TRIGGER"] = new JsonArray() { (new TIM(Timeout)).ToJson().ToJsonString() };
+                chewed["END_POINTS"][0]["TRIGGER"] = new JsonArray() { new TIM(Timeout).ToJson().ToJsonString() };
                 chewed["END_POINTS"][1]["POST_SHADERS"].AsArray()[^1]["VALUE"] = $"{Timeout}-&STDURA";
             }
 
@@ -393,7 +484,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
             }
             catch (NaposhtimException e)
             {
-                throw new NaposhtimDocumentException(NaposhtimExceptionCode.DOCUMENT_STEP_BUILD_ERROR, 
+                throw new NaposhtimDocumentException(NaposhtimExceptionCode.DOCUMENT_STEP_BUILD_ERROR,
                     $"Can not build SimpleStepWithTimeout with the following JSON node:\n{chewed.ToString()}", e);
             }
         }

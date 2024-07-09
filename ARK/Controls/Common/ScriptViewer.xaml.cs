@@ -1,4 +1,5 @@
 ﻿using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.EventMechansim;
+using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.ExceptionMechansim;
 using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe;
 using System;
 using System.Collections.Generic;
@@ -23,6 +24,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Controls.Common
     {
         List<(uint idx, string name, Event evt)> __globals;
         List<(string name, Prometheus.Napishtim.Engine.StepMechansim.Step stp)> __steps;
+        ExceptionResponse? __exception_response;
 
         public ScriptViewer(ILinkProperty network)
         {
@@ -39,7 +41,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Controls.Common
             listGlobalEvents.ItemsSource = __globals.Select(x => $"{x.idx}: {x.name}");
         }
 
-        public ScriptViewer(ILinkProperty network, IEnumerable<(uint, string, Event)> globalEvents, IEnumerable<(string, Prometheus.Napishtim.Engine.StepMechansim.Step)> steps)
+        public ScriptViewer(ILinkProperty network, IEnumerable<(uint, string, Event)> globalEvents, IEnumerable<(string, Prometheus.Napishtim.Engine.StepMechansim.Step)> steps, ExceptionResponse? exception)
         {
             InitializeComponent();
 
@@ -52,6 +54,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Controls.Common
             __globals = new List<(uint idx, string name, Event evt)>(globalEvents);
             listSteps.ItemsSource = __steps.Select(x => $"{x.Item2.ID}: {x.Item1}");
             listGlobalEvents.ItemsSource = __globals.Select(x => $"{x.idx}: {x.name}");
+
+            txtExceptionResponseContent.Text = exception?.ToString();
+            __exception_response = exception;
         }
 
         private void listSteps_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -75,7 +80,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Controls.Common
             {
                 try
                 {
-                    RecipeDocument.SaveScript(save.FileName, __globals, __steps);
+                    RecipeDocument.SaveScript(save.FileName, __globals, __steps, __exception_response);
                 }
                 catch (Exception ex)
                 {
@@ -96,11 +101,13 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Controls.Common
                     var ret = RecipeDocument.ParseScript(open.FileName);
                     __steps = new List<(string name, Prometheus.Napishtim.Engine.StepMechansim.Step stp)>(ret.steps);
                     __globals = new List<(uint idx, string name, Event evt)>(ret.globalEvents);
+                    __exception_response = ret.exceptionResponse;
                     listSteps.ItemsSource = __steps.Select(x => $"{x.Item2.ID}: {x.Item1}");
                     listGlobalEvents.ItemsSource = __globals.Select(x => $"{x.idx}: {x.name}");
 
                     txtStepContent.Text = string.Empty;
                     txtGlobalEventContent.Text = string.Empty;
+                    txtExceptionResponseContent.Text = ret.exceptionResponse?.ToString();
                 }
                 catch (Exception ex)
                 {
@@ -111,7 +118,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Controls.Common
 
         private void Download_Click(object sender, RoutedEventArgs e)
         {
-            BusyDialog busy = new BusyDialog(RecipeDocument.DownloadAsync(__globals, __steps.Select(x => x.stp), 
+            BusyDialog busy = new BusyDialog(RecipeDocument.DownloadAsync(__globals, __steps.Select(x => x.stp), __exception_response,
                 txtIPAddress.Text,
                 (ushort)(txtPortNumber.Value.HasValue? txtPortNumber.Value: 8367),
                 txtSendTimeout.Value.HasValue ? (int)(txtSendTimeout.Value) : 5000,

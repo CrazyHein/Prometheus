@@ -30,7 +30,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Controls
         private GlobalEventModelCollection __globals;
         private ContentControl __global_event_control;
         private GlobalEventControl? __global_event_control_content;
-        public GlobalEventManager(GlobalEventModelCollection globals, ControlBlockModelCollection blocks, ContentControl content)
+        public GlobalEventManager(GlobalEventModelCollection globals, ContentControl content)
         {
             __globals = globals;
             InitializeComponent();

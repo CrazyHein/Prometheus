@@ -54,7 +54,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ev
                     ("COMPARAND_B", COMPARAND_B.ToString()),
                     ("POSITIVE_TOLERANCE", POSITIVE_TOLERANCE.HasValue?POSITIVE_TOLERANCE.Value.ToString():String.Empty),
                     ("NEGATIVE_TOLERANCE", NEGATIVE_TOLERANCE.HasValue?NEGATIVE_TOLERANCE.Value.ToString():String.Empty),
-                    ("INITIAL_VALUE", (INITIAL_VALUE.HasValue&&INITIAL_VALUE == true)?1.0.ToString():String.Empty),
+                    ("INITIAL_VALUE", Event.BooleanParameterValue(INITIAL_VALUE)),
                     ("ON_DELAY", ON_DELAY!=null?ON_DELAY._TIMEOUT_STRING:String.Empty),
                     ("OFF_DELAY", OFF_DELAY!=null?OFF_DELAY._TIMEOUT_STRING:String.Empty)
                 };

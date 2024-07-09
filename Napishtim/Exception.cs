@@ -134,14 +134,22 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim
         SCRIPT_SHADER_ARGUMENTS_ERROR                               = 0x4012,
         SCRIPT_EVENT_ARGUMENTS_ERROR                                = 0x4013,
         SCRIPT_ENV_VAR_ARGUMENTS_ERROR                              = 0x4014,
+        SCRIPT_EXCEPTION_RESPONSE_PARSE_ERROR                       = 0x4015,
 
         DOCUMENT_INVALID_OPERATION                                  = 0x5001,
         DOCUMENT_INVALID_ARGUMENTS                                  = 0x5002,
         DOCUMENT_STEP_BUILD_ERROR                                   = 0x5003,
         DOCUMENT_CONTROL_BLK_BUILD_ERROR                            = 0x5004,
+        DOCUMENT_EXCEPTION_RSP_BUILD_ERROR                          = 0x5005,
+
+        PROCESS_COMPONENT_ARGUMENTS_ERROR                           = 0x5011,
+        PROCESS_COMPONENT_INVALID_OPERATION                         = 0x5012,
 
         CONTROL_BLOCK_ARGUMENTS_ERROR                               = 0x5023,
         CONTROL_BLOCK_INVALID_OPERATION                             = 0x5024,
+
+        EXCEPTION_HANDLING_ARGUMENTS_ERROR                          = 0x5031,
+        EXCEPTION_HANDLING_INVALID_OPERATION                        = 0x5032,
 
         RUNTIME_EXCEPTION                                           = 0x8000
     }

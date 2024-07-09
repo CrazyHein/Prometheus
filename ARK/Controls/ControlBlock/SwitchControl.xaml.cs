@@ -1,12 +1,15 @@
 ﻿using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Controls.Common;
 using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Controls.ControlBlock;
 using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Napishtim;
+using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.EventMechansim;
+using Syncfusion.Data.Extensions;
 using Syncfusion.UI.Xaml.Grid;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Nodes;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -32,11 +35,14 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Controls
 
             sfGridBranches.RowDragDropController.Dropped += OnSfGridBranches_Dropped;
             sfGridBranches.RowDragDropController.Drop += OnSfGridBranches_Drop;
+
+            LocalEventCollection.DataSource = sw.LocalEvents;
         }
 
         public void ResetDataModel(ControlBlockModel blk)
         {
             DataContext = blk;
+            LocalEventCollection.DataSource = (blk as SwitchModel).LocalEvents;
         }
 
         public void UpdateBindingSource()
@@ -81,130 +87,6 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Controls
                 }
                 CommandManager.InvalidateRequerySuggested();
             }
-        }
-
-        private void AddLocalEventCommand_Executed(object sender, ExecutedRoutedEventArgs e)
-        {
-            try
-            {
-                /*
-                uint next = 0;
-                if ((DataContext as SwitchModel).LocalEvents.Count() != 0)
-                    next = (DataContext as SwitchModel).LocalEvents.Select(x => x.Index).Max() + 1;
-                LocalEventHelper helper = new LocalEventHelper(next, "unnamed") { LocalEventIndexes = (DataContext as SwitchModel).LocalEvents.Select(e => e.Index), Title = "Add Local Event" };
-                if (helper.ShowDialog() == true)
-                    (DataContext as SwitchModel).AddLocalEvent(helper.Event);
-                */
-                (DataContext as SwitchModel).AddLocalEvent();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"An exception has occurred while adding local event:\n{ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-            e.Handled = true;
-        }
-        private void AddLocalEventCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
-        {
-            e.CanExecute = true; 
-            e.Handled = true;
-        }
-
-        private void RemoveLocalEventCommand_Executed(object sender, ExecutedRoutedEventArgs e)
-        {
-            try
-            {
-                if (MessageBox.Show($"Are you sure you want to remove the following local event:\n{(sfGridLocalEvents.SelectedItem as LocalEventModel).Summary}",
-                    "Question", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.No)
-                    return;
-                int pos = sfGridLocalEvents.SelectedIndex;
-                (DataContext as SwitchModel).RemoveLocalEventAt(pos);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"An exception has occurred while removing local event:\n{ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-            e.Handled = true;
-        }
-        private void RemoveLocalEventCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
-        {
-            e.CanExecute = sfGridLocalEvents.SelectedItem != null;
-            e.Handled = true;
-        }
-
-        private void EditLocalEventCommand_Executed(object sender, ExecutedRoutedEventArgs e)
-        {
-            try
-            {
-                /*
-                int pos = sfGridLocalEvents.SelectedIndex;
-                uint idx = (sfGridLocalEvents.SelectedItem as LocalEventModel).Index;
-                LocalEventHelper helper = new LocalEventHelper(sfGridLocalEvents.SelectedItem as LocalEventModel) { 
-                    LocalEventIndexes = (DataContext as SwitchModel).LocalEvents.Select(e => e.Index).Where(x => x != idx), 
-                    Title = "Edit Local Event" };
-                if (helper.ShowDialog() == true)
-                {
-                    (DataContext as SwitchModel).RemoveLocalEventAt(pos);
-                    (DataContext as SwitchModel).InsertLocalEvent(pos, helper.Event);
-                }
-                */
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"An exception has occurred while editing local event:\n{ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-            e.Handled = true;
-        }
-        private void EditLocalEventCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
-        {
-            e.CanExecute = sfGridLocalEvents.SelectedItem != null;
-            e.Handled = true;
-        }
-
-        private void InsertLocalEventCommand_Executed(object sender, ExecutedRoutedEventArgs e)
-        {
-            try
-            {
-                /*
-                int pos = sfGridLocalEvents.SelectedIndex;
-                uint next = 0;
-                if ((DataContext as SwitchModel).LocalEvents.Count() != 0)
-                    next = (DataContext as SwitchModel).LocalEvents.Select(x => x.Index).Max() + 1;
-                LocalEventHelper helper = new LocalEventHelper(next, "unnamed") { LocalEventIndexes = (DataContext as SwitchModel).LocalEvents.Select(e => e.Index), Title = "Insert Local Event" };
-                if (helper.ShowDialog() == true)
-                    (DataContext as SwitchModel).InsertLocalEvent(pos, helper.Event);
-                */
-                int pos = sfGridLocalEvents.SelectedIndex;
-                (DataContext as SwitchModel).InsertLocalEvent(pos);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"An exception has occurred while inserting local event:\n{ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-            e.Handled = true;
-        }
-        private void InsertLocalEventCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
-        {
-            e.CanExecute = sfGridLocalEvents.SelectedItem != null;
-            e.Handled = true;
-        }
-
-        private void ExpressionHelperCommand_Executed(object sender, ExecutedRoutedEventArgs e)
-        {
-            var parameter = (e.Parameter as GridRecordContextMenuInfo).Record as EventParameter;
-            ExpressionHelper helper = new ExpressionHelper(parameter.Value);
-            var ret = helper.ShowDialog();
-            if (ret == true)
-            {
-                parameter.Value = helper.Expression.ToString();
-            }
-            e.Handled = true;
-        }
-
-        private void ExpressionHelperCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
-        {
-            var parameter = (e.Parameter as GridRecordContextMenuInfo).Record as EventParameter;
-            var header = (e.Parameter as GridRecordContextMenuInfo).DataGrid.CurrentColumn.HeaderText;
-            e.CanExecute = parameter != null && header == "Value";
         }
 
         private void AddBranchCommand_Executed(object sender, ExecutedRoutedEventArgs e)

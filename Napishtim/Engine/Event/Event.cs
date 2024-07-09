@@ -156,5 +156,15 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ev
         }
 
         public abstract IEnumerable<ObjectReference> ObjectReferences { get; }
+
+        public static string BooleanParameterValue(bool? value)
+        {
+            if(value == null)
+                return string.Empty;
+            else if(value == false)
+                return 0.0.ToString();
+            else
+                return 1.0.ToString();
+        }
     }
 }

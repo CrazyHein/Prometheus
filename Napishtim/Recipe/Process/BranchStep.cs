@@ -3,6 +3,7 @@ using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.EventM
 using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.EventMechansim.TriggerMechansim;
 using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Expression;
 using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.StepMechansim;
+using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.ControlBlock;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -12,7 +13,7 @@ using System.Text;
 using System.Text.Json.Nodes;
 using System.Threading.Tasks;
 
-namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.ControlBlock.Process
+namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Process
 {
     public class BranchStep_S : ProcessStepSource
     {
@@ -21,6 +22,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
         public override IEnumerable<ProcessShader> Shaders => throw new NotImplementedException();
 
         public override IEnumerable<ProcessShader> PostShaders => throw new NotImplementedException();
+        public override IEnumerable<ProcessShader> AbortShaders => throw new NotImplementedException();
 
         public override IEnumerable<KeyValuePair<uint, (string name, Event evt)>> LocalEvents => throw new NotImplementedException();
 
@@ -52,7 +54,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
             UserVariableFootprint = 0;
         }
 
-        public BranchStep_S(string name, IReadOnlyDictionary<uint, (string name, Event evt)>? locals, IEnumerable<(string name, JsonArray condition, ProcessShaders? postShader, uint next)> branches):base(name)
+        public BranchStep_S(string name, IReadOnlyDictionary<uint, (string name, Event evt)>? locals, IEnumerable<(string name, JsonArray condition, ProcessShaders? postShader, uint next)> branches) : base(name)
         {
             if (locals != null && locals.Count > 0)
             {
@@ -94,7 +96,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
         private BranchStep_S(JsonObject node) : base(node["NAME"].GetValue<string>())
         {
             _step = node["STEP"].DeepClone().AsObject();
-            foreach(var end in _step["END_POINTS"].AsArray())
+            foreach (var end in _step["END_POINTS"].AsArray())
             {
                 AddGlobalEventRefernce(end["TRIGGER"].AsArray());
                 NumOfBranches++;
@@ -103,7 +105,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
             UserVariableFootprint = 0;
         }
 
-        public override ProcessStepObject ResolveTarget(uint next, Context context, IReadOnlyDictionary<uint, Event> globals, ReadOnlyMemory<uint> stepLinkMapping, ReadOnlyMemory<uint> userVariableMapping, Sequential_S container, Dictionary<uint, string> stepNameMapping)
+        public override ProcessStepObject ResolveTarget(uint next, uint abort, Context context, IReadOnlyDictionary<uint, Event> globals, ReadOnlyMemory<uint> stepLinkMapping, ReadOnlyMemory<uint> userVariableMapping, Sequential_S container, Dictionary<uint, string> stepNameMapping)
         {
             JsonObject chewed;
             chewed = _step.DeepClone().AsObject();
@@ -117,12 +119,12 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
         public override JsonObject SaveAsJson(Sequential_S container)
         {
             JsonObject node = new JsonObject();
-            node["ASSEMBLY"] = this.GetType().FullName;
+            node["ASSEMBLY"] = GetType().FullName;
             node["NAME"] = Name;
             node["STEP"] = _step.DeepClone();
             //node["GLOBAL_REF"] = new JsonArray();
             //foreach (var r in GlobalEventReference)
-                //node["GLOBAL_REF"].AsArray().Add(r);
+            //node["GLOBAL_REF"].AsArray().Add(r);
             //node["BRANCH"] = NumOfBranches;
 
             return node;

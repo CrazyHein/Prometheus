@@ -1,6 +1,5 @@
 ﻿using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Controls;
 using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Controls.Common;
-using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Controls.Context;
 using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Controls.ControlBlock;
 using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Controls.Step;
 using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Napishtim;
@@ -115,7 +114,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK
             __content_controls = new SortedDictionary<string, UserControl?>();
             __content_controls[ContextManager.Tag.ToString()] = null;
             __content_controls[GlobalEventManager.Tag.ToString()] = null;
-            __content_controls[ControlBlockManager.Tag.ToString()] = null;
+            __content_controls[RegularControlBlockManager.Tag.ToString()] = null;
+            __content_controls[ExceptionControlBlockManager.Tag.ToString()] = null;
 
             this.Loaded += OnLoaded;
 
@@ -143,7 +143,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK
         {
             __content_controls[ContextManager.Tag.ToString()] = null;
             __content_controls[GlobalEventManager.Tag.ToString()] = null;
-            __content_controls[ControlBlockManager.Tag.ToString()] = null;
+            __content_controls[RegularControlBlockManager.Tag.ToString()] = null;
+            __content_controls[ExceptionControlBlockManager.Tag.ToString()] = null;
             ContentControl.Content = null;
         }
 
@@ -160,7 +161,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK
             //(blk as IControlBlockControl).UpdateBindingSource();
             //else if (blk is IStepControl)
             //(blk as IStepControl).UpdateBindingSource();
-            bool currentmodified = false, globalsmodified = false, controlsmodified = false;
+            bool currentmodified = false, globalsmodified = false, rcontrolsmodified = false, econtrolsmodified = false, contextmodified = false;
             if (ContentControl != null)
             {
                 if (updateBinding)
@@ -175,8 +176,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK
                 currentmodified = ((ContentControl.Content as UserControl)?.DataContext as Component)?.Modified == true;
 
                 globalsmodified = (__content_controls[GlobalEventManager.Tag.ToString()]?.DataContext as Component)?.Modified == true;
-                controlsmodified = (__content_controls[ControlBlockManager.Tag.ToString()]?.DataContext as Component)?.Modified == true;
-                return (currentmodified || globalsmodified || controlsmodified);
+                rcontrolsmodified = (__content_controls[RegularControlBlockManager.Tag.ToString()]?.DataContext as Component)?.Modified == true;
+                econtrolsmodified = (__content_controls[ExceptionControlBlockManager.Tag.ToString()]?.DataContext as Component)?.Modified == true;
+                contextmodified = (__content_controls[ContextManager.Tag.ToString()]?.DataContext as Component)?.Modified == true;
+                return (currentmodified || globalsmodified || rcontrolsmodified || econtrolsmodified ||contextmodified);
             }
             return false;
         }
@@ -232,11 +235,14 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK
             ContextModel.Tags = tags;
 
             __document_model.GlobalEventManager = new GlobalEventModelCollection(__rcp_document);
-            __document_model.ControlBlockManager = new ControlBlockModelCollection(__rcp_document);
+            __document_model.ContextManager = new ContextModel(__rcp_document);
+            __document_model.RegularControlBlockManager = new ControlBlockModelCollection(__rcp_document, CONTROL_BLOCK_GROUP.REGULAR);
+            __document_model.ExceptionControlBlockManager = new ControlBlockModelCollection(__rcp_document, CONTROL_BLOCK_GROUP.EXCEPTION_HANDLING);
 
-            ContextManager.Content = new ContextManager(__document_model.GlobalEventManager, __document_model.ControlBlockManager, ContentControl);
-            GlobalEventManager.Content = new GlobalEventManager(__document_model.GlobalEventManager, __document_model.ControlBlockManager, ContentControl);
-            ControlBlockManager.Content = new ControlBlockManager(__document_model.GlobalEventManager, __document_model.ControlBlockManager, ContentControl);
+            ContextManager.Content = new ContextManager(__document_model.ContextManager, ContentControl);
+            GlobalEventManager.Content = new GlobalEventManager(__document_model.GlobalEventManager, ContentControl);
+            RegularControlBlockManager.Content = new ControlBlockManager(__document_model.GlobalEventManager, __document_model.RegularControlBlockManager, ContentControl);
+            ExceptionControlBlockManager.Content = new ControlBlockManager(__document_model.GlobalEventManager, __document_model.ExceptionControlBlockManager, ContentControl);
 
             __document_model.FileOpened = string.Empty;
             __reset_layout();
@@ -297,11 +303,14 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK
                 ContextModel.Tags = tags;
 
                 __document_model.GlobalEventManager = new GlobalEventModelCollection(__rcp_document);
-                __document_model.ControlBlockManager = new ControlBlockModelCollection(__rcp_document);
+                __document_model.ContextManager = new ContextModel(__rcp_document);
+                __document_model.RegularControlBlockManager = new ControlBlockModelCollection(__rcp_document, CONTROL_BLOCK_GROUP.REGULAR);
+                __document_model.ExceptionControlBlockManager = new ControlBlockModelCollection(__rcp_document, CONTROL_BLOCK_GROUP.EXCEPTION_HANDLING);
 
-                ContextManager.Content = new ContextManager(__document_model.GlobalEventManager, __document_model.ControlBlockManager, ContentControl);
-                GlobalEventManager.Content = new GlobalEventManager(__document_model.GlobalEventManager, __document_model.ControlBlockManager, ContentControl);
-                ControlBlockManager.Content = new ControlBlockManager(__document_model.GlobalEventManager, __document_model.ControlBlockManager, ContentControl);
+                ContextManager.Content = new ContextManager(__document_model.ContextManager, ContentControl);
+                GlobalEventManager.Content = new GlobalEventManager(__document_model.GlobalEventManager, ContentControl);
+                RegularControlBlockManager.Content = new ControlBlockManager(__document_model.GlobalEventManager, __document_model.RegularControlBlockManager, ContentControl);
+                ExceptionControlBlockManager.Content = new ControlBlockManager(__document_model.GlobalEventManager, __document_model.ExceptionControlBlockManager, ContentControl);
 
                 __document_model.FileOpened = open.FileName;
 
@@ -320,7 +329,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK
             {
                 __rcp_document.SaveAs(__document_model.FileOpened, __document_model.GlobalEventManager.Events.Select(e => e.Index));
                 __document_model.GlobalEventManager.IsDirty = false;
-                __document_model.ControlBlockManager.IsDirty = false;
+                __document_model.ContextManager.IsDirty = false;
+                __document_model.RegularControlBlockManager.IsDirty = false;
+                __document_model.ExceptionControlBlockManager.IsDirty = false;
 
             }
             catch (Exception ex)
@@ -358,7 +369,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK
                     __rcp_document.SaveAs(save.FileName, __document_model.GlobalEventManager.Events.Select(e => e.Index));
                     __document_model.FileOpened = save.FileName;
                     __document_model.GlobalEventManager.IsDirty = false;
-                    __document_model.ControlBlockManager.IsDirty = false;
+                    __document_model.ContextManager.IsDirty = false;
+                    __document_model.RegularControlBlockManager.IsDirty = false;
+                    __document_model.ExceptionControlBlockManager.IsDirty = false;
                 }
                 catch (Exception ex)
                 {
@@ -413,11 +426,19 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK
                     summaryViewer.ShowDialog();
                 }
             }
-            else if (ControlBlockManager.IsSelected)
+            else if (RegularControlBlockManager.IsSelected)
             {
-                if (__document_model.ControlBlockManager != null)
+                if (__document_model.RegularControlBlockManager != null)
                 {
-                    SummaryViewer summaryViewer = new SummaryViewer(__document_model.ControlBlockManager.Summary) { Owner = this };
+                    SummaryViewer summaryViewer = new SummaryViewer(__document_model.RegularControlBlockManager.Summary) { Owner = this };
+                    summaryViewer.ShowDialog();
+                }
+            }
+            else if (ExceptionControlBlockManager.IsSelected)
+            {
+                if (__document_model.ExceptionControlBlockManager != null)
+                {
+                    SummaryViewer summaryViewer = new SummaryViewer(__document_model.ExceptionControlBlockManager.Summary) { Owner = this };
                     summaryViewer.ShowDialog();
                 }
             }
@@ -429,7 +450,11 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK
             {
                 e.CanExecute = __document_model.GlobalEventManager?.Events.All(x => x.Modified == false) == true;
             }
-            else if(ControlBlockManager.IsSelected)
+            else if(RegularControlBlockManager.IsSelected)
+            {
+                e.CanExecute = (ContentControl.Content as UserControl) == null || ((ContentControl.Content as UserControl).DataContext as Component)?.Modified == false;
+            }
+            else if (ExceptionControlBlockManager.IsSelected)
             {
                 e.CanExecute = (ContentControl.Content as UserControl) == null || ((ContentControl.Content as UserControl).DataContext as Component)?.Modified == false;
             }
@@ -442,7 +467,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK
             try
             {
                 __rcp_document.BuildSteps();
-                ScriptViewer scriptViewer = new ScriptViewer(__settings.ILinkProperty, __rcp_document.Globals, __rcp_document.CompiledControlSteps) { Owner = this };
+                ScriptViewer scriptViewer = new ScriptViewer(__settings.ILinkProperty, __rcp_document.Globals, __rcp_document.CompiledControlSteps, __rcp_document.CompiledExceptionResponse) { Owner = this };
                 scriptViewer.ShowDialog();
             }
             catch (Exception ex)
@@ -517,11 +542,14 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK
             ContextModel.Tags = tags;
 
             __document_model.GlobalEventManager = new GlobalEventModelCollection(__rcp_document);
-            __document_model.ControlBlockManager = new ControlBlockModelCollection(__rcp_document);
+            __document_model.ContextManager = new ContextModel(__rcp_document);
+            __document_model.RegularControlBlockManager = new ControlBlockModelCollection(__rcp_document, CONTROL_BLOCK_GROUP.REGULAR);
+            __document_model.ExceptionControlBlockManager = new ControlBlockModelCollection(__rcp_document, CONTROL_BLOCK_GROUP.EXCEPTION_HANDLING);
 
-            ContextManager.Content = new ContextManager(__document_model.GlobalEventManager, __document_model.ControlBlockManager, ContentControl);
-            GlobalEventManager.Content = new GlobalEventManager(__document_model.GlobalEventManager, __document_model.ControlBlockManager, ContentControl);
-            ControlBlockManager.Content = new ControlBlockManager(__document_model.GlobalEventManager, __document_model.ControlBlockManager, ContentControl);
+            ContextManager.Content = new ContextManager(__document_model.ContextManager, ContentControl);
+            GlobalEventManager.Content = new GlobalEventManager(__document_model.GlobalEventManager, ContentControl);
+            RegularControlBlockManager.Content = new ControlBlockManager(__document_model.GlobalEventManager, __document_model.RegularControlBlockManager, ContentControl);
+            ExceptionControlBlockManager.Content = new ControlBlockManager(__document_model.GlobalEventManager, __document_model.ExceptionControlBlockManager, ContentControl);
 
             __document_model.FileOpened = path;
 

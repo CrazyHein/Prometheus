@@ -2,13 +2,16 @@
 using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine;
 using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.EventMechansim;
 using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.EventMechansim.TriggerMechansim;
+using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.ExceptionMechansim;
 using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Expression;
 using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.ShaderMechansim;
 using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.StepMechansim;
 using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.IOUtility;
 using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Protocol;
 using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.ControlBlock;
-using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.ControlBlock.Process;
+using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.ExceptionHandling;
+using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Globals;
+using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Process;
 using Spire.Xls.Core;
 using System;
 using System.Collections.Generic;
@@ -29,13 +32,53 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe
         BACKGROUND_PROCESSING = 0x40,
         EXCEPTION_PROCESSING = 0x80
     }
+
+    public enum CONTROL_BLOCK_GROUP: byte
+    {
+        REGULAR,
+        EXCEPTION_HANDLING
+    }
     public class RecipeDocument
     {
-        private List<Step>? __compiled_control_steps;
+        private List<Step>? __compiled_regular_control_steps;
 
-        private LinkedList<ControlBlock.ControlBlockSource> __control_block_list = new LinkedList<ControlBlock.ControlBlockSource> ();
-        public IEnumerable<ControlBlock.ControlBlockSource> ControlBlocks { get { return __control_block_list; } }
-        public IEnumerable<(string, Step)>? CompiledControlSteps => __compiled_control_steps?.Select(x => (__compiled_control_step_names[x.ID], x));
+        private LinkedList<ControlBlock.ControlBlockSource> __regular_control_block_list = new LinkedList<ControlBlock.ControlBlockSource> ();
+        public IEnumerable<ControlBlock.ControlBlockSource> RegularControlBlocks { get { return __regular_control_block_list; } }
+        public IEnumerable<(string, Step)>? CompiledRegularControlSteps => __compiled_regular_control_steps?.Select(x => (__compiled_step_names[x.ID], x));
+
+        private List<Step>? __compiled_exception_handling_steps;
+        private LinkedList<ControlBlock.ControlBlockSource> __exception_handling_block_list = new LinkedList<ControlBlock.ControlBlockSource>();
+        public IEnumerable<ControlBlock.ControlBlockSource> ExceptionHandlingBlocks { get { return __exception_handling_block_list; } }
+        public IEnumerable<(string, Step)>? CompiledExceptionHandlingSteps => __compiled_exception_handling_steps?.Select(x => (__compiled_step_names[x.ID], x));
+
+        public IEnumerable<(string, Step)> CompiledControlSteps
+        {
+            get
+            {
+                IEnumerable<(string, Step)> regular = CompiledRegularControlSteps == null? Enumerable.Empty<(string, Step)>() : CompiledRegularControlSteps;
+                IEnumerable<(string, Step)> exception = CompiledExceptionHandlingSteps == null? Enumerable.Empty<(string, Step)>() : CompiledExceptionHandlingSteps;
+                return regular.Concat(exception);
+            }
+        }
+
+        public ExceptionResponse? CompiledExceptionResponse { get; private set; }
+
+        private ExceptionResponseSource? __exception_response_source;
+        public ExceptionResponseSource? ExceptionResponseSource 
+        { 
+            get { return __exception_response_source; }
+            set 
+            {
+                if(value != __exception_response_source)
+                {
+                    if (__exception_response_source != null)
+                        __global_events.RemoveEventReference(__exception_response_source.GlobalEventReference);
+                    if(value != null)
+                        __global_events.AddEventReference(value.GlobalEventReference);
+                    __exception_response_source = value;
+                }
+            } 
+        }
 
         private GlobalEvents __global_events;
         private Context __context;
@@ -47,8 +90,14 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe
         public int? StepFootprint { get; private set; }
         public int? UserVariablesFootprint { get; private set; }
 
-        private Dictionary<uint, string>? __compiled_control_step_names;
-        public IReadOnlyDictionary<uint, string>? CompiledControlStepNames => __compiled_control_step_names;
+        public int? RegularStepFootprint { get; private set; }
+        public int? RegularUserVariablesFootprint { get; private set; }
+
+        public int? ExceptionStepFootprint { get; private set; }
+        public int? ExceptionUserVariablesFootprint { get; private set; }
+
+        private Dictionary<uint, string>? __compiled_step_names;
+        public IReadOnlyDictionary<uint, string>? CompiledStepNames => __compiled_step_names;
 
         public RecipeDocument()
         {
@@ -102,18 +151,32 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe
             __global_events.RemoveAllGlobalEvents();
         }
 
-        public LinkedListNode<ControlBlock.ControlBlockSource>? ControlBlockNodeAt(int pos)
+        public LinkedListNode<ControlBlock.ControlBlockSource>? ControlBlockNodeAt(CONTROL_BLOCK_GROUP group, int pos)
         {
-            if (pos >= __control_block_list.Count || pos < 0)
-                return null;
-            int i = 0;
-            var node = __control_block_list.First;
-            while (i++ != pos)
-                node = node.Next;
-            return node;
+            switch (group)
+            {
+                case CONTROL_BLOCK_GROUP.REGULAR:
+                    if (pos >= __regular_control_block_list.Count || pos < 0)
+                        return null;
+                    int i = 0;
+                    var node = __regular_control_block_list.First;
+                    while (i++ != pos)
+                        node = node.Next;
+                    return node;
+                case CONTROL_BLOCK_GROUP.EXCEPTION_HANDLING:
+                    if (pos >= __exception_handling_block_list.Count || pos < 0)
+                        return null;
+                    i = 0;
+                    node = __exception_handling_block_list.First;
+                    while (i++ != pos)
+                        node = node.Next;
+                    return node;
+                default:
+                    return null;
+            }
         }
 
-        public void AddControlBlockFirst(ControlBlock.ControlBlockSource blk)
+        public void AddControlBlockFirst(CONTROL_BLOCK_GROUP group, ControlBlock.ControlBlockSource blk)
         {
             //if(blk.GlobalEventPublisher != null && blk.GlobalEventPublisher != __global_events)
             //throw new NaposhtimDocumentException(NaposhtimExceptionCode.DOCUMENT_INVALID_OPERATION, $"The ControlBlock has been linked another recipe document object.");
@@ -122,12 +185,23 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe
 
             //__global_events.AddEventReference(blk.GlobalEventReference);
             if (blk.Owner != null)
-                throw new NaposhtimDocumentException(NaposhtimExceptionCode.DOCUMENT_INVALID_ARGUMENTS, $"The Control Block already has an owner.");
+                throw new NaposhtimDocumentException(NaposhtimExceptionCode.DOCUMENT_INVALID_ARGUMENTS, $"The Control Block Source already has an owner.");
             blk.GlobalEventPublisher = __global_events;
-            __control_block_list.AddFirst(blk);
+            switch(group)
+            {
+                case CONTROL_BLOCK_GROUP.REGULAR:
+                    __regular_control_block_list.AddFirst(blk);
+                    break;
+                case CONTROL_BLOCK_GROUP.EXCEPTION_HANDLING:
+                    __exception_handling_block_list.AddFirst(blk);
+                    break;
+                default:
+                    break;
+            }    
+           
         }
 
-        public void AddControlBlockLast(ControlBlock.ControlBlockSource blk)
+        public void AddControlBlockLast(CONTROL_BLOCK_GROUP group, ControlBlock.ControlBlockSource blk)
         {
             //if (blk.GlobalEventPublisher != null && blk.GlobalEventPublisher != __global_events)
             //throw new NaposhtimDocumentException(NaposhtimExceptionCode.DOCUMENT_INVALID_OPERATION, $"The ControlBlock has been linked another recipe document object.");
@@ -136,79 +210,177 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe
 
             //__global_events.AddEventReference(blk.GlobalEventReference);
             if (blk.Owner != null)
-                throw new NaposhtimDocumentException(NaposhtimExceptionCode.DOCUMENT_INVALID_ARGUMENTS, $"The Control Block already has an owner.");
+                throw new NaposhtimDocumentException(NaposhtimExceptionCode.DOCUMENT_INVALID_ARGUMENTS, $"The Control Block Source already has an owner.");
             blk.GlobalEventPublisher = __global_events;
-            __control_block_list.AddLast(blk);
+            switch (group)
+            {
+                case CONTROL_BLOCK_GROUP.REGULAR:
+                    __regular_control_block_list.AddLast(blk);
+                    break;
+                case CONTROL_BLOCK_GROUP.EXCEPTION_HANDLING:
+                    __exception_handling_block_list.AddLast(blk);
+                    break;
+                default:
+                    break;
+            }
         }
 
-        public void AddControlBlockAfter(LinkedListNode<ControlBlock.ControlBlockSource> node, ControlBlock.ControlBlockSource blk)
+        public void AddControlBlockAfter(CONTROL_BLOCK_GROUP group, LinkedListNode<ControlBlock.ControlBlockSource> node, ControlBlock.ControlBlockSource blk)
         {
             //if (blk.GlobalEventPublisher != null && blk.GlobalEventPublisher != __global_events)
-                //throw new NaposhtimDocumentException(NaposhtimExceptionCode.DOCUMENT_INVALID_OPERATION, $"The ControlBlock has been linked another recipe document object.");
+            //throw new NaposhtimDocumentException(NaposhtimExceptionCode.DOCUMENT_INVALID_OPERATION, $"The ControlBlock has been linked another recipe document object.");
             //if (blk.GlobalEventPublisher == __global_events || __control_block_list.Contains(blk))
-                //throw new NaposhtimDocumentException(NaposhtimExceptionCode.DOCUMENT_INVALID_OPERATION, $"Try to add duplicated ControlBlock.");
-            if(node.List != __control_block_list)
-                throw new NaposhtimDocumentException(NaposhtimExceptionCode.DOCUMENT_INVALID_ARGUMENTS, $"The specified node does not in the Linked List.");
+            //throw new NaposhtimDocumentException(NaposhtimExceptionCode.DOCUMENT_INVALID_OPERATION, $"Try to add duplicated ControlBlock.");
             if (blk.Owner != null)
-                throw new NaposhtimDocumentException(NaposhtimExceptionCode.DOCUMENT_INVALID_ARGUMENTS, $"The Control Block already has an owner.");
-            //__global_events.AddEventReference(blk.GlobalEventReference);
-            blk.GlobalEventPublisher = __global_events;
-            __control_block_list.AddAfter(node, blk);
+                throw new NaposhtimDocumentException(NaposhtimExceptionCode.DOCUMENT_INVALID_ARGUMENTS, $"The Control Block Source already has an owner.");
+            switch (group)
+            {
+                case CONTROL_BLOCK_GROUP.REGULAR:
+                    if (node.List != __regular_control_block_list)
+                        throw new NaposhtimDocumentException(NaposhtimExceptionCode.DOCUMENT_INVALID_ARGUMENTS, $"The specified node does not in the Linked List.");
+                    
+                    //__global_events.AddEventReference(blk.GlobalEventReference);
+                    blk.GlobalEventPublisher = __global_events;
+                    __regular_control_block_list.AddAfter(node, blk);
+                    break;
+                case CONTROL_BLOCK_GROUP.EXCEPTION_HANDLING:
+                    if (node.List != __exception_handling_block_list)
+                        throw new NaposhtimDocumentException(NaposhtimExceptionCode.DOCUMENT_INVALID_ARGUMENTS, $"The specified node does not in the Linked List.");
+
+                    blk.GlobalEventPublisher = __global_events;
+                    __exception_handling_block_list.AddAfter(node, blk);
+                    break;
+            }
+
         }
 
-        public void AddControlBlockBefore(LinkedListNode<ControlBlock.ControlBlockSource> node, ControlBlock.ControlBlockSource blk)
+        public void AddControlBlockBefore(CONTROL_BLOCK_GROUP group, LinkedListNode<ControlBlock.ControlBlockSource> node, ControlBlock.ControlBlockSource blk)
         {
             //if (blk.GlobalEventPublisher != null && blk.GlobalEventPublisher != __global_events)
-                //throw new NaposhtimDocumentException(NaposhtimExceptionCode.DOCUMENT_INVALID_OPERATION, $"The ControlBlock has been linked another recipe document object.");
+            //throw new NaposhtimDocumentException(NaposhtimExceptionCode.DOCUMENT_INVALID_OPERATION, $"The ControlBlock has been linked another recipe document object.");
             //if (blk.GlobalEventPublisher == __global_events || __control_block_list.Contains(blk))
-                //throw new NaposhtimDocumentException(NaposhtimExceptionCode.DOCUMENT_INVALID_OPERATION, $"Try to add duplicated ControlBlock.");
-            if (node.List != __control_block_list)
-                throw new NaposhtimDocumentException(NaposhtimExceptionCode.DOCUMENT_INVALID_ARGUMENTS, $"The specified node does not in the Linked List.");
+            //throw new NaposhtimDocumentException(NaposhtimExceptionCode.DOCUMENT_INVALID_OPERATION, $"Try to add duplicated ControlBlock.");
             if (blk.Owner != null)
-                throw new NaposhtimDocumentException(NaposhtimExceptionCode.DOCUMENT_INVALID_ARGUMENTS, $"The Control Block already has an owner.");
+                throw new NaposhtimDocumentException(NaposhtimExceptionCode.DOCUMENT_INVALID_ARGUMENTS, $"The Control Block Source already has an owner.");
+            switch (group)
+            {
+                case CONTROL_BLOCK_GROUP.REGULAR:
+                    if (node.List != __regular_control_block_list)
+                        throw new NaposhtimDocumentException(NaposhtimExceptionCode.DOCUMENT_INVALID_ARGUMENTS, $"The specified node does not in the Linked List.");
+                    
+                    //__global_events.AddEventReference(blk.GlobalEventReference);
+                    blk.GlobalEventPublisher = __global_events;
+                    __regular_control_block_list.AddBefore(node, blk);
+                    break;
+                case CONTROL_BLOCK_GROUP.EXCEPTION_HANDLING:
+                    if (node.List != __exception_handling_block_list)
+                        throw new NaposhtimDocumentException(NaposhtimExceptionCode.DOCUMENT_INVALID_ARGUMENTS, $"The specified node does not in the Linked List.");
 
-            //__global_events.AddEventReference(blk.GlobalEventReference);
-            blk.GlobalEventPublisher = __global_events;
-            __control_block_list.AddBefore(node, blk);
+                    blk.GlobalEventPublisher = __global_events;
+                    __exception_handling_block_list.AddBefore(node, blk);
+                    break;
+            }
+
         }
 
-        public void ClearControlBlock()
+        public void ClearControlBlock(CONTROL_BLOCK_GROUP group)
         {
-            foreach(var blk in __control_block_list)
-                blk.GlobalEventPublisher = null;
-            //__global_events.RemoveEventReference(blk.GlobalEventReference);
-            __control_block_list.Clear();
+            switch (group)
+            {
+                case CONTROL_BLOCK_GROUP.REGULAR:
+                    foreach (var blk in __regular_control_block_list)
+                        blk.GlobalEventPublisher = null;
+                    //__global_events.RemoveEventReference(blk.GlobalEventReference);
+                    __regular_control_block_list.Clear();
+                    break;
+                case CONTROL_BLOCK_GROUP.EXCEPTION_HANDLING:
+                    foreach (var blk in __exception_handling_block_list)
+                        blk.GlobalEventPublisher = null;
+                    __exception_handling_block_list.Clear();
+                    break;
+            }
         }
 
-        public void RemoveControlBlockFirst()
+        public void RemoveControlBlockFirst(CONTROL_BLOCK_GROUP group)
         {
-            if(__control_block_list.Count == 0)
-                throw new NaposhtimDocumentException(NaposhtimExceptionCode.DOCUMENT_INVALID_OPERATION, $"Can not find any ControlBlock in recipe document.");
-            var blk = __control_block_list.First.Value;
-            blk.GlobalEventPublisher = null;
-            //__global_events.RemoveEventReference(blk.GlobalEventReference);
-            __control_block_list.RemoveFirst();
+            switch(group)
+            {
+                case CONTROL_BLOCK_GROUP.REGULAR:
+                    if (__regular_control_block_list.Count == 0)
+                        throw new NaposhtimDocumentException(NaposhtimExceptionCode.DOCUMENT_INVALID_OPERATION, $"Can not find any Regular ControlBlock in recipe document.");
+                    var blk = __regular_control_block_list.First.Value;
+                    blk.GlobalEventPublisher = null;
+                    //__global_events.RemoveEventReference(blk.GlobalEventReference);
+                    __regular_control_block_list.RemoveFirst();
+                    break;
+                case CONTROL_BLOCK_GROUP.EXCEPTION_HANDLING:
+                    if (__exception_handling_block_list.Count == 0)
+                        throw new NaposhtimDocumentException(NaposhtimExceptionCode.DOCUMENT_INVALID_OPERATION, $"Can not find any Exception Handling ControlBlock in recipe document.");
+                    blk = __exception_handling_block_list.First.Value;
+                    blk.GlobalEventPublisher = null;
+                    //__global_events.RemoveEventReference(blk.GlobalEventReference);
+                    __exception_handling_block_list.RemoveFirst();
+                    break;
+            }
         }
 
-        public void RemoveControlBlockLast()
+        public void RemoveControlBlockLast(CONTROL_BLOCK_GROUP group)
         {
-            if (__control_block_list.Count == 0)
-                throw new NaposhtimDocumentException(NaposhtimExceptionCode.DOCUMENT_INVALID_OPERATION, $"Can not find any ControlBlock in recipe document.");
-            var blk = __control_block_list.Last.Value;
-            blk.GlobalEventPublisher = null;
-            //__global_events.RemoveEventReference(blk.GlobalEventReference);
-            __control_block_list.RemoveLast();
+            switch(group)
+            {
+                case CONTROL_BLOCK_GROUP.REGULAR:
+                    if (__regular_control_block_list.Count == 0)
+                        throw new NaposhtimDocumentException(NaposhtimExceptionCode.DOCUMENT_INVALID_OPERATION, $"Can not find any Regular ControlBlock in recipe document.");
+                    var blk = __regular_control_block_list.Last.Value;
+                    blk.GlobalEventPublisher = null;
+                    //__global_events.RemoveEventReference(blk.GlobalEventReference);
+                    __regular_control_block_list.RemoveLast();
+                    break;
+                case CONTROL_BLOCK_GROUP.EXCEPTION_HANDLING:
+                    if (__exception_handling_block_list.Count == 0)
+                        throw new NaposhtimDocumentException(NaposhtimExceptionCode.DOCUMENT_INVALID_OPERATION, $"Can not find any Exception Handling ControlBlock in recipe document.");
+                    blk = __exception_handling_block_list.Last.Value;
+                    blk.GlobalEventPublisher = null;
+                    //__global_events.RemoveEventReference(blk.GlobalEventReference);
+                    __exception_handling_block_list.RemoveLast();
+                    break;
+            }
         }
 
-        public void RemoveControlBlock(LinkedListNode<ControlBlock.ControlBlockSource> node)
+        public void RemoveControlBlock(CONTROL_BLOCK_GROUP group, LinkedListNode<ControlBlock.ControlBlockSource> node)
         {
-            if (node.List != __control_block_list)
-                throw new NaposhtimDocumentException(NaposhtimExceptionCode.DOCUMENT_INVALID_OPERATION, $"The specified node does not in the Linked List.");
-            var blk = node.Value;
-            blk.GlobalEventPublisher = null;
-            //__global_events.RemoveEventReference(blk.GlobalEventReference);
-            __control_block_list.Remove(node);
+            switch(group)
+            {
+                case CONTROL_BLOCK_GROUP.REGULAR:
+                    if (node.List != __regular_control_block_list)
+                        throw new NaposhtimDocumentException(NaposhtimExceptionCode.DOCUMENT_INVALID_OPERATION, $"The specified node does not in the Linked List.");
+                    var blk = node.Value;
+                    blk.GlobalEventPublisher = null;
+                    //__global_events.RemoveEventReference(blk.GlobalEventReference);
+                    __regular_control_block_list.Remove(node);
+                    break;
+                case CONTROL_BLOCK_GROUP.EXCEPTION_HANDLING:
+                    if (node.List != __exception_handling_block_list)
+                        throw new NaposhtimDocumentException(NaposhtimExceptionCode.DOCUMENT_INVALID_OPERATION, $"The specified node does not in the Linked List.");
+                    blk = node.Value;
+                    blk.GlobalEventPublisher = null;
+                    //__global_events.RemoveEventReference(blk.GlobalEventReference);
+                    __exception_handling_block_list.Remove(node);
+                    break;
+            }
         }
+
+        /*
+        public void SetExceptionCondition(JsonArray conditions)
+        {
+            if (__exception_conditions.Count != 0)
+                __global_events.RemoveEventReference(ProcessStep.SearchGlobalEventIndex(__exception_conditions));
+            __exception_conditions.Clear();
+            foreach (var condition in conditions)
+                __exception_conditions.Add(condition);
+            __global_events.AddEventReference(ProcessStep.SearchGlobalEventIndex(conditions));
+        }
+        */
 
         public ProcessShaders MakeShaders(IEnumerable<(string name, string lvalue, string rvalue)> shaders)
         {
@@ -234,32 +406,39 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe
 
         public void BuildSteps()
         {
-            if(__control_block_list.Count == 0)
-                throw new NaposhtimDocumentException(NaposhtimExceptionCode.DOCUMENT_INVALID_ARGUMENTS, "Can not find any control block in recipe document.");
+            if(__regular_control_block_list.Count == 0)
+                throw new NaposhtimDocumentException(NaposhtimExceptionCode.DOCUMENT_INVALID_ARGUMENTS, "Can not find any Regular Control Block in recipe document.");
 
             //if (__control_block_list.Any(x => x.Level >= ControlBlock.ControlBlockSource.MAX_NESTING_DEPTH))
             //throw new NaposhtimDocumentException(NaposhtimExceptionCode.DOCUMENT_INVALID_ARGUMENTS, $"The nesting depth of the Control Block exceeds the limit(MAX: {ControlBlock.ControlBlockSource.MAX_NESTING_DEPTH}).");
-            SortedSet<uint> shaderLeftUserVariablesUsage = new SortedSet<uint>(__control_block_list.SelectMany(x => x.ShaderUserVariablesUsage));
-            StepFootprint = __control_block_list.Sum(x => x.StepFootprint);
-            UserVariablesFootprint = __control_block_list.Sum(x => x.UserVariableFootprint);
+            SortedSet<uint> shaderUserVariablesUsage = new SortedSet<uint>(__regular_control_block_list.SelectMany(x => x.ShaderUserVariablesUsage).Concat(__exception_handling_block_list.SelectMany(x => x.ShaderUserVariablesUsage)));
+            if (ExceptionResponseSource != null)
+                shaderUserVariablesUsage.Union(ExceptionResponseSource.ShaderUserVariablesUsage);
+
+            RegularStepFootprint = __regular_control_block_list.Sum(x => x.StepFootprint);
+            ExceptionStepFootprint = __exception_handling_block_list.Sum(x => x.StepFootprint);
+            StepFootprint = RegularStepFootprint + ExceptionStepFootprint;
+
+            RegularUserVariablesFootprint = __regular_control_block_list.Sum(x => x.UserVariableFootprint);
+            ExceptionUserVariablesFootprint = __exception_handling_block_list.Sum(x => x.UserVariableFootprint);
+            UserVariablesFootprint = RegularUserVariablesFootprint + ExceptionUserVariablesFootprint;
             //if(stepFootprint > __context.StepCapacity)
-                //throw new NaposhtimDocumentException(NaposhtimExceptionCode.DOCUMENT_INVALID_ARGUMENTS, $"The number recipe steps required({stepFootprint}) is out of range(MAX: {__context.StepCapacity}).");
+            //throw new NaposhtimDocumentException(NaposhtimExceptionCode.DOCUMENT_INVALID_ARGUMENTS, $"The number recipe steps required({stepFootprint}) is out of range(MAX: {__context.StepCapacity}).");
             //if (userVariableFootprint > __context.ReservedUserVariableCapacity)
             //throw new NaposhtimDocumentException(NaposhtimExceptionCode.DOCUMENT_INVALID_ARGUMENTS, $"The number recipe user variables required({userVariableFootprint}) is out of range(MAX: {__context.ReservedUserVariableCapacity}).");
             //if (userVariableFootprint > userVariablesUsageLowerLimit)
-                //throw new NaposhtimDocumentException(NaposhtimExceptionCode.DOCUMENT_INVALID_ARGUMENTS, $"The number recipe user variables required({userVariableFootprint}) is out of range(MAX: {userVariablesUsageLowerLimit}).");
+            //throw new NaposhtimDocumentException(NaposhtimExceptionCode.DOCUMENT_INVALID_ARGUMENTS, $"The number recipe user variables required({userVariableFootprint}) is out of range(MAX: {userVariablesUsageLowerLimit}).");
             ReadOnlyMemory<uint> stepalloc = Enumerable.Range(0, StepFootprint.Value).Select(e => (uint)e).ToArray();
-
-
-            ReadOnlyMemory<uint> varalloc = Enumerable.Range(0, Context.UserVariableCapacity).Select(e => (uint)e).Where(x => shaderLeftUserVariablesUsage.Contains(x) == false).Take(UserVariablesFootprint.Value).ToArray();
+            ReadOnlyMemory<uint> varalloc = Enumerable.Range(0, Context.UserVariableCapacity).Select(e => (uint)e).Where(x => shaderUserVariablesUsage.Contains(x) == false).Take(UserVariablesFootprint.Value).ToArray();
             if(varalloc.Length != UserVariablesFootprint)
                 throw new NaposhtimDocumentException(NaposhtimExceptionCode.DOCUMENT_INVALID_ARGUMENTS, $"The number recipe user variables required({UserVariablesFootprint}) is out of range(The number of user variables that can be used: {varalloc.Length}).");
 
-            __compiled_control_step_names = new Dictionary<uint, string>();
+            __compiled_step_names = new Dictionary<uint, string>();
+
             var compiledBlocks = new LinkedList<ControlBlockObject>();
-            var blk = __control_block_list.Last;
-            int st0 = StepFootprint.Value - blk.Value.StepFootprint, st1 = UserVariablesFootprint.Value - blk.Value.UserVariableFootprint;
-            compiledBlocks.AddFirst(blk.Value.ResolveTarget((uint)StepFootprint, __context, GlobalEvents, stepalloc.Slice(st0, blk.Value.StepFootprint), varalloc.Slice(st1, blk.Value.UserVariableFootprint), __compiled_control_step_names));
+            var blk = __regular_control_block_list.Last;
+            int st0 = RegularStepFootprint.Value - blk.Value.StepFootprint, st1 = RegularUserVariablesFootprint.Value - blk.Value.UserVariableFootprint;
+            compiledBlocks.AddFirst(blk.Value.ResolveTarget((uint)StepFootprint, (uint)RegularStepFootprint, __context, GlobalEvents, stepalloc.Slice(st0, blk.Value.StepFootprint), varalloc.Slice(st1, blk.Value.UserVariableFootprint), __compiled_step_names));
             while(blk.Previous != null)
             {
                 blk = blk.Previous;
@@ -267,23 +446,62 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe
                 st1 = st1 - blk.Value.UserVariableFootprint;
                 if (compiledBlocks.First.Value.ID == null)
                     throw new NaposhtimDocumentException(NaposhtimExceptionCode.DOCUMENT_INVALID_OPERATION, "The next Control Block ID is unresolved.");
-                compiledBlocks.AddFirst(blk.Value.ResolveTarget(compiledBlocks.First.Value.ID.Value, __context, GlobalEvents, stepalloc.Slice(st0, blk.Value.StepFootprint), varalloc.Slice(st1, blk.Value.UserVariableFootprint), __compiled_control_step_names));
+                compiledBlocks.AddFirst(blk.Value.ResolveTarget(compiledBlocks.First.Value.ID.Value, (uint)RegularStepFootprint, __context, GlobalEvents, stepalloc.Slice(st0, blk.Value.StepFootprint), varalloc.Slice(st1, blk.Value.UserVariableFootprint), __compiled_step_names));
             }
 
             int cblkIdx = 0;
-            __compiled_control_steps = new List<Step>();
+            __compiled_regular_control_steps = new List<Step>();
             foreach (var cblk in compiledBlocks)
             {
                 try
                 {
-                    __compiled_control_steps.AddRange(cblk.Build(__context, GlobalEvents));
+                    __compiled_regular_control_steps.AddRange(cblk.Build(__context, GlobalEvents));
                 }
                 catch (NaposhtimException ex)
                 {
                     throw new NaposhtimDocumentException(NaposhtimExceptionCode.DOCUMENT_CONTROL_BLK_BUILD_ERROR,
-                            $"Can not build Control Block in Recipe Document({cblk.Name} @{cblkIdx}/{compiledBlocks.Count}).", ex);
+                            $"Can not build Regular Control Block in Recipe Document({cblk.Name} @{cblkIdx}/{compiledBlocks.Count}).", ex);
                 }
                 cblkIdx++;
+            }
+
+            __compiled_exception_handling_steps = new List<Step>();
+            if (__exception_handling_block_list.Count != 0)
+            {
+                compiledBlocks = new LinkedList<ControlBlockObject>();
+                blk = __exception_handling_block_list.Last;
+                st0 = StepFootprint.Value - blk.Value.StepFootprint;
+                st1 = UserVariablesFootprint.Value - blk.Value.UserVariableFootprint;
+                compiledBlocks.AddFirst(blk.Value.ResolveTarget((uint)StepFootprint, (uint)StepFootprint, __context, GlobalEvents, stepalloc.Slice(st0, blk.Value.StepFootprint), varalloc.Slice(st1, blk.Value.UserVariableFootprint), __compiled_step_names));
+                while (blk.Previous != null)
+                {
+                    blk = blk.Previous;
+                    st0 = st0 - blk.Value.StepFootprint;
+                    st1 = st1 - blk.Value.UserVariableFootprint;
+                    if (compiledBlocks.First.Value.ID == null)
+                        throw new NaposhtimDocumentException(NaposhtimExceptionCode.DOCUMENT_INVALID_OPERATION, "The next Control Block ID is unresolved.");
+                    compiledBlocks.AddFirst(blk.Value.ResolveTarget(compiledBlocks.First.Value.ID.Value, (uint)StepFootprint, __context, GlobalEvents, stepalloc.Slice(st0, blk.Value.StepFootprint), varalloc.Slice(st1, blk.Value.UserVariableFootprint), __compiled_step_names));
+                }
+
+                cblkIdx = 0;
+                foreach (var cblk in compiledBlocks)
+                {
+                    try
+                    {
+                        __compiled_exception_handling_steps.AddRange(cblk.Build(__context, GlobalEvents));
+                    }
+                    catch (NaposhtimException ex)
+                    {
+                        throw new NaposhtimDocumentException(NaposhtimExceptionCode.DOCUMENT_CONTROL_BLK_BUILD_ERROR,
+                                $"Can not build Exception Handling Control Block in Recipe Document({cblk.Name} @{cblkIdx}/{compiledBlocks.Count}).", ex);
+                    }
+                    cblkIdx++;
+                }
+            }
+
+            if (ExceptionResponseSource != null)
+            {
+                CompiledExceptionResponse = ExceptionResponseSource.ResolveTarget((uint)RegularStepFootprint, __context, GlobalEvents).Build(__context, GlobalEvents);
             }
             //return __compiled_control_steps;
         }
@@ -322,7 +540,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe
         }
         */
 
-        public static void Download(IEnumerable<(uint, string, Event)> globals, IEnumerable<Step> steps,
+        public static void Download(IEnumerable<(uint, string, Event)> globals, IEnumerable<Step> steps, ExceptionResponse? exceptionResponse, 
             string ip, ushort port = 8367, int sendTimeout = 5000, int recvTimeout = 5000)
         {
             using (TCP io = new TCP(new IPEndPoint(IPAddress.Any, 0), new IPEndPoint(IPAddress.Parse(ip), port), sendTimeout, recvTimeout))
@@ -346,13 +564,16 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe
                 master.Clear(RECIPE_SEGMENT_T.STEP, 1, 0);
                 foreach (var step in steps)
                     master.Download(RECIPE_SEGMENT_T.STEP, Encoding.ASCII.GetBytes(step.ToJson().ToJsonString() + '\0'));
+
+                if (exceptionResponse != null)
+                    master.Download(RECIPE_SEGMENT_T.EXCEPTION, Encoding.ASCII.GetBytes(exceptionResponse.ToJson().ToJsonString() + '\0'));
             }
         }
         
-        public static async Task DownloadAsync(IEnumerable<(uint, string, Event)> globals, IEnumerable<Step> steps,
+        public static async Task DownloadAsync(IEnumerable<(uint, string, Event)> globals, IEnumerable<Step> steps, ExceptionResponse? exceptionResponse,
             string ip, ushort port = 8367, int sendTimeout = 5000, int recvTimeout = 5000)
         {
-            await Task.Run(() => Download(globals, steps, ip, port, sendTimeout, recvTimeout));
+            await Task.Run(() => Download(globals, steps, exceptionResponse, ip, port, sendTimeout, recvTimeout));
         }
 
         public void SaveAs(string path, IEnumerable<uint> globalIndexes)
@@ -369,9 +590,21 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe
                     writer.WriteRawValue(__global_events.ToJson(idx).ToJsonString());
                 writer.WriteEndArray();
 
-                writer.WritePropertyName("CONTROL_BLOCKS");
+                if (ExceptionResponseSource != null)
+                {
+                    writer.WritePropertyName("EXCEPTION_RESPONSE");
+                    writer.WriteRawValue(ExceptionResponseSource.SaveAsJson().ToJsonString());
+                }
+
+                writer.WritePropertyName("REGULAR_BLOCKS");
                 writer.WriteStartArray();
-                foreach (var blk in ControlBlocks)
+                foreach (var blk in RegularControlBlocks)
+                    writer.WriteRawValue(blk.SaveAsJson().ToJsonString());
+                writer.WriteEndArray();
+
+                writer.WritePropertyName("EXCEPTION_BLOCKS");
+                writer.WriteStartArray();
+                foreach (var blk in ExceptionHandlingBlocks)
                     writer.WriteRawValue(blk.SaveAsJson().ToJsonString());
                 writer.WriteEndArray();
 
@@ -382,7 +615,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe
         public void ParseSource(string path)
         {
             Dictionary<uint, (string, Event)> globalEvents = new Dictionary<uint, (string, Event)>();
-            LinkedList<ControlBlock.ControlBlockSource> controlBlocks = new LinkedList<ControlBlock.ControlBlockSource>();
+            ExceptionResponseSource? exceptionResponseSource = null;
+            LinkedList<ControlBlock.ControlBlockSource> regularControlBlocks = new LinkedList<ControlBlock.ControlBlockSource>();
+            LinkedList<ControlBlock.ControlBlockSource> excepionHandlingControlBlocks = new LinkedList<ControlBlock.ControlBlockSource>();
+
             JsonObject root = JsonNode.Parse(File.OpenRead(path)).AsObject();
 
             if (root.TryGetPropertyValue("GLOBAL_EVENTS", out var globalEventsNode) && globalEventsNode.GetValueKind() == JsonValueKind.Array)
@@ -390,17 +626,37 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe
                 foreach (var globalEventNode in globalEventsNode.AsArray())
                     globalEvents.Add(globalEventNode["ID"].GetValue<uint>(), (globalEventNode["NAME"].GetValue<string>(), Event.MAKE(globalEventNode["EVENT"].AsObject())));
             }
-            if (root.TryGetPropertyValue("CONTROL_BLOCKS", out var controlBlocksNode) && controlBlocksNode.GetValueKind() == JsonValueKind.Array)
+
+            if (root.TryGetPropertyValue("EXCEPTION_RESPONSE", out var exceptionResponseNode) && exceptionResponseNode.GetValueKind() == JsonValueKind.Object)
+            {
+                exceptionResponseSource = ExceptionResponseSource.MAKE_RESPONSE(root["EXCEPTION_RESPONSE"].AsObject());
+            }
+
+            if (root.TryGetPropertyValue("REGULAR_BLOCKS", out var controlBlocksNode) && controlBlocksNode.GetValueKind() == JsonValueKind.Array)
             {
                 foreach (var controlBlockNode in controlBlocksNode.AsArray())
-                    controlBlocks.AddLast(ControlBlock.ControlBlockSource.MAKE_BLK(controlBlockNode.AsObject(), null));
+                    regularControlBlocks.AddLast(ControlBlock.ControlBlockSource.MAKE_BLK(controlBlockNode.AsObject(), null));
             }
-            ClearControlBlock();
+            if (root.TryGetPropertyValue("EXCEPTION_BLOCKS", out controlBlocksNode) && controlBlocksNode.GetValueKind() == JsonValueKind.Array)
+            {
+                foreach (var controlBlockNode in controlBlocksNode.AsArray())
+                    excepionHandlingControlBlocks.AddLast(ControlBlock.ControlBlockSource.MAKE_BLK(controlBlockNode.AsObject(), null));
+            }
+
             __global_events.RemoveAllGlobalEvents();
             foreach (var e in globalEvents)
                 __global_events.AddEvent(e.Key, e.Value.Item1, e.Value.Item2);
-            foreach(var blk in controlBlocks)
-                AddControlBlockLast(blk);
+
+            if (exceptionResponseSource != null)
+                ExceptionResponseSource = exceptionResponseSource;
+
+            ClearControlBlock(CONTROL_BLOCK_GROUP.REGULAR);
+            foreach (var blk in regularControlBlocks)
+                AddControlBlockLast(CONTROL_BLOCK_GROUP.REGULAR, blk);     
+
+            ClearControlBlock(CONTROL_BLOCK_GROUP.EXCEPTION_HANDLING);
+            foreach (var blk in excepionHandlingControlBlocks)
+                AddControlBlockLast(CONTROL_BLOCK_GROUP.EXCEPTION_HANDLING, blk);
         }
 
         public override string ToString()
@@ -412,24 +668,44 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe
                 foreach (var g in GlobalEvents)
                     sb.Append($"\n\t{g.Key:D10} {GlobalEventNames[g.Key]}: {g.Value.ToJson().ToJsonString()}");
             }
-            int blkIdx = 0;
-            if(__control_block_list.Count > 0)
+
+            if(ExceptionResponseSource != null)
             {
-                sb.Append("\nControl Block(s):");
-                foreach (var blk in __control_block_list)
+                sb.Append("\nException Response:");
+                foreach(var line in ExceptionResponseSource.ToString().Split('\n'))
+                    sb.Append("\n\t").Append(line);
+            }
+
+            int blkIdx = 0;
+            if(__regular_control_block_list.Count > 0)
+            {
+                sb.Append("\nRegular Control Block(s):");
+                foreach (var blk in __regular_control_block_list)
                 {
                     var lines = blk.ToString().Split('\n');
                     sb.Append($"\n{blkIdx:D10}:");
                     foreach (var line in lines)
                         sb.Append("\n\t").Append(line);
                     blkIdx++;
-                    //sb.Append("\n\u2193");
+                }
+            }
+            blkIdx = 0;
+            if (__exception_handling_block_list.Count > 0)
+            {
+                sb.Append("\nException Handling Control Block(s):");
+                foreach (var blk in __exception_handling_block_list)
+                {
+                    var lines = blk.ToString().Split('\n');
+                    sb.Append($"\n{blkIdx:D10}:");
+                    foreach (var line in lines)
+                        sb.Append("\n\t").Append(line);
+                    blkIdx++;
                 }
             }
             return sb.ToString();
         }
 
-        public static void SaveScript(string path, IEnumerable<(uint, string, Event)> globalEvents, IEnumerable<(string, Prometheus.Napishtim.Engine.StepMechansim.Step)> steps)
+        public static void SaveScript(string path, IEnumerable<(uint, string, Event)> globalEvents, IEnumerable<(string, Prometheus.Napishtim.Engine.StepMechansim.Step)> steps, ExceptionResponse? exceptionResponse)
         {
             var options = new JsonWriterOptions { Indented = false };
             using (var stream = File.Create(path))
@@ -450,6 +726,12 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe
                 }
                 writer.WriteEndArray();
 
+                if (exceptionResponse != null)
+                {
+                    writer.WritePropertyName("EXCEPTION_RESPONSE");
+                    writer.WriteRawValue(exceptionResponse.ToJson().ToJsonString());
+                }
+
                 writer.WritePropertyName("STEPS");
                 writer.WriteStartArray();
                 foreach (var stp in steps)
@@ -466,10 +748,11 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe
             }
         }
 
-        public static (IEnumerable<(uint, string, Event)> globalEvents, IEnumerable<(string, Prometheus.Napishtim.Engine.StepMechansim.Step)> steps) ParseScript(string path)
+        public static (IEnumerable<(uint, string, Event)> globalEvents, IEnumerable<(string, Prometheus.Napishtim.Engine.StepMechansim.Step)> steps, ExceptionResponse? exceptionResponse) ParseScript(string path)
         {
             List<(uint idx, string name, Event evt)> globals = new List<(uint idx, string name, Event evt)>();
             List<(string name, Prometheus.Napishtim.Engine.StepMechansim.Step stp)> steps = new List<(string name, Step stp)>();
+            ExceptionResponse? exception = null;
 
             JsonObject root = JsonNode.Parse(File.OpenRead(path)).AsObject();
 
@@ -483,8 +766,14 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe
                     globals.Add((idx, name, evt));
                 }
             }
-
             Dictionary<uint, Event> globalEvents = new Dictionary<uint, Event>(globals.Select(x => KeyValuePair.Create(x.idx, x.evt)));
+
+            if (root.TryGetPropertyValue("EXCEPTION_RESPONSE", out var exceptionNodes) && exceptionNodes.GetValueKind() == JsonValueKind.Object)
+            {
+                uint inlineEventIndex = 10000;
+                exception = new ExceptionResponse(root["EXCEPTION_RESPONSE"], globalEvents, ref inlineEventIndex);
+            }
+
             if (root.TryGetPropertyValue("STEPS", out var stepNodes) && stepNodes.GetValueKind() == JsonValueKind.Array)
             {
                 foreach (var stepNode in stepNodes.AsArray())
@@ -496,7 +785,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe
                 }
             }
 
-            return (globals, steps);
+            return (globals, steps, exception);
         }
     }
 }

@@ -4,7 +4,7 @@ using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.EventM
 using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Expression;
 using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.ShaderMechansim;
 using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.StepMechansim;
-using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.ControlBlock.Process;
+using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.ControlBlock;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -13,7 +13,7 @@ using System.Text;
 using System.Text.Json.Nodes;
 using System.Xml.Linq;
 
-namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.ControlBlock
+namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Process
 {
     public abstract class ProcessStep
     {
@@ -33,8 +33,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
         protected ProcessStep(string name)
         {
             name = name.Trim();
-            if(name.Length == 0)
-                throw new NaposhtimDocumentException(NaposhtimExceptionCode.CONTROL_BLOCK_ARGUMENTS_ERROR, $"Invaild name for ProcessStep(name string length should be greater than zero).");
+            if (name.Length == 0)
+                throw new NaposhtimDocumentException(NaposhtimExceptionCode.PROCESS_COMPONENT_ARGUMENTS_ERROR, $"Invaild name for ProcessStep(name string length should be greater than zero).");
             Name = name;
         }
     }
@@ -42,23 +42,23 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
     public abstract class ProcessStepSource : ProcessStep
     {
         protected JsonObject _step { get; set; } = new JsonObject();
-        public abstract ProcessStepObject ResolveTarget(uint next, Context context, IReadOnlyDictionary<uint, Event> globals, ReadOnlyMemory<uint> stepLinkMapping, ReadOnlyMemory<uint> userVariableMapping, Sequential_S container, Dictionary<uint, string> stepNameMapping);
-        public SortedSet<uint> __shader_left_user_variables_usage = new SortedSet<uint>();
-        public IEnumerable<uint> ShaderLeftUserVariablesUsage { get { return __shader_left_user_variables_usage; } }
+        public abstract ProcessStepObject ResolveTarget(uint next, uint abort, Context context, IReadOnlyDictionary<uint, Event> globals, ReadOnlyMemory<uint> stepLinkMapping, ReadOnlyMemory<uint> userVariableMapping, Sequential_S container, Dictionary<uint, string> stepNameMapping);
+        public SortedSet<uint> __shader_user_variables_usage = new SortedSet<uint>();
+        public IEnumerable<uint> ShaderUserVariablesUsage { get { return __shader_user_variables_usage; } }
 
         protected void AddShaderUserVariablesUsage(IEnumerable<uint> idxes)
         {
             foreach (var idx in idxes)
-                __shader_left_user_variables_usage.Add(idx);
+                __shader_user_variables_usage.Add(idx);
         }
 
         protected void AddShaderUserVariablesUsage(JsonArray shaderArray)
         {
-            foreach(var sh in shaderArray)
+            foreach (var sh in shaderArray)
             {
                 Shader shader = new Shader(sh);
                 AddShaderUserVariablesUsage(shader.UserVariablesUsage);
-            }   
+            }
         }
 
         private SortedSet<uint> __global_event_reference = new SortedSet<uint>();
@@ -66,13 +66,13 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
 
         protected void AddGlobalEventRefernce(IEnumerable<uint> idxes)
         {
-            foreach(var idx in idxes)
+            foreach (var idx in idxes)
                 __global_event_reference.Add(idx);
         }
 
         protected void AddGlobalEventRefernce(JsonArray? conditions)
         {
-            AddGlobalEventRefernce(ProcessStep.SearchGlobalEventIndex(conditions));
+            AddGlobalEventRefernce(SearchGlobalEventIndex(conditions));
         }
 
 
@@ -84,7 +84,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
         {
             string name = node["ASSEMBLY"].GetValue<string>();
             if (__BUIILD_PROCESS_STEP_SOURCE.ContainsKey(name) == false)
-                throw new NaposhtimDocumentException(NaposhtimExceptionCode.CONTROL_BLOCK_ARGUMENTS_ERROR, $"Unknown ProcessStepSource: {name}.");
+                throw new NaposhtimDocumentException(NaposhtimExceptionCode.PROCESS_COMPONENT_ARGUMENTS_ERROR, $"Unknown ProcessStepSource: {name}.");
             return __BUIILD_PROCESS_STEP_SOURCE[name](node, container);
         }
 
@@ -106,13 +106,15 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
 
         public static string DEFAULT_NAME(JsonNode? node)
         {
-            return node == null? "unnamed": node.GetValue<string>();
+            return node == null ? "unnamed" : node.GetValue<string>();
         }
 
         public abstract IEnumerable<ProcessShader> Shaders { get; }
         public abstract IEnumerable<ProcessShader> PostShaders { get; }
+        public abstract IEnumerable<ProcessShader> AbortShaders { get; }
         public IEnumerable<ProcessShader> ShaderObjectDirectAssignments => Shaders.Reverse().Where(x => x.Shader.Operand is ObjectReference && x.Shader.Expr.IsImmediateOperand).DistinctBy(x => x.Shader.Operand).Reverse();
         public IEnumerable<ProcessShader> PostShaderObjectDirectAssignments => PostShaders.Reverse().Where(x => x.Shader.Operand is ObjectReference && x.Shader.Expr.IsImmediateOperand).DistinctBy(x => x.Shader.Operand).Reverse();
+        public IEnumerable<ProcessShader> AbortShaderObjectDirectAssignments => AbortShaders.Reverse().Where(x => x.Shader.Operand is ObjectReference && x.Shader.Expr.IsImmediateOperand).DistinctBy(x => x.Shader.Operand).Reverse();
         public abstract IEnumerable<KeyValuePair<uint, (string name, Event evt)>> LocalEvents { get; }
     }
 
@@ -121,7 +123,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
         public abstract Step Build(Context context, IReadOnlyDictionary<uint, Event> globals, Sequential_O container);
         protected JsonObject _step;
 
-        public ProcessStepObject(string name, JsonObject step): base(name) 
+        public ProcessStepObject(string name, JsonObject step) : base(name)
         {
             _step = step;
         }

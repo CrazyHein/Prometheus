@@ -67,23 +67,23 @@
             <common:ComponentStateVisibility x:Key="ComponentStateVisibility"/>
             <common:ComponentStateImage x:Key="ComponentStateImage"/>
         </DockPanel.Resources>
-        <UniformGrid DockPanel.Dock="Bottom" Columns="4">
-            <sync:ButtonAdv Label="Add" Height="30" Margin="0,2,4,0" Command="common:Command.Add">
+        <UniformGrid DockPanel.Dock="Bottom" Rows="2" Columns="2">
+            <sync:ButtonAdv Label="Add" Height="30" Margin="0,2,2,0" Command="common:Command.Add">
                 <sync:ButtonAdv.SmallIcon>
                     <BitmapImage  UriSource="/imgs/add.png"/>
                 </sync:ButtonAdv.SmallIcon>
             </sync:ButtonAdv>
-            <sync:ButtonAdv Label="Insert Before" Height="30" Margin="4,2,4,0" Command="common:Command.Insert">
+            <sync:ButtonAdv Label="Insert Before" Height="30" Margin="2,2,2,0" Command="common:Command.Insert">
                 <sync:ButtonAdv.SmallIcon>
                     <BitmapImage  UriSource="/imgs/insert_before.png"/>
                 </sync:ButtonAdv.SmallIcon>
             </sync:ButtonAdv>
-            <sync:ButtonAdv Label="Remove"  Height="30" Margin="4,2,2,0" Command="common:Command.Remove">
+            <sync:ButtonAdv Label="Remove"  Height="30" Margin="0,4,2,0" Command="common:Command.Remove">
                 <sync:ButtonAdv.SmallIcon>
                     <BitmapImage  UriSource="/imgs/remove.png"/>
                 </sync:ButtonAdv.SmallIcon>
             </sync:ButtonAdv>
-            <sync:ButtonAdv Label="Summary"  Height="30" Margin="4,2,2,0" Command="common:Command.Summary">
+            <sync:ButtonAdv Label="Summary"  Height="30" Margin="2,4,2,0" Command="common:Command.Summary">
                 <sync:ButtonAdv.SmallIcon>
                     <BitmapImage  UriSource="/imgs/summary.png"/>
                 </sync:ButtonAdv.SmallIcon>

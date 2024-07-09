@@ -2,7 +2,7 @@
 using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.EventMechansim;
 using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Expression;
 using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.StepMechansim;
-using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.ControlBlock.Process;
+using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Process;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -119,13 +119,13 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
             }
             catch (Exception ex)
             {
-                throw new NaposhtimDocumentException(NaposhtimExceptionCode.CONTROL_BLOCK_ARGUMENTS_ERROR, $"Can not restore Loop object from node:\n{node.ToString()}", ex);
+                throw new NaposhtimDocumentException(NaposhtimExceptionCode.CONTROL_BLOCK_ARGUMENTS_ERROR, $"Can not restore Loop_S object from node:\n{node.ToString()}", ex);
             }
         }
 
 
 
-        public override ControlBlockObject ResolveTarget(uint next, Context context, IReadOnlyDictionary<uint, Event> globals, ReadOnlyMemory<uint> stepLinkMapping, ReadOnlyMemory<uint> userVariableMapping, Dictionary<uint, string> stepNameMapping)
+        public override ControlBlockObject ResolveTarget(uint next, uint abort, Context context, IReadOnlyDictionary<uint, Event> globals, ReadOnlyMemory<uint> stepLinkMapping, ReadOnlyMemory<uint> userVariableMapping, Dictionary<uint, string> stepNameMapping)
         {
             if (LoopBody == null)
                 throw new NaposhtimDocumentException(NaposhtimExceptionCode.CONTROL_BLOCK_ARGUMENTS_ERROR, "The loop body of 'Loop' Control Block is empty.");
@@ -143,9 +143,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
             //conditionalStatement.Next = Next;
             //LoopBody.Next = conditionalStatement;
 
-            var c = conditionalStatement.ResolveTarget(next, context, globals, stepLinkMapping.Slice(1), userVariableMapping, stepNameMapping);
-            var i = initializationStatement.ResolveTarget(stepLinkMapping.Span[1], context, globals, stepLinkMapping, userVariableMapping, stepNameMapping);
-            var b = LoopBody.ResolveTarget(stepLinkMapping.Span[1], context, globals, stepLinkMapping.Slice(2), userVariableMapping.Slice(1), stepNameMapping);
+            var c = conditionalStatement.ResolveTarget(next, abort, context, globals, stepLinkMapping.Slice(1), userVariableMapping, stepNameMapping);
+            var i = initializationStatement.ResolveTarget(stepLinkMapping.Span[1], abort, context, globals, stepLinkMapping, userVariableMapping, stepNameMapping);
+            var b = LoopBody.ResolveTarget(stepLinkMapping.Span[1], abort, context, globals, stepLinkMapping.Slice(2), userVariableMapping.Slice(1), stepNameMapping);
 
             return new Loop_O(Name, i, c, b, StepFootprint, UserVariableFootprint);
         }

@@ -9,6 +9,7 @@ using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.EventM
 using System.Text.Json.Nodes;
 using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Expression;
 using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Expression.AU;
+using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Process;
 
 namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.ControlBlock
 {
@@ -61,11 +62,11 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
             }
             catch (Exception ex)
             {
-                throw new NaposhtimDocumentException(NaposhtimExceptionCode.CONTROL_BLOCK_ARGUMENTS_ERROR, $"Can not restore Sequential object from node:\n{node.ToString()}", ex);
+                throw new NaposhtimDocumentException(NaposhtimExceptionCode.CONTROL_BLOCK_ARGUMENTS_ERROR, $"Can not restore Sequential_S object from node:\n{node.ToString()}", ex);
             }
         }
 
-        public override IEnumerable<uint> ShaderUserVariablesUsage => __original_process_steps.SelectMany(x => x.ShaderLeftUserVariablesUsage).Distinct();
+        public override IEnumerable<uint> ShaderUserVariablesUsage => __original_process_steps.SelectMany(x => x.ShaderUserVariablesUsage).Distinct();
 
         public int IndexOf(ProcessStepSource? step)
         {
@@ -356,7 +357,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
         }
 
 
-        public override ControlBlockObject ResolveTarget(uint next,Context context, IReadOnlyDictionary<uint, Event> globals, ReadOnlyMemory<uint> stepLinkMapping, ReadOnlyMemory<uint> userVariableMapping, Dictionary<uint, string> stepNameMapping)
+        public override ControlBlockObject ResolveTarget(uint next,uint abort, Context context, IReadOnlyDictionary<uint, Event> globals, ReadOnlyMemory<uint> stepLinkMapping, ReadOnlyMemory<uint> userVariableMapping, Dictionary<uint, string> stepNameMapping)
         {
             if (__original_process_steps.Count == 0)
                 throw new NaposhtimDocumentException(NaposhtimExceptionCode.CONTROL_BLOCK_ARGUMENTS_ERROR, "Can not find any process step in 'Sequential' Control Block.");
@@ -367,7 +368,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
 
             TimeToTimeout.Clear();
 
-            compiledProcessSteps.AddFirst(step.Value.ResolveTarget(next, context, globals, stepLinkMapping.Slice(st0, step.Value.StepFootprint), userVariableMapping.Slice(st1, step.Value.UserVariableFootprint), this, stepNameMapping));
+            compiledProcessSteps.AddFirst(step.Value.ResolveTarget(next, abort, context, globals, stepLinkMapping.Slice(st0, step.Value.StepFootprint), userVariableMapping.Slice(st1, step.Value.UserVariableFootprint), this, stepNameMapping));
 
             while (step.Previous != null)
             {
@@ -376,7 +377,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
                 st1 = st1 - step.Value.UserVariableFootprint;
                 if(compiledProcessSteps.First.Value.ID == null)
                     throw new NaposhtimDocumentException(NaposhtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, "The next step ID is unresolved.");
-                compiledProcessSteps.AddFirst(step.Value.ResolveTarget(compiledProcessSteps.First.Value.ID.Value,//step.Next.Value.ID.Value,
+                compiledProcessSteps.AddFirst(step.Value.ResolveTarget(compiledProcessSteps.First.Value.ID.Value, abort,//step.Next.Value.ID.Value,
                                                 context, globals,
                                                 stepLinkMapping.Slice(st0, step.Value.StepFootprint),
                                                 userVariableMapping.Slice(st1, step.Value.UserVariableFootprint), this, stepNameMapping));

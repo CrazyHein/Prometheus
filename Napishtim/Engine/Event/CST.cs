@@ -30,7 +30,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ev
             {
                 (string pname, string pvalue)[] parameters = new (string pname, string pvalue)[]
                 {
-                    ("EVAL", EVAL == true?1.0.ToString():0.0.ToString()),
+                    ("EVAL", EVAL == true?1.0.ToString():0.0.ToString())
                 };
                 return parameters;
             }

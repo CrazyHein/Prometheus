@@ -89,6 +89,29 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Controls.Common
         }
     }
 
+    public class ShaderRecordBackgroundBrush : IMultiValueConverter
+    {
+        public Brush Default { get; set; } = new SolidColorBrush(Colors.Transparent);
+        public Brush Invalid { get; set; } = new SolidColorBrush(Colors.Red);
+        public Brush CanBeOmitted { get; set; } = new SolidColorBrush(Colors.BlanchedAlmond);
+        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
+        {
+            bool isValid = (bool)values[0];
+            bool canBeOmitted = (bool)values[1];
+            if (isValid == false)
+                return Invalid;
+            else if (canBeOmitted == true)
+                return CanBeOmitted;
+            else
+                return Default;
+        }
+
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
     public class CollectionControlIsDirtyBrush : IValueConverter
     {
         public Brush DirtyBrush { get; set; } = new SolidColorBrush(Colors.Red);

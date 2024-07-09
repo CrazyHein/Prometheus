@@ -1,0 +1,108 @@
+﻿<UserControl x:Class="AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Controls.Common.LocalEventCollectionControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:common="clr-namespace:AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Controls.Common"
+             xmlns:napishtim="clr-namespace:AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Napishtim"
+             xmlns:syncfusionskin ="clr-namespace:Syncfusion.SfSkinManager;assembly=Syncfusion.SfSkinManager.WPF"
+             xmlns:sync="http://schemas.syncfusion.com/wpf"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800"
+             syncfusionskin:SfSkinManager.Theme="{syncfusionskin:SkinManagerExtension ThemeName=FluentDark}">
+    <GroupBox>
+        <GroupBox.CommandBindings>
+            <CommandBinding Command="common:Command.Add" Executed="AddCommand_Executed" CanExecute="AddCommand_CanExecute"/>
+            <CommandBinding Command="common:Command.Insert" Executed="InsertCommand_Executed" CanExecute="InsertCommand_CanExecute"/>
+            <CommandBinding Command="common:Command.Remove" Executed="RemoveCommand_Executed" CanExecute="RemoveCommand_CanExecute"/>
+            <CommandBinding Command="common:Command.ExpressionHelper" Executed="ExpressionHelperCommand_Executed" CanExecute="ExpressionHelperCommand_CanExecute"/>
+            <CommandBinding Command="common:Command.PasteBefore" Executed="PasteBeforeCommand_Executed" CanExecute="PasteBeforeCommand_CanExecute"/>
+            <CommandBinding Command="common:Command.Paste2" Executed="PasteCommand_Executed" CanExecute="PasteCommand_CanExecute"/>
+        </GroupBox.CommandBindings>
+        <GroupBox.Resources>
+            <ContextMenu x:Key="RecordContextMenu">
+                <MenuItem Command="common:Command.Insert" CommandParameter="{Binding}">
+                    <MenuItem.Icon>
+                        <Image Source="/imgs/insert_before.png" Height="20" Margin="4"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Command="common:Command.Remove" CommandParameter="{Binding}">
+                    <MenuItem.Icon>
+                        <Image Source="/imgs/remove.png" Height="20" Margin="4"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <Separator/>
+                <MenuItem Command="common:Command.PasteBefore" CommandParameter="{Binding}">
+                    <MenuItem.Icon>
+                        <Image Source="/imgs/paste.png" Height="20" Margin="4"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <Separator/>
+                <MenuItem Command="common:Command.ExpressionHelper" CommandParameter="{Binding}">
+                    <MenuItem.Icon>
+                        <Image Source="/imgs/build_expression.png" Height="20" Margin="4"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+            </ContextMenu>
+            <ContextMenu x:Key="LocalEventParametersContextMenu">
+                <MenuItem Command="common:Command.ExpressionHelper" CommandParameter="{Binding}">
+                    <MenuItem.Icon>
+                        <Image Source="/imgs/build_expression.png" Height="20" Margin="4"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+            </ContextMenu>
+            <DataTemplate x:Key="LocalEventDetailToolTip">
+                <TextBlock Text="{Binding Comment}" FontSize="16"/>
+            </DataTemplate>
+            <DataTemplate x:Key="LocalEventDetails">
+                <sync:SfDataGrid ItemsSource="{Binding Data.Event.EventParameters}" AllowSorting="False" AllowResizingColumns="True" AutoGenerateColumns="False" ColumnSizer="Auto" RecordContextMenu="{StaticResource LocalEventParametersContextMenu}">
+                    <sync:SfDataGrid.Columns>
+                        <sync:GridTextColumn MappingName="Name" HeaderText="Parameter" ShowToolTip="True" ToolTipTemplate="{StaticResource LocalEventDetailToolTip}"/>
+                        <sync:GridTextColumn MappingName="Value" HeaderText="Value" AllowEditing="True"/>
+                        <sync:GridTextColumn MappingName="ValueWithTags" HeaderText="Tags"/>
+                        <sync:GridCheckBoxColumn MappingName="Required" HeaderText="Required"/>
+                    </sync:SfDataGrid.Columns>
+                </sync:SfDataGrid>
+            </DataTemplate>
+        </GroupBox.Resources>
+        <GroupBox.Header>
+            <TextBlock Text="Local Events" FontSize="16"/>
+        </GroupBox.Header>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition Height="auto"/>
+            </Grid.RowDefinitions>
+            <sync:SfDataGrid x:Name="sfLocalEventsViewer" ItemsSource="{Binding LocalEvents}" Margin="2,8,2,2" AllowSorting="False" AllowResizingColumns="True" AutoGenerateColumns="False"  ColumnSizer="AutoLastColumnFill" ShowRowHeader="True"
+             RecordContextMenu="{StaticResource RecordContextMenu}" SelectionUnit="Row" SelectionMode="Extended"
+             GridCopyContent="CopyLocalEvent" GridPasteOption="None">
+                <sync:SfDataGrid.DetailsViewDefinition>
+                    <sync:TemplateViewDefinition  RowTemplate="{StaticResource LocalEventDetails}"/>
+                </sync:SfDataGrid.DetailsViewDefinition>
+                <sync:SfDataGrid.Columns>
+                    <sync:GridTextColumn MappingName="Index" HeaderText="Index" AllowEditing="True"/>
+                    <sync:GridTextColumn MappingName="Name" HeaderText="Name" AllowEditing="True"/>
+                    <sync:GridComboBoxColumn ItemsSource="{x:Static napishtim:EventModel.EventTypes}" ValueBinding="{Binding Event.Type}" HeaderText="Type" AllowEditing="True" MinimumWidth="80"/>
+                    <sync:GridTextColumn DisplayBinding="{Binding Event.Info}" HeaderText="Event"/>
+                </sync:SfDataGrid.Columns>
+            </sync:SfDataGrid>
+            <UniformGrid Grid.Row="1" Columns="3">
+                <sync:ButtonAdv Label="Add" Height="30" Margin="2,2,4,0" Command="common:Command.Add" CommandParameter="{Binding Events}">
+                    <sync:ButtonAdv.SmallIcon>
+                        <BitmapImage  UriSource="/imgs/add.png"/>
+                    </sync:ButtonAdv.SmallIcon>
+                </sync:ButtonAdv>
+                <sync:ButtonAdv Label="Insert Before" Height="30" Margin="4,2,4,0" Command="common:Command.Insert" CommandParameter="{Binding Events}">
+                    <sync:ButtonAdv.SmallIcon>
+                        <BitmapImage  UriSource="/imgs/insert_before.png"/>
+                    </sync:ButtonAdv.SmallIcon>
+                </sync:ButtonAdv>
+                <sync:ButtonAdv Label="Remove"  Height="30" Margin="4,2,2,0" Command="common:Command.Remove" CommandParameter="{Binding Events}">
+                    <sync:ButtonAdv.SmallIcon>
+                        <BitmapImage  UriSource="/imgs/remove.png"/>
+                    </sync:ButtonAdv.SmallIcon>
+                </sync:ButtonAdv>
+            </UniformGrid>
+        </Grid>
+    </GroupBox>
+</UserControl>

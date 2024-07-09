@@ -1,6 +1,7 @@
 ﻿using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Expression.AU;
 using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe;
 using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.ControlBlock;
+using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Process;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -19,11 +20,16 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Napishtim
         private ObservableCollection<ControlBlockModel> __control_blocks;
         public IEnumerable<ControlBlockModel> ControlBlocks { get; }
         public override IEnumerable<ControlBlockModel> Components { get; }
+        public CONTROL_BLOCK_GROUP Group { get; }
 
-        public ControlBlockModelCollection(RecipeDocument doc) 
+        public ControlBlockModelCollection(RecipeDocument doc, CONTROL_BLOCK_GROUP group) 
         {
             RecipeDocument = doc;
-            __control_blocks = new ObservableCollection<ControlBlockModel>(doc.ControlBlocks.Select(x => ControlBlockModel.MAKE_CONTROL_BLOCK(this, x, null)));
+            Group = group;
+            if(group == CONTROL_BLOCK_GROUP.REGULAR)
+                __control_blocks = new ObservableCollection<ControlBlockModel>(doc.RegularControlBlocks.Select(x => ControlBlockModel.MAKE_CONTROL_BLOCK(this, x, null)));
+            else
+                __control_blocks = new ObservableCollection<ControlBlockModel>(doc.ExceptionHandlingBlocks.Select(x => ControlBlockModel.MAKE_CONTROL_BLOCK(this, x, null)));
             ControlBlocks = __control_blocks;
             Components = __control_blocks;
         }
@@ -34,7 +40,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Napishtim
             {
                 StringBuilder sb = new StringBuilder();
                 int i = 0;
-                foreach (var blk in RecipeDocument.ControlBlocks)
+                foreach (var blk in Group == CONTROL_BLOCK_GROUP.REGULAR?RecipeDocument.RegularControlBlocks: RecipeDocument.ExceptionHandlingBlocks)
                 {
                     sb.Append($"Control Block {i:D10}:\n");
                     foreach(var line in blk.ToString().Split('\n'))
@@ -49,7 +55,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Napishtim
         public Component AddControlBlock()
         {
             Sequential_S seq = new Sequential_S("unnamed", Enumerable.Empty<ProcessStepSource>()) { Owner = null };
-            RecipeDocument.AddControlBlockLast(seq);
+            RecipeDocument.AddControlBlockLast(Group, seq);
 
             SequentialModel seqm = new SequentialModel(this, seq) { Owner = null };
             __control_blocks.Add(seqm);
@@ -64,7 +70,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Napishtim
             if (blk.Modified)
                 throw new ArgumentException($"Unapplied changes detected in the specified Control Block.");
 
-            RecipeDocument.AddControlBlockLast(blk.ControlBlock);
+            RecipeDocument.AddControlBlockLast(Group, blk.ControlBlock);
 
             __control_blocks.Add(blk);
             IsDirty = true;
@@ -76,7 +82,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Napishtim
             var blk = Component.BUILD_CONTROL_BLOCK_FROM_CLIPBOARD(this);
             if (blk != null)
             {
-                RecipeDocument.AddControlBlockLast(blk.ControlBlock);
+                RecipeDocument.AddControlBlockLast(Group, blk.ControlBlock);
                 __control_blocks.Add(blk);
                 IsDirty = true;
             }
@@ -89,7 +95,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Napishtim
             var blk = Component.BUILD_CONTROL_BLOCK_FROM_CLIPBOARD(this);
             if (blk != null)
             {
-                RecipeDocument.AddControlBlockBefore(RecipeDocument.ControlBlockNodeAt(idx), blk.ControlBlock);
+                RecipeDocument.AddControlBlockBefore(Group, RecipeDocument.ControlBlockNodeAt(Group, idx), blk.ControlBlock);
                 __control_blocks.Insert(idx, blk);
                 IsDirty = true;
             }
@@ -128,7 +134,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Napishtim
         {
             var ret = __default_control_block_based_on_type(type);
 
-            RecipeDocument.AddControlBlockLast(ret.Item2);
+            RecipeDocument.AddControlBlockLast(Group, ret.Item2);
             __control_blocks.Add(ret.Item1);
             IsDirty = true;
             return ret.Item1;
@@ -137,7 +143,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Napishtim
         public Component InsertControlBlockAt(int pos)
         {
             Sequential_S seq = new Sequential_S("unnamed", Enumerable.Empty<ProcessStepSource>()) { Owner = null };
-            RecipeDocument.AddControlBlockBefore(RecipeDocument.ControlBlockNodeAt(pos), seq);
+            RecipeDocument.AddControlBlockBefore(Group, RecipeDocument.ControlBlockNodeAt(Group, pos), seq);
 
             SequentialModel seqm = new SequentialModel(this, seq) { Owner = null };
             __control_blocks.Insert(pos, seqm);
@@ -148,7 +154,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Napishtim
         public Component InsertControlBlockAt(int pos, Type type)
         {
             var ret = __default_control_block_based_on_type(type);
-            RecipeDocument.AddControlBlockBefore(RecipeDocument.ControlBlockNodeAt(pos), ret.Item2);
+            RecipeDocument.AddControlBlockBefore(Group, RecipeDocument.ControlBlockNodeAt(Group, pos), ret.Item2);
             __control_blocks.Insert(pos, ret.Item1);
             IsDirty = true;
             return ret.Item1;
@@ -156,7 +162,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Napishtim
 
         public void RemoveControlBlockAt(int pos)
         {
-            RecipeDocument.RemoveControlBlock(RecipeDocument.ControlBlockNodeAt(pos));
+            RecipeDocument.RemoveControlBlock(Group, RecipeDocument.ControlBlockNodeAt(Group, pos));
             __control_blocks.RemoveAt(pos);
             IsDirty = true;
         }

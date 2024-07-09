@@ -3,14 +3,18 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Controls.Context"
              xmlns:sync="http://schemas.syncfusion.com/wpf"
              xmlns:syncfusionskin ="clr-namespace:Syncfusion.SfSkinManager;assembly=Syncfusion.SfSkinManager.WPF"
+             xmlns:common="clr-namespace:AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Controls.Common"
              mc:Ignorable="d" 
              d:DesignHeight="800" d:DesignWidth="450"
              syncfusionskin:SfSkinManager.Theme="{syncfusionskin:SkinManagerExtension ThemeName=FluentDark}">
     <Grid>
         <ListBox SelectionChanged="ContextListBox_SelectionChanged">
+            <ListBox.Resources>
+                <common:ComponentStateVisibility x:Key="ComponentStateVisibility"/>
+                <common:ComponentStateImage x:Key="ComponentStateImage"/>
+            </ListBox.Resources>
             <ListBoxItem Tag="Labels">
                 <Grid>
                     <Grid.ColumnDefinitions>
@@ -19,6 +23,31 @@
                     </Grid.ColumnDefinitions>
                     <Image Source="/imgs/labels.png"  VerticalAlignment="Center" HorizontalAlignment="Center" Height="25"/>
                     <TextBlock Grid.Column="1" Text="Labels" VerticalAlignment="Center" Margin="8,0,0,0"/>
+                </Grid>
+            </ListBoxItem>
+            <ListBoxItem Tag="Exception" x:Name="ListBoxItemException">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="25"/>
+                        <ColumnDefinition Width="auto"/>
+                        <ColumnDefinition Width="auto"/>
+                    </Grid.ColumnDefinitions>
+                    <Image Source="{Binding ExceptionResponse.ImageIcon}"  VerticalAlignment="Center" HorizontalAlignment="Center" Height="25"/>
+                    <TextBlock Grid.Column="1" Text="{Binding ExceptionResponse.Header}" VerticalAlignment="Center" Margin="8,0,0,0"/>
+                    <Image Grid.Column="2" Width="20" Margin="16,0,0,0">
+                        <Image.Visibility>
+                            <MultiBinding Converter="{StaticResource ComponentStateVisibility}">
+                                <Binding Path="ExceptionResponse.Modified"/>
+                                <Binding Path="ExceptionResponse.Validated"/>
+                            </MultiBinding>
+                        </Image.Visibility>
+                        <Image.Source>
+                            <MultiBinding Converter="{StaticResource ComponentStateImage}">
+                                <Binding Path="ExceptionResponse.Modified"/>
+                                <Binding Path="ExceptionResponse.Validated"/>
+                            </MultiBinding>
+                        </Image.Source>
+                    </Image>
                 </Grid>
             </ListBoxItem>
         </ListBox>

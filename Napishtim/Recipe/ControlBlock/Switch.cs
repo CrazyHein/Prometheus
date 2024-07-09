@@ -4,7 +4,7 @@ using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.EventM
 using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.EventMechansim.TriggerMechansim;
 using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Expression.AU;
 using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.StepMechansim;
-using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.ControlBlock.Process;
+using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Process;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -118,7 +118,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
             }
             catch (Exception ex)
             {
-                throw new NaposhtimDocumentException(NaposhtimExceptionCode.CONTROL_BLOCK_ARGUMENTS_ERROR, $"Can not restore Switch object from node:\n{node.ToString()}", ex);
+                throw new NaposhtimDocumentException(NaposhtimExceptionCode.CONTROL_BLOCK_ARGUMENTS_ERROR, $"Can not restore Switch_S object from node:\n{node.ToString()}", ex);
             }
         }
 
@@ -241,7 +241,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
             GlobalEventPublisher?.RemoveEventReference(ProcessStep.SearchGlobalEventIndex(branch.condition).Concat(branch.action.GlobalEventReference).Distinct());
         }
 
-        public override ControlBlockObject ResolveTarget(uint next, Context context, IReadOnlyDictionary<uint, Event> globals, ReadOnlyMemory<uint> stepLinkMapping, ReadOnlyMemory<uint> userVariableMapping, Dictionary<uint, string> stepNameMapping)
+        public override ControlBlockObject ResolveTarget(uint next, uint abort, Context context, IReadOnlyDictionary<uint, Event> globals, ReadOnlyMemory<uint> stepLinkMapping, ReadOnlyMemory<uint> userVariableMapping, Dictionary<uint, string> stepNameMapping)
         {
             if (__branches.Count == 0)
                 throw new NaposhtimDocumentException(NaposhtimExceptionCode.CONTROL_BLOCK_ARGUMENTS_ERROR, "The number of 'Switch' Control Block branches is zero.");
@@ -260,12 +260,12 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
             //foreach (var b in __branches)
                 //b.action.Next = __conditional_statement.Next;
 
-            var c = conditionalStatement.ResolveTarget(next, context, globals, stepLinkMapping, userVariableMapping, stepNameMapping);
+            var c = conditionalStatement.ResolveTarget(next, abort, context, globals, stepLinkMapping, userVariableMapping, stepNameMapping);
             List<ControlBlockObject> a = new List<ControlBlockObject>(__branches.Count);
             int spos = 1, upos = 0;
             foreach (var b in __branches)
             {
-                a.Add(b.action.ResolveTarget(next, context, globals, stepLinkMapping.Slice(spos), userVariableMapping.Slice(upos), stepNameMapping));
+                a.Add(b.action.ResolveTarget(next, abort, context, globals, stepLinkMapping.Slice(spos), userVariableMapping.Slice(upos), stepNameMapping));
                 spos += b.action.StepFootprint;
                 upos += b.action.UserVariableFootprint;
             }

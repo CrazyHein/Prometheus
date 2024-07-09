@@ -19,7 +19,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Napishtim
         public event PropertyChangedEventHandler? PropertyChanged;
 
         private bool __component_virgin = true;
-        protected void _notify_property_changed([CallerMemberName] string? propertyName = null)
+        public void _notify_property_changed([CallerMemberName] string? propertyName = null)
         {
             //if(propertyName == "Modified" || propertyName == "Validated")
             //return;
@@ -38,7 +38,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Napishtim
                 Owner.SubComponentChangesHappened(this);
         }
 
-        protected void _reload_property(string propertyName)
+        public void _reload_property(string propertyName)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }

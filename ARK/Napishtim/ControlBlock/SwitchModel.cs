@@ -2,7 +2,8 @@
 using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.EventMechansim;
 using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.StepMechansim;
 using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.ControlBlock;
-using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.ControlBlock.Process;
+using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Globals;
+using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Process;
 using Microsoft.VisualBasic;
 using Syncfusion.Data.Extensions;
 using System;
@@ -38,6 +39,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Napishtim
             int pos = (Owner as SwitchModel).Branches.IndexOf(this);
             var act = (Owner as SwitchModel).BranchActions.ElementAt(pos);
             JsonObject o = new JsonObject();
+            o["VERSION"] = Settings.ArkVersion;
             o["ASSEMBLY"] = this.GetType().FullName;
             o["NAME"] = Name;
             o["TRIGGER"] = ConditionArray;
@@ -85,7 +87,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Napishtim
         {
             get 
             {
-                return new JsonArray(__condition.Split('\n').Select(x => JsonValue.Create<string>(x)).ToArray());
+                return new JsonArray(__condition.Split('\n').Select(x => JsonValue.Create<string>(x.TrimEnd())).ToArray());
             }
         }
 
@@ -152,7 +154,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Napishtim
         //public IEnumerable<(string, JsonArray)> BranchConditions { get; }
         public IEnumerable<SwitchBranchModel> Branches { get; }
 
-        private bool __local_events_modified = false;
+        //private bool __local_events_modified = false;
         private bool __branch_modified = false;
         public SwitchModel(ControlBlockModelCollection collection, Switch_S blk) : base(collection, blk)
         {
@@ -164,15 +166,17 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Napishtim
                 __branch_actions.Add(ControlBlockModel.MAKE_CONTROL_BLOCK(collection, a, this));
 
             __branches = new ObservableCollection<SwitchBranchModel>(blk.Branches.Select(x => new SwitchBranchModel(x.name, x.condition.DeepClone().AsArray()) { Owner = this}));
-            __local_events = new ObservableCollection<LocalEventModel>(blk.LocalEvents.Select(x => new LocalEventModel(x.Key, x.Value.name, x.Value.evt){ Owner = this}));
+            //__local_events = new ObservableCollection<LocalEventModel>(blk.LocalEvents.Select(x => new LocalEventModel(x.Key, x.Value.name, x.Value.evt){ Owner = this}));
+            LocalEvents = new LocalEventModelCollection(this, blk.LocalEvents.Select(x => new LocalEventModel(x.Key, x.Value.name, x.Value.evt) { Owner = this }));
 
             BranchActions = __branch_actions;
             //BranchConditions = __branch_conditions;
             Branches = __branches;
         }
 
-        private ObservableCollection<LocalEventModel> __local_events;
-        public IEnumerable<LocalEventModel> LocalEvents { get { return __local_events; } }
+        //private ObservableCollection<LocalEventModel> __local_events;
+        //public IEnumerable<LocalEventModel> LocalEvents { get { return __local_events; } }
+        public LocalEventModelCollection LocalEvents { get; }
 
         public override string Header => $"{Name} ({__branches.Count})";
         public override BitmapImage ImageIcon => new BitmapImage(new Uri("pack://application:,,,/imgs/switch.png"));
@@ -214,17 +218,13 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Napishtim
         {
             if (Modified)
             {
-                if (__local_events_modified)
-                {
-                    HashSet<uint> localEvents = new HashSet<uint>(__local_events.Select(x => x.Index));
-                    if (localEvents.Count != __local_events.Count)
-                        throw new ArgumentException("Local Events with the same index exist.");
+                HashSet<uint> localEvents = new HashSet<uint>(LocalEvents.Events.Select(x => x.Index));
+                if (localEvents.Count != LocalEvents.Events.Count())
+                    throw new ArgumentException("Local Events with the same index exist.");
 
-                    (ControlBlock as Switch_S).ClearLocalEvents();
-                    (ControlBlock as Switch_S).MergeLocalEvents(__local_events.Select(e => (e.Index, e.Name, e.Event.Event)));
+                (ControlBlock as Switch_S).ClearLocalEvents();
+                (ControlBlock as Switch_S).MergeLocalEvents(LocalEvents.Events.Select(e => (e.Index, e.Name, e.Event.ToEvent())));
 
-                    __local_events_modified = false;
-                }
 
                 if (__branch_modified)
                 {
@@ -244,14 +244,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Napishtim
             {
                 Name = ControlBlock.Name;
 
-                if (__local_events_modified)
-                {
-                    __local_events.Clear();
-                    foreach(var x in (ControlBlock as Switch_S).LocalEvents)
-                        __local_events.Add(new LocalEventModel(x.Key, x.Value.name, x.Value.evt) { Owner = this });
+                LocalEvents.Clear(false);
+                foreach(var x in (ControlBlock as Switch_S).LocalEvents)
+                    LocalEvents.Add(new LocalEventModel(x.Key, x.Value.name, x.Value.evt) { Owner = this }, false);
 
-                    __local_events_modified = false;
-                }
 
                 if (__branch_modified)
                 {
@@ -272,7 +268,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Napishtim
 
         public override ControlBlockSource ExportToControlBlockSource()
         {
-            return new Switch_S(Name, new Dictionary<uint, (string name, Event evt)>(__local_events.Select(x => KeyValuePair.Create(x.Index, (x.Name, x.Event.ToEvent())))),
+            return new Switch_S(Name, new Dictionary<uint, (string name, Event evt)>(LocalEvents.Events.Select(x => KeyValuePair.Create(x.Index, (x.Name, x.Event.ToEvent())))),
                 __branches.Zip(__branch_actions).Select(x => (x.First.Name, x.First.ConditionArray, x.Second.ExportToControlBlockSource())))
             { Owner = null };
         }
@@ -290,7 +286,6 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Napishtim
             if (sub is LocalEventModel)
             {
                 _notify_property_changed("Summary");
-                __local_events_modified = true;
             }
             else if(sub is SwitchBranchModel)
             {
@@ -318,56 +313,6 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Napishtim
         public int IndexOf(SwitchBranchModel branch)
         {
             return __branches.IndexOf(branch);
-        }
-
-        public void AddLocalEvent(LocalEventModel evt)
-        {
-            (ControlBlock as Switch_S).AddLocalEvent(evt.Index, evt.Name, evt.Event.Event);
-            __local_events.Add(evt);
-            __local_events_modified = true;
-            _notify_property_changed("Summary");
-            //ApplyChanges();
-        }
-
-        public void AddLocalEvent()
-        {
-            uint idx = 0;
-            if (__local_events.Count != 0)
-                idx = __local_events.Max(x => x.Index) + 1;
-            LocalEventModel evt = new LocalEventModel(idx, "unnamed") { Owner = this };
-            __local_events.Add(evt);
-            __local_events_modified = true;
-            _notify_property_changed("Summary");
-        }
-
-
-        public void RemoveLocalEventAt(int pos)
-        {
-            (ControlBlock as Switch_S).RemoveLocalEvent(__local_events[pos].Index);
-            __local_events.RemoveAt(pos);
-            __local_events_modified = true;
-            _notify_property_changed("Summary");
-            ApplyChanges();
-        }
-
-        public void InsertLocalEvent(int pos, LocalEventModel evt)
-        {
-            (ControlBlock as Switch_S).AddLocalEvent(evt.Index, evt.Name, evt.Event.Event);
-            __local_events.Insert(pos, evt);
-            __local_events_modified = true;
-            _notify_property_changed("Summary");
-            //ApplyChanges();
-        }
-
-        public void InsertLocalEvent(int pos)
-        {
-            uint idx = 0;
-            if (__local_events.Count != 0)
-                idx = __local_events.Max(x => x.Index) + 1;
-            LocalEventModel evt = new LocalEventModel(idx, "unnamed") { Owner = this };
-            __local_events.Insert(pos, evt);
-            __local_events_modified = true;
-            _notify_property_changed("Summary");
         }
 
         public void AddBranch()

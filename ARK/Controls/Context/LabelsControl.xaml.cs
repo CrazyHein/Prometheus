@@ -15,7 +15,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Controls.Context
+namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Controls
 {
     /// <summary>
     /// Labels.xaml 的交互逻辑

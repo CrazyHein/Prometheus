@@ -8,7 +8,7 @@ using System.Text;
 using System.Text.Json.Nodes;
 using System.Threading.Tasks;
 
-namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.ControlBlock.Process
+namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Process
 {
     public record ProcessShader(string Name, Shader Shader)
     {
@@ -17,7 +17,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
             JsonObject o = new JsonObject();
             o["NAME"] = Name;
             JsonObject s = Shader.ToJson().AsObject();
-            foreach(var p in s)
+            foreach (var p in s)
                 o[p.Key] = p.Value.DeepClone();
             return o;
         }
@@ -54,9 +54,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
         public IEnumerable<ProcessShader> Shaders => _shaders;
     }
 
-    internal class ReservedProcessShaders: ProcessShaders
+    internal class ReservedProcessShaders : ProcessShaders
     {
-        public ReservedProcessShaders(IEnumerable<(string name, string lvalue, string rvalue)> shaders): base(shaders)
+        public ReservedProcessShaders(IEnumerable<(string name, string lvalue, string rvalue)> shaders) : base(shaders)
         {
             foreach (var s in _shaders)
             {
@@ -72,7 +72,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
         }
     }
 
-    public class UserProcessShaders: ProcessShaders
+    public class UserProcessShaders : ProcessShaders
     {
         public UserProcessShaders(IEnumerable<(string name, string lvalue, string rvalue)> shaders) : base(shaders)
         {
