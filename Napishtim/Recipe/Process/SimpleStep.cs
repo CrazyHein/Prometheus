@@ -170,7 +170,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Pr
             chewed["END_POINTS"][0]["TARGET"] = next;
             if (chewed["END_POINTS"].AsArray().Count == 2)
                 chewed["END_POINTS"][1]["TARGET"] = abort;
-            stepNameMapping[stepLinkMapping.Span[0]] = Name;
+            stepNameMapping[stepLinkMapping.Span[0]] = String.Join('/', container.FullName, Name);
 
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////
             List<ProcessShader> abortShaderObjectDirectAssignments = AbortShaderObjectDirectAssignments.ToList();

@@ -31,6 +31,7 @@
             <RowDefinition Height="*"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <Image Source="/imgs/shell.png" Width="64" Grid.RowSpan="12" Margin="10,4,10,4"/>
         <TextBlock Text="Description : " Grid.Column="1" Grid.Row="0" Margin="4" VerticalAlignment="Center"/>
@@ -41,10 +42,11 @@
         <TextBlock Text="ARK Version : " Grid.Column="1" Grid.Row="5" Margin="4" VerticalAlignment="Center"/>
         <TextBlock Text="Napishtim Version : " Grid.Column="1" Grid.Row="6" Margin="4" VerticalAlignment="Center"/>
         <TextBlock Text="Lombardia Version : " Grid.Column="1" Grid.Row="7" Margin="4" VerticalAlignment="Center"/>
-        <TextBlock Text="Suppored File Format Version : " Grid.Column="1" Grid.Row="8" Margin="4" VerticalAlignment="Center"/>
-        <TextBlock Text="Supported Variable File Format Version : " Grid.Column="1" Grid.Row="9" Margin="4" VerticalAlignment="Center"/>
-        <TextBlock Text="Supported IO File Format Version : " Grid.Column="1" Grid.Row="10" Margin="4" VerticalAlignment="Center"/>
-        <TextBlock Text="Gagharv Version : " Grid.Column="1" Grid.Row="11" Margin="4" VerticalAlignment="Center"/>
+        <TextBlock Text="Suppored Source File Format Version : " Grid.Column="1" Grid.Row="8" Margin="4" VerticalAlignment="Center"/>
+        <TextBlock Text="Suppored Script File Format Version : " Grid.Column="1" Grid.Row="9" Margin="4" VerticalAlignment="Center"/>
+        <TextBlock Text="Supported Variable File Format Version : " Grid.Column="1" Grid.Row="10" Margin="4" VerticalAlignment="Center"/>
+        <TextBlock Text="Supported IO File Format Version : " Grid.Column="1" Grid.Row="11" Margin="4" VerticalAlignment="Center"/>
+        <TextBlock Text="Gagharv Version : " Grid.Column="1" Grid.Row="12" Margin="4" VerticalAlignment="Center"/>
 
         <TextBlock Text="{Binding Description}" Grid.Column="2" Grid.Row="0" Margin="4" VerticalAlignment="Center"/>
         <TextBlock Text="{Binding DataTypeCataloguePath}" Grid.Column="2" Grid.Row="1" Margin="4" VerticalAlignment="Center"/>
@@ -54,10 +56,11 @@
         <TextBlock Text="{Binding ArkVersion}" Grid.Column="2" Grid.Row="5" Margin="4" VerticalAlignment="Center"/>
         <TextBlock Text="{Binding NapishtimVersion}" Grid.Column="2" Grid.Row="6" Margin="4" VerticalAlignment="Center"/>
         <TextBlock Text="{Binding LombardiaVersion}" Grid.Column="2" Grid.Row="7" Margin="4" VerticalAlignment="Center"/>
-        <TextBlock Text="{Binding SupporedFileFormatVersion}" Grid.Column="2" Grid.Row="8" Margin="4" VerticalAlignment="Center"/>
-        <TextBlock Text="{Binding SupportedVariableFileFormatVersion}" Grid.Column="2" Grid.Row="9" Margin="4" VerticalAlignment="Center"/>
-        <TextBlock Text="{Binding SupportedIOFileFormatVersion}" Grid.Column="2" Grid.Row="10" Margin="4" VerticalAlignment="Center"/>
-        <TextBlock Text="{Binding GagharvVersion}" Grid.Column="2" Grid.Row="11" Margin="4" VerticalAlignment="Center"/>
+        <TextBlock Text="{Binding SupporedSourceFileFormatVersion}" Grid.Column="2" Grid.Row="8" Margin="4" VerticalAlignment="Center"/>
+        <TextBlock Text="{Binding SupporedScriptFileFormatVersion}" Grid.Column="2" Grid.Row="9" Margin="4" VerticalAlignment="Center"/>
+        <TextBlock Text="{Binding SupportedVariableFileFormatVersion}" Grid.Column="2" Grid.Row="10" Margin="4" VerticalAlignment="Center"/>
+        <TextBlock Text="{Binding SupportedIOFileFormatVersion}" Grid.Column="2" Grid.Row="11" Margin="4" VerticalAlignment="Center"/>
+        <TextBlock Text="{Binding GagharvVersion}" Grid.Column="2" Grid.Row="12" Margin="4" VerticalAlignment="Center"/>
 
     </Grid>
 </Window>

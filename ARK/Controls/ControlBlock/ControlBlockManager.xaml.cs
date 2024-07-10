@@ -164,7 +164,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Controls
                 Component? component = null;
                 if (e.Parameter == DataContext)
                 {
-                    ControlBlockTypeSelector selector = new ControlBlockTypeSelector();
+                    ControlBlockTypeSelector selector = new ControlBlockTypeSelector() { Owner = Application.Current.MainWindow };
                     if(selector.ShowDialog() == true)
                         component = (DataContext as ControlBlockModelCollection).AddControlBlock(selector.ControlBlockType);
                 }
@@ -204,7 +204,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Controls
                 if((sfControlBlocksTreeView.SelectedItem as Component).Owner == null)
                 {
                     int pos = (DataContext as ControlBlockModelCollection).ControlBlocks.IndexOf(sfControlBlocksTreeView.SelectedItem as ControlBlockModel);
-                    ControlBlockTypeSelector selector = new ControlBlockTypeSelector();
+                    ControlBlockTypeSelector selector = new ControlBlockTypeSelector() { Owner = Application.Current.MainWindow };
                     if (selector.ShowDialog() == true)
                         component = (DataContext as ControlBlockModelCollection).InsertControlBlockAt(pos, selector.ControlBlockType);
                 }

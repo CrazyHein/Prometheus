@@ -65,6 +65,21 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
                 __owner = value;
             }
         }
+
+        public string FullName
+        {
+            get
+            {
+                string name = Name;
+                ControlBlockSource owner = Owner;
+                while(owner != null)
+                {
+                    name = String.Join('/', owner.Name, name);
+                    owner = owner.Owner;
+                }
+                return name;
+            }
+        }
         public abstract int Height { get; }
         public const int MAX_NESTING_DEPTH = 32;
         public virtual int RootHeight

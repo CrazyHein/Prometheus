@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Net;
+using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe;
 
 namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK
 {
@@ -19,7 +20,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK
         public static string ArkVersion { get; } = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
         public static string NapishtimVersion { get; } = System.Reflection.Assembly.GetAssembly(typeof(Step)).GetName().Version.ToString();
         public static string LombardiaVersion { get; } = System.Reflection.Assembly.GetAssembly(typeof(IOCelcetaHelper)).GetName().Version.ToString();
-        public static uint SupporedFileFormatVersion { get; } = IOCelcetaHelper.SupportedFileFormatVersion;
+        public static uint SupporedSourceFileFormatVersion { get; } = RecipeDocument.SupportedSourceFileFormatVersion;
+        public static uint SupporedScriptFileFormatVersion { get; } = RecipeDocument.SupportedScriptFileFormatVersion;
         public static uint SupportedVariableFileFormatVersion { get; } = IOCelcetaHelper.SupportedVariableFileFormatVersion;
         public static uint SupportedIOFileFormatVersion { get; } = IOCelcetaHelper.SupportedIOFileFormatVersion;
         public static string GagharvVersion { get; } = System.Reflection.Assembly.GetAssembly(typeof(RemoteOperationMaster)).GetName().Version.ToString();

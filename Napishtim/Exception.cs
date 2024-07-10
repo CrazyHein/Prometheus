@@ -141,6 +141,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim
         DOCUMENT_STEP_BUILD_ERROR                                   = 0x5003,
         DOCUMENT_CONTROL_BLK_BUILD_ERROR                            = 0x5004,
         DOCUMENT_EXCEPTION_RSP_BUILD_ERROR                          = 0x5005,
+        DOCUMENT_FILE_VERSION_UNSUPPORTED                           = 0x5006,
+        DOCUMENT_FILE_ASSEMBLY_MISMATCH                             = 0x5007,
 
         PROCESS_COMPONENT_ARGUMENTS_ERROR                           = 0x5011,
         PROCESS_COMPONENT_INVALID_OPERATION                         = 0x5012,

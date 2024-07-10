@@ -111,7 +111,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Pr
             chewed = _step.DeepClone().AsObject();
             chewed["ID"] = stepLinkMapping.Span[0];
             chewed["END_POINTS"].AsArray()[^1]["TARGET"] = next;
-            stepNameMapping[stepLinkMapping.Span[0]] = Name;
+            stepNameMapping[stepLinkMapping.Span[0]] = String.Join('/', container.FullName, Name);
 
             return new BranchStep_O(Name, chewed, StepFootprint, UserVariableFootprint, NumOfBranches);
         }

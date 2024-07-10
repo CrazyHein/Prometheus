@@ -236,8 +236,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK
 
             __document_model.GlobalEventManager = new GlobalEventModelCollection(__rcp_document);
             __document_model.ContextManager = new ContextModel(__rcp_document);
-            __document_model.RegularControlBlockManager = new ControlBlockModelCollection(__rcp_document, CONTROL_BLOCK_GROUP.REGULAR);
-            __document_model.ExceptionControlBlockManager = new ControlBlockModelCollection(__rcp_document, CONTROL_BLOCK_GROUP.EXCEPTION_HANDLING);
+            __document_model.RegularControlBlockManager = new ControlBlockModelCollection(__rcp_document, CONTROL_BLOCK_GROUP_T.REGULAR);
+            __document_model.ExceptionControlBlockManager = new ControlBlockModelCollection(__rcp_document, CONTROL_BLOCK_GROUP_T.EXCEPTION_HANDLING);
 
             ContextManager.Content = new ContextManager(__document_model.ContextManager, ContentControl);
             GlobalEventManager.Content = new GlobalEventManager(__document_model.GlobalEventManager, ContentControl);
@@ -304,8 +304,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK
 
                 __document_model.GlobalEventManager = new GlobalEventModelCollection(__rcp_document);
                 __document_model.ContextManager = new ContextModel(__rcp_document);
-                __document_model.RegularControlBlockManager = new ControlBlockModelCollection(__rcp_document, CONTROL_BLOCK_GROUP.REGULAR);
-                __document_model.ExceptionControlBlockManager = new ControlBlockModelCollection(__rcp_document, CONTROL_BLOCK_GROUP.EXCEPTION_HANDLING);
+                __document_model.RegularControlBlockManager = new ControlBlockModelCollection(__rcp_document, CONTROL_BLOCK_GROUP_T.REGULAR);
+                __document_model.ExceptionControlBlockManager = new ControlBlockModelCollection(__rcp_document, CONTROL_BLOCK_GROUP_T.EXCEPTION_HANDLING);
 
                 ContextManager.Content = new ContextManager(__document_model.ContextManager, ContentControl);
                 GlobalEventManager.Content = new GlobalEventManager(__document_model.GlobalEventManager, ContentControl);
@@ -543,8 +543,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK
 
             __document_model.GlobalEventManager = new GlobalEventModelCollection(__rcp_document);
             __document_model.ContextManager = new ContextModel(__rcp_document);
-            __document_model.RegularControlBlockManager = new ControlBlockModelCollection(__rcp_document, CONTROL_BLOCK_GROUP.REGULAR);
-            __document_model.ExceptionControlBlockManager = new ControlBlockModelCollection(__rcp_document, CONTROL_BLOCK_GROUP.EXCEPTION_HANDLING);
+            __document_model.RegularControlBlockManager = new ControlBlockModelCollection(__rcp_document, CONTROL_BLOCK_GROUP_T.REGULAR);
+            __document_model.ExceptionControlBlockManager = new ControlBlockModelCollection(__rcp_document, CONTROL_BLOCK_GROUP_T.EXCEPTION_HANDLING);
 
             ContextManager.Content = new ContextManager(__document_model.ContextManager, ContentControl);
             GlobalEventManager.Content = new GlobalEventManager(__document_model.GlobalEventManager, ContentControl);

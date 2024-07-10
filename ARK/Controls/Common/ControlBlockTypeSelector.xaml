@@ -8,7 +8,7 @@
         xmlns:syncfusionskin ="clr-namespace:Syncfusion.SfSkinManager;assembly=Syncfusion.SfSkinManager.WPF"
         syncfusionskin:SfSkinManager.Theme="{syncfusionskin:SkinManagerExtension ThemeName=FluentDark}"
         mc:Ignorable="d"
-        Title="Select Control Block Type" Height="280" Width="600" ResizeMode="NoResize" WindowStartupLocation="CenterScreen">
+        Title="Select Control Block Type" Height="280" Width="600" ResizeMode="NoResize" WindowStartupLocation="CenterOwner">
     <Grid Margin="16">
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"/>

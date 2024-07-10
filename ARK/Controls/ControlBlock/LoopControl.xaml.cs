@@ -63,7 +63,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Controls
 
         private void AddControlBlockCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            ControlBlockTypeSelector selector = new ControlBlockTypeSelector();
+            ControlBlockTypeSelector selector = new ControlBlockTypeSelector() { Owner = Application.Current.MainWindow };
             if (selector.ShowDialog() == true)
                 (DataContext as LoopModel).ResetLoopBody(selector.ControlBlockType);
         }

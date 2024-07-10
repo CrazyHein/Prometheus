@@ -20,13 +20,13 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Napishtim
         private ObservableCollection<ControlBlockModel> __control_blocks;
         public IEnumerable<ControlBlockModel> ControlBlocks { get; }
         public override IEnumerable<ControlBlockModel> Components { get; }
-        public CONTROL_BLOCK_GROUP Group { get; }
+        public CONTROL_BLOCK_GROUP_T Group { get; }
 
-        public ControlBlockModelCollection(RecipeDocument doc, CONTROL_BLOCK_GROUP group) 
+        public ControlBlockModelCollection(RecipeDocument doc, CONTROL_BLOCK_GROUP_T group) 
         {
             RecipeDocument = doc;
             Group = group;
-            if(group == CONTROL_BLOCK_GROUP.REGULAR)
+            if(group == CONTROL_BLOCK_GROUP_T.REGULAR)
                 __control_blocks = new ObservableCollection<ControlBlockModel>(doc.RegularControlBlocks.Select(x => ControlBlockModel.MAKE_CONTROL_BLOCK(this, x, null)));
             else
                 __control_blocks = new ObservableCollection<ControlBlockModel>(doc.ExceptionHandlingBlocks.Select(x => ControlBlockModel.MAKE_CONTROL_BLOCK(this, x, null)));
@@ -40,7 +40,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Napishtim
             {
                 StringBuilder sb = new StringBuilder();
                 int i = 0;
-                foreach (var blk in Group == CONTROL_BLOCK_GROUP.REGULAR?RecipeDocument.RegularControlBlocks: RecipeDocument.ExceptionHandlingBlocks)
+                foreach (var blk in Group == CONTROL_BLOCK_GROUP_T.REGULAR?RecipeDocument.RegularControlBlocks: RecipeDocument.ExceptionHandlingBlocks)
                 {
                     sb.Append($"Control Block {i:D10}:\n");
                     foreach(var line in blk.ToString().Split('\n'))
