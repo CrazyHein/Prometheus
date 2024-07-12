@@ -319,7 +319,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Pr
 
     public class SimpleStep_O : ProcessStepObject
     {
-        public SimpleStep_O(string name, JsonObject step, int stepFootprint, int userVariableFootprint) : base(name, step)
+        internal SimpleStep_O(string name, JsonObject step, int stepFootprint, int userVariableFootprint) : base(name, step)
         {
             StepFootprint = stepFootprint;
             UserVariableFootprint = userVariableFootprint;

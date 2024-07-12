@@ -327,7 +327,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
     {
         ControlBlockObject __condition;
         List<ControlBlockObject> __actions;
-        public Switch_O(string name, ControlBlockObject condition, IEnumerable<ControlBlockObject> actions, int stepFootprint, int userVariableFootprint):base(name)
+        internal Switch_O(string name, ControlBlockObject condition, IEnumerable<ControlBlockObject> actions, int stepFootprint, int userVariableFootprint):base(name)
         {
             __condition = condition;
             __actions = new List<ControlBlockObject>(actions);

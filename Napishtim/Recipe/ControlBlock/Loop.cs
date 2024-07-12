@@ -208,7 +208,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
         private ControlBlockObject __conditional_statement;
         private ControlBlockObject __control_block_body;
 
-        public Loop_O(string name, ControlBlockObject init, ControlBlockObject condition, ControlBlockObject body, int stepFootprint, int userVariableFootprint): base(name)
+        internal Loop_O(string name, ControlBlockObject init, ControlBlockObject condition, ControlBlockObject body, int stepFootprint, int userVariableFootprint): base(name)
         {
             __initialization_statement = init;
             __conditional_statement = condition;

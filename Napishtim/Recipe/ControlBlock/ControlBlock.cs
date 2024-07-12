@@ -82,21 +82,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
         }
         public abstract int Height { get; }
         public const int MAX_NESTING_DEPTH = 32;
-        public virtual int RootHeight
-        {
-            get
-            {
-                if (Owner == null)
-                    return Height;
-                else
-                {
-                    ControlBlockSource? owner = Owner;
-                    while (owner.Owner != null)
-                        owner = owner.Owner;
-                    return owner.Height;
-                }
-            }
-        }
+
 
         public virtual int Nesting
         {
@@ -178,12 +164,14 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
                         if (__global_events_publisher_counter == 0)
                             __global_events_publisher = null;
                     }
+                    else
+                        throw new NaposhtimDocumentException(NaposhtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, $"The ControlBlock has not been linked to a GlobalEvents object yet.");
                 }
             }
         }
 
         public abstract JsonObject SaveAsJson();
-        public delegate ControlBlockSource MakeControlBlock(JsonObject node, ControlBlockSource? owner);
+        private delegate ControlBlockSource MakeControlBlock(JsonObject node, ControlBlockSource? owner);
         private static Dictionary<string, MakeControlBlock> __BUIILD_CONTROL_BLOCK = new Dictionary<string, MakeControlBlock>();
         public static ControlBlockSource MAKE_BLK(JsonObject node, ControlBlockSource? owner)
         {
@@ -211,7 +199,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
 
     public abstract class ControlBlockObject: ControlBlock
     {
-        protected ControlBlockObject(string name) : base(name)
+        internal ControlBlockObject(string name) : base(name)
         {
         }
 

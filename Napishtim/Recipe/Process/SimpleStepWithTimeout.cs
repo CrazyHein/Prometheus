@@ -448,7 +448,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Pr
         public SimpleStepWithTimeout_S? EmployPreceding { get; private init; }
         public int Timeout { get; private init; }
 
-        public SimpleStepWithTimeout_O(string name, JsonObject step, int stepFootprint, int userVariableFootprint, SimpleStepWithTimeout_S? employPreceding, int timeout) : base(name, step)
+        internal SimpleStepWithTimeout_O(string name, JsonObject step, int stepFootprint, int userVariableFootprint, SimpleStepWithTimeout_S? employPreceding, int timeout) : base(name, step)
         {
             StepFootprint = stepFootprint;
             UserVariableFootprint = userVariableFootprint;

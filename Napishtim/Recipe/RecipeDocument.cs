@@ -112,7 +112,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe
         {
             __global_events = new GlobalEvents();
             __context = new Context();
-            ParseSource(path);
+            __parse_source(path);
         }
 
         public void AddGlobalEvent(uint idx, string name, string type, params (string pname, string pvalue)[]? parameters)
@@ -618,7 +618,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe
             }
         }
 
-        public void ParseSource(string path)
+        private void __parse_source(string path)
         {
             Dictionary<uint, (string, Event)> globalEvents = new Dictionary<uint, (string, Event)>();
             ExceptionResponseSource? exceptionResponseSource = null;

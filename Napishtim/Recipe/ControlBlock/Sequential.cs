@@ -469,7 +469,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
 
         public override int UserVariableFootprint => __compiled_process_steps.Sum(x => x.UserVariableFootprint);
 
-        public Sequential_O(string name, IEnumerable<ProcessStepObject> steps, IReadOnlyDictionary<SimpleStepWithTimeout_S, Expression> timeToTimeout, int stepFootprint, int userVariableFootprint): base(name)
+        internal Sequential_O(string name, IEnumerable<ProcessStepObject> steps, IReadOnlyDictionary<SimpleStepWithTimeout_S, Expression> timeToTimeout, int stepFootprint, int userVariableFootprint): base(name)
         {
             __compiled_process_steps = new LinkedList<ProcessStepObject>(steps);
             ID = __compiled_process_steps.First.Value.ID;

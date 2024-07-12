@@ -123,7 +123,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Pr
         public abstract Step Build(Context context, IReadOnlyDictionary<uint, Event> globals, Sequential_O container);
         protected JsonObject _step;
 
-        public ProcessStepObject(string name, JsonObject step) : base(name)
+        internal ProcessStepObject(string name, JsonObject step) : base(name)
         {
             _step = step;
         }

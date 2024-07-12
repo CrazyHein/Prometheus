@@ -176,7 +176,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Pr
     public class BranchStep_O : ProcessStepObject
     {
         public int NumOfBranches { get; private init; } = 1;
-        public BranchStep_O(string name, JsonObject step, int stepFootprint, int userVariableFootprint, int numOfBranches) : base(name, step)
+        internal BranchStep_O(string name, JsonObject step, int stepFootprint, int userVariableFootprint, int numOfBranches) : base(name, step)
         {
             _step = step;
             StepFootprint = stepFootprint;
