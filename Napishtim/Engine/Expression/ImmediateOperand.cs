@@ -22,6 +22,11 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ex
                 throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EXPRESSION_PARSE_ERROR, $"{value} -> double");
         }
 
+        public ImmediateOperand(double value)
+        {
+            __value = value;
+        }
+
         public override string ToString()
         {
             return __value.ToString();

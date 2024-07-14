@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.EventMechansim
 {
-    [CompatibleEvent("LMT: the evaluation value of event is TRUE(FALSE if `REVERSED` has been set to TRUE). In Any Other Case, the value is FALSE(TRUE if `REVERSED` has been set to TRUE).")]
+    [CompatibleEvent("LMT: The evaluation value of event is TRUE(FALSE if `REVERSED` has been set to TRUE) if the `EXPRESSION` value is within the range. In Any Other Case, the value is FALSE(TRUE if `REVERSED` has been set to TRUE).")]
     public class LMT : Event
     {
         public override string Tag => "LMT";

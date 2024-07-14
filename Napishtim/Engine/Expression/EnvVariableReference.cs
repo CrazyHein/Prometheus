@@ -37,8 +37,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ex
             __ENV_VARIABLE_INFO[ENV_VARIABLE_TYPE_T.STEP] = "Returns the number of step that is being executed.";
             __ENV_VARIABLE_INFO[ENV_VARIABLE_TYPE_T.RETURN] = "Variable that users can freely read and write, usually used to store the result of running the recipe.";
             __ENV_VARIABLE_INFO[ENV_VARIABLE_TYPE_T.DEBUG] = "For debugging purposes, users should avoid using this variable.";
-            __ENV_VARIABLE_INFO[ENV_VARIABLE_TYPE_T.USER] = "Variable that users can freely read and write, the number of variables available is limited by the system configuration.";
-            __ENV_VARIABLE_INFO[ENV_VARIABLE_TYPE_T.STBEGIN] = "Returns the value of engine internal clock when the step begined in milliseconds";
+            __ENV_VARIABLE_INFO[ENV_VARIABLE_TYPE_T.USER] = "Variable that users can freely read and write, the number of variables available is limited by the system and recipe configuration.";
+            __ENV_VARIABLE_INFO[ENV_VARIABLE_TYPE_T.STBEGIN] = "Returns the value of engine internal clock of the step began in milliseconds.";
             __ENV_VARIABLE_INFO[ENV_VARIABLE_TYPE_T.STDURA] = "Returns the time(milliseconds) since the current step has been executed.";
         }
 

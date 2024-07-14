@@ -21,12 +21,14 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ex
 			/*')'*/{ '>', '>', '>', '>', 'X', '>', '>' },
 		   /*'\0'*/{ '<', '<', '<', '<', '<', 'X', '=' },
 		};
+        private static Expression __zero = new Expression(new ImmediateOperand(0));
+        private static Expression __one = new Expression(new ImmediateOperand(1));
 
-        public static Expression ZERO { get; } = new Expression(new ImmediateOperand("0"));
-        public static Expression ONE { get; } = new Expression(new ImmediateOperand("1"));
+        public static Expression ZERO { get; } = __zero;
+        public static Expression ONE { get; } = __one;
         public static Expression NUMBER_EXPR(double value)
         {
-            return new Expression(new ImmediateOperand(value.ToString("f6")));
+            return new Expression(new ImmediateOperand(value));
         }
 
         public static Expression USER_VARIABLE_EXPR(uint index)
