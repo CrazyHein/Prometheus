@@ -52,10 +52,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
         public abstract ControlBlockObject ResolveTarget(uint next, uint abort, Context context, IReadOnlyDictionary<uint, Event> globals, ReadOnlyMemory<uint> stepLinkMapping, ReadOnlyMemory<uint> userVariableMapping, Dictionary<uint, string> stepNameMapping);
 
         private ControlBlockSource? __owner = null;
-        public required ControlBlockSource? Owner 
+        public ControlBlockSource? Owner 
         {
             get { return __owner; }
-            set
+            internal set
             {
                 if (value != null)
                 {

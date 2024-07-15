@@ -269,8 +269,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Napishtim
         public override ControlBlockSource ExportToControlBlockSource()
         {
             return new Switch_S(Name, new Dictionary<uint, (string name, Event evt)>(LocalEvents.Events.Select(x => KeyValuePair.Create(x.Index, (x.Name, x.Event.ToEvent())))),
-                __branches.Zip(__branch_actions).Select(x => (x.First.Name, x.First.ConditionArray, x.Second.ExportToControlBlockSource())))
-            { Owner = null };
+                __branches.Zip(__branch_actions).Select(x => (x.First.Name, x.First.ConditionArray, x.Second.ExportToControlBlockSource())));
         }
 
         public override void SubComponentChangesApplied(Component sub)
@@ -318,7 +317,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Napishtim
         public void AddBranch()
         {
             var sm = new SwitchBranchModel("unnamed", new JsonArray()) { Owner = this };
-            var blk = new SequentialModel(Manager, new Sequential_S("unnamed", Enumerable.Empty<ProcessStepSource>()) { Owner = null }) { Owner = this };
+            var blk = new SequentialModel(Manager, new Sequential_S("unnamed", Enumerable.Empty<ProcessStepSource>())) { Owner = this };
             if (this.ControlBlock.Nesting + blk.ControlBlock.Height > ControlBlockSource.MAX_NESTING_DEPTH)
                 throw new InvalidOperationException($"The nesting depth of the Control Block exceeds the limit(MAX: {ControlBlockSource.MAX_NESTING_DEPTH}).");
             __branches.Add(sm);
@@ -330,7 +329,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Napishtim
         public void InsertBranch(int pos)
         {
             var sm = new SwitchBranchModel("unnamed", new JsonArray()) { Owner = this };
-            var blk = new SequentialModel(Manager, new Sequential_S("unnamed", Enumerable.Empty<ProcessStepSource>()) { Owner = null }) { Owner = this };
+            var blk = new SequentialModel(Manager, new Sequential_S("unnamed", Enumerable.Empty<ProcessStepSource>())) { Owner = this };
             if (this.ControlBlock.Nesting + blk.ControlBlock.Height > ControlBlockSource.MAX_NESTING_DEPTH)
                 throw new InvalidOperationException($"The nesting depth of the Control Block exceeds the limit(MAX: {ControlBlockSource.MAX_NESTING_DEPTH}).");
             __branches.Insert(pos, sm);
@@ -386,19 +385,19 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Napishtim
 
             if (typeof(Sequential_S) == type)
             {
-                blk_s = new Sequential_S(__branch_actions[pos].Name, Enumerable.Empty<ProcessStepSource>()) { Owner = null };
+                blk_s = new Sequential_S(__branch_actions[pos].Name, Enumerable.Empty<ProcessStepSource>());
                 blk_m = new SequentialModel(Manager, blk_s as Sequential_S) { Owner = this };
             }
             else if (typeof(Loop_S) == type)
             {
-                blk_s = new Loop_S(__branch_actions[pos].Name, 1) { Owner = null };
-                Sequential_S seq = new Sequential_S("unnamed", Enumerable.Empty<ProcessStepSource>()) { Owner = null };
+                blk_s = new Loop_S(__branch_actions[pos].Name, 1);
+                Sequential_S seq = new Sequential_S("unnamed", Enumerable.Empty<ProcessStepSource>());
                 (blk_s as Loop_S).LoopBody = seq;
                 blk_m = new LoopModel(Manager, blk_s as Loop_S) { Owner = this };
             }
             else if (typeof(Switch_S) == type)
             {
-                blk_s = new Switch_S(__branch_actions[pos].Name) { Owner = null };
+                blk_s = new Switch_S(__branch_actions[pos].Name);
                 blk_m = new SwitchModel(Manager, blk_s as Switch_S) { Owner = this };
             }
             else

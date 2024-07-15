@@ -28,7 +28,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Napishtim
 
         public static SequentialModel MAKE(ControlBlockModelCollection collection, JsonNode seqNode)
         {
-            Sequential_S blk = new Sequential_S(seqNode["NAME"].GetValue<string>(), Enumerable.Empty<ProcessStepSource>()) { Owner = null};
+            Sequential_S blk = new Sequential_S(seqNode["NAME"].GetValue<string>(), Enumerable.Empty<ProcessStepSource>());
             foreach (var stp in seqNode["SUBSTEPS"].AsArray())
             {
                 blk.AddProcessStepLast(ProcessStepSource.MAKE_STEP(stp["SOURCE"].AsObject(), blk));
@@ -243,7 +243,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Napishtim
 
         public override ControlBlockSource ExportToControlBlockSource()
         {
-            Sequential_S seq = new Sequential_S(Name, Enumerable.Empty<ProcessStepSource>()) { Owner = null };
+            Sequential_S seq = new Sequential_S(Name, Enumerable.Empty<ProcessStepSource>());
             foreach(var s in SubSteps)
             {
                 seq.AddProcessStepLast(s.ExportToProcessStepSource(seq));

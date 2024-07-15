@@ -373,5 +373,11 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ex
         public bool IsImmediateOperand {
             get { return __original_order_vector.All(x => x is ImmediateOperand || x is Operator); }
         }
+
+        public static implicit operator Expression(string expr)
+        {
+            return new Expression(expr, null);
+        }
+
     }
 }

@@ -88,14 +88,14 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Napishtim
 
             if (typeof(Sequential_S) == type)
             {
-                Sequential_S seq = new Sequential_S(name, Enumerable.Empty<ProcessStepSource>()) { Owner = null };
+                Sequential_S seq = new Sequential_S(name, Enumerable.Empty<ProcessStepSource>());
                 (ControlBlock as Loop_S).LoopBody = seq;
                 blk = new SequentialModel(Manager, seq) { Owner = this };
             }
             else if (typeof(Loop_S) == type)
             {
-                Loop_S loop = new Loop_S(name, 1) { Owner = null };
-                Sequential_S seq = new Sequential_S("unnamed", Enumerable.Empty<ProcessStepSource>()) { Owner = null };
+                Loop_S loop = new Loop_S(name, 1);
+                Sequential_S seq = new Sequential_S("unnamed", Enumerable.Empty<ProcessStepSource>());
                 loop.LoopBody = seq;
 
                 (ControlBlock as Loop_S).LoopBody = loop;
@@ -103,7 +103,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Napishtim
             }
             else if (typeof(Switch_S) == type)
             {
-                Switch_S sw = new Switch_S(name) { Owner = null }; ;
+                Switch_S sw = new Switch_S(name); ;
                 (ControlBlock as Loop_S).LoopBody = sw;
                 blk = new SwitchModel(Manager, sw) { Owner = this };
             }
@@ -162,9 +162,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Napishtim
         public override ControlBlockSource ExportToControlBlockSource()
         {
             if(__loop_body.Count() == 0)
-                return new Loop_S(Name, LoopCount) { Owner = null };
+                return new Loop_S(Name, LoopCount);
             else
-                return new Loop_S(Name, __loop_body[0].ExportToControlBlockSource(), LoopCount) { Owner = null };
+                return new Loop_S(Name, __loop_body[0].ExportToControlBlockSource(), LoopCount);
         }
 
         public override void SubComponentChangesApplied(Component sub)

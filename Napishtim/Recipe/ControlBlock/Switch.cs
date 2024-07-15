@@ -135,7 +135,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
             }
         }
 
-        public void MergeLocalEvents(IEnumerable<(uint idx, string name, Event evt)>? locals)
+        public void MergeLocalEvents(IEnumerable<(uint idx, string name, Event evt)> locals)
         {
             foreach(var evt in locals)
                 __locals[evt.idx] = (evt.name, evt.evt);
