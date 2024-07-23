@@ -8,7 +8,7 @@
         xmlns:sync="http://schemas.syncfusion.com/wpf"
         mc:Ignorable="d"
         Title="Settings" Height="450" Width="800"
-        syncfusionskin:SfSkinManager.Theme="{syncfusionskin:SkinManagerExtension ThemeName=FluentDark}" WindowStartupLocation="CenterOwner">
+        syncfusionskin:SfSkinManager.Theme="{syncfusionskin:SkinManagerExtension ThemeName=FluentDark}" WindowStartupLocation="CenterOwner" Closing="Window_Closing">
     <DockPanel Margin="8,4,8,4" LastChildFill="True">
         <UniformGrid Columns="2" Margin="0,10,0,0" DockPanel.Dock="Bottom">
             <Button Content="Cancel" Height="30" Margin="0,0,4,4" Click="Cancel_Click"/>
@@ -44,6 +44,7 @@
                     <Grid.RowDefinitions>
                         <RowDefinition Height="auto"/>
                         <RowDefinition Height="auto"/>
+                        <RowDefinition Height="auto"/>
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition/>
@@ -63,6 +64,13 @@
                     <sync:SfTextInputLayout Grid.Row="1" Grid.Column="1" Hint="Receive Timeout Value" HelperText="Sets a value that specifies the amount of time after which a synchronous Receive call will time out." ContainerType="Filled" FontStyle="Italic" FontSize="12" Margin="4,8,4,8" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}">
                         <TextBox Text="{Binding ReceiveTimeoutValue, ValidatesOnExceptions=True, NotifyOnValidationError=True}" FontStyle="Normal"/>
                     </sync:SfTextInputLayout>
+
+                    <Button Grid.Row="2" Grid.ColumnSpan="2" Height="36" Margin="4,8" Click="CommunicationTest_Click">
+                        <StackPanel Orientation="Horizontal">
+                            <sync:SfBusyIndicator AnimationType="Flower" ViewboxHeight="24" ViewboxWidth="24" Background="Transparent" x:Name="Communicating" Visibility="Collapsed"/>
+                            <TextBlock Text="Communication Test" VerticalAlignment="Center" Margin="8,0"/>
+                        </StackPanel>
+                    </Button>
                 </Grid>
             </TabItem>
         </TabControl>

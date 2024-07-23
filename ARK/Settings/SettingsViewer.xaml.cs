@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -19,6 +20,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK
     /// </summary>
     public partial class SettingsViewer : Window
     {
+        private bool __busy = false;
         private int __errors = 0;
         public bool HasError { get { return __errors != 0; } }
         public Settings Settings { get; private set; }
@@ -64,6 +66,32 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK
         private void Cancel_Click(object sender, RoutedEventArgs e)
         {
             DialogResult = false;
+        }
+
+        private async void CommunicationTest_Click(object sender, RoutedEventArgs e)
+        {
+            var property = ILinkSettings.DataContext as ILinkProperty;
+            Communicating.Visibility = Visibility.Visible;
+            __busy = true;
+            try
+            {
+                var ret = await RecipeDocument.InfoAsync(property.IPv4s, property.Port, property.SendTimeoutValue, property.ReceiveTimeoutValue);
+                MessageBox.Show(this, $"Information Received:\nVersion: {ret.version}\nStep Capacity: {ret.steps}\nController Throughput: {ret.throughput}", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show(this, $"At least one unexpected error occured during the operation:\n" + ex.Message, "Error Message", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            finally
+            {
+                Communicating.Visibility = Visibility.Collapsed;
+                __busy = false;
+            }
+        }
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            if(__busy) e.Cancel = true;
         }
     }
 }

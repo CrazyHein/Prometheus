@@ -544,6 +544,27 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe
         }
         */
 
+        public static (uint version, uint steps, uint throughput) Info(string ip, ushort port = 8367, int sendTimeout = 5000, int recvTimeout = 5000)
+        {
+            using (TCP io = new TCP(new IPEndPoint(IPAddress.Any, 0), new IPEndPoint(IPAddress.Parse(ip), port), sendTimeout, recvTimeout))
+            {
+                DataPackager packager = new DataPackager(io, null);
+                Master master = new Master(packager, null);
+                io.Connect();
+
+                master.Info(out var version, out var steps, out var throughput);
+
+                return (version, steps, throughput);
+            }
+        }
+
+        public static async Task<(uint version, uint steps, uint throughput)> InfoAsync(string ip, ushort port = 8367, int sendTimeout = 5000, int recvTimeout = 5000)
+        {
+            var ret = new ValueTuple<uint, uint, uint>();
+            await Task.Run(() => ret = Info(ip, port, sendTimeout, recvTimeout));
+            return ret;
+        }
+
         public static void Download(IEnumerable<(uint, string, Event)> globals, IEnumerable<Step> steps, ExceptionResponse? exceptionResponse, 
             string ip, ushort port = 8367, int sendTimeout = 5000, int recvTimeout = 5000)
         {
