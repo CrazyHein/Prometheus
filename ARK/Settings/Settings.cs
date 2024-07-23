@@ -8,6 +8,9 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Net;
 using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe;
+using System.Text.Json.Serialization;
+using System.Text.Json;
+using System.IO;
 
 namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK
 {
@@ -31,18 +34,106 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK
         public static byte[] DataTypeCatalogueHash { get; } = DataTypeCatalogue.MD5Code;
         public static byte[] ControllerModelCatalogueHash { get; } = ControllerModelCatalogue.MD5Code;
 
-        public PreferenceProperty PreferenceProperty { get; private set; }
-        public ILinkProperty ILinkProperty { get; private set; }
+        private static ReadOnlySpan<byte> __UTF8_BOM => new byte[] { 0xEF, 0xBB, 0xBF };
+        public PreferenceProperty? PreferenceProperty { get; set; }
+        public ILinkProperty? ILinkProperty { get; set; }
 
-        public Settings()
+
+        public Settings(string? path = null)
         {
-            PreferenceProperty = new PreferenceProperty();
-            ILinkProperty = new ILinkProperty();
+            Restore(path);
+        }
+
+        public void Save(string? path = null)
+        {
+            if (path == null)
+                path = SettingsPath;
+            try
+            {
+                using var ms = new MemoryStream();
+                using var writer = new Utf8JsonWriter(ms, new JsonWriterOptions() { Indented = true });
+                writer.WriteStartObject();
+                writer.WritePropertyName("Preference");
+                PreferenceProperty.Save(writer);
+                writer.WritePropertyName("ILinkProperty");
+                ILinkProperty.Save(writer);
+                writer.WriteEndObject();
+                writer.Flush();
+
+                using var fs = new FileStream(path, FileMode.Create, FileAccess.Write);
+                ms.Seek(0, SeekOrigin.Begin);
+                ms.CopyTo(fs);
+                fs.Flush();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public void Restore(string? path = null)
+        {
+            if (path == null)
+                path = SettingsPath;
+            try
+            {
+                ReadOnlySpan<byte> fs = File.ReadAllBytes(path);
+                if (fs.StartsWith(__UTF8_BOM)) fs = fs.Slice(__UTF8_BOM.Length);
+
+                var reader = new Utf8JsonReader(fs, new JsonReaderOptions() { CommentHandling = JsonCommentHandling.Skip });
+
+                while (reader.Read())
+                {
+                    switch (reader.TokenType, reader.CurrentDepth)
+                    {
+                        case (JsonTokenType.PropertyName, 1):
+                            switch (reader.GetString())
+                            {
+                                case "Preference":
+                                    PreferenceProperty = PreferenceProperty.RESTORE(ref reader); break;
+                                case "ILinkProperty":
+                                    ILinkProperty = ILinkProperty.RESTORE(ref reader); break;
+                            }
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                
+            }
+            finally
+            {
+                PreferenceProperty ??= new PreferenceProperty();
+                ILinkProperty ??= new ILinkProperty();
+            }
         }
     }
 
     public class PreferenceProperty
     {
+        public PreferenceProperty Copy()
+        {
+            return (MemberwiseClone() as PreferenceProperty)!;
+        }
+
+        private static JsonSerializerOptions __JSON_OPTION = new JsonSerializerOptions
+        {
+            WriteIndented = true,
+            Converters = { new JsonStringEnumConverter(null, false) }
+        };
+        public void Save(Utf8JsonWriter writer)
+        {
+            JsonSerializer.Serialize(writer, this, __JSON_OPTION);
+        }
+
+        public static PreferenceProperty RESTORE(ref Utf8JsonReader reader)
+        {
+            return JsonSerializer.Deserialize<PreferenceProperty>(ref reader, __JSON_OPTION)!;
+        }
+
         private int __recently_opened_file_collection_capacity = 16;
         public int RecentlyOpenedFileCollectionCapacity
         {
@@ -61,7 +152,35 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK
 
     public class ILinkProperty
     {
+        public ILinkProperty Copy()
+        {
+            return (MemberwiseClone() as ILinkProperty)!;
+        }
+
+        private static JsonSerializerOptions __JSON_OPTION = new JsonSerializerOptions
+        {
+            WriteIndented = true,
+            Converters = { new JsonStringEnumConverter(null, false) }
+        };
+        public void Save(Utf8JsonWriter writer)
+        {
+            JsonSerializer.Serialize(writer, this, __JSON_OPTION);
+        }
+
+        public static ILinkProperty RESTORE(ref Utf8JsonReader reader)
+        {
+            return JsonSerializer.Deserialize<ILinkProperty>(ref reader, __JSON_OPTION)!;
+        }
+
+        [JsonIgnore]
         public IPAddress IPv4 { get; set; } = IPAddress.Parse("192.168.3.3");
+        [JsonPropertyName("IPv4")]
+        public string IPv4s
+        {
+            get { return IPv4.ToString(); }
+            set { IPv4 = IPAddress.Parse(value); }
+        }
+
         public ushort Port { get; set; } = 8367;
         private int __send_timeout_value = 5000;
         public int SendTimeoutValue

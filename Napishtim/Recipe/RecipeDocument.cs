@@ -422,9 +422,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe
             ExceptionStepFootprint = __exception_handling_block_list.Sum(x => x.StepFootprint);
             StepFootprint = RegularStepFootprint + ExceptionStepFootprint;
 
-            RegularUserVariablesFootprint = __regular_control_block_list.Sum(x => x.UserVariableFootprint);
-            ExceptionUserVariablesFootprint = __exception_handling_block_list.Sum(x => x.UserVariableFootprint);
-            UserVariablesFootprint = RegularUserVariablesFootprint + ExceptionUserVariablesFootprint;
+            RegularUserVariablesFootprint = __regular_control_block_list.Max(x => x.UserVariableFootprint);
+            ExceptionUserVariablesFootprint = __exception_handling_block_list.Max(x => x.UserVariableFootprint);
+            UserVariablesFootprint = Math.Max(RegularUserVariablesFootprint.Value, ExceptionUserVariablesFootprint.Value);
             //if(stepFootprint > __context.StepCapacity)
             //throw new NaposhtimDocumentException(NaposhtimExceptionCode.DOCUMENT_INVALID_ARGUMENTS, $"The number recipe steps required({stepFootprint}) is out of range(MAX: {__context.StepCapacity}).");
             //if (userVariableFootprint > __context.ReservedUserVariableCapacity)
@@ -440,16 +440,17 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe
 
             var compiledBlocks = new LinkedList<ControlBlockObject>();
             var blk = __regular_control_block_list.Last;
-            int st0 = RegularStepFootprint.Value - blk.Value.StepFootprint, st1 = RegularUserVariablesFootprint.Value - blk.Value.UserVariableFootprint;
-            compiledBlocks.AddFirst(blk.Value.ResolveTarget((uint)StepFootprint, (uint)RegularStepFootprint, __context, GlobalEvents, stepalloc.Slice(st0, blk.Value.StepFootprint), varalloc.Slice(st1, blk.Value.UserVariableFootprint), __compiled_step_names));
+            int st0 = RegularStepFootprint.Value - blk.Value.StepFootprint;
+            //int st1 = RegularUserVariablesFootprint.Value - blk.Value.UserVariableFootprint;
+            compiledBlocks.AddFirst(blk.Value.ResolveTarget((uint)StepFootprint, (uint)RegularStepFootprint, __context, GlobalEvents, stepalloc.Slice(st0, blk.Value.StepFootprint), varalloc.Slice(0/*st1*/, blk.Value.UserVariableFootprint), __compiled_step_names));
             while(blk.Previous != null)
             {
                 blk = blk.Previous;
                 st0 = st0 - blk.Value.StepFootprint;
-                st1 = st1 - blk.Value.UserVariableFootprint;
+                //st1 = st1 - blk.Value.UserVariableFootprint;
                 if (compiledBlocks.First.Value.ID == null)
                     throw new NaposhtimDocumentException(NaposhtimExceptionCode.DOCUMENT_INVALID_OPERATION, "The next Control Block ID is unresolved.");
-                compiledBlocks.AddFirst(blk.Value.ResolveTarget(compiledBlocks.First.Value.ID.Value, (uint)RegularStepFootprint, __context, GlobalEvents, stepalloc.Slice(st0, blk.Value.StepFootprint), varalloc.Slice(st1, blk.Value.UserVariableFootprint), __compiled_step_names));
+                compiledBlocks.AddFirst(blk.Value.ResolveTarget(compiledBlocks.First.Value.ID.Value, (uint)RegularStepFootprint, __context, GlobalEvents, stepalloc.Slice(st0, blk.Value.StepFootprint), varalloc.Slice(0/*st1*/, blk.Value.UserVariableFootprint), __compiled_step_names));
             }
 
             int cblkIdx = 0;
@@ -474,16 +475,16 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe
                 compiledBlocks = new LinkedList<ControlBlockObject>();
                 blk = __exception_handling_block_list.Last;
                 st0 = StepFootprint.Value - blk.Value.StepFootprint;
-                st1 = UserVariablesFootprint.Value - blk.Value.UserVariableFootprint;
-                compiledBlocks.AddFirst(blk.Value.ResolveTarget((uint)StepFootprint, (uint)StepFootprint, __context, GlobalEvents, stepalloc.Slice(st0, blk.Value.StepFootprint), varalloc.Slice(st1, blk.Value.UserVariableFootprint), __compiled_step_names));
+                //st1 = ExceptionUserVariablesFootprint.Value - blk.Value.UserVariableFootprint;
+                compiledBlocks.AddFirst(blk.Value.ResolveTarget((uint)StepFootprint, (uint)StepFootprint, __context, GlobalEvents, stepalloc.Slice(st0, blk.Value.StepFootprint), varalloc.Slice(0/*st1*/, blk.Value.UserVariableFootprint), __compiled_step_names));
                 while (blk.Previous != null)
                 {
                     blk = blk.Previous;
                     st0 = st0 - blk.Value.StepFootprint;
-                    st1 = st1 - blk.Value.UserVariableFootprint;
+                    //st1 = st1 - blk.Value.UserVariableFootprint;
                     if (compiledBlocks.First.Value.ID == null)
                         throw new NaposhtimDocumentException(NaposhtimExceptionCode.DOCUMENT_INVALID_OPERATION, "The next Control Block ID is unresolved.");
-                    compiledBlocks.AddFirst(blk.Value.ResolveTarget(compiledBlocks.First.Value.ID.Value, (uint)StepFootprint, __context, GlobalEvents, stepalloc.Slice(st0, blk.Value.StepFootprint), varalloc.Slice(st1, blk.Value.UserVariableFootprint), __compiled_step_names));
+                    compiledBlocks.AddFirst(blk.Value.ResolveTarget(compiledBlocks.First.Value.ID.Value, (uint)StepFootprint, __context, GlobalEvents, stepalloc.Slice(st0, blk.Value.StepFootprint), varalloc.Slice(0/*st1*/, blk.Value.UserVariableFootprint), __compiled_step_names));
                 }
 
                 cblkIdx = 0;
@@ -627,42 +628,44 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe
             uint version = 0;
             string assembly = string.Empty;
 
-            JsonObject root = JsonNode.Parse(File.OpenRead(path)).AsObject();
-
-            if (root.TryGetPropertyValue("VERSION", out var versionNode) && versionNode.GetValueKind() == JsonValueKind.Number)
-                version = versionNode.GetValue<uint>();
-            if(version == 0)
-                throw new NaposhtimDocumentException(NaposhtimExceptionCode.DOCUMENT_FILE_VERSION_UNSUPPORTED, $"No version information is read or the version information is invalid.");
-            if (version > RecipeDocument.SupportedSourceFileFormatVersion)
-                throw new NaposhtimDocumentException(NaposhtimExceptionCode.DOCUMENT_FILE_VERSION_UNSUPPORTED, $"The file version is {version}, the supported version is up to {RecipeDocument.SupportedSourceFileFormatVersion}.");
-
-            if (root.TryGetPropertyValue("SOURCE_ASSEMBLY", out var assemblyNode) && assemblyNode.GetValueKind() == JsonValueKind.String)
-                assembly = assemblyNode.GetValue<string>();
-            if (String.IsNullOrEmpty(assembly))
-                throw new NaposhtimDocumentException(NaposhtimExceptionCode.DOCUMENT_FILE_ASSEMBLY_MISMATCH, $"No assembly information is read or the assembly information is invalid.");
-            if (assembly != typeof(RecipeDocument).FullName)
-                throw new NaposhtimDocumentException(NaposhtimExceptionCode.DOCUMENT_FILE_ASSEMBLY_MISMATCH, $"Read assembly: {assembly}; \nDesired assmebly: {typeof(RecipeDocument).FullName};");
-
-            if (root.TryGetPropertyValue("GLOBAL_EVENTS", out var globalEventsNode) && globalEventsNode.GetValueKind() == JsonValueKind.Array)
+            using (var fs = File.OpenRead(path))
             {
-                foreach (var globalEventNode in globalEventsNode.AsArray())
-                    globalEvents.Add(globalEventNode["ID"].GetValue<uint>(), (globalEventNode["NAME"].GetValue<string>(), Event.MAKE(globalEventNode["EVENT"].AsObject())));
-            }
+                JsonObject root = JsonNode.Parse(fs).AsObject();
+                if (root.TryGetPropertyValue("VERSION", out var versionNode) && versionNode.GetValueKind() == JsonValueKind.Number)
+                    version = versionNode.GetValue<uint>();
+                if (version == 0)
+                    throw new NaposhtimDocumentException(NaposhtimExceptionCode.DOCUMENT_FILE_VERSION_UNSUPPORTED, $"No version information is read or the version information is invalid.");
+                if (version > RecipeDocument.SupportedSourceFileFormatVersion)
+                    throw new NaposhtimDocumentException(NaposhtimExceptionCode.DOCUMENT_FILE_VERSION_UNSUPPORTED, $"The file version is {version}, the supported version is up to {RecipeDocument.SupportedSourceFileFormatVersion}.");
 
-            if (root.TryGetPropertyValue("EXCEPTION_RESPONSE", out var exceptionResponseNode) && exceptionResponseNode.GetValueKind() == JsonValueKind.Object)
-            {
-                exceptionResponseSource = ExceptionResponseSource.MAKE_RESPONSE(root["EXCEPTION_RESPONSE"].AsObject());
-            }
+                if (root.TryGetPropertyValue("SOURCE_ASSEMBLY", out var assemblyNode) && assemblyNode.GetValueKind() == JsonValueKind.String)
+                    assembly = assemblyNode.GetValue<string>();
+                if (String.IsNullOrEmpty(assembly))
+                    throw new NaposhtimDocumentException(NaposhtimExceptionCode.DOCUMENT_FILE_ASSEMBLY_MISMATCH, $"No assembly information is read or the assembly information is invalid.");
+                if (assembly != typeof(RecipeDocument).FullName)
+                    throw new NaposhtimDocumentException(NaposhtimExceptionCode.DOCUMENT_FILE_ASSEMBLY_MISMATCH, $"Read assembly: {assembly}; \nDesired assmebly: {typeof(RecipeDocument).FullName};");
 
-            if (root.TryGetPropertyValue("REGULAR_BLOCKS", out var controlBlocksNode) && controlBlocksNode.GetValueKind() == JsonValueKind.Array)
-            {
-                foreach (var controlBlockNode in controlBlocksNode.AsArray())
-                    regularControlBlocks.AddLast(ControlBlock.ControlBlockSource.MAKE_BLK(controlBlockNode.AsObject(), null));
-            }
-            if (root.TryGetPropertyValue("EXCEPTION_BLOCKS", out controlBlocksNode) && controlBlocksNode.GetValueKind() == JsonValueKind.Array)
-            {
-                foreach (var controlBlockNode in controlBlocksNode.AsArray())
-                    excepionHandlingControlBlocks.AddLast(ControlBlock.ControlBlockSource.MAKE_BLK(controlBlockNode.AsObject(), null));
+                if (root.TryGetPropertyValue("GLOBAL_EVENTS", out var globalEventsNode) && globalEventsNode.GetValueKind() == JsonValueKind.Array)
+                {
+                    foreach (var globalEventNode in globalEventsNode.AsArray())
+                        globalEvents.Add(globalEventNode["ID"].GetValue<uint>(), (globalEventNode["NAME"].GetValue<string>(), Event.MAKE(globalEventNode["EVENT"].AsObject())));
+                }
+
+                if (root.TryGetPropertyValue("EXCEPTION_RESPONSE", out var exceptionResponseNode) && exceptionResponseNode.GetValueKind() == JsonValueKind.Object)
+                {
+                    exceptionResponseSource = ExceptionResponseSource.MAKE_RESPONSE(root["EXCEPTION_RESPONSE"].AsObject());
+                }
+
+                if (root.TryGetPropertyValue("REGULAR_BLOCKS", out var controlBlocksNode) && controlBlocksNode.GetValueKind() == JsonValueKind.Array)
+                {
+                    foreach (var controlBlockNode in controlBlocksNode.AsArray())
+                        regularControlBlocks.AddLast(ControlBlock.ControlBlockSource.MAKE_BLK(controlBlockNode.AsObject(), null));
+                }
+                if (root.TryGetPropertyValue("EXCEPTION_BLOCKS", out controlBlocksNode) && controlBlocksNode.GetValueKind() == JsonValueKind.Array)
+                {
+                    foreach (var controlBlockNode in controlBlocksNode.AsArray())
+                        excepionHandlingControlBlocks.AddLast(ControlBlock.ControlBlockSource.MAKE_BLK(controlBlockNode.AsObject(), null));
+                }
             }
 
             __global_events.RemoveAllGlobalEvents();

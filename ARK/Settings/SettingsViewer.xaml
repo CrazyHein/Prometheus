@@ -1,0 +1,70 @@
+﻿<Window x:Class="AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.SettingsViewer"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK"
+        xmlns:syncfusionskin ="clr-namespace:Syncfusion.SfSkinManager;assembly=Syncfusion.SfSkinManager.WPF"
+        xmlns:sync="http://schemas.syncfusion.com/wpf"
+        mc:Ignorable="d"
+        Title="Settings" Height="450" Width="800"
+        syncfusionskin:SfSkinManager.Theme="{syncfusionskin:SkinManagerExtension ThemeName=FluentDark}" WindowStartupLocation="CenterOwner">
+    <DockPanel Margin="8,4,8,4" LastChildFill="True">
+        <UniformGrid Columns="2" Margin="0,10,0,0" DockPanel.Dock="Bottom">
+            <Button Content="Cancel" Height="30" Margin="0,0,4,4" Click="Cancel_Click"/>
+            <Button Content="OK"  Height="30" Margin="4,0,0,4" Click="OK_Click"/>
+        </UniformGrid>
+        <TabControl>
+            <TabControl.Resources>
+                <Style TargetType="TextBox" BasedOn="{StaticResource WPFTextBoxStyle}">
+                    <Style.Triggers>
+                        <Trigger Property="Validation.HasError" Value="true">
+                            <Setter Property="ToolTip" Value="{Binding RelativeSource={RelativeSource Mode=Self}, Path=(Validation.Errors)[0].ErrorContent}" />
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </TabControl.Resources>
+            <TabItem Header="Preference" Width="135" x:Name="PreferenceSettings">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <Grid Validation.Error="Settings_Error">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto" />
+                        </Grid.RowDefinitions>
+                        <GroupBox Header="Recently Opened File Collection Capacity" Padding="3,0,3,0" Margin="0,4,0,0" Grid.Row="0">
+                            <sync:SfTextInputLayout Hint="Capacity"  FontSize="12" FontStyle="Italic" ContainerType="Filled" Margin="4" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}"
+                                                HelperText="Restarting the application to put the change in effect.">
+                                <TextBox FontStyle="Normal" Text="{Binding RecentlyOpenedFileCollectionCapacity, ValidatesOnExceptions=True, NotifyOnValidationError=True}"/>
+                            </sync:SfTextInputLayout>
+                        </GroupBox>
+                    </Grid>
+                </ScrollViewer>
+            </TabItem>
+            <TabItem Header="ILink" Width="135" x:Name="ILinkSettings">
+                <Grid Validation.Error="Settings_Error">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="auto"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+
+                    <sync:SfTextInputLayout Hint="IPv4" HelperText="Input IPv4 of remote controller here" ContainerType="Filled" FontStyle="Italic" FontSize="12" Margin="4,8,4,8" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}">
+                        <TextBox Text="{Binding IPv4s, ValidatesOnExceptions=True, NotifyOnValidationError=True}" FontStyle="Normal"/>
+                    </sync:SfTextInputLayout>
+                    <sync:SfTextInputLayout Grid.Column="1" Hint="Port" HelperText="Input port of remote controller here" ContainerType="Filled" FontStyle="Italic" FontSize="12" Margin="4,8,4,8" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}">
+                        <TextBox Text="{Binding Port, ValidatesOnExceptions=True, NotifyOnValidationError=True}" FontStyle="Normal"/>
+                    </sync:SfTextInputLayout>
+
+                    <sync:SfTextInputLayout Grid.Row="1" Hint="Send Timeout Value" HelperText="Sets a value that specifies the amount of time after which a synchronous Send call will time out." ContainerType="Filled" FontStyle="Italic" FontSize="12" Margin="4,8,4,8" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}">
+                        <TextBox Text="{Binding SendTimeoutValue, ValidatesOnExceptions=True, NotifyOnValidationError=True}" FontStyle="Normal"/>
+                    </sync:SfTextInputLayout>
+                    <sync:SfTextInputLayout Grid.Row="1" Grid.Column="1" Hint="Receive Timeout Value" HelperText="Sets a value that specifies the amount of time after which a synchronous Receive call will time out." ContainerType="Filled" FontStyle="Italic" FontSize="12" Margin="4,8,4,8" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}">
+                        <TextBox Text="{Binding ReceiveTimeoutValue, ValidatesOnExceptions=True, NotifyOnValidationError=True}" FontStyle="Normal"/>
+                    </sync:SfTextInputLayout>
+                </Grid>
+            </TabItem>
+        </TabControl>
+    </DockPanel>
+</Window>

@@ -16,8 +16,10 @@
         <CommandBinding Command="common:Command.About" Executed="AboutCommand_Executed"/>
         <CommandBinding Command="common:Command.New" Executed="NewCommand_Executed" CanExecute="NewCommand_CanExecute"/>
         <CommandBinding Command="common:Command.Open" Executed="OpenCommand_Executed" CanExecute="OpenCommand_CanExecute"/>
+        <CommandBinding Command="common:Command.Close" Executed="CloseCommand_Executed" CanExecute="CloseCommand_CanExecute"/>
         <CommandBinding Command="common:Command.Save" Executed="SaveCommand_Executed" CanExecute="SaveCommand_CanExecute"/>
         <CommandBinding Command="common:Command.SaveAs" Executed="SaveAsCommand_Executed" CanExecute="SaveAsCommand_CanExecute"/>
+        <CommandBinding Command="common:Command.Quit" Executed="QuitCommand_Executed" CanExecute="QuitCommand_CanExecute"/>
         <CommandBinding Command="common:Command.ApplyChanges" Executed="ApplyChangesCommand_Executed" CanExecute="ApplyChangesCommand_CanExecute"/>
         <CommandBinding Command="common:Command.DiscardChanges" Executed="DiscardChangesCommand_Executed" CanExecute="DiscardChangesCommand_CanExecute"/>
         <CommandBinding Command="common:Command.Summary" Executed="SummaryCommand_Executed" CanExecute="SummaryCommand_CanExecute"/>
@@ -48,6 +50,11 @@
                         <Path Data="{StaticResource IconOpen}" Fill="White" Stretch="Uniform"/>
                     </sync:MenuItemAdv.Icon>
                 </sync:MenuItemAdv>
+                <sync:MenuItemAdv Command="common:Command.Close" Height="25" Width="200">
+                    <sync:MenuItemAdv.Icon>
+                        <Path Data="{StaticResource IconClose}" Fill="White" Stretch="Uniform"/>
+                    </sync:MenuItemAdv.Icon>
+                </sync:MenuItemAdv>
                 <sync:MenuItemSeparator/>
                 <sync:MenuItemAdv Header="_Recent" ItemsSource="{Binding RecentlyOpenedFiles}" sync:MenuItemAdv.Click="RecentlyOpened_Click" x:Name="RecentlyOpenedMenu" Height="25" Width="200">
                     <sync:MenuItemAdv.Icon>
@@ -64,12 +71,6 @@
                     </sync:MenuItemAdv.ItemTemplate>
                 </sync:MenuItemAdv>
                 <sync:MenuItemSeparator/>
-                <sync:MenuItemAdv Height="25" Width="200">
-                    <sync:MenuItemAdv.Icon>
-                        <Path Data="{StaticResource IconClose}" Fill="White" Stretch="Uniform"/>
-                    </sync:MenuItemAdv.Icon>
-                </sync:MenuItemAdv>
-                <sync:MenuItemSeparator/>
                 <sync:MenuItemAdv Command="common:Command.Save" Height="25" Width="200">
                     <sync:MenuItemAdv.Icon>
                         <Path Data="{StaticResource IconSave}" Fill="White" Stretch="Uniform"/>
@@ -81,7 +82,7 @@
                     </sync:MenuItemAdv.Icon>
                 </sync:MenuItemAdv>
                 <sync:MenuItemSeparator/>
-                <sync:MenuItemAdv Height="25" Width="200">
+                <sync:MenuItemAdv Command="common:Command.Quit" Height="25" Width="200">
                     <sync:MenuItemAdv.Icon>
                         <Path Data="{StaticResource IconQuit}" Fill="White" Stretch="Uniform"/>
                     </sync:MenuItemAdv.Icon>
@@ -96,6 +97,15 @@
             </sync:MenuItemAdv>
             <sync:MenuItemAdv  Header="_Utility" Margin="2">
                 <sync:MenuItemAdv Header="Script Viewer" Height="25" Width="200" Click="MenuOpenScriptViewer_Click">
+                    <sync:MenuItemAdv.Icon>
+                        <Path Data="{StaticResource IconScript}" Fill="White" Stretch="Uniform"/>
+                    </sync:MenuItemAdv.Icon>
+                </sync:MenuItemAdv>
+                <sync:MenuItemSeparator/>
+                <sync:MenuItemAdv Header="Settings" Height="25" Width="200" Click="MenuOpenSettings_Click">
+                    <sync:MenuItemAdv.Icon>
+                        <Path Data="{StaticResource IconSettings}" Fill="White" Stretch="Uniform"/>
+                    </sync:MenuItemAdv.Icon>
                 </sync:MenuItemAdv>
             </sync:MenuItemAdv>
             <sync:MenuItemAdv  Header="_Help" Margin="2">
@@ -109,11 +119,17 @@
         <sync:ToolBarAdv Grid.Row="1" Margin="2">
             <sync:ButtonAdv SizeMode="Small" Command="common:Command.New" IconTemplate="{StaticResource IconNewTemplate}" Margin="2" IconHeight="25" IconWidth="25" Height="36" Width="36"/>
             <sync:ButtonAdv SizeMode="Small" Command="common:Command.Open" IconTemplate="{StaticResource IconOpenTemplate}"  Margin="2" IconHeight="25" IconWidth="25" Height="36" Width="36"/>
+            <sync:ButtonAdv SizeMode="Small" Command="common:Command.Close" IconTemplate="{StaticResource IconCloseTemplate}"  Margin="2" IconHeight="25" IconWidth="25" Height="36" Width="36"/>
             <Separator/>
             <sync:ButtonAdv SizeMode="Small" Command="common:Command.Save" IconTemplate="{StaticResource IconSaveTemplate}"  Margin="2" IconHeight="25" IconWidth="25" Height="36" Width="36"/>
             <sync:ButtonAdv SizeMode="Small" Command="common:Command.SaveAs" IconTemplate="{StaticResource IconSaveAsTemplate}"  Margin="2" IconHeight="25" IconWidth="25" Height="36" Width="36"/>
             <Separator/>
             <sync:ButtonAdv SizeMode="Small" Command="common:Command.Build" IconTemplate="{StaticResource IconBuildTemplate}"  Margin="2" IconHeight="25" IconWidth="25" Height="36" Width="36"/>
+            <Separator/>
+            <sync:ButtonAdv SizeMode="Small" Click="MenuOpenScriptViewer_Click" IconTemplate="{StaticResource IconScriptTemplate}"  Margin="2" IconHeight="25" IconWidth="25" Height="36" Width="36"/>
+            <sync:ButtonAdv SizeMode="Small" Click="MenuOpenSettings_Click" IconTemplate="{StaticResource IconSettingsTemplate}"  Margin="2" IconHeight="25" IconWidth="25" Height="36" Width="36"/>
+            <Separator/>
+            <sync:ButtonAdv SizeMode="Small" Command="common:Command.About" IconTemplate="{StaticResource IconAboutTemplate}"  Margin="2" IconHeight="25" IconWidth="25" Height="36" Width="36"/>
         </sync:ToolBarAdv>
         <sync:SfGridSplitter Height="2" HorizontalAlignment="Stretch" Grid.Row="3" ResizeBehavior="PreviousAndNext" Margin="2"/>
         <TabControl Grid.Row="4" Margin="2" TabStripPlacement="Bottom">

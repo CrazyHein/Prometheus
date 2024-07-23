@@ -323,6 +323,47 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK
             e.CanExecute = true;
         }
 
+        private void CloseCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            if (__unapplied_changes(true) || __document_model.UnsavedChanges)
+            {
+                var res = MessageBox.Show("Discard the changes you have made ?", "Question", MessageBoxButton.YesNo, MessageBoxImage.Question);
+                if (res == MessageBoxResult.No)
+                    return;
+            }
+
+            ContextModel.Tags = null;
+
+            __document_model.GlobalEventManager = null;
+            __document_model.ContextManager = null;
+            __document_model.RegularControlBlockManager = null;
+            __document_model.ExceptionControlBlockManager = null;
+
+            ContextManager.Content = null;
+            GlobalEventManager.Content = null;
+            RegularControlBlockManager.Content = null;
+            ExceptionControlBlockManager.Content = null;
+
+            __document_model.FileOpened = null;
+
+            __reset_layout();
+        }
+
+        private void CloseCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = __document_model?.IsOpened == true;
+        }
+
+        private void QuitCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            Close();
+        }
+
+        private void QuitCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = true;
+        }
+
         private void SaveCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             try
@@ -558,7 +599,13 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK
 
         private void MenuOpenScriptViewer_Click(object sender, RoutedEventArgs e)
         {
-            ScriptViewer viewer = new ScriptViewer(__settings.ILinkProperty);
+            ScriptViewer viewer = new ScriptViewer(__settings.ILinkProperty) { Owner = this };
+            viewer.ShowDialog();
+        }
+
+        private void MenuOpenSettings_Click(object sender, RoutedEventArgs e)
+        {
+            SettingsViewer viewer = new SettingsViewer(__settings) { Owner = this };
             viewer.ShowDialog();
         }
     }
