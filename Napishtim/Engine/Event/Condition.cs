@@ -35,8 +35,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ev
         ([
             ("COMPARAND_A", true, "0", "The string must be a valid Expression string."),
             ("COMPARAND_B", true, "0", "The string must be a valid Expression string."),
-            ("POSITIVE_TOLERANCE", false, String.Empty, "Optional parameter of type Double.\nSpecify the positive tolerance of deviation. The default value is 0.0."),
-            ("NEGATIVE_TOLERANCE", false, String.Empty, "Optional parameter of type Double.\nSpecify the negative tolerance of deviation. The default value is 0.0."),
+            ("POSITIVE_TOLERANCE", false, String.Empty, "Optional parameter of type Double.Available only in EQU.\nSpecify the positive tolerance of deviation(A - B). The default value is 0.0."),
+            ("NEGATIVE_TOLERANCE", false, String.Empty, "Optional parameter of type Double.Available only in EQU.\nSpecify the negative tolerance of deviation(A - B). The default value is 0.0."),
             ("INITIAL_VALUE", false, String.Empty, "Optional parameter of type Boolean. 0.0 -> false / Others -> true\nSpecify the initial evaluation value of event. The default value is false."),
             ("ON_DELAY", false, String.Empty, "Optional parameter of type Integer32 or JSON object.\nIf the parameter value is a Integer32 , it must be a non-negative integer number;\nIf the parameter value is a JSON object, it must be a valid Expression object;"),
             ("OFF_DELAY", false, String.Empty,"Optional parameter of type Integer32 or JSON object.\nIf the parameter value is a Integer32 , it must be a non-negative integer number;\nIf the parameter value is a JSON object, it must be a valid Expression object;"),

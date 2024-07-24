@@ -18,19 +18,29 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ev
         public Expression.Expression? FEEDBACK { get; init; }
         public double? POSITIVE_TOLERANCE { get; init; }
         public double? NEGATIVE_TOLERANCE { get; init; }
+        public double? STABLE_POSITIVE_TOLERANCE { get; init; }
+        public double? STABLE_NEGATIVE_TOLERANCE { get; init; }
         public bool? INITIAL_VALUE { get; init; }
+        public bool? INITIAL_STATE { get; init; }
         public TIM? ON_DELAY { get; init; }
         public TIM? OFF_DELAY { get; init; }
+        public TIM? STABLE_DELAY { get; init; }
+        public bool? DELAY_TIME_PRIORITY { get; init; }
 
         public static ReadOnlyCollection<(string name, bool required, string defaultv, string comment)> _ParameterDescriptions { get; } = new ReadOnlyCollection<(string name, bool required, string defaultv, string comment)>
         ([
             ("SETPOINT", true, "0", "The string must be a valid Expression string."),
             ("FEEDBACK", true, "0", "The string must be a valid Expression string."),
-            ("POSITIVE_TOLERANCE", false, string.Empty, "Optional parameter of type Double.\nSpecify the positive tolerance of deviation. The default value is 0.0."),
-            ("NEGATIVE_TOLERANCE", false, string.Empty, "Optional parameter of type Double.\nSpecify the positive tolerance of deviation. The default value is 0.0."),
+            ("POSITIVE_TOLERANCE", false, string.Empty, "Optional parameter of type Double.\nSpecify the positive tolerance of deviation(FB - SP). The default value is 0.0."),
+            ("NEGATIVE_TOLERANCE", false, string.Empty, "Optional parameter of type Double.\nSpecify the negative tolerance of deviation(FB - SP). The default value is 0.0."),
+            ("STABLE_POSITIVE_TOLERANCE", false, string.Empty, "Optional parameter of type Double.\nSpecify the positive tolerance of deviation. The default value is 0.0."),
+            ("STABLE_NEGATIVE_TOLERANCE", false, string.Empty, "Optional parameter of type Double.\nSpecify the positive tolerance of deviation. The default value is 0.0."),
             ("INITIAL_VALUE", false, string.Empty, "Optional parameter of type Boolean. 0.0 -> false / Others -> true\nSpecify the initial evaluation value of event. The default value is false."),
+            ("INITIAL_STATE", false, string.Empty, "Optional parameter of type Boolean. 0.0 -> not in stable state / Others -> in stable state\nSpecify the initial state value of event. The default value is \"not in stable state\"."),
             ("ON_DELAY", false, string.Empty, "Optional parameter of type Integer32 or JSON object.\nIf the parameter value is a Integer32 , it must be a non-negative integer number;\nIf the parameter value is a JSON object, it must be a valid Expression object;"),
             ("OFF_DELAY", false, string.Empty, "Optional parameter of type Integer32 or JSON object.\nIf the parameter value is a Integer32 , it must be a non-negative integer number;\nIf the parameter value is a JSON object, it must be a valid Expression object;"),
+            ("STABLE_DELAY", false, string.Empty, "Optional parameter of type Integer32 or JSON object.\nIf the parameter value is a Integer32 , it must be a non-negative integer number;\nIf the parameter value is a JSON object, it must be a valid Expression object;"),
+            ("DELAY_TIME_PRIORITY", false, string.Empty, "Optional parameter of type Boolean. 0.0 -> false / Others -> true\nIf this property is true, it will wait for a period of time (STABLE_DELAY) before entering the stable state and then starting the error judgment phase.\nIf this property is false, it will wait for a period of time (STABLE_DELAY) or FEEDBACK to enter the stable state interval before entering the stable state and then starting the error judgment phase.\nThe default value is false."),
         ]);
 
         public override IEnumerable<(string pname, bool required, string defaultv, string comment)> ParameterDescriptions => _ParameterDescriptions;
@@ -45,9 +55,14 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ev
                     ("FEEDBACK", FEEDBACK.ToString()),
                     ("POSITIVE_TOLERANCE", POSITIVE_TOLERANCE.HasValue?POSITIVE_TOLERANCE.Value.ToString():string.Empty),
                     ("NEGATIVE_TOLERANCE", NEGATIVE_TOLERANCE.HasValue?NEGATIVE_TOLERANCE.Value.ToString():string.Empty),
+                    ("STABLE_POSITIVE_TOLERANCE", STABLE_POSITIVE_TOLERANCE.HasValue?STABLE_POSITIVE_TOLERANCE.Value.ToString():string.Empty),
+                    ("STABLE_NEGATIVE_TOLERANCE", STABLE_NEGATIVE_TOLERANCE.HasValue?STABLE_NEGATIVE_TOLERANCE.Value.ToString():string.Empty),
                     ("INITIAL_VALUE", Event.BooleanParameterValue(INITIAL_VALUE)),
+                    ("INITIAL_STATE", Event.BooleanParameterValue(INITIAL_STATE)),
                     ("ON_DELAY", ON_DELAY!=null?ON_DELAY._TIMEOUT_STRING:string.Empty),
                     ("OFF_DELAY", OFF_DELAY!=null?OFF_DELAY._TIMEOUT_STRING:string.Empty),
+                    ("STABLE_DELAY", STABLE_DELAY!=null?STABLE_DELAY._TIMEOUT_STRING:string.Empty),
+                    ("DELAY_TIME_PRIORITY", Event.BooleanParameterValue(DELAY_TIME_PRIORITY))
                 };
                 return parameters;
             }
@@ -62,6 +77,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ev
                     temp = temp.Concat(ON_DELAY.ObjectReferences);
                 if(OFF_DELAY != null)
                     temp = temp.Concat(OFF_DELAY.ObjectReferences);
+                if (STABLE_DELAY != null)
+                    temp = temp.Concat(STABLE_DELAY.ObjectReferences);
                 return temp.Distinct();
             }
         }
@@ -75,6 +92,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ev
                     ret.Concat(ON_DELAY.UserVariablesUsage);
                 if (OFF_DELAY != null)
                     ret.Concat(OFF_DELAY.UserVariablesUsage);
+                if (STABLE_DELAY != null)
+                    ret.Concat(STABLE_DELAY.UserVariablesUsage);
                 return ret.Distinct();
             }
         }
@@ -92,6 +111,11 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ev
                     INITIAL_VALUE = opt.AsValue().GetValue<bool>();
                 else
                     INITIAL_VALUE = null;
+
+                if (node.AsObject().TryGetPropertyValue("INITIAL_STATE", out opt))
+                    INITIAL_STATE = opt.AsValue().GetValue<bool>();
+                else
+                    INITIAL_STATE = null;
 
                 if (node.AsObject().TryGetPropertyValue("POSITIVE_TOLERANCE", out opt))
                     POSITIVE_TOLERANCE = opt.AsValue().GetValue<double>();
@@ -123,6 +147,31 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ev
                 else
                     OFF_DELAY = null;
 
+                if (node.AsObject().TryGetPropertyValue("STABLE_DELAY", out opt))
+                {
+                    if (opt.GetValueKind() == System.Text.Json.JsonValueKind.Object)
+                        STABLE_DELAY = new TIM(opt);
+                    else
+                        STABLE_DELAY = new TIM(opt.AsValue().GetValue<int>());
+                }
+                else
+                    STABLE_DELAY = null;
+
+                if (node.AsObject().TryGetPropertyValue("STABLE_POSITIVE_TOLERANCE", out opt))
+                    STABLE_POSITIVE_TOLERANCE = opt.AsValue().GetValue<double>();
+                else
+                    STABLE_POSITIVE_TOLERANCE = null;
+
+                if (node.AsObject().TryGetPropertyValue("STABLE_NEGATIVE_TOLERANCE", out opt))
+                    STABLE_NEGATIVE_TOLERANCE = opt.AsValue().GetValue<double>();
+                else
+                    STABLE_NEGATIVE_TOLERANCE = null;
+
+                if (node.AsObject().TryGetPropertyValue("DELAY_TIME_PRIORITY", out opt))
+                    DELAY_TIME_PRIORITY = opt.AsValue().GetValue<bool>();
+                else
+                    DELAY_TIME_PRIORITY = null;
+
             }
             catch (Exception ex)
             {
@@ -133,7 +182,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ev
         public ERR(string name, params (string pname, Expression.Expression pvalue)[] parameters)
         {
             if (name != Tag)
-                throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EVENT_ARGUMENTS_ERROR, "ERR(SETPOINT, FEEDBACK, [INITIAL_VALUE], [POSITIVE_TOLERANCE], [NEGATIVE_TOLERANCE], [ON_DELAY], [OFF_DELAY])");
+                throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EVENT_ARGUMENTS_ERROR, "ERR(SETPOINT, FEEDBACK, [INITIAL_VALUE], [INITIAL_STATE], [POSITIVE_TOLERANCE], [NEGATIVE_TOLERANCE], [STABLE_POSITIVE_TOLERANCE], [STABLE_NEGATIVE_TOLERANCE], [ON_DELAY], [OFF_DELAY], [STABLE_DELAY], [DELAY_TIME_PRIORITY])");
             bool sp = false, fb = false;
             foreach (var param in parameters)
             {
@@ -148,6 +197,12 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ev
                             INITIAL_VALUE = param.pvalue.Value(true, 0.0) == 0.0 ? false : true;
                         else
                             throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EVENT_ARGUMENTS_ERROR, "The value of property 'INITIAL_VALUE' should be an immediate operand.");
+                        break;
+                    case "INITIAL_STATE":
+                        if (param.pvalue.IsImmediateOperand)
+                            INITIAL_STATE = param.pvalue.Value(true, 0.0) == 0.0 ? false : true;
+                        else
+                            throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EVENT_ARGUMENTS_ERROR, "The value of property 'INITIAL_STATE' should be an immediate operand.");
                         break;
                     case "POSITIVE_TOLERANCE":
                         if (param.pvalue.IsImmediateOperand)
@@ -173,10 +228,34 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ev
                         else
                             OFF_DELAY = new TIM("TIM", ("TIMEOUT", param.pvalue));
                         break;
+                    case "STABLE_DELAY":
+                        if (param.pvalue.IsImmediateOperand)
+                            STABLE_DELAY = new TIM((int)param.pvalue.Value(true, 0.0));
+                        else
+                            STABLE_DELAY = new TIM("TIM", ("TIMEOUT", param.pvalue));
+                        break;
+                    case "STABLE_POSITIVE_TOLERANCE":
+                        if (param.pvalue.IsImmediateOperand)
+                            STABLE_POSITIVE_TOLERANCE = param.pvalue.Value(true, 0.0);
+                        else
+                            throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EVENT_ARGUMENTS_ERROR, "The value of property 'STABLE_POSITIVE_TOLERANCE' should be an immediate operand.");
+                        break;
+                    case "STABLE_NEGATIVE_TOLERANCE":
+                        if (param.pvalue.IsImmediateOperand)
+                            STABLE_NEGATIVE_TOLERANCE = param.pvalue.Value(true, 0.0);
+                        else
+                            throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EVENT_ARGUMENTS_ERROR, "The value of property 'STABLE_NEGATIVE_TOLERANCE' should be an immediate operand.");
+                        break;
+                    case "DELAY_TIME_PRIORITY":
+                        if (param.pvalue.IsImmediateOperand)
+                            DELAY_TIME_PRIORITY = param.pvalue.Value(true, 0.0) == 0.0 ? false : true;
+                        else
+                            throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EVENT_ARGUMENTS_ERROR, "The value of property 'DELAY_TIME_PRIORITY' should be an immediate operand.");
+                        break;
                 }
             }
             if(sp == false || fb == false)
-                throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EVENT_ARGUMENTS_ERROR, "ERR(SETPOINT, FEEDBACK, [INITIAL_VALUE], [POSITIVE_TOLERANCE], [NEGATIVE_TOLERANCE], [ON_DELAY], [OFF_DELAY])");
+                throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EVENT_ARGUMENTS_ERROR, "ERR(SETPOINT, FEEDBACK, [INITIAL_VALUE], [INITIAL_STATE], [POSITIVE_TOLERANCE], [NEGATIVE_TOLERANCE], [STABLE_POSITIVE_TOLERANCE], [STABLE_NEGATIVE_TOLERANCE], [ON_DELAY], [OFF_DELAY], [STABLE_DELAY], [DELAY_TIME_PRIORITY])");
         }
 
         public override JsonNode ToJson()
@@ -187,14 +266,24 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ev
             node["FEEDBACK"] = FEEDBACK.ToString();
             if(INITIAL_VALUE.HasValue)
                 node["INITIAL_VALUE"] = INITIAL_VALUE;
-            if( POSITIVE_TOLERANCE.HasValue)
+            if (INITIAL_STATE.HasValue)
+                node["INITIAL_STATE"] = INITIAL_STATE;
+            if ( POSITIVE_TOLERANCE.HasValue)
                 node["POSITIVE_TOLERANCE"] = POSITIVE_TOLERANCE;
             if(NEGATIVE_TOLERANCE.HasValue)
                 node["NEGATIVE_TOLERANCE"] = NEGATIVE_TOLERANCE;
-            if(ON_DELAY != null)
+            if (STABLE_POSITIVE_TOLERANCE.HasValue)
+                node["STABLE_POSITIVE_TOLERANCE"] = STABLE_POSITIVE_TOLERANCE;
+            if (STABLE_NEGATIVE_TOLERANCE.HasValue)
+                node["STABLE_NEGATIVE_TOLERANCE"] = STABLE_NEGATIVE_TOLERANCE;
+            if (ON_DELAY != null)
                 node["ON_DELAY"] = ON_DELAY.ToJson();
-            if( OFF_DELAY != null)
+            if(OFF_DELAY != null)
                 node["OFF_DELAY"] = OFF_DELAY.ToJson();
+            if(STABLE_DELAY != null)
+                node["STABLE_DELAY"] = STABLE_DELAY.ToJson();
+            if (DELAY_TIME_PRIORITY.HasValue)
+                node["DELAY_TIME_PRIORITY"] = DELAY_TIME_PRIORITY;
             return node;
         }
     }

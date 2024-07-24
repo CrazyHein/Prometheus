@@ -39,14 +39,14 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ev
         public static ReadOnlyCollection<(string name, bool required, string defaultv, string comment)> _ParameterDescriptions { get; } = new ReadOnlyCollection<(string name, bool required, string defaultv, string comment)>
         ([
             ("EXPRESSION", true, "0", "The string must be a valid Expression string."),
-            ("PATTERN", false, String.Empty, 
+            ("PATTERN", false, String.Empty,
             """
             Optional parameter of type String.
             Specify the alert pattern. The default pattern is "Below"(0).
             If you want to use "Above" pattern, you should use a string "Above"(other than 0) to explicitly specify, otherwise, the default pattern will be used.
             "Above"(other than 0) pattern:
                The evaluation value of event turns to TRUE when the "EXPRESSION" value is equal to or greater than "UPPER"; 
-               The evaluation value of event turns to FALSE when the "EXPRESSION" value is equal to or greater than "UPPER";
+               The evaluation value of event turns to FALSE when the "EXPRESSION" value is equal to or less than "LOWER";
             "Below"(0) pattern:
                The evaluation value of event turns to TRUE when the "EXPRESSION" value is equal to or less than "LOWER";
                The evaluation value of event turns to FALSE when the "EXPRESSION" value is equal to or greater than "UPPER";
