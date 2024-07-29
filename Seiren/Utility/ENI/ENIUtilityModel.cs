@@ -19,7 +19,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility
         public string ENIPath { get; private set; }
         public IReadOnlyList<EtherCATSlave> EtherCATSlaves { get { return __ethercat_slaves; } }
         public IReadOnlyList<EtherCATVariableInfo> EtherCATVariables { get { return __ethercat_variables; } }
-        public ENIUtilityModel(string eniPath)
+        public ENIUtilityModel(string eniPath, bool identityAsPhysAddr)
         {
             XmlDocument eni = new XmlDocument();
             List<EtherCATSlave> ethercatSlaves = new List<EtherCATSlave>();
@@ -36,7 +36,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility
                 XmlNode slaveInfoNode;
                 slaveName = slaveNode.SelectSingleNode("Info/Name").FirstChild.Value;
                 slaveInfoNode = slaveNode.SelectSingleNode("Info/Identification");
-                if (slaveInfoNode != null)
+                if (slaveInfoNode != null && identityAsPhysAddr)
                 {
                     slaveAddr = Convert.ToUInt16(slaveInfoNode.Attributes["Value"].Value);
                 }

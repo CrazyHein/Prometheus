@@ -1139,7 +1139,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             {
                 try
                 {
-                    __ecat_pdo_viewer = new EtherCATPDOViewer(new ENIUtilityModel(open.FileName), this);
+                    var id = MessageBox.Show("Use the device ID as device physical address if the ID exists?\nIf you are using SMART-ECAT as master, it is highly recommended to use the device ID as device physical address.", "Question", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes;
+                    __ecat_pdo_viewer = new EtherCATPDOViewer(new ENIUtilityModel(open.FileName, id), this);
                     __ecat_pdo_viewer.Show();
                 }
                 catch (Exception ex)
