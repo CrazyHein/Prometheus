@@ -423,7 +423,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe
             StepFootprint = RegularStepFootprint + ExceptionStepFootprint;
 
             RegularUserVariablesFootprint = __regular_control_block_list.Max(x => x.UserVariableFootprint);
-            ExceptionUserVariablesFootprint = __exception_handling_block_list.Max(x => x.UserVariableFootprint);
+            ExceptionUserVariablesFootprint = __exception_handling_block_list.Count == 0? 0:__exception_handling_block_list.Max(x => x.UserVariableFootprint);
             UserVariablesFootprint = Math.Max(RegularUserVariablesFootprint.Value, ExceptionUserVariablesFootprint.Value);
             //if(stepFootprint > __context.StepCapacity)
             //throw new NaposhtimDocumentException(NaposhtimExceptionCode.DOCUMENT_INVALID_ARGUMENTS, $"The number recipe steps required({stepFootprint}) is out of range(MAX: {__context.StepCapacity}).");

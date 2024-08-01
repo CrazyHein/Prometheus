@@ -244,68 +244,38 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Pr
             chewed = _step.DeepClone().AsObject();
 
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            List<ProcessShader> abortShaderObjectDirectAssignments = AbortShaderObjectDirectAssignments.ToList();
-            List<ProcessShader> postShaderObjectDirectAssignments = PostShaderObjectDirectAssignments.ToList();
-            List<ProcessShader> shaderObjectDirectAssignments = ShaderObjectDirectAssignments.ToList();
             int pos = container.IndexOf(this);
 
             var abortShaderSearchRange = container.OriginalProcessSteps.Take(pos).SelectMany(x => x.ShaderObjectDirectAssignments.Concat(x.PostShaderObjectDirectAssignments)).Concat(ShaderObjectDirectAssignments).Reverse();
             var postShaderSearchRange = container.OriginalProcessSteps.Take(pos).SelectMany(x => x.ShaderObjectDirectAssignments.Concat(x.PostShaderObjectDirectAssignments)).Concat(ShaderObjectDirectAssignments).Reverse();
             var shaderSearchRange = container.OriginalProcessSteps.Take(pos).SelectMany(x => x.ShaderObjectDirectAssignments.Concat(x.PostShaderObjectDirectAssignments)).Reverse();
 
-            if (abortShaderObjectDirectAssignments.Count() != 0)
-            {
-                var tempShaders = AbortShaderObjectDirectAssignments.ToList();
-                foreach (var assign in abortShaderObjectDirectAssignments)
-                {
-                    if (assign.Shader.Expr.IsImmediateOperand && assign.Shader.Operand is ObjectReference)
-                    {
-                        var ret = abortShaderSearchRange.FirstOrDefault(x => x.Shader.Operand.Equals(assign.Shader.Operand));
-                        if (ret != null && ret.Shader.Expr.Equals(assign.Shader.Expr))
-                            tempShaders.Remove(assign);
-                    }
-                }
-                if (tempShaders.Count() != 0)
-                    chewed["END_POINTS"][2]["POST_SHADERS"] = new JsonArray(tempShaders.Select(x => x.ToJson()).ToArray());
-                else
-                    chewed["END_POINTS"][2].AsObject().Remove("POST_SHADERS");
-            }
+            var tempShaders = AbortShaders.Where(
+                (x, p) => !(x.Shader.Operand is ObjectReference) || x.Shader.Expr.IsImmediateOperand == false ||
+                (AbortShaders.TakeLast(AbortShaders.Count() - p - 1).FirstOrDefault(y => x.Shader.Operand.Equals(y.Shader.Operand)) == null &&
+                !(abortShaderSearchRange.FirstOrDefault(z => x.Shader.Operand.Equals(z.Shader.Operand))?.Shader.Expr.Equals(x.Shader.Expr) == true)));
 
-            if (postShaderObjectDirectAssignments.Count() != 0)
-            {
-                var tempShaders = PostShaderObjectDirectAssignments.ToList();
-                foreach (var assign in postShaderObjectDirectAssignments)
-                {
-                    if (assign.Shader.Expr.IsImmediateOperand && assign.Shader.Operand is ObjectReference)
-                    {
-                        var ret = postShaderSearchRange.FirstOrDefault(x => x.Shader.Operand.Equals(assign.Shader.Operand));
-                        if (ret != null && ret.Shader.Expr.Equals(assign.Shader.Expr))
-                            tempShaders.Remove(assign);
-                    }
-                }
-                if (tempShaders.Count() != 0)
-                    chewed["END_POINTS"][1]["POST_SHADERS"] = new JsonArray(tempShaders.Select(x => x.ToJson()).ToArray());
-                else
-                    chewed["END_POINTS"][1].AsObject().Remove("POST_SHADERS");
-            }
+            chewed["END_POINTS"][2]["POST_SHADERS"] = new JsonArray(tempShaders.Select(x => x.ToJson()).ToArray());
+            if ((chewed["END_POINTS"][2]["POST_SHADERS"] as JsonArray).Count == 0)
+                chewed["END_POINTS"][2].AsObject().Remove("POST_SHADERS");
 
-            if (shaderObjectDirectAssignments.Count() != 0)
-            {
-                var tempShaders = new List<ProcessShader>(shaderObjectDirectAssignments);
-                foreach (var assign in shaderObjectDirectAssignments)
-                {
-                    if (assign.Shader.Expr.IsImmediateOperand && assign.Shader.Operand is ObjectReference)
-                    {
-                        var ret = shaderSearchRange.FirstOrDefault(x => x.Shader.Operand.Equals(assign.Shader.Operand));
-                        if (ret != null && ret.Shader.Expr.Equals(assign.Shader.Expr))
-                            tempShaders.Remove(assign);
-                    }
-                }
-                if (tempShaders.Count() != 0)
-                    chewed["SHADERS"] = new JsonArray(tempShaders.Select(x => x.ToJson()).ToArray());
-                else
-                    chewed.Remove("SHADERS");
-            }
+            tempShaders = PostShaders.Where(
+                (x, p) => !(x.Shader.Operand is ObjectReference) || x.Shader.Expr.IsImmediateOperand == false ||
+                (PostShaders.TakeLast(PostShaders.Count() - p - 1).FirstOrDefault(y => x.Shader.Operand.Equals(y.Shader.Operand)) == null &&
+                !(postShaderSearchRange.FirstOrDefault(z => x.Shader.Operand.Equals(z.Shader.Operand))?.Shader.Expr.Equals(x.Shader.Expr) == true)));
+            
+            chewed["END_POINTS"][1]["POST_SHADERS"] = new JsonArray(tempShaders.Select(x => x.ToJson()).ToArray());
+            if ((chewed["END_POINTS"][1]["POST_SHADERS"] as JsonArray).Count == 0)
+                chewed["END_POINTS"][1].AsObject().Remove("POST_SHADERS");
+
+            tempShaders = Shaders.Where(
+                (x, p) => !(x.Shader.Operand is ObjectReference) || x.Shader.Expr.IsImmediateOperand == false ||
+                (Shaders.TakeLast(Shaders.Count() - p - 1).FirstOrDefault(y => x.Shader.Operand.Equals(y.Shader.Operand)) == null &&
+                !(shaderSearchRange.FirstOrDefault(z => x.Shader.Operand.Equals(z.Shader.Operand))?.Shader.Expr.Equals(x.Shader.Expr) == true)));
+
+            chewed["SHADERS"] = new JsonArray(tempShaders.Select(x => x.ToJson()).ToArray());
+            if ((chewed["SHADERS"] as JsonArray).Count == 0)
+                chewed.Remove("SHADERS");
 
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
