@@ -49,12 +49,13 @@
             </sync:SfDataGrid>
         </GroupBox>
         <GroupBox Header="Built-in Functions" Margin="4" Grid.Row="1" Grid.Column="2">
-            <sync:SfDataGrid Margin="0,8,0,0" x:Name="sfBuiltInFunctionsViewer" AutoGenerateColumns="False" AllowSorting="False" AllowTriStateSorting="False" AllowFiltering="False" ColumnSizer="AutoWithLastColumnFill"
+            <sync:SfDataGrid Margin="0,8,0,0" x:Name="sfBuiltInFunctionsViewer" AutoGenerateColumns="False" AllowSorting="False" AllowTriStateSorting="True" AllowFiltering="False" ColumnSizer="AutoWithLastColumnFill"
                              GridCopyOption="CopyData" CopyGridCellContent="sfBuiltInFunctionsViewer_CopyGridCellContent"
                              CellDoubleTapped="sfBuiltInFunctionsViewer_CellDoubleTapped">
                 <sync:SfDataGrid.Columns>
-                    <sync:GridTextColumn HeaderText="Name" MappingName="Key"/>
-                    <sync:GridTextColumn HeaderText="Comment" MappingName="Value"/>
+                    <sync:GridTextColumn HeaderText="Name" MappingName="Name" AllowSorting="True"/>
+                    <sync:GridTextColumn HeaderText="Category" MappingName="Category" AllowFiltering="True" AllowSorting="True"/>
+                    <sync:GridTextColumn HeaderText="Comment" MappingName="Comment"/>
                 </sync:SfDataGrid.Columns>
             </sync:SfDataGrid>
         </GroupBox>

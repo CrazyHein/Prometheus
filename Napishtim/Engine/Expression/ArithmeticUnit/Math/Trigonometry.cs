@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Expression.AU
 {
-    [ArithmeticUnitUsage("SIN(x): Returns the sine of an angle of x radians.")]
+    [ArithmeticUnitUsage("Trigonometry", "SIN(x): Returns the sine of an angle of x radians.")]
     public class SIN : ArithmeticUnit
     {
         public SIN(IReadOnlyList<Expression> parameters) : base(parameters)
@@ -25,7 +25,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ex
         }
     }
 
-    [ArithmeticUnitUsage("COS(x): Returns the cosine of an angle of x radians.")]
+    [ArithmeticUnitUsage("Trigonometry", "COS(x): Returns the cosine of an angle of x radians.")]
     public class COS : ArithmeticUnit
     {
         public COS(IReadOnlyList<Expression> parameters) : base(parameters)
@@ -43,7 +43,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ex
         }
     }
 
-    [ArithmeticUnitUsage("TAN(x): Returns the tangent of an angle of x radians.")]
+    [ArithmeticUnitUsage("Trigonometry", "TAN(x): Returns the tangent of an angle of x radians.")]
     public class TAN : ArithmeticUnit
     {
         public TAN(IReadOnlyList<Expression> parameters) : base(parameters)

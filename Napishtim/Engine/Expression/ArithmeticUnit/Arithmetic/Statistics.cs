@@ -8,7 +8,7 @@ using System.Xml.Linq;
 
 namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Expression.AU
 {
-    [ArithmeticUnitUsage("MAX(v0, ...): Returns the maximum value of all input variables.")]
+    [ArithmeticUnitUsage("Statistics", "MAX(v0, ...): Returns the maximum value of all input variables.")]
     public class MAX : ArithmeticUnit
     {
         public MAX(IReadOnlyList<Expression> parameters) : base(parameters)
@@ -27,7 +27,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ex
         }
     }
 
-    [ArithmeticUnitUsage("MIN(v0, ...): Returns the minimum value of all input variables.")]
+    [ArithmeticUnitUsage("Statistics", "MIN(v0, ...): Returns the minimum value of all input variables.")]
     public class MIN : ArithmeticUnit
     {
         public MIN(IReadOnlyList<Expression> parameters) : base(parameters)
@@ -45,7 +45,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ex
         }
     }
 
-    [ArithmeticUnitUsage("SUM(v0, ...): Returns the sum of all input variables.")]
+    [ArithmeticUnitUsage("Statistics", "SUM(v0, ...): Returns the sum of all input variables.")]
     public class SUM : ArithmeticUnit
     {
         public SUM(IReadOnlyList<Expression> parameters) : base(parameters)
@@ -63,7 +63,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ex
         }
     }
 
-    [ArithmeticUnitUsage("MEAN(v0, ...): Returns the mean value of all input variables.")]
+    [ArithmeticUnitUsage("Statistics", "MEAN(v0, ...): Returns the mean value of all input variables.")]
     public class MEAN : ArithmeticUnit
     {
         public MEAN(IReadOnlyList<Expression> parameters) : base(parameters)
@@ -81,7 +81,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ex
         }
     }
 
-    [ArithmeticUnitUsage("DMEAN(v0, ...): Returns the mean value of all input variables.")]
+    [ArithmeticUnitUsage("Statistics", "DMEAN(v0, ...): Returns the mean value of all input variables.")]
     public class DMEAN : ArithmeticUnit
     {
         public DMEAN(IReadOnlyList<Expression> parameters) : base(parameters)
@@ -99,7 +99,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ex
         }
     }
 
-    [ArithmeticUnitUsage("STDEV(v0, v1, ...): Returns the standard deviation of all input variables.")]
+    [ArithmeticUnitUsage("Statistics", "STDEV(v0, v1, ...): Returns the standard deviation of all input variables.")]
     public class STDEV : ArithmeticUnit
     {
         public STDEV(IReadOnlyList<Expression> parameters) : base(parameters)
@@ -117,7 +117,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ex
         }
     }
 
-    [ArithmeticUnitUsage("DSTDEV(v0, v1, ...): Returns the standard deviation of all input variables.")]
+    [ArithmeticUnitUsage("Statistics", "DSTDEV(v0, v1, ...): Returns the standard deviation of all input variables.")]
     public class DSTDEV : ArithmeticUnit
     {
         public DSTDEV(IReadOnlyList<Expression> parameters) : base(parameters)

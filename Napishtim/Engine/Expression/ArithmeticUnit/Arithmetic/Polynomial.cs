@@ -8,7 +8,7 @@ using System.Xml.Linq;
 
 namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Expression.AU
 {
-    [ArithmeticUnitUsage("POLY(a0, a1, x1, a2, x2, ...): Returns the calculation result of the expression 'a0 + a1*x1 + a2*x2, ...'.")]
+    [ArithmeticUnitUsage("Polynomial", "POLY(a0, a1, x1, a2, x2, ...): Returns the calculation result of the expression 'a0 + a1*x1 + a2*x2*x2, ...'.")]
     public class POLY : ArithmeticUnit
     {
         public POLY(IReadOnlyList<Expression> parameters) : base(parameters)

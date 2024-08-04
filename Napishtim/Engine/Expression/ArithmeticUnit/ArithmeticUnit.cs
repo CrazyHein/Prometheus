@@ -11,14 +11,16 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ex
     public sealed class ArithmeticUnitUsageAttribute : Attribute
     {
         public string Usage { get; }
-        public ArithmeticUnitUsageAttribute(string usage) {
+        public string Category { get; }
+        public ArithmeticUnitUsageAttribute(string category, string usage) {
             Usage = usage;
+            Category = category;
         }
     }
     public abstract class ArithmeticUnit
     {
-        private static Dictionary<string, string> __COMPATIBLE_ARITHMETIC_UINT_NAMES = new Dictionary<string, string>();
-        public static IReadOnlyDictionary<string, string> CompatibleArithmeticUnitNames { get; }
+        private static Dictionary<string, (string, string)> __COMPATIBLE_ARITHMETIC_UINT_NAMES = new Dictionary<string, (string, string)>();
+        public static IReadOnlyDictionary<string, (string, string)> CompatibleArithmeticUnitNames { get; }
         static ArithmeticUnit()
         {
             var assem = typeof(ArithmeticUnit).Assembly;
@@ -28,7 +30,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ex
                 if(bt != null && bt.FullName == typeof(ArithmeticUnit).FullName)
                 {
                     __ARITHMETIC_UNIT_FACTORY[t.Name] = p => Activator.CreateInstance(t, p);
-                    __COMPATIBLE_ARITHMETIC_UINT_NAMES.Add(t.Name, t.GetCustomAttribute<ArithmeticUnitUsageAttribute>().Usage);
+                    __COMPATIBLE_ARITHMETIC_UINT_NAMES.Add(t.Name, (t.GetCustomAttribute<ArithmeticUnitUsageAttribute>().Category, t.GetCustomAttribute<ArithmeticUnitUsageAttribute>().Usage));
                 }
             }
             CompatibleArithmeticUnitNames = __COMPATIBLE_ARITHMETIC_UINT_NAMES;

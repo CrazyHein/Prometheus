@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Expression.AU
 {
-    [ArithmeticUnitUsage("MOD(x, y): Returns the floating-point remainder of x/y (rounded towards zero).")]
+    [ArithmeticUnitUsage("Mod", "MOD(x, y): Returns the floating-point remainder of x/y (rounded towards zero).")]
     public class MOD: ArithmeticUnit
     {
         public MOD(IReadOnlyList<Expression> parameters) : base(parameters)
@@ -25,7 +25,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ex
         }
     }
 
-    [ArithmeticUnitUsage("ABS(x): Returns the absolute value of x: |x|.")]
+    [ArithmeticUnitUsage("Mod", "ABS(x): Returns the absolute value of x: |x|.")]
     public class ABS : ArithmeticUnit
     {
         public ABS(IReadOnlyList<Expression> parameters) : base(parameters)

@@ -12,11 +12,11 @@ using System.Threading.Tasks;
 
 namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.EventMechansim
 {
-    [CompatibleEvent(("EQU:The event is triggered depends on the arithmetic comparison of the two operands: Whether the operand A is equal to the operand B ?"),
-        ("GTE:The event is triggered depends on the arithmetic comparison of the two operands: Whether the operand A is greater than or equal to the operand B ?"),
-        ("GRT:The event is triggered depends on the arithmetic comparison of the two operands: Whether the operand A is greater than the operand B ?"),
-        ("LTE:The event is triggered depends on the arithmetic comparison of the two operands: Whether the operand A is less than or equal to the operand B ?"),
-        ("LES:The event is triggered depends on the arithmetic comparison of the two operands: Whether the operand A is less than the operand B ?"))]
+    [CompatibleEvent(("EQU:The event is triggered depends on the arithmetic comparison of the two operands: Whether the operand A is equal to the operand B ? POSITIVE_TOLERANCE >= (A-B) >= NEGATIVE_TOLERANCE"),
+        ("GTE:The event is triggered depends on the arithmetic comparison of the two operands: Whether the operand A is greater than or equal to the operand B ? (A-B) >= NEGATIVE_TOLERANCE"),
+        ("GRT:The event is triggered depends on the arithmetic comparison of the two operands: Whether the operand A is greater than the operand B ? (A-B) > POSITIVE_TOLERANCE"),
+        ("LTE:The event is triggered depends on the arithmetic comparison of the two operands: Whether the operand A is less than or equal to the operand B ? (A-B) <= POSITIVE_TOLERANCE"),
+        ("LES:The event is triggered depends on the arithmetic comparison of the two operands: Whether the operand A is less than the operand B ? (A-B) < NEGATIVE_TOLERANCE"))]
     public class Condition : Event
     {
         private readonly string __condition = string.Empty;

@@ -31,7 +31,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Controls.Common
         {
             InitializeComponent();
             sfIOVariablesViewer.ItemsSource = ContextModel.Tags?.Select(x => x.Value);
-            sfBuiltInFunctionsViewer.ItemsSource = ArithmeticUnit.CompatibleArithmeticUnitNames.Select(x => KeyValuePair.Create(x.Key, x.Value));
+            sfBuiltInFunctionsViewer.ItemsSource = ArithmeticUnit.CompatibleArithmeticUnitNames.Select(x => new { Name = x.Key, Category = x.Value.Item1, Comment = x.Value.Item2 }); 
             sfSystemVariablesViewer.ItemsSource = EnvVariableReference.ENV_VARIABLE_INFO.Select(x => KeyValuePair.Create(x.Key, x.Value));
             txtExpression.Text = expression;
 
@@ -73,15 +73,13 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Controls.Common
 
         private void sfBuiltInFunctionsViewer_CellDoubleTapped(object sender, Syncfusion.UI.Xaml.Grid.GridCellDoubleTappedEventArgs e)
         {
-            txtExpression.Text += ((KeyValuePair<string, string>)sfBuiltInFunctionsViewer.SelectedItem).Key;
+            txtExpression.Text += (sfBuiltInFunctionsViewer.SelectedItem).GetType().GetProperty("Name").GetValue(sfBuiltInFunctionsViewer.SelectedItem).ToString();
         }
 
         private void sfBuiltInFunctionsViewer_CopyGridCellContent(object sender, Syncfusion.UI.Xaml.Grid.GridCopyPasteCellEventArgs e)
         {
-            if (e.Column.HeaderText == "Comment")
+            if (e.Column.HeaderText == "Comment" || e.Column.HeaderText == "Category")
                 e.Handled = true;
-            else
-                e.ClipBoardValue = ((KeyValuePair<string, string>)e.RowData).Key;
         }
 
         private void CancelButtonAdv_Click(object sender, RoutedEventArgs e)

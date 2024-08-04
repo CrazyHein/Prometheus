@@ -78,7 +78,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Napishtim
         static EventModel()
         {
             EventIndex = new Dictionary<string, string>();
-            foreach (var x in Event.CompatibleEventTypes)
+            foreach (var x in Event.CompatibleEventTypes.OrderBy(x => x.Key))
                 EventIndex[x.Key] = x.Value;
             EventTypes = EventIndex.Keys;
         }
