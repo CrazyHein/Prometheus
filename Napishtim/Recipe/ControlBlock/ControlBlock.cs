@@ -4,6 +4,7 @@ using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.EventM
 using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Expression.AU;
 using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.StepMechansim;
 using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Globals;
+using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Process;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -205,5 +206,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
 
         public abstract IEnumerable<Step> Build(Context context, IReadOnlyDictionary<uint, Event> globals);
         public uint? ID { get; protected init; }
+
+        public abstract IEnumerable<ProcessStepObject> ProcessSteps(IEnumerable<Type> owners);
     }
 }

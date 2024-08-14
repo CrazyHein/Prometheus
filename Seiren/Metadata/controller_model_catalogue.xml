@@ -556,6 +556,33 @@
 				<GroupParameter>4294967295</GroupParameter>
 			</RX>
 		</ExtensionModel>
+		<ExtensionModel>
+			<ID>0x00F0</ID>
+			<Name>RJ71EC92</Name>
+			<BitSize>0x20</BitSize>
+			<TX>
+				<NetSLV>1</NetSLV>
+				<NetCFG>1</NetCFG>
+				<NetIOCOM>1</NetIOCOM>
+				<NetInfo>1</NetInfo>
+				<NodeInfo>10000</NodeInfo>
+				<NodeIOCOM>10000</NodeIOCOM>
+				<Raw>32768</Raw>
+				<BitArea>262144</BitArea>
+				<BitIndex>4294967295</BitIndex>
+				<ByteIndex>4294967295</ByteIndex>
+				<RawReadback>32768</RawReadback>
+				<BitAreaReadback>262144</BitAreaReadback>
+				<BitIndexReadback>4294967295</BitIndexReadback>
+				<ByteIndexReadback>4294967295</ByteIndexReadback>
+			</TX>
+			<RX>
+				<Raw>32768</Raw>
+				<BitArea>262144</BitArea>
+				<BitIndex>4294967295</BitIndex>
+				<ByteIndex>4294967295</ByteIndex>
+			</RX>
+		</ExtensionModel>
 	</ExtensionModels>
 	<EthernetModels ConfigurationFields = "Timeout;Timer;Interval;Priority;InputDataOffset;InputDataSize;OutputDataOffset;OutputDataSize;">
 		<EthernetModel>

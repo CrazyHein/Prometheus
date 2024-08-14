@@ -74,6 +74,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Napishtim
             get { return __condition; }
             set
             {
+                value = value.Trim();
                 if (value != __condition)
                 {
                     __condition = value;
@@ -87,6 +88,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Napishtim
         {
             get 
             {
+                if (__condition.Length == 0)
+                    return new JsonArray();
                 return new JsonArray(__condition.Split('\n').Select(x => JsonValue.Create<string>(x.TrimEnd())).ToArray());
             }
         }

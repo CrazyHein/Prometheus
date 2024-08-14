@@ -248,6 +248,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
             int pos = 1;
             var trans = delegate (ValueTuple<string, JsonArray, ControlBlockSource> x)
             {
+                if(pos >= stepLinkMapping.Length)
+                    throw new NaposhtimDocumentException(NaposhtimExceptionCode.CONTROL_BLOCK_ARGUMENTS_ERROR, "Can not find any Control Step in sub control blocks of 'Switch' Control Block.");
                 var ret = new ValueTuple<string, JsonArray, ProcessShaders?, uint>(x.Item1, x.Item2, null, stepLinkMapping.Span[pos]);
                 pos += x.Item3.StepFootprint;
                 return ret;
@@ -347,6 +349,14 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
             var y = __actions.SelectMany(b => b.Build(context, globals));
 
             return x.Concat(y);
+        }
+
+        public override IEnumerable<ProcessStepObject> ProcessSteps(IEnumerable<Type> owners)
+        {
+            if (owners.Contains(typeof(Switch_O)))
+                return __actions.SelectMany(b => b.ProcessSteps(owners));
+            else
+                return Enumerable.Empty<ProcessStepObject>();
         }
     }
 }

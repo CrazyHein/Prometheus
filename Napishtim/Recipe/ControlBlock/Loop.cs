@@ -234,5 +234,13 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
 
             return x.Concat(y).Concat(z);
         }
+
+        public override IEnumerable<ProcessStepObject> ProcessSteps(IEnumerable<Type> owners)
+        {
+            if (owners.Contains(typeof(Loop_O)))
+                return __control_block_body.ProcessSteps(owners);
+            else
+                return Enumerable.Empty<ProcessStepObject>();
+        }
     }
 }
