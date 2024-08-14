@@ -18,7 +18,6 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
         private LinkedList<ProcessStepSource> __original_process_steps;
         
         public IEnumerable<ProcessStepSource> OriginalProcessSteps { get { return __original_process_steps; } }
-        private SortedDictionary<uint, int> __global_event_reference = new SortedDictionary<uint, int>();
         public Dictionary<SimpleStepWithTimeout_S, Expression> TimeToTimeout = new Dictionary<SimpleStepWithTimeout_S, Expression>();
 
         public Sequential_S(string name, IEnumerable<ProcessStepSource> steps):base(name)
@@ -34,7 +33,6 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
                 __original_process_steps.AddLast(step);
                 //StepFootprint += step.StepFootprint;
                 //UserVariableFootprint += step.UserVariableFootprint;
-                _AddGlobalEventReference(step.GlobalEventReference);
             }
         }
 
@@ -116,8 +114,6 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
             __original_process_steps.AddFirst(step);
             //StepFootprint += step.StepFootprint;
             //UserVariableFootprint += step.UserVariableFootprint;
-            _AddGlobalEventReference(step.GlobalEventReference);
-            GlobalEventPublisher?.AddEventReference(step.GlobalEventReference);
         }
 
         public void AddProcessStepLast(ProcessStepSource step)
@@ -129,8 +125,6 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
             __original_process_steps.AddLast(step);
             //StepFootprint += step.StepFootprint;
             //UserVariableFootprint += step.UserVariableFootprint;
-            _AddGlobalEventReference(step.GlobalEventReference);
-            GlobalEventPublisher?.AddEventReference(step.GlobalEventReference);
         }
 
         public void AddProcessStepAfter(LinkedListNode<ProcessStepSource> node, ProcessStepSource step)
@@ -145,8 +139,6 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
             __original_process_steps.AddAfter(node, step);
             //StepFootprint += step.StepFootprint;
             //UserVariableFootprint += step.UserVariableFootprint;
-            _AddGlobalEventReference(step.GlobalEventReference);
-            GlobalEventPublisher?.AddEventReference(step.GlobalEventReference);
         }
         public void AddProcessStepBefore(LinkedListNode<ProcessStepSource> node, ProcessStepSource step)
         {
@@ -160,8 +152,6 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
             __original_process_steps.AddBefore(node, step);
             //StepFootprint += step.StepFootprint;
             //UserVariableFootprint += step.UserVariableFootprint;
-            _AddGlobalEventReference(step.GlobalEventReference);
-            GlobalEventPublisher?.AddEventReference(step.GlobalEventReference);
         }
         public void RemoveProcessStepFirst()
         {
@@ -174,9 +164,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
             var step = __original_process_steps.First.Value;
             //StepFootprint -= step.StepFootprint;
             //UserVariableFootprint -= step.UserVariableFootprint;
-            _RemoveGlobalEventReference(step.GlobalEventReference);
             __original_process_steps.RemoveFirst();
-            GlobalEventPublisher?.RemoveEventReference(step.GlobalEventReference);
         }
 
         public void RemoveProcessStepLast()
@@ -186,8 +174,6 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
             var step = __original_process_steps.Last.Value;
             //StepFootprint -= step.StepFootprint;
             //UserVariableFootprint -= step.UserVariableFootprint;
-            _RemoveGlobalEventReference(step.GlobalEventReference);
-            GlobalEventPublisher?.RemoveEventReference(step.GlobalEventReference);
             __original_process_steps.RemoveLast();
         }
         public void RemoveProcessStep(LinkedListNode<ProcessStepSource> node)
@@ -201,8 +187,6 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
             var step = node.Value;
             //StepFootprint -= step.StepFootprint;
             //UserVariableFootprint -= step.UserVariableFootprint;
-            _RemoveGlobalEventReference(step.GlobalEventReference);
-            GlobalEventPublisher?.RemoveEventReference(step.GlobalEventReference);
             __original_process_steps.Remove(node);
         }
 
@@ -233,13 +217,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
                 }
                 //StepFootprint -= originalStep.StepFootprint;
                 //UserVariableFootprint -= originalStep.UserVariableFootprint;
-                _RemoveGlobalEventReference(originalStep.GlobalEventReference);
-                GlobalEventPublisher?.RemoveEventReference(originalStep.GlobalEventReference);
 
                 //StepFootprint += value.StepFootprint;
                 //UserVariableFootprint += value.UserVariableFootprint;
-                _AddGlobalEventReference(value.GlobalEventReference);
-                GlobalEventPublisher?.AddEventReference(value.GlobalEventReference);
 
                 var node = NodeAt(idx);
                 __original_process_steps.AddBefore(node, value);
@@ -280,13 +260,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
             var stp = node.Value;
             //StepFootprint -= stp.StepFootprint;
             //UserVariableFootprint -= stp.UserVariableFootprint;
-            _RemoveGlobalEventReference(stp.GlobalEventReference);
-            GlobalEventPublisher?.RemoveEventReference(stp.GlobalEventReference);
 
             //StepFootprint += step.StepFootprint;
             //UserVariableFootprint += step.UserVariableFootprint;
-            _AddGlobalEventReference(step.GlobalEventReference);
-            GlobalEventPublisher?.AddEventReference(step.GlobalEventReference);
 
             __original_process_steps.AddBefore(node, step);
             __original_process_steps.Remove(node);
@@ -351,8 +327,6 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
         {
             //StepFootprint = 0;
             //UserVariableFootprint = 0;
-            GlobalEventPublisher?.RemoveEventReference(__original_process_steps.SelectMany(x => x.GlobalEventReference));
-            __global_event_reference.Clear();
             __original_process_steps.Clear();
         }
 
@@ -386,42 +360,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
             return new Sequential_O(Name, compiledProcessSteps, TimeToTimeout, StepFootprint, UserVariableFootprint);
         }
 
-        public override IEnumerable<uint> GlobalEventReference => __global_event_reference.Keys;
+        public override IEnumerable<uint> GlobalEventReference => __original_process_steps.SelectMany(s => s.GlobalEventReference).Distinct();
 
         public override int Height => 1;
 
-        protected void _AddGlobalEventReference(IEnumerable<uint> idxes)
-        {
-            foreach (var index in idxes)
-            {
-                if (__global_event_reference.ContainsKey(index))
-                    __global_event_reference[index]++;
-                else
-                    __global_event_reference[index] = 1;
-            }
-        }
-        protected void _AddGlobalEventReference(JsonArray? conditions)
-        {
-            _AddGlobalEventReference(ProcessStep.SearchGlobalEventIndex(conditions));
-        }
-
-        protected void _RemoveGlobalEventReference(IEnumerable<uint> idxes)
-        {
-            foreach (var index in idxes)
-            {
-                if (__global_event_reference.ContainsKey(index))
-                {
-                    __global_event_reference[index]--;
-                    if(__global_event_reference[index] == 0)
-                        __global_event_reference.Remove(index);
-                }
-            }
-        }
-
-        protected void _RemoveGlobalEventReference(JsonArray? conditions)
-        {
-            _RemoveGlobalEventReference(ProcessStep.SearchGlobalEventIndex(conditions));
-        }
 
         public override JsonObject SaveAsJson()
         {
@@ -438,7 +380,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
 
         public override bool ContainsGlobalEventReference(uint index)
         {
-            return __global_event_reference.ContainsKey(index);
+            return GlobalEventReference.Contains(index);
         }
         public override string ToString()
         {

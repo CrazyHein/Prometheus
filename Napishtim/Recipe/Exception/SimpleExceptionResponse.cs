@@ -52,6 +52,14 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Ex
             }
         }
 
+        public override IEnumerable<uint> GlobalEventReference
+        {
+            get
+            {
+                return _exception_response["END_POINTS"].AsArray().SelectMany(x => ProcessStep.SearchGlobalEventIndex(x["TRIGGER"].AsArray())).Distinct();
+            }
+        }
+
         public SimpleExceptionResponse_S(string name, IReadOnlyDictionary<uint, (string name, Event evt)>? locals, IEnumerable<(string name, JsonArray condition, int returnCode)> responses) : base(name)
         {
             if (locals != null && locals.Count > 0)
@@ -75,15 +83,12 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Ex
                 branch["TRIGGER"] = x.condition.DeepClone();
                 branch["POST_SHADERS"] = new ReservedProcessShaders([($"RETURN {x.returnCode}", $"&RETURN", $"{x.returnCode}")]).ToJson();
                 _exception_response["END_POINTS"].AsArray().Add(branch);
-                AddGlobalEventRefernce(x.condition);
             }
         }
 
         private SimpleExceptionResponse_S(JsonObject node) : base(node["NAME"].GetValue<string>())
         {
             _exception_response = node["RESPONSE"].DeepClone().AsObject();
-            foreach (var e in _exception_response["END_POINTS"].AsArray())
-                AddGlobalEventRefernce(e["TRIGGER"].AsArray());
         }
 
         public override JsonObject SaveAsJson()
@@ -122,6 +127,11 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Ex
             {
                 throw new NaposhtimDocumentException(NaposhtimExceptionCode.EXCEPTION_HANDLING_ARGUMENTS_ERROR, $"Can not restore SimpleExceptionResponse_S object from node:\n{node.ToString()}", ex);
             }
+        }
+
+        public override bool ContainsGlobalEventReference(uint index)
+        {
+            return GlobalEventReference.Contains(index);
         }
     }
 

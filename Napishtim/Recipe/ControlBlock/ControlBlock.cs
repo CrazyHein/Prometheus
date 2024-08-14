@@ -131,46 +131,6 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
         public abstract IEnumerable<uint> GlobalEventReference { get; }
         public abstract bool ContainsGlobalEventReference(uint index);
 
-        private GlobalEvents? __global_events_publisher;
-        private int __global_events_publisher_counter;
-
-        public virtual GlobalEvents? GlobalEventPublisher 
-        { 
-            get
-            {
-                if (__global_events_publisher_counter == 0)
-                    return null;
-                else
-                    return __global_events_publisher;
-            }
-            set
-            {
-                if (value != null)
-                {
-                    if (__global_events_publisher == null || __global_events_publisher == value)
-                    {
-                        value.AddEventReference(GlobalEventReference);
-                        __global_events_publisher_counter++;
-                        __global_events_publisher = value;
-                    }
-                    else if (__global_events_publisher != value)
-                        throw new NaposhtimDocumentException(NaposhtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, $"The ControlBlock has been linked to another GlobalEvents object.");
-                }
-                else
-                {
-                    if (__global_events_publisher != null && __global_events_publisher_counter > 0)
-                    {
-                        __global_events_publisher.RemoveEventReference(GlobalEventReference);
-                        __global_events_publisher_counter--;
-                        if (__global_events_publisher_counter == 0)
-                            __global_events_publisher = null;
-                    }
-                    else
-                        throw new NaposhtimDocumentException(NaposhtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, $"The ControlBlock has not been linked to a GlobalEvents object yet.");
-                }
-            }
-        }
-
         public abstract JsonObject SaveAsJson();
         private delegate ControlBlockSource MakeControlBlock(JsonObject node, ControlBlockSource? owner);
         private static Dictionary<string, MakeControlBlock> __BUIILD_CONTROL_BLOCK = new Dictionary<string, MakeControlBlock>();

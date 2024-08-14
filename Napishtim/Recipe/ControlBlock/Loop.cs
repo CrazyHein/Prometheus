@@ -29,7 +29,6 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
                     __loop_body.Owner = null;
                     //StepFootprint -= __loop_body.StepFootprint;
                     //UserVariableFootprint -= __loop_body.UserVariableFootprint;
-                    GlobalEventPublisher?.RemoveEventReference(__loop_body.GlobalEventReference);
                 }
 
                 if (value != null)
@@ -37,7 +36,6 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
                     value.Owner = this;
                     //StepFootprint += value.StepFootprint;
                     //UserVariableFootprint += value.UserVariableFootprint;
-                    GlobalEventPublisher?.AddEventReference(value.GlobalEventReference);
                 }
                     
                 __loop_body = value;
@@ -71,7 +69,6 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
 
             //StepFootprint = 2 + body.StepFootprint;
             //UserVariableFootprint = 1 + body.UserVariableFootprint;
-            GlobalEventPublisher?.AddEventReference(body.GlobalEventReference);
         }
 
         public Loop_S(string name, int count) : base(name)
@@ -94,7 +91,6 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
 
                 //StepFootprint = 2 + __loop_body.StepFootprint;
                 //UserVariableFootprint = 1 + __loop_body.UserVariableFootprint;
-                GlobalEventPublisher?.AddEventReference(__loop_body.GlobalEventReference);
             }
             else
             {
@@ -106,7 +102,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
             }
         }
 
-        public override IEnumerable<uint> ShaderUserVariablesUsage => __loop_body.ShaderUserVariablesUsage;
+        public override IEnumerable<uint> ShaderUserVariablesUsage => __loop_body != null ? __loop_body.ShaderUserVariablesUsage : Enumerable.Empty<uint>();
 
         static public ControlBlockSource MAKE(JsonObject node, ControlBlockSource? owner)
         {
@@ -166,10 +162,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
 
         public override bool ContainsGlobalEventReference(uint index)
         {
-            return LoopBody.ContainsGlobalEventReference(index);
+            return LoopBody != null ? LoopBody.ContainsGlobalEventReference(index) : false;
         }
 
-        public override IEnumerable<uint> GlobalEventReference => LoopBody.GlobalEventReference;
+        public override IEnumerable<uint> GlobalEventReference => __loop_body != null ? __loop_body.GlobalEventReference : Enumerable.Empty<uint>();
 
         public override int Height
         {

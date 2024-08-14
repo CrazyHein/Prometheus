@@ -42,8 +42,6 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
             __branches = new List<(string name, JsonArray condition, ControlBlockSource action)>(branches);
             //StepFootprint = 1 + __branches.Sum(x => x.action.StepFootprint);
             //UserVariableFootprint = 0 + __branches.Sum(x => x.action.UserVariableFootprint);
-            foreach(var b in __branches)
-                GlobalEventPublisher?.AddEventReference(ProcessStep.SearchGlobalEventIndex(b.condition).Concat(b.action.GlobalEventReference).Distinct());
         }
 
         public Switch_S(string name) : base(name)
@@ -184,7 +182,6 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
                 __branches.Add((b.name, b.condition, b.action));
                 //StepFootprint += b.action.StepFootprint;
                 //UserVariableFootprint += b.action.UserVariableFootprint;
-                GlobalEventPublisher?.AddEventReference(ProcessStep.SearchGlobalEventIndex(b.condition).Concat(b.action.GlobalEventReference).Distinct());
             }
         }
 
@@ -197,7 +194,6 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
             __branches.Add((name, condition, action));
             //StepFootprint += action.StepFootprint;
             //UserVariableFootprint += action.UserVariableFootprint;
-            GlobalEventPublisher?.AddEventReference(ProcessStep.SearchGlobalEventIndex(condition).Concat(action.GlobalEventReference).Distinct());
         }
 
         public void InsertBranch(int pos, string name, JsonArray condition, ControlBlockSource action)
@@ -211,7 +207,6 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
             __branches.Insert(pos, (name, condition, action));
             //StepFootprint += action.StepFootprint;
             //UserVariableFootprint += action.UserVariableFootprint;
-            GlobalEventPublisher?.AddEventReference(ProcessStep.SearchGlobalEventIndex(condition).Concat(action.GlobalEventReference).Distinct());
         }
 
         public void MoveBranch(int oldIndex, int newIndex)
@@ -238,7 +233,6 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
             //StepFootprint -= branch.action.StepFootprint;
             //UserVariableFootprint -= branch.action.UserVariableFootprint;
             //Level = __branches.Max(x => x.action.Level) + 1;
-            GlobalEventPublisher?.RemoveEventReference(ProcessStep.SearchGlobalEventIndex(branch.condition).Concat(branch.action.GlobalEventReference).Distinct());
         }
 
         public override ControlBlockObject ResolveTarget(uint next, uint abort, Context context, IReadOnlyDictionary<uint, Event> globals, ReadOnlyMemory<uint> stepLinkMapping, ReadOnlyMemory<uint> userVariableMapping, Dictionary<uint, string> stepNameMapping)
@@ -277,7 +271,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
 
         public override bool ContainsGlobalEventReference(uint index)
         {
-            return __branches.Any(x => x.action.ContainsGlobalEventReference(index));
+            return GlobalEventReference.Contains(index);
         }
 
         public override string ToString()

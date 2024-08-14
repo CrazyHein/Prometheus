@@ -53,19 +53,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Ex
             }
         }
 
-        private SortedSet<uint> __global_event_reference = new SortedSet<uint>();
-        public IEnumerable<uint> GlobalEventReference { get { return __global_event_reference; } }
-
-        protected void AddGlobalEventRefernce(IEnumerable<uint> idxes)
-        {
-            foreach (var idx in idxes)
-                __global_event_reference.Add(idx);
-        }
-
-        protected void AddGlobalEventRefernce(JsonArray? conditions)
-        {
-            AddGlobalEventRefernce(ProcessStep.SearchGlobalEventIndex(conditions));
-        }
+        public abstract IEnumerable<uint> GlobalEventReference { get; }
+        public abstract bool ContainsGlobalEventReference(uint index);
 
         public abstract JsonObject SaveAsJson();
 

@@ -74,10 +74,6 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe
             {
                 if(value != __exception_response_source)
                 {
-                    if (__exception_response_source != null)
-                        __global_events.RemoveEventReference(__exception_response_source.GlobalEventReference);
-                    if(value != null)
-                        __global_events.AddEventReference(value.GlobalEventReference);
                     __exception_response_source = value;
                 }
             } 
@@ -115,6 +111,17 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe
             __parse_source(path);
         }
 
+        private bool __global_event_is_referenced(uint idx)
+        {
+            if (RegularControlBlocks.Any(x => x.ContainsGlobalEventReference(idx)))
+                return true;
+            else if (ExceptionHandlingBlocks.Any(x => x.ContainsGlobalEventReference(idx)))
+                return true;
+            else if(ExceptionResponseSource?.ContainsGlobalEventReference(idx) == true)
+                return true;
+            return false;
+        }
+
         public void AddGlobalEvent(uint idx, string name, string type, params (string pname, string pvalue)[]? parameters)
         {
             __global_events.AddEvent(idx, name, type, parameters);
@@ -127,6 +134,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe
 
         public void ReplaceGlobalEvent(uint idx, uint nidx, string name, string type, params (string pname, string pvalue)[]? parameters)
         {
+            if (__global_event_is_referenced(idx))
+                throw new NaposhtimDocumentException(NaposhtimExceptionCode.DOCUMENT_INVALID_OPERATION, $"GEVENT with index({idx}) has been referenced elsewhere and cannot be deleted directly.");
             __global_events.ReplaceEvent(idx, nidx, name, type, parameters);
         }
 
@@ -137,20 +146,26 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe
 
         public void ReplaceGlobalEvent(uint idx, uint nidx, string name, Event evt)
         {
+            if (__global_event_is_referenced(idx))
+                throw new NaposhtimDocumentException(NaposhtimExceptionCode.DOCUMENT_INVALID_OPERATION, $"GEVENT with index({idx}) has been referenced elsewhere and cannot be deleted directly.");
             __global_events.ReplaceEvent(idx, nidx, name, evt);
         }
 
         public void RemoveGlobalEvent(uint idx)
         {
+            if (__global_event_is_referenced(idx))
+                throw new NaposhtimDocumentException(NaposhtimExceptionCode.DOCUMENT_INVALID_OPERATION, $"GEVENT with index({idx}) has been referenced elsewhere and cannot be deleted directly.");
             //if(__control_block_list.Any(x => x.ContainsGlobalEventReference(idx)))
-                //throw new NaposhtimDocumentException(NaposhtimExceptionCode.DOCUMENT_INVALID_OPERATION, $"GEVENT with index({idx}) has been referenced elsewhere and cannot be deleted directly.");
+            //throw new NaposhtimDocumentException(NaposhtimExceptionCode.DOCUMENT_INVALID_OPERATION, $"GEVENT with index({idx}) has been referenced elsewhere and cannot be deleted directly.");
             __global_events.RemoveEvent(idx);
         }
 
         public void RemoveAllGlobalEvents()
         {
+            if(__global_events.Events.Keys.Any(x => __global_event_is_referenced(x)))
+                throw new NaposhtimDocumentException(NaposhtimExceptionCode.DOCUMENT_INVALID_OPERATION, $"At least one GEVENT has been referenced elsewhere and cannot be deleted directly.");
             //if(__control_block_list.SelectMany(x => x.GlobalEventReference).Distinct().Any(x => GlobalEvents.ContainsKey(x)))
-                //throw new NaposhtimDocumentException(NaposhtimExceptionCode.DOCUMENT_INVALID_OPERATION, $"At least one GEVENT has been referenced elsewhere and cannot be deleted directly.");
+            //throw new NaposhtimDocumentException(NaposhtimExceptionCode.DOCUMENT_INVALID_OPERATION, $"At least one GEVENT has been referenced elsewhere and cannot be deleted directly.");
             __global_events.RemoveAllGlobalEvents();
         }
 
@@ -189,7 +204,6 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe
             //__global_events.AddEventReference(blk.GlobalEventReference);
             if (blk.Owner != null)
                 throw new NaposhtimDocumentException(NaposhtimExceptionCode.DOCUMENT_INVALID_ARGUMENTS, $"The Control Block Source already has an owner.");
-            blk.GlobalEventPublisher = __global_events;
             switch(group)
             {
                 case CONTROL_BLOCK_GROUP_T.REGULAR:
@@ -214,7 +228,6 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe
             //__global_events.AddEventReference(blk.GlobalEventReference);
             if (blk.Owner != null)
                 throw new NaposhtimDocumentException(NaposhtimExceptionCode.DOCUMENT_INVALID_ARGUMENTS, $"The Control Block Source already has an owner.");
-            blk.GlobalEventPublisher = __global_events;
             switch (group)
             {
                 case CONTROL_BLOCK_GROUP_T.REGULAR:
@@ -243,14 +256,12 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe
                         throw new NaposhtimDocumentException(NaposhtimExceptionCode.DOCUMENT_INVALID_ARGUMENTS, $"The specified node does not in the Linked List.");
                     
                     //__global_events.AddEventReference(blk.GlobalEventReference);
-                    blk.GlobalEventPublisher = __global_events;
                     __regular_control_block_list.AddAfter(node, blk);
                     break;
                 case CONTROL_BLOCK_GROUP_T.EXCEPTION_HANDLING:
                     if (node.List != __exception_handling_block_list)
                         throw new NaposhtimDocumentException(NaposhtimExceptionCode.DOCUMENT_INVALID_ARGUMENTS, $"The specified node does not in the Linked List.");
 
-                    blk.GlobalEventPublisher = __global_events;
                     __exception_handling_block_list.AddAfter(node, blk);
                     break;
             }
@@ -272,14 +283,12 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe
                         throw new NaposhtimDocumentException(NaposhtimExceptionCode.DOCUMENT_INVALID_ARGUMENTS, $"The specified node does not in the Linked List.");
                     
                     //__global_events.AddEventReference(blk.GlobalEventReference);
-                    blk.GlobalEventPublisher = __global_events;
                     __regular_control_block_list.AddBefore(node, blk);
                     break;
                 case CONTROL_BLOCK_GROUP_T.EXCEPTION_HANDLING:
                     if (node.List != __exception_handling_block_list)
                         throw new NaposhtimDocumentException(NaposhtimExceptionCode.DOCUMENT_INVALID_ARGUMENTS, $"The specified node does not in the Linked List.");
 
-                    blk.GlobalEventPublisher = __global_events;
                     __exception_handling_block_list.AddBefore(node, blk);
                     break;
             }
@@ -291,14 +300,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe
             switch (group)
             {
                 case CONTROL_BLOCK_GROUP_T.REGULAR:
-                    foreach (var blk in __regular_control_block_list)
-                        blk.GlobalEventPublisher = null;
-                    //__global_events.RemoveEventReference(blk.GlobalEventReference);
                     __regular_control_block_list.Clear();
                     break;
                 case CONTROL_BLOCK_GROUP_T.EXCEPTION_HANDLING:
-                    foreach (var blk in __exception_handling_block_list)
-                        blk.GlobalEventPublisher = null;
                     __exception_handling_block_list.Clear();
                     break;
             }
@@ -312,7 +316,6 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe
                     if (__regular_control_block_list.Count == 0)
                         throw new NaposhtimDocumentException(NaposhtimExceptionCode.DOCUMENT_INVALID_OPERATION, $"Can not find any Regular ControlBlock in recipe document.");
                     var blk = __regular_control_block_list.First.Value;
-                    blk.GlobalEventPublisher = null;
                     //__global_events.RemoveEventReference(blk.GlobalEventReference);
                     __regular_control_block_list.RemoveFirst();
                     break;
@@ -320,7 +323,6 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe
                     if (__exception_handling_block_list.Count == 0)
                         throw new NaposhtimDocumentException(NaposhtimExceptionCode.DOCUMENT_INVALID_OPERATION, $"Can not find any Exception Handling ControlBlock in recipe document.");
                     blk = __exception_handling_block_list.First.Value;
-                    blk.GlobalEventPublisher = null;
                     //__global_events.RemoveEventReference(blk.GlobalEventReference);
                     __exception_handling_block_list.RemoveFirst();
                     break;
@@ -335,7 +337,6 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe
                     if (__regular_control_block_list.Count == 0)
                         throw new NaposhtimDocumentException(NaposhtimExceptionCode.DOCUMENT_INVALID_OPERATION, $"Can not find any Regular ControlBlock in recipe document.");
                     var blk = __regular_control_block_list.Last.Value;
-                    blk.GlobalEventPublisher = null;
                     //__global_events.RemoveEventReference(blk.GlobalEventReference);
                     __regular_control_block_list.RemoveLast();
                     break;
@@ -343,7 +344,6 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe
                     if (__exception_handling_block_list.Count == 0)
                         throw new NaposhtimDocumentException(NaposhtimExceptionCode.DOCUMENT_INVALID_OPERATION, $"Can not find any Exception Handling ControlBlock in recipe document.");
                     blk = __exception_handling_block_list.Last.Value;
-                    blk.GlobalEventPublisher = null;
                     //__global_events.RemoveEventReference(blk.GlobalEventReference);
                     __exception_handling_block_list.RemoveLast();
                     break;
@@ -358,7 +358,6 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe
                     if (node.List != __regular_control_block_list)
                         throw new NaposhtimDocumentException(NaposhtimExceptionCode.DOCUMENT_INVALID_OPERATION, $"The specified node does not in the Linked List.");
                     var blk = node.Value;
-                    blk.GlobalEventPublisher = null;
                     //__global_events.RemoveEventReference(blk.GlobalEventReference);
                     __regular_control_block_list.Remove(node);
                     break;
@@ -366,7 +365,6 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe
                     if (node.List != __exception_handling_block_list)
                         throw new NaposhtimDocumentException(NaposhtimExceptionCode.DOCUMENT_INVALID_OPERATION, $"The specified node does not in the Linked List.");
                     blk = node.Value;
-                    blk.GlobalEventPublisher = null;
                     //__global_events.RemoveEventReference(blk.GlobalEventReference);
                     __exception_handling_block_list.Remove(node);
                     break;
@@ -411,6 +409,36 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe
         {
             if(__regular_control_block_list.Count == 0)
                 throw new NaposhtimDocumentException(NaposhtimExceptionCode.DOCUMENT_INVALID_ARGUMENTS, "Can not find any Regular Control Block in recipe document.");
+
+            int sblkIdx = 0;
+            foreach(var sblk in __regular_control_block_list)
+            {
+                foreach (var idx in sblk.GlobalEventReference)
+                {
+                    if (__global_events.Events.ContainsKey(idx) == false)
+                        throw new NaposhtimDocumentException(NaposhtimExceptionCode.DOCUMENT_CONTROL_BLK_BUILD_ERROR,
+                                $"GEVENT{idx} referenced in ({sblk.Name} @{sblkIdx}/{__regular_control_block_list.Count}) does not exist.");
+                }
+                sblkIdx++;
+            }
+
+            sblkIdx = 0;
+            foreach (var sblk in __exception_handling_block_list)
+            {
+                foreach (var idx in sblk.GlobalEventReference)
+                {
+                    if (__global_events.Events.ContainsKey(idx) == false)
+                        throw new NaposhtimDocumentException(NaposhtimExceptionCode.DOCUMENT_CONTROL_BLK_BUILD_ERROR,
+                                $"GEVENT{idx} referenced in ({sblk.Name} @{sblkIdx}/{__exception_handling_block_list.Count}) does not exist.");
+                }
+                sblkIdx++;
+            }
+
+            foreach (var idx in __exception_response_source.GlobalEventReference)
+                if (__global_events.Events.ContainsKey(idx) == false)
+                    throw new NaposhtimDocumentException(NaposhtimExceptionCode.DOCUMENT_CONTROL_BLK_BUILD_ERROR,
+                                $"GEVENT{idx} referenced in (Exception Response) does not exist.");
+
 
             //if (__control_block_list.Any(x => x.Level >= ControlBlock.ControlBlockSource.MAX_NESTING_DEPTH))
             //throw new NaposhtimDocumentException(NaposhtimExceptionCode.DOCUMENT_INVALID_ARGUMENTS, $"The nesting depth of the Control Block exceeds the limit(MAX: {ControlBlock.ControlBlockSource.MAX_NESTING_DEPTH}).");
