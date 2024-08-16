@@ -133,6 +133,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
             }
         }
 
+        public override IEnumerable<(Sequential_S container, ProcessStepSource step)> ProcessSteps => __branches.SelectMany(x => x.action.ProcessSteps);
+
         public void MergeLocalEvents(IEnumerable<(uint idx, string name, Event evt)> locals)
         {
             foreach(var evt in locals)
@@ -238,7 +240,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
         public override ControlBlockObject ResolveTarget(uint next, uint abort, Context context, IReadOnlyDictionary<uint, Event> globals, ReadOnlyMemory<uint> stepLinkMapping, ReadOnlyMemory<uint> userVariableMapping, Dictionary<uint, string> stepNameMapping)
         {
             if (__branches.Count == 0)
-                throw new NaposhtimDocumentException(NaposhtimExceptionCode.CONTROL_BLOCK_ARGUMENTS_ERROR, "The number of 'Switch' Control Block branches is zero.");
+                throw new NaposhtimDocumentException(NaposhtimExceptionCode.CONTROL_BLOCK_ARGUMENTS_ERROR, $"The number of Switch({FullName}) Control Block branches is zero.");
             int pos = 1;
             var trans = delegate (ValueTuple<string, JsonArray, ControlBlockSource> x)
             {
@@ -345,12 +347,6 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
             return x.Concat(y);
         }
 
-        public override IEnumerable<ProcessStepObject> ProcessSteps(IEnumerable<Type> owners)
-        {
-            if (owners.Contains(typeof(Switch_O)))
-                return __actions.SelectMany(b => b.ProcessSteps(owners));
-            else
-                return Enumerable.Empty<ProcessStepObject>();
-        }
+        public override IEnumerable<ProcessStepObject> ProcessSteps => __actions.SelectMany(b => b.ProcessSteps);
     }
 }

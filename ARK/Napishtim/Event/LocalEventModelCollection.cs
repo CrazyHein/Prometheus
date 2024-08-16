@@ -39,7 +39,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Napishtim
             uint idx = 0;
             if (__events.Count != 0)
                 idx = __events.Max(x => x.Index) + 1;
-            LocalEventModel evt = new LocalEventModel(idx, "unnamed") { Owner = __owner };
+            LocalEventModel evt = new LocalEventModel(idx, "unnamed_event") { Owner = __owner };
             __events.Add(evt);
             if (updateSummay)
                 __owner._notify_property_changed(__summary);
@@ -69,7 +69,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Napishtim
             uint idx = 0;
             if (__events.Count != 0)
                 idx = __events.Max(x => x.Index) + 1;
-            LocalEventModel evt = new LocalEventModel(idx, "unnamed") { Owner = __owner };
+            LocalEventModel evt = new LocalEventModel(idx, "unnamed_event") { Owner = __owner };
             __events.Insert(pos, evt);
             if (updateSummay)
                 __owner._notify_property_changed(__summary);

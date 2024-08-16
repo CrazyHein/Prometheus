@@ -8,13 +8,14 @@
         xmlns:syncfusionskin ="clr-namespace:Syncfusion.SfSkinManager;assembly=Syncfusion.SfSkinManager.WPF"
         syncfusionskin:SfSkinManager.Theme="{syncfusionskin:SkinManagerExtension ThemeName=FluentDark}"
         mc:Ignorable="d"
-        Title="Select Control Block Type" Height="280" Width="600" ResizeMode="NoResize" WindowStartupLocation="CenterOwner">
+        Title="Select Control Block Type" Height="280" Width="800" ResizeMode="NoResize" WindowStartupLocation="CenterOwner">
     <Grid Margin="16">
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"/>
             <RowDefinition Height="auto"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
             <ColumnDefinition/>
             <ColumnDefinition/>
             <ColumnDefinition/>
@@ -34,8 +35,14 @@
                 <BitmapImage  UriSource="/imgs/switch.png"/>
             </sync:ButtonAdv.LargeIcon>
         </sync:ButtonAdv>
+        <sync:ButtonAdv Grid.Column="3" Label="" Height="160" Width="160" Margin="8" SizeMode="Large" IconStretch="Uniform" IconHeight="100" IconWidth="100" Click="CompoundButtonAdv_Click">
+            <sync:ButtonAdv.LargeIcon>
+                <BitmapImage  UriSource="/imgs/compound.png"/>
+            </sync:ButtonAdv.LargeIcon>
+        </sync:ButtonAdv>
         <TextBlock Grid.Row="1" Text="Sequential" TextAlignment="Center" FontSize="25"/>
         <TextBlock Grid.Row="1" Grid.Column="1" Text="Loop" TextAlignment="Center" FontSize="25"/>
         <TextBlock Grid.Row="1" Grid.Column="2" Text="Switch" TextAlignment="Center" FontSize="25"/>
+        <TextBlock Grid.Row="1" Grid.Column="3" Text="Compound" TextAlignment="Center" FontSize="25"/>
     </Grid>
 </Window>

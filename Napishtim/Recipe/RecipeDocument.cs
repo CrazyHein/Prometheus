@@ -410,35 +410,33 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe
             if(__regular_control_block_list.Count == 0)
                 throw new NaposhtimDocumentException(NaposhtimExceptionCode.DOCUMENT_INVALID_ARGUMENTS, "Can not find any Regular Control Block in recipe document.");
 
-            int sblkIdx = 0;
-            foreach(var sblk in __regular_control_block_list)
+            foreach(var stp in __regular_control_block_list.SelectMany(x => x.ProcessSteps))
             {
-                foreach (var idx in sblk.GlobalEventReference)
+                foreach (var idx in stp.step.GlobalEventReference)
                 {
                     if (__global_events.Events.ContainsKey(idx) == false)
-                        throw new NaposhtimDocumentException(NaposhtimExceptionCode.DOCUMENT_CONTROL_BLK_BUILD_ERROR,
-                                $"GEVENT{idx} referenced in ({sblk.Name} @{sblkIdx}/{__regular_control_block_list.Count}) does not exist.");
+                        throw new NaposhtimDocumentException(NaposhtimExceptionCode.DOCUMENT_INVALID_ARGUMENTS,
+                                $"GEVENT{idx} referenced in '{stp.container.FullName}' does not exist.");
                 }
-                sblkIdx++;
             }
 
-            sblkIdx = 0;
-            foreach (var sblk in __exception_handling_block_list)
+            foreach (var stp in __exception_handling_block_list.SelectMany(x => x.ProcessSteps))
             {
-                foreach (var idx in sblk.GlobalEventReference)
+                foreach (var idx in stp.step.GlobalEventReference)
                 {
                     if (__global_events.Events.ContainsKey(idx) == false)
-                        throw new NaposhtimDocumentException(NaposhtimExceptionCode.DOCUMENT_CONTROL_BLK_BUILD_ERROR,
-                                $"GEVENT{idx} referenced in ({sblk.Name} @{sblkIdx}/{__exception_handling_block_list.Count}) does not exist.");
+                        throw new NaposhtimDocumentException(NaposhtimExceptionCode.DOCUMENT_INVALID_ARGUMENTS,
+                                $"GEVENT{idx} referenced in '{stp.container.FullName}' does not exist.");
                 }
-                sblkIdx++;
             }
 
-            foreach (var idx in __exception_response_source.GlobalEventReference)
-                if (__global_events.Events.ContainsKey(idx) == false)
-                    throw new NaposhtimDocumentException(NaposhtimExceptionCode.DOCUMENT_CONTROL_BLK_BUILD_ERROR,
-                                $"GEVENT{idx} referenced in (Exception Response) does not exist.");
-
+            if (ExceptionResponseSource != null)
+            {
+                foreach (var idx in __exception_response_source.GlobalEventReference)
+                    if (__global_events.Events.ContainsKey(idx) == false)
+                        throw new NaposhtimDocumentException(NaposhtimExceptionCode.DOCUMENT_INVALID_ARGUMENTS,
+                                    $"GEVENT{idx} referenced in (Exception Response) does not exist.");
+            }
 
             //if (__control_block_list.Any(x => x.Level >= ControlBlock.ControlBlockSource.MAX_NESTING_DEPTH))
             //throw new NaposhtimDocumentException(NaposhtimExceptionCode.DOCUMENT_INVALID_ARGUMENTS, $"The nesting depth of the Control Block exceeds the limit(MAX: {ControlBlock.ControlBlockSource.MAX_NESTING_DEPTH}).");
@@ -481,21 +479,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe
                 compiledBlocks.AddFirst(blk.Value.ResolveTarget(compiledBlocks.First.Value.ID.Value, (uint)RegularStepFootprint, __context, GlobalEvents, stepalloc.Slice(st0, blk.Value.StepFootprint), varalloc.Slice(0/*st1*/, blk.Value.UserVariableFootprint), __compiled_step_names));
             }
 
-            int cblkIdx = 0;
+
             __compiled_regular_control_steps = new List<Step>();
             foreach (var cblk in compiledBlocks)
-            {
-                try
-                {
-                    __compiled_regular_control_steps.AddRange(cblk.Build(__context, GlobalEvents));
-                }
-                catch (NaposhtimException ex)
-                {
-                    throw new NaposhtimDocumentException(NaposhtimExceptionCode.DOCUMENT_CONTROL_BLK_BUILD_ERROR,
-                            $"Can not build Regular Control Block in Recipe Document({cblk.Name} @{cblkIdx}/{compiledBlocks.Count}).", ex);
-                }
-                cblkIdx++;
-            }
+                __compiled_regular_control_steps.AddRange(cblk.Build(__context, GlobalEvents));
 
             __compiled_exception_handling_steps = new List<Step>();
             if (__exception_handling_block_list.Count != 0)
@@ -510,25 +497,12 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe
                     blk = blk.Previous;
                     st0 = st0 - blk.Value.StepFootprint;
                     //st1 = st1 - blk.Value.UserVariableFootprint;
-                    if (compiledBlocks.First.Value.ID == null)
-                        throw new NaposhtimDocumentException(NaposhtimExceptionCode.DOCUMENT_INVALID_OPERATION, "The next Control Block ID is unresolved.");
-                    compiledBlocks.AddFirst(blk.Value.ResolveTarget(compiledBlocks.First.Value.ID.Value, (uint)StepFootprint, __context, GlobalEvents, stepalloc.Slice(st0, blk.Value.StepFootprint), varalloc.Slice(0/*st1*/, blk.Value.UserVariableFootprint), __compiled_step_names));
+                    compiledBlocks.AddFirst(blk.Value.ResolveTarget(compiledBlocks.First.Value.ID!.Value, (uint)StepFootprint, __context, GlobalEvents, stepalloc.Slice(st0, blk.Value.StepFootprint), varalloc.Slice(0/*st1*/, blk.Value.UserVariableFootprint), __compiled_step_names));
                 }
 
-                cblkIdx = 0;
                 foreach (var cblk in compiledBlocks)
-                {
-                    try
-                    {
-                        __compiled_exception_handling_steps.AddRange(cblk.Build(__context, GlobalEvents));
-                    }
-                    catch (NaposhtimException ex)
-                    {
-                        throw new NaposhtimDocumentException(NaposhtimExceptionCode.DOCUMENT_CONTROL_BLK_BUILD_ERROR,
-                                $"Can not build Exception Handling Control Block in Recipe Document({cblk.Name} @{cblkIdx}/{compiledBlocks.Count}).", ex);
-                    }
-                    cblkIdx++;
-                }
+                    __compiled_exception_handling_steps.AddRange(cblk.Build(__context, GlobalEvents));
+
             }
 
             if (ExceptionResponseSource != null)

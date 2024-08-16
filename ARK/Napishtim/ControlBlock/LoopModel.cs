@@ -8,6 +8,7 @@ using System.Text;
 using System.Text.Json.Nodes;
 using System.Threading.Tasks;
 using System.Windows.Media.Imaging;
+using static System.Reflection.Metadata.BlobBuilder;
 
 namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Napishtim
 {
@@ -84,7 +85,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Napishtim
                 throw new InvalidOperationException("Apply or discard the changes first and reset loop body.");
 
             ControlBlockModel blk;
-            string name = __loop_body.Count() == 0? "unnamed": __loop_body[0].Name;
+            string name = __loop_body.Count() == 0? "unnamed_control_block": __loop_body[0].Name;
 
             if (typeof(Sequential_S) == type)
             {
@@ -95,7 +96,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Napishtim
             else if (typeof(Loop_S) == type)
             {
                 Loop_S loop = new Loop_S(name, 1);
-                Sequential_S seq = new Sequential_S("unnamed", Enumerable.Empty<ProcessStepSource>());
+                Sequential_S seq = new Sequential_S("sequential", Enumerable.Empty<ProcessStepSource>());
                 loop.LoopBody = seq;
 
                 (ControlBlock as Loop_S).LoopBody = loop;
@@ -106,6 +107,12 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Napishtim
                 Switch_S sw = new Switch_S(name); ;
                 (ControlBlock as Loop_S).LoopBody = sw;
                 blk = new SwitchModel(Manager, sw) { Owner = this };
+            }
+            else if (typeof(Compound_S) == type)
+            {
+                Compound_S cp = new Compound_S(name, Enumerable.Empty<ControlBlockSource>());
+                (ControlBlock as Loop_S).LoopBody = cp;
+                blk = new CompoundModel(Manager, cp as Compound_S) { Owner = this };
             }
             else
                 throw new ArgumentException($"Unrecognized control block type: \n{type.FullName}");

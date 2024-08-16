@@ -86,7 +86,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Controls
         {
             try
             {
-                (DataContext as SequentialModel).Add("unnamed");
+                (DataContext as SequentialModel).Add("step");
             }
             catch (Exception ex)
             {
@@ -105,7 +105,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Controls
         {
             try
             {
-                (DataContext as SequentialModel).InsertBefore(sfGridSubSteps.SelectedIndex, "unnamed");
+                (DataContext as SequentialModel).InsertBefore(sfGridSubSteps.SelectedIndex, "step");
             }
             catch (Exception ex)
             {

@@ -457,17 +457,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Pr
                 chewed["END_POINTS"][1]["POST_SHADERS"].AsArray()[^1]["VALUE"] = $"{Timeout}-&STDURA";
             }
 
-            try
-            {
-                uint inlineEvent = 10000;
-                var s = new Step(chewed, globals, ref inlineEvent);
-                return s;
-            }
-            catch (NaposhtimException e)
-            {
-                throw new NaposhtimDocumentException(NaposhtimExceptionCode.DOCUMENT_STEP_BUILD_ERROR,
-                    $"Can not build SimpleStepWithTimeout with the following JSON node:\n{chewed.ToString()}", e);
-            }
+            uint inlineEvent = 10000;
+            var s = new Step(chewed, globals, ref inlineEvent);
+            return s;
         }
     }
 }

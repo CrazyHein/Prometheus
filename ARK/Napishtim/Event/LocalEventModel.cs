@@ -30,7 +30,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Napishtim
         }
 
         private string __applied_name;
-        private string __name = "unnamed";
+        private string __name = "unnamed_event";
         public string Name
         {
             get { return __name; }

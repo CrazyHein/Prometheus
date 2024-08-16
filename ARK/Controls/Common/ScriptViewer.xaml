@@ -56,7 +56,7 @@
             </sync:ButtonAdv>
             <sync:ButtonAdv Label="Download"  Height="30" Margin="4,2,2,4" Click="Download_Click">
                 <sync:ButtonAdv.SmallIcon>
-                    <BitmapImage  UriSource="/imgs/remove.png"/>
+                    <BitmapImage  UriSource="/imgs/download.png"/>
                 </sync:ButtonAdv.SmallIcon>
             </sync:ButtonAdv>
         </UniformGrid>

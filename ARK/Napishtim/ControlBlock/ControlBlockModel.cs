@@ -67,6 +67,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Napishtim
                 return new LoopModel(collection, blk as Loop_S) { Owner = owner };
             else if (blk is Switch_S)
                 return new SwitchModel(collection, blk as Switch_S) { Owner = owner };
+            else if (blk is Compound_S)
+                return new CompoundModel(collection, blk as Compound_S) { Owner = owner };
             else
                 throw new ArgumentException($"Unsupported control block object was given:\n{blk.ToString()}");
         }

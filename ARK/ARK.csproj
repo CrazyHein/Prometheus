@@ -22,10 +22,12 @@
     <None Remove="imgs\build.png" />
     <None Remove="imgs\build_expression.png" />
     <None Remove="imgs\close.png" />
+    <None Remove="imgs\compound.png" />
     <None Remove="imgs\context.png" />
     <None Remove="imgs\control_blocks.png" />
     <None Remove="imgs\copy.png" />
     <None Remove="imgs\discard.png" />
+    <None Remove="imgs\download.png" />
     <None Remove="imgs\edit.png" />
     <None Remove="imgs\global_events.png" />
     <None Remove="imgs\insert-before.png" />
@@ -60,7 +62,9 @@
     <Resource Include="imgs\build.png" />
     <Resource Include="imgs\build_expression.png" />
     <Resource Include="imgs\close.png" />
+    <Resource Include="imgs\compound.png" />
     <Resource Include="imgs\context.png" />
+    <Resource Include="imgs\download.png" />
     <Resource Include="imgs\edit.png" />
     <Resource Include="imgs\insert_before.png" />
     <Resource Include="imgs\json.png" />

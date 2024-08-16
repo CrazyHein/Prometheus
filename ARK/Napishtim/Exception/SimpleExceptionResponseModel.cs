@@ -25,7 +25,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Napishtim
         public override string Header { get { return Name; } }
         public override JsonNode ToJson() => throw new NotSupportedException();
 
-        private string __name = "unnamed";
+        private string __name = "unnamed_exception_branch";
         public string Name
         {
             get { return __name; }
@@ -90,7 +90,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Napishtim
 
         public SimpleExceptionResponseBranchModel()
         {
-            __name = "unnamed";
+            __name = "unnamed_exception_branch";
             __condition = string.Empty;
             __return_code= -1;
         }

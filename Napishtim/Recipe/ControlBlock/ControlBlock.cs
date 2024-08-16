@@ -129,6 +129,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
         */
         public abstract IEnumerable<uint> ShaderUserVariablesUsage { get; }
         public abstract IEnumerable<uint> GlobalEventReference { get; }
+        public abstract IEnumerable<(Sequential_S container, ProcessStepSource step)> ProcessSteps { get; }
         public abstract bool ContainsGlobalEventReference(uint index);
 
         public abstract JsonObject SaveAsJson();
@@ -146,6 +147,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
             __BUIILD_CONTROL_BLOCK[typeof(Sequential_S).FullName] = Sequential_S.MAKE;
             __BUIILD_CONTROL_BLOCK[typeof(Loop_S).FullName] = Loop_S.MAKE;
             __BUIILD_CONTROL_BLOCK[typeof(Switch_S).FullName] = Switch_S.MAKE;
+            __BUIILD_CONTROL_BLOCK[typeof(Compound_S).FullName] = Compound_S.MAKE;
         }
 
         protected ControlBlockSource(string name) : base(name)
@@ -158,7 +160,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
         }
     }
 
-    public abstract class ControlBlockObject: ControlBlock
+    public abstract class ControlBlockObject : ControlBlock
     {
         internal ControlBlockObject(string name) : base(name)
         {
@@ -167,6 +169,6 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
         public abstract IEnumerable<Step> Build(Context context, IReadOnlyDictionary<uint, Event> globals);
         public uint? ID { get; protected init; }
 
-        public abstract IEnumerable<ProcessStepObject> ProcessSteps(IEnumerable<Type> owners);
+        public abstract IEnumerable<ProcessStepObject> ProcessSteps { get; }
     }
 }

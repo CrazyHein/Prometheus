@@ -32,6 +32,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Controls
         private SequentialControl? __sequential_control_block;
         private LoopControl? __loop_control_block;
         private SwitchControl? __switch_control_block;
+        private CompoundControl? __compound_control_block;
         private StepControl? __step;
         public ControlBlockManager(GlobalEventModelCollection globals, ControlBlockModelCollection blocks, ContentControl content)
         {
@@ -70,6 +71,15 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Controls
                     __switch_control_block.ResetDataModel(component as SwitchModel);
 
                 __control_block_control.Content = __switch_control_block;
+            }
+            else if (component is CompoundModel)
+            {
+                if (__compound_control_block == null)
+                    __compound_control_block = new CompoundControl(component as CompoundModel);
+                else
+                    __compound_control_block.ResetDataModel(component as CompoundModel);
+
+                __control_block_control.Content = __compound_control_block;
             }
             else if (component is StepModel)
             {
@@ -172,7 +182,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Controls
                 {
                     if (sfControlBlocksTreeView.SelectedItem is SequentialModel)
                     {
-                        component = (sfControlBlocksTreeView.SelectedItem as SequentialModel).Add("unnamed");
+                        component = (sfControlBlocksTreeView.SelectedItem as SequentialModel).Add("step");
                     }
                 }
                 if(component != null)
@@ -211,7 +221,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Controls
                 else if(sfControlBlocksTreeView.SelectedItem is StepModel)
                 {
                     var seq = (sfControlBlocksTreeView.SelectedItem as StepModel).Owner as SequentialModel;
-                    component = seq.InsertBefore(seq.SubSteps.IndexOf(sfControlBlocksTreeView.SelectedItem as StepModel), "unnamed");
+                    component = seq.InsertBefore(seq.SubSteps.IndexOf(sfControlBlocksTreeView.SelectedItem as StepModel), "step");
                 }
 
                 if (component != null)
@@ -325,6 +335,11 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Controls
                         var node = JsonNode.Parse(Clipboard.GetText());
                         component = (sfControlBlocksTreeView.SelectedItem as LoopModel).ResetLoopBody(node);
                     }
+                    else if (sfControlBlocksTreeView.SelectedItem is CompoundModel)
+                    {
+                        var node = JsonNode.Parse(Clipboard.GetText());
+                        component = (sfControlBlocksTreeView.SelectedItem as CompoundModel).Add(node);
+                    }
                 }
                 if (component != null)
                 {
@@ -357,6 +372,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Controls
                     if (selected is SwitchModel)
                         ret = true;
                     else if (selected is LoopModel && (selected as LoopModel).LoopBody.Count() == 0)
+                        ret = true;
+                    else if (selected is CompoundModel)
                         ret = true;
                 }
             }
@@ -420,6 +437,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Controls
                     if (selected.Owner == null)
                         ret = true;
                     else if (selected.Owner is SwitchModel)
+                        ret = true;
+                    else if (selected.Owner is CompoundModel)
                         ret = true;
                 }
             }

@@ -334,7 +334,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
         public override ControlBlockObject ResolveTarget(uint next,uint abort, Context context, IReadOnlyDictionary<uint, Event> globals, ReadOnlyMemory<uint> stepLinkMapping, ReadOnlyMemory<uint> userVariableMapping, Dictionary<uint, string> stepNameMapping)
         {
             if (__original_process_steps.Count == 0)
-                throw new NaposhtimDocumentException(NaposhtimExceptionCode.CONTROL_BLOCK_ARGUMENTS_ERROR, "Can not find any process step in 'Sequential' Control Block.");
+                throw new NaposhtimDocumentException(NaposhtimExceptionCode.CONTROL_BLOCK_ARGUMENTS_ERROR, $"Can not find any process step in Sequential({FullName}) Control Block.");
 
             var compiledProcessSteps = new LinkedList<ProcessStepObject>();
             var step = __original_process_steps.Last;
@@ -342,28 +342,37 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
 
             TimeToTimeout.Clear();
 
-            compiledProcessSteps.AddFirst(step.Value.ResolveTarget(next, abort, context, globals, stepLinkMapping.Slice(st0, step.Value.StepFootprint), userVariableMapping.Slice(st1, step.Value.UserVariableFootprint), this, stepNameMapping));
-
-            while (step.Previous != null)
+            try
             {
-                step = step.Previous;
-                st0 = st0 - step.Value.StepFootprint;
-                st1 = st1 - step.Value.UserVariableFootprint;
-                if(compiledProcessSteps.First.Value.ID == null)
-                    throw new NaposhtimDocumentException(NaposhtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, "The next step ID is unresolved.");
-                compiledProcessSteps.AddFirst(step.Value.ResolveTarget(compiledProcessSteps.First.Value.ID.Value, abort,//step.Next.Value.ID.Value,
-                                                context, globals,
-                                                stepLinkMapping.Slice(st0, step.Value.StepFootprint),
-                                                userVariableMapping.Slice(st1, step.Value.UserVariableFootprint), this, stepNameMapping));
+                compiledProcessSteps.AddFirst(step.Value.ResolveTarget(next, abort, context, globals, stepLinkMapping.Slice(st0, step.Value.StepFootprint), userVariableMapping.Slice(st1, step.Value.UserVariableFootprint), this, stepNameMapping));
+
+                while (step.Previous != null)
+                {
+                    step = step.Previous;
+                    st0 = st0 - step.Value.StepFootprint;
+                    st1 = st1 - step.Value.UserVariableFootprint;
+
+
+                    compiledProcessSteps.AddFirst(step.Value.ResolveTarget(compiledProcessSteps.First.Value.ID!.Value, abort,//step.Next.Value.ID.Value,
+                                                    context, globals,
+                                                    stepLinkMapping.Slice(st0, step.Value.StepFootprint),
+                                                    userVariableMapping.Slice(st1, step.Value.UserVariableFootprint), this, stepNameMapping));
+                }
+            }
+            catch (NaposhtimException e)
+            {
+                throw new NaposhtimDocumentException(NaposhtimExceptionCode.DOCUMENT_STEP_BUILD_ERROR,
+                        $"Can not resolve step: {FullName}/{step.Value.Name}.", e);
             }
 
-            return new Sequential_O(Name, compiledProcessSteps, TimeToTimeout, StepFootprint, UserVariableFootprint);
+            return new Sequential_O(FullName, compiledProcessSteps, TimeToTimeout, StepFootprint, UserVariableFootprint);
         }
 
         public override IEnumerable<uint> GlobalEventReference => __original_process_steps.SelectMany(s => s.GlobalEventReference).Distinct();
 
         public override int Height => 1;
 
+        public override IEnumerable<(Sequential_S container, ProcessStepSource step)> ProcessSteps => __original_process_steps.Select(x => (this, x));
 
         public override JsonObject SaveAsJson()
         {
@@ -423,7 +432,6 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
 
         public override IEnumerable<Step> Build(Context context, IReadOnlyDictionary<uint, Event> globals)
         {
-            int i = 0;
             foreach (var step in __compiled_process_steps)
             {
                 Step ret;
@@ -434,19 +442,12 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
                 catch (NaposhtimException e)
                 {
                     throw new NaposhtimDocumentException(NaposhtimExceptionCode.DOCUMENT_STEP_BUILD_ERROR,
-                        $"Can not build Step in Sequential({step.Name} @{i}/{__compiled_process_steps.Count}).", e);
+                        $"Can not build step: {Name}/{step.Name}.", e);
                 }
                 yield return ret;
-                i++;
             }
         }
 
-        public override IEnumerable<ProcessStepObject> ProcessSteps(IEnumerable<Type> owners)
-        {
-            if (owners.Contains(typeof(Sequential_O)))
-                return __compiled_process_steps;
-            else
-                return Enumerable.Empty<ProcessStepObject>();
-        }
+        public override IEnumerable<ProcessStepObject> ProcessSteps => __compiled_process_steps;
     }
 }

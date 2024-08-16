@@ -48,7 +48,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Napishtim
             uint idx = 0;
             if(RecipeDocument.GlobalEvents.Count != 0)
                 idx = RecipeDocument.GlobalEvents.Keys.Max() + 1;
-            GlobalEventModel evt = new GlobalEventModel(this, idx, "unnamed") { Owner = null };
+            GlobalEventModel evt = new GlobalEventModel(this, idx, "unnamed_global_event") { Owner = null };
             RecipeDocument.AddGlobalEvent(idx, evt.Name, evt.Event.Type, evt.Event.EventParameters.Where(x => x.Value != string.Empty).Select(x => (x.Name, x.Value)).ToArray());
             __events.Add(evt);
             IsDirty = true;
@@ -60,7 +60,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Napishtim
             uint idx = 0;
             if (RecipeDocument.GlobalEvents.Count != 0)
                 idx = RecipeDocument.GlobalEvents.Keys.Max() + 1;
-            GlobalEventModel evt = new GlobalEventModel(this, idx, "unnamed") { Owner = null };
+            GlobalEventModel evt = new GlobalEventModel(this, idx, "unnamed_global_event") { Owner = null };
             RecipeDocument.AddGlobalEvent(idx, evt.Name, evt.Event.Type, evt.Event.EventParameters.Where(x => x.Value != string.Empty).Select(x => (x.Name, x.Value)).ToArray());
             __events.Insert(pos, evt);
             IsDirty = true;

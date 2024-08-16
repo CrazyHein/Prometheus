@@ -54,7 +54,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Napishtim
 
         public Component AddControlBlock()
         {
-            Sequential_S seq = new Sequential_S("unnamed", Enumerable.Empty<ProcessStepSource>());
+            Sequential_S seq = new Sequential_S("sequential", Enumerable.Empty<ProcessStepSource>());
             RecipeDocument.AddControlBlockLast(Group, seq);
 
             SequentialModel seqm = new SequentialModel(this, seq) { Owner = null };
@@ -108,21 +108,26 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Napishtim
             ControlBlockModel blk_m = null;
             if (typeof(Sequential_S) == type)
             {
-                blk_s = new Sequential_S("unnamed", Enumerable.Empty<ProcessStepSource>());
+                blk_s = new Sequential_S("sequential", Enumerable.Empty<ProcessStepSource>());
                 blk_m = new SequentialModel(this, blk_s as Sequential_S) { Owner = null };
             }
             else if (typeof(Loop_S) == type)
             {
-                blk_s = new Loop_S("unnamed", 1);
-                Sequential_S seq = new Sequential_S("unnamed", Enumerable.Empty<ProcessStepSource>());
+                blk_s = new Loop_S("loop", 1);
+                Sequential_S seq = new Sequential_S("sequential", Enumerable.Empty<ProcessStepSource>());
                 (blk_s as Loop_S).LoopBody = seq;
 
                 blk_m = new LoopModel(this, blk_s as Loop_S) { Owner = null };
             }
             else if (typeof(Switch_S) == type)
             {
-                blk_s = new Switch_S("unnamed"); ;
+                blk_s = new Switch_S("switch"); ;
                 blk_m = new SwitchModel(this, blk_s as Switch_S) { Owner = null };
+            }
+            else if (typeof(Compound_S) == type)
+            {
+                blk_s = new Compound_S("compound", Enumerable.Empty<ControlBlockSource>());
+                blk_m = new CompoundModel(this, blk_s as Compound_S) { Owner = null };
             }
             else
                 throw new ArgumentException($"Unrecognized control block type: \n{type.FullName}");
@@ -142,7 +147,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Napishtim
 
         public Component InsertControlBlockAt(int pos)
         {
-            Sequential_S seq = new Sequential_S("unnamed", Enumerable.Empty<ProcessStepSource>());
+            Sequential_S seq = new Sequential_S("sequential", Enumerable.Empty<ProcessStepSource>());
             RecipeDocument.AddControlBlockBefore(Group, RecipeDocument.ControlBlockNodeAt(Group, pos), seq);
 
             SequentialModel seqm = new SequentialModel(this, seq) { Owner = null };

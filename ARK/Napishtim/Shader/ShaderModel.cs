@@ -32,7 +32,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Napishtim
 
         public ShaderModel()
         {
-            __name = "unnamed";
+            __name = "unnamed_shader";
             __leftvalue = "@0x00000000";
             __rightvalue = "0";
             Shader = new ProcessShader(__name, new Shader(__leftvalue, __rightvalue));

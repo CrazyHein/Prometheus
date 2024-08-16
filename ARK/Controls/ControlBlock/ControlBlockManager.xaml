@@ -44,6 +44,11 @@
                         <Image Source="/imgs/switch.png" Height="20" Margin="4"/>
                     </MenuItem.Icon>
                 </MenuItem>
+                <MenuItem Command="common:Command.SwitchControlBlockType" CommandParameter="{x:Type rcp:Compound_S}" Header="Compound">
+                    <MenuItem.Icon>
+                        <Image Source="/imgs/compound.png" Height="20" Margin="4"/>
+                    </MenuItem.Icon>
+                </MenuItem>
             </MenuItem>
             <Separator/>
             <MenuItem Command="common:Command.Add" CommandParameter="{Binding}">
@@ -117,6 +122,7 @@
                 <treeViewEngine:HierarchyPropertyDescriptor TargetType="{x:Type nap:SequentialModel}" ChildPropertyName="SubSteps"/>
                 <treeViewEngine:HierarchyPropertyDescriptor TargetType="{x:Type nap:LoopModel}" ChildPropertyName="LoopBody"/>
                 <treeViewEngine:HierarchyPropertyDescriptor TargetType="{x:Type nap:SwitchModel}" ChildPropertyName="BranchActions"/>
+                <treeViewEngine:HierarchyPropertyDescriptor TargetType="{x:Type nap:CompoundModel}" ChildPropertyName="SubControlBlocks"/>
             </sync:SfTreeView.HierarchyPropertyDescriptors>
             <sync:SfTreeView.ItemTemplate>
                 <DataTemplate>

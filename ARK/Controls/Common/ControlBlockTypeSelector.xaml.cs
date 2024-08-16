@@ -44,5 +44,11 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Controls.Common
             ControlBlockType = typeof(Switch_S);
             DialogResult = true;
         }
+
+        private void CompoundButtonAdv_Click(object sender, RoutedEventArgs e)
+        {
+            ControlBlockType = typeof(Compound_S);
+            DialogResult = true;
+        }
     }
 }

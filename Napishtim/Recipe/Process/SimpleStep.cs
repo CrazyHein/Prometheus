@@ -309,17 +309,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Pr
 
         public override Step Build(Context context, IReadOnlyDictionary<uint, Event> globals, Sequential_O container)
         {
-            try
-            {
-                uint inlineEvent = 10000;
-                var s = new Step(_step, globals, ref inlineEvent);
-                return s;
-            }
-            catch (NaposhtimException e)
-            {
-                throw new NaposhtimDocumentException(NaposhtimExceptionCode.DOCUMENT_STEP_BUILD_ERROR,
-                    $"Can not build SimpleStep with the following JSON node:\n{_step.ToString()}", e);
-            }
+            uint inlineEvent = 10000;
+            var s = new Step(_step, globals, ref inlineEvent);
+            return s;
         }
     }
 }

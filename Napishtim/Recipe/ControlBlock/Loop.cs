@@ -124,7 +124,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
         public override ControlBlockObject ResolveTarget(uint next, uint abort, Context context, IReadOnlyDictionary<uint, Event> globals, ReadOnlyMemory<uint> stepLinkMapping, ReadOnlyMemory<uint> userVariableMapping, Dictionary<uint, string> stepNameMapping)
         {
             if (LoopBody == null)
-                throw new NaposhtimDocumentException(NaposhtimExceptionCode.CONTROL_BLOCK_ARGUMENTS_ERROR, "The loop body of 'Loop' Control Block is empty.");
+                throw new NaposhtimDocumentException(NaposhtimExceptionCode.CONTROL_BLOCK_ARGUMENTS_ERROR, $"The loop body of Loop({FullName}) Control Block is empty.");
             ProcessShaders postShaders = new ReservedProcessShaders([("#Loop Control Variable Initialization#", $"&USER{userVariableMapping.Span[0]}", "0")]);
             ProcessStepSource step = new SimpleStep_S("#InitialStep#", null, null, null, postShaders);
             var initializationStatement = new Sequential_S("#InitialControlBlock#", [step]) { Owner = this };
@@ -177,6 +177,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
                     return __loop_body.Height + 1;
             }
         }
+
+        public override IEnumerable<(Sequential_S container, ProcessStepSource step)> ProcessSteps => __loop_body != null ? __loop_body.ProcessSteps : Enumerable.Empty<(Sequential_S container, ProcessStepSource step)>();
 
         public override string ToString()
         {
@@ -231,12 +233,6 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
             return x.Concat(y).Concat(z);
         }
 
-        public override IEnumerable<ProcessStepObject> ProcessSteps(IEnumerable<Type> owners)
-        {
-            if (owners.Contains(typeof(Loop_O)))
-                return __control_block_body.ProcessSteps(owners);
-            else
-                return Enumerable.Empty<ProcessStepObject>();
-        }
+        public override IEnumerable<ProcessStepObject> ProcessSteps => __control_block_body.ProcessSteps;
     }
 }

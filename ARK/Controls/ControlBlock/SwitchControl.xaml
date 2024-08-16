@@ -48,6 +48,11 @@
                             <Image Source="/imgs/switch.png" Height="20" Margin="4"/>
                         </MenuItem.Icon>
                     </MenuItem>
+                    <MenuItem Command="common:Command.SwitchControlBlockType" CommandParameter="{x:Type nap:Compound_S}" Header="Compound">
+                        <MenuItem.Icon>
+                            <Image Source="/imgs/compound.png" Height="20" Margin="4"/>
+                        </MenuItem.Icon>
+                    </MenuItem>
                 </MenuItem>
             </ContextMenu>
             <ContextMenu x:Key="LocalEventManagerContextMenu">
