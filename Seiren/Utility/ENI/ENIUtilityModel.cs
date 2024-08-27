@@ -31,7 +31,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility
 
             eni.Load(eniPath);
             
-            foreach (XmlNode slaveNode in eni.SelectNodes("/EtherCATConfig/Config/Slave"))
+            foreach (XmlNode slaveNode in eni.SelectNodes("/EtherCATConfig/Config/Slave|/EncryptedEtherCATConfig/Config/Slave"))
             {
                 XmlNode slaveInfoNode;
                 slaveName = slaveNode.SelectSingleNode("Info/Name").FirstChild.Value;
