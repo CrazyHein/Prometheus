@@ -20,6 +20,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ev
     public class LVL : Event
     {
         public override string Tag => "LVL";
+
+        public Expression.Expression? DISABLED { get; init; }
         public Expression.Expression? EXPRESSION { get; init; }
         public LevelAlertPattern? PATTERN { get; init; }
         public double? LOWER { get; init; }
@@ -38,6 +40,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ev
 
         public static ReadOnlyCollection<(string name, bool required, string defaultv, string comment)> _ParameterDescriptions { get; } = new ReadOnlyCollection<(string name, bool required, string defaultv, string comment)>
         ([
+            ("DISABLED", false, string.Empty, "Optional parameter of type Expression.\nThe value of the expression is used to indicate whether this event is temporarily disabled.\nIf the value is not zero, the event will be temporarily disabled. The default value is 0.0."),
             ("EXPRESSION", true, "0", "The string must be a valid Expression string."),
             ("PATTERN", false, String.Empty,
             """
@@ -63,6 +66,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ev
             {
                 (string pname, string pvalue)[] parameters = new (string pname, string pvalue)[]
                 {
+                    ("DISABLED", DISABLED == null? string.Empty :DISABLED.ToString()),
                     ("EXPRESSION", EXPRESSION.ToString()),
                     ("PATTERN", LVL.PatternParameterValue(PATTERN)),
                     ("LOWER", LOWER.HasValue?LOWER.Value.ToString():String.Empty),
@@ -75,14 +79,16 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ev
 
         public override IEnumerable<(string pname, bool required, string defaultv, string comment)> ParameterDescriptions => _ParameterDescriptions;
 
-        public override IEnumerable<uint> UserVariablesUsage => EXPRESSION.UserVariablesUsage;
+        public override IEnumerable<uint> UserVariablesUsage => (DISABLED == null ? Enumerable.Empty<uint>() : DISABLED.UserVariablesUsage).Concat(EXPRESSION.UserVariablesUsage).Distinct();
 
-        public override IEnumerable<ObjectReference> ObjectReferences => EXPRESSION.ObjectReferences;
+        public override IEnumerable<ObjectReference> ObjectReferences => (DISABLED == null ? Enumerable.Empty<ObjectReference>() : DISABLED.ObjectReferences).Concat(EXPRESSION.ObjectReferences).Distinct();
 
         public override JsonNode ToJson()
         {
             JsonNode node = new JsonObject();
             node["TYPE"] = Tag;
+            if (DISABLED != null)
+                node["DISABLED"] = DISABLED.ToString();
             node["EXPRESSION"] = EXPRESSION.ToString();
             if(PATTERN.HasValue)
                 node["PATTERN"] = PATTERN.Value.ToString();
@@ -101,9 +107,15 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ev
             {
                 if ((string)node["TYPE"] != Tag)
                     throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EVENT_PARSE_ERROR, $"Type name '{(string)node["TYPE"]}' is not supported by {Tag} event object.");
+                
+                if (node.AsObject().TryGetPropertyValue("DISABLED", out var opt))
+                    DISABLED = opt.AsValue().GetValue<string>();
+                else
+                    DISABLED = null;
+
                 EXPRESSION = new Expression.Expression((string)node["EXPRESSION"], null);
 
-                if (node.AsObject().TryGetPropertyValue("PATTERN", out var opt))
+                if (node.AsObject().TryGetPropertyValue("PATTERN", out opt))
                     PATTERN = Enum.Parse<LevelAlertPattern>(opt.AsValue().GetValue<string>());
                 else
                     PATTERN = null;
@@ -132,11 +144,13 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ev
         public LVL(string name, params (string pname, Expression.Expression pvalue)[] parameters)
         {
             if (name != Tag)
-                throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EVENT_ARGUMENTS_ERROR, "LVL(EXPRESSION, [PATTERN], [LOWER], [UPPER], [INITIAL_VALUE])");
+                throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EVENT_ARGUMENTS_ERROR, "LVL([DISABLED], EXPRESSION, [PATTERN], [LOWER], [UPPER], [INITIAL_VALUE])");
             foreach (var param in parameters)
             {
                 switch (param.pname)
                 {
+                    case "DISABLED":
+                        DISABLED = param.pvalue; break;
                     case "EXPRESSION":
                         EXPRESSION = param.pvalue; break;
                     case "PATTERN":
@@ -166,12 +180,13 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ev
                 }
             }
             if (EXPRESSION == null)
-                throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EVENT_ARGUMENTS_ERROR, "LVL(EXPRESSION, [PATTERN], [LOWER], [UPPER], [INITIAL_VALUE])");
+                throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EVENT_ARGUMENTS_ERROR, "LVL([DISABLED], EXPRESSION, [PATTERN], [LOWER], [UPPER], [INITIAL_VALUE])");
         }
 
-        public LVL(Expression.Expression a)
+        public LVL(Expression.Expression a, Expression.Expression? disabled = null)
         {
             EXPRESSION = a;
+            DISABLED = disabled;
         }
     }
 }

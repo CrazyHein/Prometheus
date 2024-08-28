@@ -191,6 +191,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Napishtim
             get { return __value; }
             set
             {
+                value = value.Trim();
                 if(value != __value)
                 {
                     __value = value;

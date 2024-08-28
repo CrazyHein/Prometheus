@@ -22,7 +22,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ev
         private readonly string __condition = string.Empty;
         public override string Tag => __condition;
 
-
+        public Expression.Expression? DISABLED { get; init; }
         public Expression.Expression? COMPARAND_A { get; init; }
         public Expression.Expression? COMPARAND_B { get; init; }
         public double? POSITIVE_TOLERANCE { get; init; }
@@ -33,6 +33,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ev
 
         public static ReadOnlyCollection<(string name, bool required, string defaultv, string comment)> _ParameterDescriptions { get; } = new ReadOnlyCollection<(string name, bool required, string defaultv, string comment)>
         ([
+            ("DISABLED", false, string.Empty, "Optional parameter of type Expression.\nThe value of the expression is used to indicate whether this event is temporarily disabled.\nIf the value is not zero, the event will be temporarily disabled. The default value is 0.0."),
             ("COMPARAND_A", true, "0", "The string must be a valid Expression string."),
             ("COMPARAND_B", true, "0", "The string must be a valid Expression string."),
             ("POSITIVE_TOLERANCE", false, String.Empty, "Optional parameter of type Double.Available only in EQU.\nSpecify the positive tolerance of deviation(A - B). The default value is 0.0."),
@@ -50,6 +51,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ev
             {
                 (string pname, string pvalue)[] parameters = new (string pname, string pvalue)[]
                 {
+                    ("DISABLED", DISABLED == null? string.Empty :DISABLED.ToString()),
                     ("COMPARAND_A", COMPARAND_A.ToString()),
                     ("COMPARAND_B", COMPARAND_B.ToString()),
                     ("POSITIVE_TOLERANCE", POSITIVE_TOLERANCE.HasValue?POSITIVE_TOLERANCE.Value.ToString():String.Empty),
@@ -72,10 +74,16 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ev
                     __condition = name;
                 else
                     throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EVENT_PARSE_ERROR, $"Comparison operator '{name}'is not supported by CONDITION event object.");//ok
+
+                if (node.AsObject().TryGetPropertyValue("DISABLED", out var opt))
+                    DISABLED = opt.AsValue().GetValue<string>();
+                else
+                    DISABLED = null;
+
                 COMPARAND_A = new Expression.Expression((string)node["COMPARAND_A"], null);
                 COMPARAND_B = new Expression.Expression((string)node["COMPARAND_B"], null);
 
-                if (node.AsObject().TryGetPropertyValue("INITIAL_VALUE", out var opt))
+                if (node.AsObject().TryGetPropertyValue("INITIAL_VALUE", out opt))
                     INITIAL_VALUE = opt.AsValue().GetValue<bool>();
                 else
                     INITIAL_VALUE = null;
@@ -130,6 +138,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ev
             {
                 switch (param.pname)
                 {
+                    case "DISABLED":
+                        DISABLED = param.pvalue; break;
                     case "COMPARAND_A":
                         COMPARAND_A = param.pvalue; a = true; break;
                     case "COMPARAND_B":
@@ -167,7 +177,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ev
                 }
             }
             if (a == false || b == false)
-                throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EVENT_ARGUMENTS_ERROR, $"{name}(COMPARAND_A, COMPARAND_B, [INITIAL_VALUE], [POSITIVE_TOLERANCE], [NEGATIVE_TOLERANCE], [ON_DELAY, [OFF_DELAY])");
+                throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EVENT_ARGUMENTS_ERROR, $"{name}([DISABLED], COMPARAND_A, COMPARAND_B, [INITIAL_VALUE], [POSITIVE_TOLERANCE], [NEGATIVE_TOLERANCE], [ON_DELAY, [OFF_DELAY])");
         }
 
         public Condition(string condition, Expression.Expression a, Expression.Expression b)
@@ -186,6 +196,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ev
             get
             {
                 var temp = COMPARAND_A.ObjectReferences.Concat(COMPARAND_B.ObjectReferences);
+                if (DISABLED != null)
+                    temp = temp.Concat(DISABLED.ObjectReferences);
                 if (ON_DELAY != null)
                     temp = temp.Concat(ON_DELAY.ObjectReferences);
                 if (OFF_DELAY != null)
@@ -199,6 +211,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ev
             get
             {
                 var ret = COMPARAND_A.UserVariablesUsage.Concat(COMPARAND_B.UserVariablesUsage);
+                if (DISABLED != null)
+                    ret = ret.Concat(DISABLED.UserVariablesUsage);
                 if (ON_DELAY != null)
                     ret.Concat(ON_DELAY.UserVariablesUsage);
                 if (OFF_DELAY != null)
@@ -211,6 +225,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ev
         {
             JsonNode node = new JsonObject();
             node["TYPE"] = Tag;
+            if (DISABLED != null)
+                node["DISABLED"] = DISABLED.ToString();
+
             node["COMPARAND_A"] = COMPARAND_A.ToString();
             node["COMPARAND_B"] = COMPARAND_B.ToString();
             if (INITIAL_VALUE.HasValue)

@@ -31,9 +31,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ev
 
         public static ReadOnlyCollection<(string name, bool required, string defaultv, string comment)> _ParameterDescriptions { get; } = new ReadOnlyCollection<(string name, bool required, string defaultv, string comment)>
         ([
-            ("SETPOINT", true, "0", "The string must be a valid Expression string."),
-            ("FEEDBACK", true, "0", "The string must be a valid Expression string."),
             ("DISABLED", false, string.Empty, "Optional parameter of type Expression.\nThe value of the expression is used to indicate whether this event is temporarily disabled.\nIf the value is not zero, the event will be temporarily disabled. The default value is 0.0."),
+            ("SETPOINT", true, "0", "The string must be a valid Expression string."),
+            ("FEEDBACK", true, "0", "The string must be a valid Expression string."),  
             ("POSITIVE_TOLERANCE", false, string.Empty, "Optional parameter of type Double.\nSpecify the positive tolerance of deviation(FB - SP). The default value is 0.0."),
             ("NEGATIVE_TOLERANCE", false, string.Empty, "Optional parameter of type Double.\nSpecify the negative tolerance of deviation(FB - SP). The default value is 0.0."),
             ("STABLE_POSITIVE_TOLERANCE", false, string.Empty, "Optional parameter of type Double.\nSpecify the positive tolerance of deviation. The default value is 0.0."),
@@ -56,9 +56,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ev
             {
                 (string pname, string pvalue)[] parameters = new (string pname, string pvalue)[]
                 {
+                    ("DISABLED", DISABLED == null? string.Empty :DISABLED.ToString()),
                     ("SETPOINT", SETPOINT.ToString()),
                     ("FEEDBACK", FEEDBACK.ToString()),
-                    ("DISABLED", DISABLED == null? string.Empty :DISABLED.ToString()),
                     ("POSITIVE_TOLERANCE", POSITIVE_TOLERANCE.HasValue?POSITIVE_TOLERANCE.Value.ToString():string.Empty),
                     ("NEGATIVE_TOLERANCE", NEGATIVE_TOLERANCE.HasValue?NEGATIVE_TOLERANCE.Value.ToString():string.Empty),
                     ("STABLE_POSITIVE_TOLERANCE", STABLE_POSITIVE_TOLERANCE.HasValue?STABLE_POSITIVE_TOLERANCE.Value.ToString():string.Empty),
@@ -115,10 +115,16 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ev
             {
                 if ((string)node["TYPE"] != Tag)
                     throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EVENT_PARSE_ERROR, $"Type name '{(string)node["TYPE"]}' is not supported by {Tag} event object.");
+
+                if (node.AsObject().TryGetPropertyValue("DISABLED", out var opt))
+                    DISABLED = opt.AsValue().GetValue<string>();
+                else
+                    DISABLED = null;
+
                 SETPOINT = new Expression.Expression((string)node["SETPOINT"], null);
                 FEEDBACK = new Expression.Expression((string)node["FEEDBACK"], null);
 
-                if (node.AsObject().TryGetPropertyValue("INITIAL_VALUE", out var opt))
+                if (node.AsObject().TryGetPropertyValue("INITIAL_VALUE", out opt))
                     INITIAL_VALUE = opt.AsValue().GetValue<bool>();
                 else
                     INITIAL_VALUE = null;
@@ -187,12 +193,6 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ev
                     IN_PROPORTION = opt.AsValue().GetValue<bool>();
                 else
                     IN_PROPORTION = null;
-
-                if (node.AsObject().TryGetPropertyValue("DISABLED", out opt))
-                    DISABLED = opt.AsValue().GetValue<string>();
-                else
-                    DISABLED = null;
-
             }
             catch (Exception ex)
             {
@@ -203,18 +203,18 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ev
         public ERR(string name, params (string pname, Expression.Expression pvalue)[] parameters)
         {
             if (name != Tag)
-                throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EVENT_ARGUMENTS_ERROR, "ERR(SETPOINT, FEEDBACK, [DISABLED], [INITIAL_VALUE], [INITIAL_STATE], [POSITIVE_TOLERANCE], [NEGATIVE_TOLERANCE], [STABLE_POSITIVE_TOLERANCE], [STABLE_NEGATIVE_TOLERANCE], [ON_DELAY], [OFF_DELAY], [STABLE_DELAY], [DELAY_TIME_PRIORITY], [IN_PROPORTION])");
+                throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EVENT_ARGUMENTS_ERROR, "ERR([DISABLED], SETPOINT, FEEDBACK, [INITIAL_VALUE], [INITIAL_STATE], [POSITIVE_TOLERANCE], [NEGATIVE_TOLERANCE], [STABLE_POSITIVE_TOLERANCE], [STABLE_NEGATIVE_TOLERANCE], [ON_DELAY], [OFF_DELAY], [STABLE_DELAY], [DELAY_TIME_PRIORITY], [IN_PROPORTION])");
             bool sp = false, fb = false;
             foreach (var param in parameters)
             {
                 switch (param.pname)
                 {
+                    case "DISABLED":
+                        DISABLED = param.pvalue; break;
                     case "SETPOINT":
                         SETPOINT = param.pvalue; sp = true; break;
                     case "FEEDBACK":
                         FEEDBACK = param.pvalue; fb = true; break;
-                    case "DISABLED":
-                        DISABLED = param.pvalue; break;
                     case "INITIAL_VALUE":
                         if (param.pvalue.IsImmediateOperand)
                             INITIAL_VALUE = param.pvalue.Value(true, 0.0) == 0.0 ? false : true;
@@ -284,17 +284,19 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ev
                 }
             }
             if(sp == false || fb == false)
-                throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EVENT_ARGUMENTS_ERROR, "ERR(SETPOINT, FEEDBACK, [DISABLED], [INITIAL_VALUE], [INITIAL_STATE], [POSITIVE_TOLERANCE], [NEGATIVE_TOLERANCE], [STABLE_POSITIVE_TOLERANCE], [STABLE_NEGATIVE_TOLERANCE], [ON_DELAY], [OFF_DELAY], [STABLE_DELAY], [DELAY_TIME_PRIORITY], [IN_PROPORTION])");
+                throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EVENT_ARGUMENTS_ERROR, "ERR([DISABLED], SETPOINT, FEEDBACK, [INITIAL_VALUE], [INITIAL_STATE], [POSITIVE_TOLERANCE], [NEGATIVE_TOLERANCE], [STABLE_POSITIVE_TOLERANCE], [STABLE_NEGATIVE_TOLERANCE], [ON_DELAY], [OFF_DELAY], [STABLE_DELAY], [DELAY_TIME_PRIORITY], [IN_PROPORTION])");
         }
 
         public override JsonNode ToJson()
         {
             JsonNode node = new JsonObject();
             node["TYPE"] = Tag;
+            if (DISABLED != null)
+                node["DISABLED"] = DISABLED.ToString();
+
             node["SETPOINT"] = SETPOINT.ToString();
             node["FEEDBACK"] = FEEDBACK.ToString();
-            if(DISABLED != null)
-                node["DISABLED"] = DISABLED.ToString();
+
             if(INITIAL_VALUE.HasValue)
                 node["INITIAL_VALUE"] = INITIAL_VALUE;
             if (INITIAL_STATE.HasValue)

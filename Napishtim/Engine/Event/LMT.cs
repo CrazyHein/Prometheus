@@ -15,6 +15,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ev
     public class LMT : Event
     {
         public override string Tag => "LMT";
+
+        public Expression.Expression? DISABLED { get; init; }
         public Expression.Expression? EXPRESSION { get; init; }
         public double? LOWER { get; init; }
         public double? UPPER { get; init; }
@@ -22,6 +24,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ev
 
         public static ReadOnlyCollection<(string name, bool required, string defaultv, string comment)> _ParameterDescriptions { get; } = new ReadOnlyCollection<(string name, bool required, string defaultv, string comment)>
         ([
+            ("DISABLED", false, string.Empty, "Optional parameter of type Expression.\nThe value of the expression is used to indicate whether this event is temporarily disabled.\nIf the value is not zero, the event will be temporarily disabled. The default value is 0.0."),
             ("EXPRESSION", true, "0", "The string must be a valid Expression string."),
             ("LOWER", false, String.Empty, "Optional parameter of type Double.\nSpecify the lower limit of the closed interval. The default value is 0.0. "),
             ("UPPER", false, String.Empty, "Optional parameter of type Double.\nSpecify the upper limit of the closed interval. The default value is 0.0."),
@@ -33,6 +36,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ev
             {
                 (string pname, string pvalue)[] parameters = new (string pname, string pvalue)[]
                 {
+                    ("DISABLED", DISABLED == null? string.Empty :DISABLED.ToString()),
                     ("EXPRESSION", EXPRESSION.ToString()),
                     ("LOWER", LOWER.HasValue?LOWER.Value.ToString():String.Empty),
                     ("UPPER", UPPER.HasValue?UPPER.Value.ToString():String.Empty),
@@ -44,14 +48,16 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ev
 
         public override IEnumerable<(string pname, bool required, string defaultv, string comment)> ParameterDescriptions => _ParameterDescriptions;
 
-        public override IEnumerable<uint> UserVariablesUsage => EXPRESSION.UserVariablesUsage;
+        public override IEnumerable<uint> UserVariablesUsage => (DISABLED == null ? Enumerable.Empty<uint>() : DISABLED.UserVariablesUsage).Concat(EXPRESSION.UserVariablesUsage).Distinct();
 
-        public override IEnumerable<ObjectReference> ObjectReferences => EXPRESSION.ObjectReferences;
+        public override IEnumerable<ObjectReference> ObjectReferences => (DISABLED == null ? Enumerable.Empty<ObjectReference>() : DISABLED.ObjectReferences).Concat(EXPRESSION.ObjectReferences).Distinct();
 
         public override JsonNode ToJson()
         {
             JsonNode node = new JsonObject();
             node["TYPE"] = Tag;
+            if (DISABLED != null)
+                node["DISABLED"] = DISABLED.ToString();
             node["EXPRESSION"] = EXPRESSION.ToString();
             if (LOWER.HasValue)
                 node["LOWER"] = LOWER;
@@ -68,9 +74,15 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ev
             {
                 if ((string)node["TYPE"] != Tag)
                     throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EVENT_PARSE_ERROR, $"Type name '{(string)node["TYPE"]}' is not supported by {Tag} event object.");
+
+                if (node.AsObject().TryGetPropertyValue("DISABLED", out var opt))
+                    DISABLED = opt.AsValue().GetValue<string>();
+                else
+                    DISABLED = null;
+
                 EXPRESSION = new Expression.Expression((string)node["EXPRESSION"], null);
 
-                if (node.AsObject().TryGetPropertyValue("REVERSED", out var opt))
+                if (node.AsObject().TryGetPropertyValue("REVERSED", out opt))
                     REVERSED = opt.AsValue().GetValue<bool>();
                 else
                     REVERSED = null;
@@ -94,11 +106,13 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ev
         public LMT(string name, params (string pname, Expression.Expression pvalue)[] parameters)
         {
             if (name != Tag)
-                throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EVENT_ARGUMENTS_ERROR, "LMT(EXPRESSION, [LOWER], [UPPER], [REVERSED])");
+                throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EVENT_ARGUMENTS_ERROR, "LMT([DISABLED], EXPRESSION, [LOWER], [UPPER], [REVERSED])");
             foreach (var param in parameters)
             {
                 switch(param.pname)
                 {
+                    case "DISABLED":
+                        DISABLED = param.pvalue; break;
                     case "EXPRESSION":
                         EXPRESSION = param.pvalue; break;
                     case "REVERSED":
@@ -122,12 +136,13 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ev
                 }
             }
             if (EXPRESSION == null)
-                throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EVENT_ARGUMENTS_ERROR, "LMT(EXPRESSION, [LOWER], [UPPER], [REVERSED])");
+                throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EVENT_ARGUMENTS_ERROR, "LMT([DISABLED], EXPRESSION, [LOWER], [UPPER], [REVERSED])");
         }
 
-        public LMT(Expression.Expression a)
+        public LMT(Expression.Expression a, Expression.Expression? disabled = null)
         {
             EXPRESSION = a;
+            DISABLED = disabled;
         }
     }
 }

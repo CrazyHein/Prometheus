@@ -15,6 +15,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ev
     {
         public override string Tag => "TIM";
 
+        public Expression.Expression? DISABLED { get; init; }
+
         private int? __timeout = null;
         public int? TIMEOUT 
         { 
@@ -29,6 +31,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ev
 
         public static ReadOnlyCollection<(string name, bool required, string defaultv, string comment)> _ParameterDescriptions { get; } = new ReadOnlyCollection<(string name, bool required, string defaultv, string comment)>
         ([
+            ("DISABLED", false, string.Empty, "Optional parameter of type Expression.\nThe value of the expression is used to indicate whether this event is temporarily disabled.\nIf the value is not zero, the event will be temporarily disabled. The default value is 0.0."),
             ("TIMEOUT", true, "0",
             """
             If the parameter is of type Integer32 , the parameter should be a positive integer or zero. In another case, the parameter must be valid Expression string.
@@ -44,6 +47,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ev
             {
                 (string pname, string pvalue)[] parameters = new (string pname, string pvalue)[]
                 {
+                    ("DISABLED", DISABLED == null? string.Empty :DISABLED.ToString()),
                     ("TIMEOUT", _TIMEOUT_STRING),
                 };
                 return parameters;
@@ -63,12 +67,16 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ev
         {
             get 
             {
+                IEnumerable<ObjectReference> temp = Enumerable.Empty<ObjectReference>();
+                if (DISABLED != null)
+                    temp = temp.Concat(DISABLED.ObjectReferences);
+
                 if (TIMEOUT != null)
-                    return Enumerable.Empty<ObjectReference>();
+                    temp = temp.Concat(Enumerable.Empty<ObjectReference>());
                 else if(TIMEOUT_EXPR != null)
-                    return TIMEOUT_EXPR.ObjectReferences;
-                else
-                    return Enumerable.Empty<ObjectReference>();
+                    temp = temp.Concat(TIMEOUT_EXPR.ObjectReferences);
+
+                return temp.Distinct();
             }
         }
 
@@ -76,26 +84,49 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ev
         {
             get
             {
+                IEnumerable<uint> ret = Enumerable.Empty<uint>();
+                if (DISABLED != null)
+                    ret = ret.Concat(DISABLED.UserVariablesUsage);
+
                 if (TIMEOUT == null)
-                    return TIMEOUT_EXPR.UserVariablesUsage;
+                    ret = ret.Concat(TIMEOUT_EXPR.UserVariablesUsage);
                 else
-                    return Enumerable.Empty<uint>();
+                    ret = ret.Concat(Enumerable.Empty<uint>());
+
+                return ret.Distinct();
             }
         }
 
         public TIM(string name, params (string pname, Expression.Expression pvalue)[] parameters)
         {
-            if (name != Tag || parameters.Length != 1 || parameters[0].pname != "TIMEOUT")
-                throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EVENT_ARGUMENTS_ERROR, "TIM(TIMEOUT)");
-            if (parameters[0].pvalue.IsImmediateOperand)
-                TIMEOUT = (int)parameters[0].pvalue.Value(true, 0.0);
-            else
-                TIMEOUT_EXPR = parameters[0].pvalue;
+            if (name != Tag)
+                throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EVENT_ARGUMENTS_ERROR, "TIM([DISABLED], TIMEOUT)");
+
+            bool timeout = false;
+            foreach (var param in parameters)
+            {
+                switch (param.pname)
+                {
+                    case "DISABLED":
+                        DISABLED = param.pvalue; break;
+                    case "TIMEOUT":
+                        if (param.pvalue.IsImmediateOperand)
+                            TIMEOUT = (int)parameters[0].pvalue.Value(true, 0.0);
+                        else
+                            TIMEOUT_EXPR = param.pvalue;
+                        timeout = true; 
+                        break;
+                }
+            }
+
+            if(timeout == false)
+                throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EVENT_ARGUMENTS_ERROR, "TIM([DISABLED], TIMEOUT)");
         }
 
-        public TIM(int timeout)
+        public TIM(int timeout, Expression.Expression? disabled = null)
         {
             TIMEOUT = timeout;
+            DISABLED = disabled;
         }
 
         public TIM(JsonNode node)
@@ -105,6 +136,12 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ev
             {
                 if ((string)node["TYPE"] != Tag)
                     throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EVENT_PARSE_ERROR, $"Event type {(string)node["TYPE"]}' is not supported by {Tag} event object.");
+                
+                if (node.AsObject().TryGetPropertyValue("DISABLED", out var opt))
+                    DISABLED = opt.AsValue().GetValue<string>();
+                else
+                    DISABLED = null;
+
                 var propertyNode = node["TIMEOUT"];
                 if(propertyNode == null)
                     throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EVENT_PARSE_ERROR, $"Property with name 'TIMEOUT' must be provided.");
@@ -134,6 +171,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ev
             {
                 JsonNode node = new JsonObject();
                 node["TYPE"] = Tag;
+                if (DISABLED != null)
+                    node["DISABLED"] = DISABLED.ToString();
                 if (TIMEOUT_EXPR != null)
                     node["TIMEOUT"] = TIMEOUT_EXPR.ToString();
                 else
@@ -144,6 +183,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ev
             {
                 JsonNode node = new JsonObject();
                 node["TYPE"] = Tag;
+                if (DISABLED != null)
+                    node["DISABLED"] = DISABLED.ToString();
                 node["TIMEOUT"] = JsonValue.Create(TIMEOUT.Value);
                 return node;
             }
