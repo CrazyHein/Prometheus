@@ -34,7 +34,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Debugger
         SocketInterface __io = null;
         private string __sync_exception_message = "";
         private int __polling_interval = 0;
-        private List<(uint start, ushort size, DataSyncMode access, ushort[] data)> __process_data;
+        private List<(uint start, ushort size, DataSyncMode access, ushort[] data, int blk, uint blkStart, ushort blkSize)> __process_data;
         private List<ushort[]> __internal_process_data;
         private ushort __process_data_end;
         private ushort __internal_process_data_end;
@@ -47,8 +47,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Debugger
 
         public DataSynchronizer(IEnumerable<(uint start, uint size, IEnumerable<(uint bitpos, uint bitsize)> layout, DataSyncMode access)> datas)
         {
-            __process_data = new List<(uint start, ushort size, DataSyncMode access, ushort[] data)>();
-            foreach (var data in datas)
+            __process_data = new List<(uint start, ushort size, DataSyncMode access, ushort[] data, int blk, uint blkStart, ushort blkSize)>();
+            foreach (var (index, data) in datas.Select((v, i) => (i, v)))
             {
                 uint start = 0;
                 uint lastpos = 0;
@@ -57,10 +57,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Debugger
                 foreach (var layout in data.layout)
                 {
                     Debug.Assert(layout.bitsize < NumberOfDevicePoints * 16 && lastpos + lastsize <= layout.bitpos);
-                    if (layout.bitpos >= (NumberOfDevicePoints + start) * 16 || layout.bitpos + layout.bitsize >= (NumberOfDevicePoints + start) * 16)
+                    if (layout.bitpos >= (NumberOfDevicePoints + start) * 16 || layout.bitpos + layout.bitsize > (NumberOfDevicePoints + start) * 16)
                     {
                         size = (ushort)((lastpos + lastsize) / 16 + ((lastpos + lastsize) % 16 == 0 ? 0 : 1) - start);
-                        __process_data.Add(new(data.start + start, size, data.access, new ushort[size]));
+                        __process_data.Add(new(data.start + start, size, data.access, new ushort[size], index, start, size));
                         start = (ushort)(layout.bitpos / 16);
                     }
                     lastpos = layout.bitpos;
@@ -68,7 +68,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Debugger
                 }
                 size = (ushort)((lastpos + lastsize) / 16 + ((lastpos + lastsize) % 16 == 0 ? 0 : 1) - start);
                 Debug.Assert(data.size >= size);
-                __process_data.Add(new(data.start + start, size, data.access, new ushort[size]));
+                __process_data.Add(new(data.start + start, size, data.access, new ushort[size], index, start, size));
             }
             //datas.Select(i => (i.start, i.size, i.access, new ushort[i.size])));
             __internal_process_data = new List<ushort[]>(__process_data.Select(i => new ushort[i.size]));
@@ -222,9 +222,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Debugger
                 for (int i = 0; i < __process_data.Count; ++i)
                 {
                     if (__process_data[i].access == DataSyncMode.Read)
-                        __internal_process_data[i].CopyTo(datas[i], 0);
+                        Array.Copy(__internal_process_data[i], 0, datas[__process_data[i].blk], __process_data[i].blkStart, __process_data[i].blkSize);
                     else
-                        datas[i].CopyTo(__internal_process_data[i], 0);
+                        Array.Copy(datas[__process_data[i].blk], __process_data[i].blkStart, __internal_process_data[i], 0, __process_data[i].blkSize);
                 }
                 end = __internal_process_data_end;
             }
@@ -278,7 +278,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Debugger
             {
                 if (__process_data[i].access == DataSyncMode.Write)
                 {
-                    __process_data[i].data.CopyTo(datas[i], 0);
+                    Array.Copy(__process_data[i].data, 0, datas[__process_data[i].blk], __process_data[i].blkStart, __process_data[i].blkSize);
                     __process_data[i].data.CopyTo(__internal_process_data[i], 0);
                 }
             }
