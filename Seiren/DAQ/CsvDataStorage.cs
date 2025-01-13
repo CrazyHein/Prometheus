@@ -13,8 +13,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.DAQ
 {
     internal class CsvDataStorage:IDisposable
     {
-        public static readonly string FILE_TIMESTAMP_FORMAT = @"MMddyyHHmmssfff";
-        public static readonly string RECORD_TIMESTAMP_FORMAT = @"MMddyy HH:mm:ss:fff";
+        public static readonly string FILE_TIMESTAMP_FORMAT = @"yyMMddHHmmssfff";
+        public static readonly string RECORD_TIMESTAMP_FORMAT = @"yyMMdd HH:mm:ss:fff";
         private string __storage_file_path;
         private string __storage_file_name_prefix;
         private int __storage_file_size_limit = 0;

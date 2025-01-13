@@ -29,7 +29,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ex
 
         public override string ToString()
         {
-            return __value.ToString();
+            return __value.ToString("0.#################");
         }
 
         public override double Value()
