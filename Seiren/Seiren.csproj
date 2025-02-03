@@ -7,7 +7,7 @@
     <UseWindowsForms>true</UseWindowsForms>
     <RootNamespace>AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren</RootNamespace>
     <Nullable>annotations</Nullable>
-    <Version>0.23.2.0</Version>
+    <Version>0.23.2.1</Version>
     <Authors>CrazyHein</Authors>
     <Company>AMEC</Company>
     <ApplicationIcon>imgs\logo.ico</ApplicationIcon>
@@ -169,6 +169,7 @@
   
   <ItemGroup>
     <PackageReference Include="CsvHelper" Version="31.0.3" />
+    <PackageReference Include="MongoDB.Driver" Version="3.1.0" />
   </ItemGroup>
 
   

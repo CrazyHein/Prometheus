@@ -93,13 +93,31 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.DAQ
                                         new System.Net.IPEndPoint(property.DestinationIPv4, property.DestinationPort),
                                         property.SendTimeoutValue, property.ReceiveTimeoutValue);
                 DAQMaster daqMaster = new DAQMaster(__daq_interface, property.InternalReservedBufferSize);
-                CsvDataStorage storage = new CsvDataStorage(property.DataFilePath, property.DataFileNamePrefix, property.DataFileSize,
-                    diag.Where(d => d.DAQ).Select(d => new AcquisitionDataIndex(d.ProcessObject.Variable.Type.Name) { BitPos = d.BitPos, FriendlyName = d.ProcessObject.Variable.Name }),
-                    txbit.Where(d => d.DAQ).Select(d => new AcquisitionDataIndex(d.ProcessObject.Variable.Type.Name) { BitPos = d.BitPos, FriendlyName = d.ProcessObject.Variable.Name }),
-                    txblk.Where(d => d.DAQ).Select(d => new AcquisitionDataIndex(d.ProcessObject.Variable.Type.Name) { BitPos = d.BitPos, FriendlyName = d.ProcessObject.Variable.Name }),
-                    ctrl.Where(d => d.DAQ).Select(d => new AcquisitionDataIndex(d.ProcessObject.Variable.Type.Name) { BitPos = d.BitPos, FriendlyName = d.ProcessObject.Variable.Name }),
-                    rxbit.Where(d => d.DAQ).Select(d => new AcquisitionDataIndex(d.ProcessObject.Variable.Type.Name) { BitPos = d.BitPos, FriendlyName = d.ProcessObject.Variable.Name }),
-                    rxblk.Where(d => d.DAQ).Select(d => new AcquisitionDataIndex(d.ProcessObject.Variable.Type.Name) { BitPos = d.BitPos, FriendlyName = d.ProcessObject.Variable.Name }));
+                IDataStorage storage = null;
+                int writeInterval = 0;
+                switch(property.DAQStorageSchema)
+                {
+                    case DAQStorageSchema.CSV:
+                        storage = new CsvDataStorage(property.DataFilePath, property.DataFileNamePrefix, property.DataFileSize,
+                                diag.Where(d => d.DAQ).Select(d => new AcquisitionDataIndex(d.ProcessObject.Variable.Type.Name) { BitPos = d.BitPos, FriendlyName = d.ProcessObject.Variable.Name }),
+                                txbit.Where(d => d.DAQ).Select(d => new AcquisitionDataIndex(d.ProcessObject.Variable.Type.Name) { BitPos = d.BitPos, FriendlyName = d.ProcessObject.Variable.Name }),
+                                txblk.Where(d => d.DAQ).Select(d => new AcquisitionDataIndex(d.ProcessObject.Variable.Type.Name) { BitPos = d.BitPos, FriendlyName = d.ProcessObject.Variable.Name }),
+                                ctrl.Where(d => d.DAQ).Select(d => new AcquisitionDataIndex(d.ProcessObject.Variable.Type.Name) { BitPos = d.BitPos, FriendlyName = d.ProcessObject.Variable.Name }),
+                                rxbit.Where(d => d.DAQ).Select(d => new AcquisitionDataIndex(d.ProcessObject.Variable.Type.Name) { BitPos = d.BitPos, FriendlyName = d.ProcessObject.Variable.Name }),
+                                rxblk.Where(d => d.DAQ).Select(d => new AcquisitionDataIndex(d.ProcessObject.Variable.Type.Name) { BitPos = d.BitPos, FriendlyName = d.ProcessObject.Variable.Name }));
+                        writeInterval = property.ExpectedDiskWriteInterval;
+                        break;
+                    case DAQStorageSchema.MongoDB:
+                        storage = new MongoDataStorage(property.MongoDBConnectionString, property.MongoDBDatabaseName, property.MongoDBCollectionName, property.MongoDBCollectionSize,
+                                diag.Where(d => d.DAQ).Select(d => new AcquisitionDataIndex(d.ProcessObject.Variable.Type.Name) { BitPos = d.BitPos, FriendlyName = d.ProcessObject.Variable.Name }),
+                                txbit.Where(d => d.DAQ).Select(d => new AcquisitionDataIndex(d.ProcessObject.Variable.Type.Name) { BitPos = d.BitPos, FriendlyName = d.ProcessObject.Variable.Name }),
+                                txblk.Where(d => d.DAQ).Select(d => new AcquisitionDataIndex(d.ProcessObject.Variable.Type.Name) { BitPos = d.BitPos, FriendlyName = d.ProcessObject.Variable.Name }),
+                                ctrl.Where(d => d.DAQ).Select(d => new AcquisitionDataIndex(d.ProcessObject.Variable.Type.Name) { BitPos = d.BitPos, FriendlyName = d.ProcessObject.Variable.Name }),
+                                rxbit.Where(d => d.DAQ).Select(d => new AcquisitionDataIndex(d.ProcessObject.Variable.Type.Name) { BitPos = d.BitPos, FriendlyName = d.ProcessObject.Variable.Name }),
+                                rxblk.Where(d => d.DAQ).Select(d => new AcquisitionDataIndex(d.ProcessObject.Variable.Type.Name) { BitPos = d.BitPos, FriendlyName = d.ProcessObject.Variable.Name }));
+                        writeInterval = property.ExpectedDatabaseWriteInterval;
+                        break;
+                }
 
                 Status = new AcquisitionUnitStatus();
                 State = AcquisitionUnitState.Connecting;
@@ -109,7 +127,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.DAQ
                 ExceptionMessage = "N/A";
 
                 __acquisition_routine_thread = new Thread(new ParameterizedThreadStart(__data_acquisition_routine));
-                __acquisition_routine_thread.Start(Tuple.Create(daqMaster, storage, property.ExpectedDiskWriteInterval));
+                __acquisition_routine_thread.Start(Tuple.Create(daqMaster, storage, writeInterval));
                 return State;
             }
             catch (Exception ex)
@@ -253,7 +271,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.DAQ
 
         private void __data_acquisition_routine(object param)
         {
-            (DAQMaster master, CsvDataStorage storage, int interval) = (Tuple<DAQMaster, CsvDataStorage, int>)param;
+            (DAQMaster master, IDataStorage storage, int interval) = (Tuple<DAQMaster, IDataStorage, int>)param;
             DAQ_SERVER_INFO_T info = new DAQ_SERVER_INFO_T();
             ReadOnlyMemory<byte> data = null;
             int txframesize = 0, rxframesize = 0;
@@ -364,6 +382,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.DAQ
                                 data.Span.Slice(i * rxframesize + rxctrlpos, info.ctrl_size_in_word * 2),
                                 data.Span.Slice(i * rxframesize + rxbitpos, info.rx_bit_size_in_word * 2),
                                 data.Span.Slice(i * rxframesize + rxblkpos, info.rx_blk_size_in_word * 2));
+                        //storage.Flush();
                     }
                 }
                 catch (Exception ex)

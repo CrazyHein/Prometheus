@@ -306,5 +306,44 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                 MessageBox.Show(this, $"At least one unexpected error occured while opening directory : 'DebugConsole'.\n{ex.Message}", "Error Message", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
+
+        private async void MongoDBValidate_Click(object sender, RoutedEventArgs e)
+        {
+            if (HasError)
+                MessageBox.Show("At least one user input is invalid.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            else
+            {
+                var property = DAQSettings.DataContext as DAQTargetProperty;
+
+                DAQBusyIndicator.IsBusy = true;
+                IsEnabled = false;
+
+                bool createNew = false;
+
+                using (var res = await Task<MongoDataStorage.ValidateResult>.Run(() => MongoDataStorage.ValidateMongoDBStorage(property.MongoDBConnectionString, property.MongoDBDatabaseName, property.MongoDBCollectionName)))
+                {
+                    if (res.Exception != null)
+                        MessageBox.Show(this, "At least one unexpected error occured while doing database validation.\n" + res.Exception.Message, "Error Message", MessageBoxButton.OK, MessageBoxImage.Error);
+                    else if (res.Collection != null)
+                        MessageBox.Show(this, $"Collection: {res.Collection.CollectionNamespace}\nCapped: {res.IsCapped}\nSize: {res.Size}", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
+                    else
+                    {
+                        if (MessageBox.Show(this, $"The specified collection({property.MongoDBDatabaseName}.{property.MongoDBCollectionName}) could not be found. Do you want to create a new one?", "Question", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+                            createNew = true;
+                    }
+                }
+
+                if(createNew)
+                {
+                    using (var res = await Task<MongoDataStorage.ValidateResult>.Run(() => MongoDataStorage.ValidateMongoDBStorage(property.MongoDBConnectionString, property.MongoDBDatabaseName, property.MongoDBCollectionName, true, property.MongoDBCollectionSize)))
+                    {
+                        if (res.Exception != null)
+                            MessageBox.Show(this, "At least one unexpected error occured while create data collection.\n" + res.Exception.Message, "Error Message", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                }
+                DAQBusyIndicator.IsBusy = false;
+                IsEnabled = true;
+            }
+        }
     }
 }

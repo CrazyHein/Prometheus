@@ -161,6 +161,14 @@
             </TabItem>
             <TabItem Header="DAQ" Width="135" Name="DAQSettingsTab">
                 <Grid d:DataContext="{d:DesignInstance Type=daq:DAQTargetProperty}" x:Name="DAQSettings" Validation.Error="DAQSettings_Error">
+                    <Grid.Resources>
+                        <ObjectDataProvider ObjectType="{x:Type sys:Enum}" MethodName="GetValues" x:Key="storageschemas">
+                            <ObjectDataProvider.MethodParameters>
+                                <x:Type TypeName="daq:DAQStorageSchema" />
+                            </ObjectDataProvider.MethodParameters>
+                        </ObjectDataProvider>
+                        <daq:StorageSchemaVisibilityConverter x:Key="storageschemavisibilityconverter"/>
+                    </Grid.Resources>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="auto" />
                         <RowDefinition Height="auto" />
@@ -190,30 +198,77 @@
                             </sync:SfTextInputLayout>
                         </UniformGrid>
                     </GroupBox>
-                    <GroupBox Header="User Configuration" Grid.Row="2" Grid.ColumnSpan="2" Padding="3,0,3,0" Margin="0,4,0,0">
-                        <UniformGrid Rows="2" Columns="4">
+                    <GroupBox Header="Client Configuration" Grid.Row="1" Grid.ColumnSpan="2" Padding="3,0,3,0" Margin="0,4,0,0">
+                        <UniformGrid Rows="1" Columns="4">
                             <sync:SfTextInputLayout Hint="Send Timeout (ms)"  FontSize="12" FontStyle="Italic" ContainerType="Filled" Margin="4" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}">
                                 <TextBox FontStyle="Normal" Text="{Binding SendTimeoutValue, ValidatesOnExceptions=True, NotifyOnValidationError=True}" />
                             </sync:SfTextInputLayout>
                             <sync:SfTextInputLayout Hint="Receive Timeout (ms)"  FontSize="12" FontStyle="Italic" ContainerType="Filled" Margin="4" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}">
                                 <TextBox FontStyle="Normal" Text="{Binding ReceiveTimeoutValue, ValidatesOnExceptions=True, NotifyOnValidationError=True}" />
                             </sync:SfTextInputLayout>
-                            <sync:SfTextInputLayout Hint="Expected Disk Write Interval (ms)"  FontSize="12" FontStyle="Italic" ContainerType="Filled" Margin="4" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}">
-                                <TextBox FontStyle="Normal" Text="{Binding ExpectedDiskWriteInterval, ValidatesOnExceptions=True, NotifyOnValidationError=True}" />
-                            </sync:SfTextInputLayout>
-                            <sync:SfTextInputLayout Hint="Data File Size (kb)"  FontSize="12" FontStyle="Italic" ContainerType="Filled" Margin="4" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}">
-                                <TextBox FontStyle="Normal" Text="{Binding DataFileSize, ValidatesOnExceptions=True, NotifyOnValidationError=True}" />
-                            </sync:SfTextInputLayout>
-                            <sync:SfTextInputLayout Hint="Data File Path"  FontSize="12" FontStyle="Italic" ContainerType="Filled" Margin="4" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}">
-                                <TextBox FontStyle="Normal" Text="{Binding DataFilePath, ValidatesOnExceptions=True, NotifyOnValidationError=True}" />
-                            </sync:SfTextInputLayout>
-                            <sync:SfTextInputLayout Hint="Data File Name Prefix"  FontSize="12" FontStyle="Italic" ContainerType="Filled" Margin="4" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}">
-                                <TextBox FontStyle="Normal" Text="{Binding DataFileNamePrefix, ValidatesOnExceptions=True, NotifyOnValidationError=True}" />
-                            </sync:SfTextInputLayout>
                             <sync:SfTextInputLayout Hint="Reserved Buffer Size (byte)"  FontSize="12" FontStyle="Italic" ContainerType="Filled" Margin="4" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}">
                                 <TextBox FontStyle="Normal" Text="{Binding InternalReservedBufferSize, ValidatesOnExceptions=True, NotifyOnValidationError=True}" />
                             </sync:SfTextInputLayout>
                         </UniformGrid>
+                    </GroupBox>
+                    <GroupBox Header="Storage Schema Configuration" Grid.Row="2" Grid.ColumnSpan="2" Padding="3,0,3,0" Margin="0,4,0,0">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+                            <sync:SfTextInputLayout Hint="Storage Schema"  FontSize="12" FontStyle="Italic" ContainerType="Filled" Margin="4">
+                                <ComboBox FontStyle="Normal" ItemsSource="{Binding Source={StaticResource storageschemas}}" SelectedItem="{Binding DAQStorageSchema}"/>
+                            </sync:SfTextInputLayout>
+
+                            <sync:SfTextInputLayout Visibility="{Binding DAQStorageSchema, Converter={StaticResource storageschemavisibilityconverter}, ConverterParameter={x:Static daq:DAQStorageSchema.CSV}}" 
+                                                    Grid.Column="1" Hint="Expected Disk Write Interval (ms)"  FontSize="12" FontStyle="Italic" ContainerType="Filled" Margin="4" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}">
+                                <TextBox FontStyle="Normal" Text="{Binding ExpectedDiskWriteInterval, ValidatesOnExceptions=True, NotifyOnValidationError=True}" />
+                            </sync:SfTextInputLayout>
+                            <sync:SfTextInputLayout Visibility="{Binding DAQStorageSchema, Converter={StaticResource storageschemavisibilityconverter}, ConverterParameter={x:Static daq:DAQStorageSchema.CSV}}" 
+                                                    Grid.Column="2" Hint="Data File Size (kb)"  FontSize="12" FontStyle="Italic" ContainerType="Filled" Margin="4" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}">
+                                <TextBox FontStyle="Normal" Text="{Binding DataFileSize, ValidatesOnExceptions=True, NotifyOnValidationError=True}" />
+                            </sync:SfTextInputLayout>
+                            <sync:SfTextInputLayout Visibility="{Binding DAQStorageSchema, Converter={StaticResource storageschemavisibilityconverter}, ConverterParameter={x:Static daq:DAQStorageSchema.CSV}}" 
+                                                    Grid.Column="3" Hint="Data File Path"  FontSize="12" FontStyle="Italic" ContainerType="Filled" Margin="4" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}">
+                                <TextBox FontStyle="Normal" Text="{Binding DataFilePath, ValidatesOnExceptions=True, NotifyOnValidationError=True}" />
+                            </sync:SfTextInputLayout>
+                            <sync:SfTextInputLayout Visibility="{Binding DAQStorageSchema, Converter={StaticResource storageschemavisibilityconverter}, ConverterParameter={x:Static daq:DAQStorageSchema.CSV}}" 
+                                                    Grid.Column="1" Grid.Row="1" Hint="Data File Name Prefix"  FontSize="12" FontStyle="Italic" ContainerType="Filled" Margin="4" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}">
+                                <TextBox FontStyle="Normal" Text="{Binding DataFileNamePrefix, ValidatesOnExceptions=True, NotifyOnValidationError=True}" />
+                            </sync:SfTextInputLayout>
+
+
+                            <sync:SfTextInputLayout Visibility="{Binding DAQStorageSchema, Converter={StaticResource storageschemavisibilityconverter}, ConverterParameter={x:Static daq:DAQStorageSchema.MongoDB}}" 
+                                                    Grid.Column="1" Grid.ColumnSpan="3" Hint="MongoDB Connection String"  FontSize="12" FontStyle="Italic" ContainerType="Filled" Margin="4" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}">
+                                <TextBox FontStyle="Normal" Text="{Binding MongoDBConnectionString, ValidatesOnExceptions=True, NotifyOnValidationError=True}" />
+                            </sync:SfTextInputLayout>
+                            <sync:SfTextInputLayout Visibility="{Binding DAQStorageSchema, Converter={StaticResource storageschemavisibilityconverter}, ConverterParameter={x:Static daq:DAQStorageSchema.MongoDB}}" 
+                                                    Grid.Row ="1" Grid.Column="1" Hint="Expected MongoDB Write Interval (ms)"  FontSize="12" FontStyle="Italic" ContainerType="Filled" Margin="4" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}">
+                                <TextBox FontStyle="Normal" Text="{Binding ExpectedDatabaseWriteInterval, ValidatesOnExceptions=True, NotifyOnValidationError=True}" />
+                            </sync:SfTextInputLayout>
+                            <sync:SfTextInputLayout Visibility="{Binding DAQStorageSchema, Converter={StaticResource storageschemavisibilityconverter}, ConverterParameter={x:Static daq:DAQStorageSchema.MongoDB}}" 
+                                                    Grid.Row ="1" Grid.Column="2" Hint="Database Name"  FontSize="12" FontStyle="Italic" ContainerType="Filled" Margin="4" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}">
+                                <TextBox FontStyle="Normal" Text="{Binding MongoDBDatabaseName, ValidatesOnExceptions=True, NotifyOnValidationError=True}" />
+                            </sync:SfTextInputLayout>
+                            <sync:SfTextInputLayout Visibility="{Binding DAQStorageSchema, Converter={StaticResource storageschemavisibilityconverter}, ConverterParameter={x:Static daq:DAQStorageSchema.MongoDB}}" 
+                                                    Grid.Row ="1" Grid.Column="3" Hint="Collection Name"  FontSize="12" FontStyle="Italic" ContainerType="Filled" Margin="4" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}">
+                                <TextBox FontStyle="Normal" Text="{Binding MongoDBCollectionName, ValidatesOnExceptions=True, NotifyOnValidationError=True}" />
+                            </sync:SfTextInputLayout>
+                            <sync:SfTextInputLayout Visibility="{Binding DAQStorageSchema, Converter={StaticResource storageschemavisibilityconverter}, ConverterParameter={x:Static daq:DAQStorageSchema.MongoDB}}" 
+                                                    Grid.Row ="2" Grid.Column="1" Hint="Prefer Collection Size(bytes)"  FontSize="12" FontStyle="Italic" ContainerType="Filled" Margin="4" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}">
+                                <TextBox FontStyle="Normal" Text="{Binding MongoDBCollectionSize, ValidatesOnExceptions=True, NotifyOnValidationError=True}" ToolTip="It only takes effect when the collection does not exist"/>
+                            </sync:SfTextInputLayout>
+                            <Button Visibility="{Binding DAQStorageSchema, Converter={StaticResource storageschemavisibilityconverter}, ConverterParameter={x:Static daq:DAQStorageSchema.MongoDB}}" 
+                                    Grid.Row="2" Grid.Column="3" Content="Validate" Height="30" Click="MongoDBValidate_Click"/>
+                        </Grid>
                     </GroupBox>
                 </Grid>
             </TabItem>

@@ -11,7 +11,7 @@ using static System.Windows.Forms.VisualStyles.VisualStyleElement.TaskbarClock;
 
 namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.DAQ
 {
-    internal class CsvDataStorage:IDisposable
+    internal class CsvDataStorage: IDataStorage
     {
         public static readonly string FILE_TIMESTAMP_FORMAT = @"yyMMddHHmmssfff";
         public static readonly string RECORD_TIMESTAMP_FORMAT = @"yyMMdd HH:mm:ss:fff";
@@ -114,6 +114,12 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.DAQ
             __last_time = time;
         }
 
+        /*
+        public void Flush()
+        {
+            __csv_writer?.Flush();
+        }
+        */
 
         protected virtual void Dispose(bool disposing)
         {

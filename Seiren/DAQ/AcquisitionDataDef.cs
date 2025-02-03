@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MongoDB.Bson;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -139,6 +140,71 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.DAQ
                         sb.Append(b.ToString("x2"));
                     return sb.ToString();
                 default: return "Not yet supported";
+            }
+        }
+
+        public BsonValue DataBsonValue(ReadOnlySpan<byte> data)
+        {
+            int raw0, raw1;
+            bool isNegative;
+            switch (DataType)
+            {
+                case AcquisitionDataType.BOOLEAN:
+                    var v = data[(int)BytePos];
+                    int bits = (int)(BitPos % 8);
+                    if ((v & (1 << bits)) == 0)
+                        return new BsonBoolean(false);
+                    else
+                        return new BsonBoolean(true);
+                case AcquisitionDataType.BYTE:
+                    return new BsonInt32(MemoryMarshal.Read<byte>(data.Slice((int)BytePos, 1)));
+                case AcquisitionDataType.SBYTE:
+                    return new BsonInt32(MemoryMarshal.Read<sbyte>(data.Slice((int)BytePos, 1)));
+                case AcquisitionDataType.USHORT:
+                    return new BsonInt32(MemoryMarshal.Read<ushort>(data.Slice((int)BytePos, 2)));
+                case AcquisitionDataType.SHORT:
+                    return new BsonInt32(MemoryMarshal.Read<short>(data.Slice((int)BytePos, 2)));
+                case AcquisitionDataType.UINT:
+                    return new BsonInt64(MemoryMarshal.Read<uint>(data.Slice((int)BytePos, 4)));
+                case AcquisitionDataType.INT:
+                    return new BsonInt32(MemoryMarshal.Read<int>(data.Slice((int)BytePos, 4)));
+                case AcquisitionDataType.DUINT:
+                    //return new BsonBinaryData(data.Slice((int)BytePos, 8).ToArray(), BsonBinarySubType.Binary);
+                    return new BsonDecimal128(new Decimal(MemoryMarshal.Read<ulong>(data.Slice((int)BytePos, 8))));
+                case AcquisitionDataType.DINT:
+                    return new BsonInt64(MemoryMarshal.Read<long>(data.Slice((int)BytePos, 8)));
+                case AcquisitionDataType.FLOAT:
+                    return new BsonDouble(MemoryMarshal.Read<float>(data.Slice((int)BytePos, 4)));
+                case AcquisitionDataType.DOUBLE:
+                    return new BsonDouble(MemoryMarshal.Read<double>(data.Slice((int)BytePos, 8)));
+
+                case AcquisitionDataType.FIXEDPOINT3201:
+                    raw0 = MemoryMarshal.Read<int>(data.Slice((int)BytePos, 4));
+                    isNegative = raw0 < 0;
+                    return new BsonDecimal128(new Decimal(raw0, 0, 0, isNegative, 1));
+                case AcquisitionDataType.FIXEDPOINT3202:
+                    raw0 = MemoryMarshal.Read<int>(data.Slice((int)BytePos, 4));
+                    isNegative = raw0 < 0;
+                    return new BsonDecimal128(new Decimal(raw0, 0, 0, isNegative, 2));
+                case AcquisitionDataType.FIXEDPOINT6401:
+                    raw0 = MemoryMarshal.Read<int>(data.Slice((int)BytePos, 4));
+                    raw1 = MemoryMarshal.Read<int>(data.Slice((int)BytePos + 4, 4));
+                    isNegative = raw1 < 0;
+                    return new BsonDecimal128(new Decimal(raw0, raw1, 0, isNegative, 1));
+                case AcquisitionDataType.FIXEDPOINT6402:
+                    raw0 = MemoryMarshal.Read<int>(data.Slice((int)BytePos, 4));
+                    raw1 = MemoryMarshal.Read<int>(data.Slice((int)BytePos + 4, 4));
+                    isNegative = raw1 < 0;
+                    return new BsonDecimal128(new Decimal(raw0, raw1, 0, isNegative, 2));
+                case AcquisitionDataType.FIXEDPOINT6404:
+                    raw0 = MemoryMarshal.Read<int>(data.Slice((int)BytePos, 4));
+                    raw1 = MemoryMarshal.Read<int>(data.Slice((int)BytePos + 4, 4));
+                    isNegative = raw1 < 0;
+                    return new BsonDecimal128(new Decimal(raw0, raw1, 0, isNegative, 4));
+                case AcquisitionDataType.FINGERPRINT:
+                    return new BsonBinaryData(data.Slice((int)BytePos, 16).ToArray(), BsonBinarySubType.MD5);
+                default:
+                    return new BsonString("Not yet supported");
             }
         }
     }
