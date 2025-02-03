@@ -382,7 +382,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.DAQ
                                 data.Span.Slice(i * rxframesize + rxctrlpos, info.ctrl_size_in_word * 2),
                                 data.Span.Slice(i * rxframesize + rxbitpos, info.rx_bit_size_in_word * 2),
                                 data.Span.Slice(i * rxframesize + rxblkpos, info.rx_blk_size_in_word * 2));
-                        //storage.Flush();
+                        storage.Flush();
                     }
                 }
                 catch (Exception ex)

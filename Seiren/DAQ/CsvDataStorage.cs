@@ -114,12 +114,11 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.DAQ
             __last_time = time;
         }
 
-        /*
         public void Flush()
         {
             __csv_writer?.Flush();
         }
-        */
+
 
         protected virtual void Dispose(bool disposing)
         {

@@ -92,7 +92,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.DAQ
         private uint __last_time = 0;
         private System.DateTime __last_data_acquisition_date_time;
         private List<AcquisitionDataIndex> __diag_area, __tx_bit_area, __tx_blk_area, __ctrl_area, __rx_bit_area, __rx_blk_area;
-        //private List<BsonDocument> __documents = new List<BsonDocument>();
+        private List<BsonDocument> __documents = new List<BsonDocument>();
 
         public MongoDataStorage(string connectiongString, string databaseName, string collectionName, int preferSize,
             IEnumerable<AcquisitionDataIndex> diag, IEnumerable<AcquisitionDataIndex> DI, IEnumerable<AcquisitionDataIndex> AI,
@@ -136,19 +136,19 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.DAQ
             foreach (var f in __rx_blk_area)
                 bsonDocument.Add(f.FriendlyName, f.DataBsonValue(rxblkdata));
 
-            __validate_result.Collection.InsertOne(bsonDocument);
-            //__documents.Add(bsonDocument);
+            __documents.Add(bsonDocument);
 
             __last_time = time;
         }
 
-        /*
         public void Flush()
         {
-            __validate_result.Collection.InsertMany(__documents);
-            __documents.Clear();
+            if (__documents.Count > 0)
+            {
+                __validate_result.Collection.InsertMany(__documents);
+                __documents.Clear();
+            }
         }
-        */
 
         private bool disposedValue;
 
@@ -159,6 +159,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.DAQ
                 if (disposing)
                 {
                     // TODO: 释放托管状态(托管对象)
+                    Flush();
                     (__validate_result as IDisposable)?.Dispose();
                     __validate_result = null;
                 }
