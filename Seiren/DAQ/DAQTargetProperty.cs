@@ -150,8 +150,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.DAQ
         public string MongoDBDatabaseName { get; set; } = "DAQ";
         public string MongoDBCollectionName { get; set; } = "Data";
 
-        private int __mongo_db_collection_size = 100 * 1024 * 1024;
-        public int MongoDBCollectionSize
+        private long __mongo_db_collection_size = 100 * 1024 * 1024;
+        public long MongoDBCollectionSize
         {
             get { return __mongo_db_collection_size; }
             set

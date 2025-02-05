@@ -18,7 +18,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.DAQ
             public MongoClient? Client { get; init; }
             public IMongoCollection<BsonDocument>? Collection { get; init; }
             public bool IsCapped { get; init; } = false;
-            public int Size { get; init; } = 0;
+            public long Size { get; init; } = 0;
             public bool New { get; init; } = false;
 
             protected virtual void Dispose(bool disposing)
@@ -51,7 +51,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.DAQ
                 GC.SuppressFinalize(this);
             }
         }
-        public static ValidateResult ValidateMongoDBStorage(string connectiongString, string databaseName, string collectionName, bool createIfNotExist = false, int preferSize = 0)
+        public static ValidateResult ValidateMongoDBStorage(string connectiongString, string databaseName, string collectionName, bool createIfNotExist = false, long preferSize = 0)
         {
             try
             {
@@ -94,7 +94,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.DAQ
         private List<AcquisitionDataIndex> __diag_area, __tx_bit_area, __tx_blk_area, __ctrl_area, __rx_bit_area, __rx_blk_area;
         private List<BsonDocument> __documents = new List<BsonDocument>();
 
-        public MongoDataStorage(string connectiongString, string databaseName, string collectionName, int preferSize,
+        public MongoDataStorage(string connectiongString, string databaseName, string collectionName, long preferSize,
             IEnumerable<AcquisitionDataIndex> diag, IEnumerable<AcquisitionDataIndex> DI, IEnumerable<AcquisitionDataIndex> AI,
             IEnumerable<AcquisitionDataIndex> ctrl, IEnumerable<AcquisitionDataIndex> DO, IEnumerable<AcquisitionDataIndex> AO)
         {

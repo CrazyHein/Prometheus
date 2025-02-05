@@ -482,7 +482,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             __main_model.DAQUnitStatus = new AcquisitionUnitStatus();
             __main_model.DAQUnitTarget = $"{__settings.DAQTargetProperty.DestinationIPv4String}:{__settings.DAQTargetProperty.DestinationPort}";
 
-            __user_interface_acquisition_unit.Startup(__settings.DAQTargetProperty.ExpectedDiskWriteInterval);
+            __user_interface_acquisition_unit.Startup(__settings.DAQTargetProperty.DAQStorageSchema == DAQStorageSchema.CSV?
+                __settings.DAQTargetProperty.ExpectedDiskWriteInterval:
+                __settings.DAQTargetProperty.ExpectedDatabaseWriteInterval);
             CommandManager.InvalidateRequerySuggested();
         }
 
