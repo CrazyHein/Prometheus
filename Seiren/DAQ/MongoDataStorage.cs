@@ -124,17 +124,17 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.DAQ
             __last_data_acquisition_date_time += TimeSpan.FromMilliseconds((time - __last_time + 500) / 1000);
             BsonDocument bsonDocument = new BsonDocument("time", new BsonDateTime(__last_data_acquisition_date_time));
             foreach (var f in __diag_area)
-                bsonDocument.Add(f.FriendlyName, f.DataBsonValue(diagdata));
+                bsonDocument.Add($"{f.FriendlyName}[0.{f.BitPos}]", f.DataBsonValue(diagdata));
             foreach (var f in __tx_bit_area)
-                bsonDocument.Add(f.FriendlyName, f.DataBsonValue(txbitdata));
+                bsonDocument.Add($"{f.FriendlyName}[1.{f.BitPos}]", f.DataBsonValue(txbitdata));
             foreach (var f in __tx_blk_area)
-                bsonDocument.Add(f.FriendlyName, f.DataBsonValue(txblkdata));
+                bsonDocument.Add($"{f.FriendlyName}[2.{f.BitPos}]", f.DataBsonValue(txblkdata));
             foreach (var f in __ctrl_area)
-                bsonDocument.Add(f.FriendlyName, f.DataBsonValue(ctrldata));
+                bsonDocument.Add($"{f.FriendlyName}[3.{f.BitPos}]", f.DataBsonValue(ctrldata));
             foreach (var f in __rx_bit_area)
-                bsonDocument.Add(f.FriendlyName, f.DataBsonValue(rxbitdata));
+                bsonDocument.Add($"{f.FriendlyName}[4.{f.BitPos}]", f.DataBsonValue(rxbitdata));
             foreach (var f in __rx_blk_area)
-                bsonDocument.Add(f.FriendlyName, f.DataBsonValue(rxblkdata));
+                bsonDocument.Add($"{f.FriendlyName}[5.{f.BitPos}]", f.DataBsonValue(rxblkdata));
 
             __documents.Add(bsonDocument);
 
