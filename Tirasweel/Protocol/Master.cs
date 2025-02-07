@@ -45,6 +45,39 @@ namespace AMEC.PCSoftware.CommunicationProtocol.CrazyHein.OrbmentDAQ.Protocol
             return info;
         }
 
+        public void AcquisiteServerInfoEx(ushort trans, ref DAQ_SERVER_INFO_T info, ref DAQ_SERVER_IO_HASH_T varhash, ref DAQ_SERVER_IO_HASH_T iohash)
+        {
+            DAQ_DATAGRAM_HEADER_T request = new DAQ_DATAGRAM_HEADER_T(trans, DAQ_FUNC_CODE_T.CMD | DAQ_FUNC_CODE_T.INQUIRE_EX, 0);
+
+            Port.Send(ref request);
+
+            var body = Port.Recv(out DAQ_DATAGRAM_HEADER_T header);
+
+            if ((header.func & DAQ_FUNC_CODE_T.EXCEPTION) != 0)
+            {
+                if (body.Length == 1)
+                    throw new DAQException(DAQExceptionCode.EXCEPTION_DATAGRAM, ((DAQ_EXCEPTION_CODE_T)body.Span[0]).ToString());
+                else
+                    throw new DAQException(DAQExceptionCode.INVALID_DATAGRAM);
+            }
+
+            if (header.transaction != trans || header.func != (DAQ_FUNC_CODE_T.ACK | DAQ_FUNC_CODE_T.INQUIRE) || header.protocol_identifier_d != 0x44 || header.protocol_identifier_a != 0x41 || header.protocol_identifier_q != 0x51)
+                throw new DAQException(DAQExceptionCode.TRANSACTION_MISMATCH);
+
+            varhash = MemoryMarshal.Read<DAQ_SERVER_IO_HASH_T>(body.Span);
+            iohash = MemoryMarshal.Read<DAQ_SERVER_IO_HASH_T>(body.Span.Slice(Marshal.SizeOf<DAQ_SERVER_IO_HASH_T>()));
+            info = MemoryMarshal.Read<DAQ_SERVER_INFO_T>(body.Span.Slice(Marshal.SizeOf<DAQ_SERVER_IO_HASH_T>() * 2));
+        }
+
+        public async Task<(DAQ_SERVER_INFO_T, DAQ_SERVER_IO_HASH_T, DAQ_SERVER_IO_HASH_T)> AcquisiteServerInfoExAsync(ushort trans)
+        {
+            DAQ_SERVER_INFO_T info = new DAQ_SERVER_INFO_T();
+            DAQ_SERVER_IO_HASH_T varhash = new DAQ_SERVER_IO_HASH_T();
+            DAQ_SERVER_IO_HASH_T iohash = new DAQ_SERVER_IO_HASH_T();
+            await Task.Run(() => AcquisiteServerInfoEx(trans, ref info, ref varhash, ref iohash));
+            return (info, varhash, iohash);
+        }
+
         public void AcquisiteData(bool txAcquisition, ushort trans, 
             int expected, out int received, out int residual, out int corrupted, out ReadOnlyMemory<byte> data)
         {

@@ -260,11 +260,41 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                     while (received != 1);
                     uint t1 = MemoryMarshal.Read<uint>(data.Span);
 
-                    string msg = String.Format("Communication success, the DAQ server returns following information:\nCapacity : {0}\nTx : {1}/{2}/{3}/{4}\nRx : {5}/{6}/{7}/{8}\nSample Rate : {9}",
+                    DAQ_SERVER_IO_HASH_T? varHash, ioHash;
+                    string varHashString, ioHashString;
+
+                    try
+                    {
+                        (_, varHash, ioHash) = await master.AcquisiteServerInfoExAsync(0xBBBB);
+                        StringBuilder sb = new StringBuilder();
+                        foreach (var i in varHash.Value)
+                        {
+                            sb.Append(i.ToString("X02"));
+                        }
+                        varHashString = sb.ToString();
+
+                        sb.Clear();
+                        foreach (var i in ioHash.Value)
+                        {
+                            sb.Append(i.ToString("X02"));
+                        }
+                        ioHashString = sb.ToString();
+                    }
+                    catch
+                    {
+                        varHash = null;
+                        ioHash = null;
+                        varHashString = "N/A";
+                        ioHashString = "N/A";
+                    }
+
+                    string msg = String.Format("Communication success, the DAQ server returns following information:\nVariable Dictionary Hash: {10}\nIOList Hash: {11}\nCapacity : {0}\nTx : {1}/{2}/{3}/{4}\nRx : {5}/{6}/{7}/{8}\nSample Rate : {9}",
                         info.capacity, 
                         info.tx_timestamp_size_in_word, info.diag_size_in_word, info.tx_bit_size_in_word, info.tx_blk_size_in_word,
                         info.rx_timestamp_size_in_word, info.ctrl_size_in_word, info.rx_bit_size_in_word, info.rx_blk_size_in_word,
-                        (t1 - t0 + 500u)/1000u);
+                        (t1 - t0 + 500u)/1000u,
+                        varHashString, ioHashString
+                        );
                     MessageBox.Show(this, msg,
                         "Information", MessageBoxButton.OK, MessageBoxImage.Information);
 

@@ -10,6 +10,7 @@ namespace AMEC.PCSoftware.CommunicationProtocol.CrazyHein.OrbmentDAQ.Protocol
         POLL_TX                 = 0x04,
         POLL_RX                 = 0x08,
         INQUIRE                 = 0x10,
+        INQUIRE_EX              = 0x1F,
         CMD                     = 0x20,
         ACK                     = 0x40,
         EXCEPTION               = 0x80,
@@ -62,9 +63,25 @@ namespace AMEC.PCSoftware.CommunicationProtocol.CrazyHein.OrbmentDAQ.Protocol
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    [System.Runtime.CompilerServices.InlineArray(16)]
+    public struct DAQ_SERVER_IO_HASH_T
+    {
+        public byte md5_code;
+    }
+
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public struct DAQ_DATAGRAM_INQUIRE_RSP_T
     {
         public DAQ_DATAGRAM_HEADER_T header;
+        public DAQ_SERVER_INFO_T info;
+    }
+
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    public struct DAQ_DATAGRAM_INQUIRE_EX_RSP_T
+    {
+        public DAQ_DATAGRAM_HEADER_T header;
+        public DAQ_SERVER_IO_HASH_T var_hash;
+        public DAQ_SERVER_IO_HASH_T io_hash;
         public DAQ_SERVER_INFO_T info;
     }
 
