@@ -1,0 +1,28 @@
+{
+  "DAQ": {
+    "SourceIPv4": "0.0.0.0",
+    "DestinationIPv4": "192.168.3.3",
+    "DestinationPort": 8368,
+    "SendTimeoutValue": 2000,
+    "ReceiveTimeoutValue": 10000,
+    "InternalReservedBufferSize": 4194304,
+    "MongoDBConnectionString": "mongodb://192.168.17.200:27017/?connectTimeoutMS=60000\u0026serverSelectionTimeoutMS=10000\u0026compressors=zlib,zstd",
+    "ExpectedDatabaseWriteInterval": 1000,
+    "MongoDBDatabaseName": "DAQ",
+    "MongoDBCollectionName": "Oceanus",
+    "MongoDBCollectionSize": 104857600
+  },
+  "FTP": {
+    "HostIPv4": "192.168.3.3",
+    "HostPort": 21,
+    "User": "target",
+    "Password": "password",
+    "TimeoutValue": 5000,
+    "ReadWriteTimeoutValue": 5000,
+    "IOListPath": "/2/io_list.xml",
+    "VariableDictionaryPath": "/2/variable_catalogue.xml"
+  },
+  "GRPC": {
+    "ServerPort": 50003
+  }
+}

@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+option csharp_namespace = "AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Oceanus.Management";
+
+package AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Oceanus.Management;
+
+service RemoteManagement {
+	rpc QueryStatue (Dummy) returns (Status);
+}
+
+message Dummy{}
+
+message Status{
+	string WorkerStage = 1;
+	string AcquisitionUnitState = 2;
+	string AcquisitionUnitExceptionMessage = 3;
+	int32 AcquisitionUnitWriteInterval = 4;
+	uint32 AcquisitionUnitHeartbeat = 5;
+	string AcquisitionUnitStatus = 6;
+}

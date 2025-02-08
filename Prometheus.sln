@@ -17,7 +17,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tirasweel", "Tirasweel\Tira
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Napishtim", "Napishtim\Napishtim.csproj", "{9C447796-A7D3-447D-BFE5-603D4DA11784}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ARK", "ARK\ARK.csproj", "{296A8191-92CD-4336-9E40-A6C1079F4E2C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ARK", "ARK\ARK.csproj", "{296A8191-92CD-4336-9E40-A6C1079F4E2C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Oceanus", "Oceanus\Oceanus.csproj", "{3D6093CB-9A8E-4A08-9806-1204C02DFE94}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -57,6 +59,10 @@ Global
 		{296A8191-92CD-4336-9E40-A6C1079F4E2C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{296A8191-92CD-4336-9E40-A6C1079F4E2C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{296A8191-92CD-4336-9E40-A6C1079F4E2C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3D6093CB-9A8E-4A08-9806-1204C02DFE94}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3D6093CB-9A8E-4A08-9806-1204C02DFE94}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3D6093CB-9A8E-4A08-9806-1204C02DFE94}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3D6093CB-9A8E-4A08-9806-1204C02DFE94}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

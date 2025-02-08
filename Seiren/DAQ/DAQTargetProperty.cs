@@ -133,7 +133,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.DAQ
             }
         }
 
-        public string MongoDBConnectionString { get; set; } = "mongodb://localhost:27017/?connectTimeoutMS=60000&serverSelectionTimeoutMS=10000&compressors=snappy,zlib,zstd";
+        public string MongoDBConnectionString { get; set; } = "mongodb://localhost:27017/?connectTimeoutMS=60000&serverSelectionTimeoutMS=10000&compressors=zlib,zstd";
 
         private int __expected_db_write_interval = 1000;
         public int ExpectedDatabaseWriteInterval

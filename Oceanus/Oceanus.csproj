@@ -1,0 +1,48 @@
+<Project Sdk="Microsoft.NET.Sdk.Worker">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>dotnet-Oceanus-bc82834b-4ee0-40e0-b51a-49d4086aedf9</UserSecretsId>
+    <RootNamespace>AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Oceanus</RootNamespace>
+    <ServerGarbageCollection>true</ServerGarbageCollection>
+    <Version>0.1.0.0</Version>
+    <Authors>CrazyHein</Authors>
+    <Company>AMEC</Company>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Management\Protos\remote_management.proto" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Google.Protobuf" Version="3.29.3" />
+    <PackageReference Include="Grpc.Core" Version="2.46.6" />
+    <PackageReference Include="Grpc.Tools" Version="2.69.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" Version="8.0.1" />
+    <PackageReference Include="MongoDB.Driver" Version="3.1.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Lombardia\Lombardia.csproj" />
+    <ProjectReference Include="..\Tirasweel\Tirasweel.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Protobuf Include="Management\Protos\remote_management.proto" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Metadata\controller_model_catalogue.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Metadata\data_type_catalogue.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+</Project>

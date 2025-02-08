@@ -127,10 +127,16 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.DAQ
                 if (disposing)
                 {
                     // TODO: 释放托管状态(托管对象)
-                    __csv_writer?.Flush();
-                    __csv_writer?.Dispose();
-                    __stream_writer?.Dispose();
-                    __file_stream?.Dispose();
+                    try
+                    {
+                        __csv_writer?.Flush();
+                    }
+                    finally
+                    {
+                        __csv_writer?.Dispose();
+                        __stream_writer?.Dispose();
+                        __file_stream?.Dispose();
+                    }
 
                     __file_stream = null;
                     __stream_writer = null;
