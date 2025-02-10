@@ -6,9 +6,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.DAQ
+namespace AMEC.PCSoftware.CommunicationProtocol.CrazyHein.OrbmentDAQ.Storage
 {
-    internal class MongoDataStorage : IDataStorage
+    public class MongoDataStorage : IDataStorage
     {
         public class ValidateResult : IDisposable
         {
@@ -74,9 +74,14 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.DAQ
                     bool capped = false;
                     if (options["capped"] != null)
                         capped = options["capped"].AsBoolean;
-                    int size = 0;
+                    long size = 0;
                     if (options["size"] != null)
-                        size = options["size"].AsInt32;
+                    {
+                        if (options["size"].BsonType == BsonType.Int32)
+                            size = options["size"].AsInt32;
+                        else
+                            size = options["size"].AsInt64;
+                    }
                     return new ValidateResult() { IsCapped = capped, Size = size, Client = client, Collection = client.GetDatabase(databaseName).GetCollection<BsonDocument>(collectionName) };
                 }
                 else

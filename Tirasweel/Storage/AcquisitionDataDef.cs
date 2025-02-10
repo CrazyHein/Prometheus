@@ -6,9 +6,9 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Oceanus.Workloads
+namespace AMEC.PCSoftware.CommunicationProtocol.CrazyHein.OrbmentDAQ.Storage
 {
-    internal enum AcquisitionDataType : byte
+    public enum AcquisitionDataType : byte
     {
         BOOLEAN,
         BYTE,
@@ -30,7 +30,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Oceanus.Workloads
         UNKNOWN
     }
 
-    internal enum AcquisitionDataDisplayFormat : int
+    public enum AcquisitionDataDisplayFormat : int
     {
         DEC = 10,
         HEX = 16,
@@ -39,16 +39,16 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Oceanus.Workloads
         BOOL = 1
     }
 
-    internal class AcquisitionDataIndex
+    public class AcquisitionDataIndex
     {
-        public string FriendlyName { get; init; } = string.Empty;
+        public string FriendlyName { get; init; }
         public uint BitPos { get; init; }
         public uint BytePos { get { return BitPos / 8; } }
         public AcquisitionDataType DataType { get; private set; }
 
         public AcquisitionDataIndex(string datatype)
         {
-            switch (datatype)
+            switch(datatype)
             {
                 case "BIT":
                     DataType = AcquisitionDataType.BOOLEAN; break;
@@ -90,14 +90,14 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Oceanus.Workloads
             }
         }
 
-        public string DataStringValue(ReadOnlySpan<byte> data, AcquisitionDataDisplayFormat fmt = AcquisitionDataDisplayFormat.DEC)
+        public string DataStringValue(ReadOnlySpan<byte> data, AcquisitionDataDisplayFormat fmt  = AcquisitionDataDisplayFormat.DEC)
         {
-            switch (DataType)
+            switch(DataType)
             {
                 case AcquisitionDataType.BOOLEAN:
                     var v = data[(int)BytePos];
                     int bits = (int)(BitPos % 8);
-                    if ((v & (1 << bits)) == 0)
+                    if ((v & (1 <<bits)) == 0)
                         return "0";
                     else
                         return "1";
@@ -136,7 +136,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Oceanus.Workloads
                     return (MemoryMarshal.Read<long>(data.Slice((int)BytePos, 8)) / 10000.0).ToString("F4");
                 case AcquisitionDataType.FINGERPRINT:
                     StringBuilder sb = new StringBuilder(16 * 2);
-                    foreach (var b in data.Slice((int)BytePos, 16))
+                    foreach(var b in data.Slice((int)BytePos, 16))
                         sb.Append(b.ToString("x2"));
                     return sb.ToString();
                 default: return "Not yet supported";

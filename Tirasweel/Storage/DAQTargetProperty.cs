@@ -1,16 +1,29 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using System.Windows;
 
-namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Oceanus.Settings
+namespace AMEC.PCSoftware.CommunicationProtocol.CrazyHein.OrbmentDAQ.Storage
 {
+    public enum DAQStorageSchema
+    {
+        CSV,
+        MongoDB
+    }
+
     public class DAQTargetProperty
     {
+        public DAQTargetProperty Copy()
+        {
+            return MemberwiseClone() as DAQTargetProperty;
+        }
+
         [JsonIgnore]
         public IPAddress SourceIPv4 { get; private set; } = IPAddress.Any;
         [JsonPropertyName("SourceIPv4")]
@@ -56,7 +69,39 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Oceanus.Settings
             }
         }
 
-        private int __internal_reserved_buffer_size = 4 * 1024 * 1024;
+        public DAQStorageSchema DAQStorageSchema { get; set; } = DAQStorageSchema.CSV;
+
+        private int __expected_disk_write_interval = 1000;
+        public int ExpectedDiskWriteInterval
+        {
+            get { return __expected_disk_write_interval; }
+            set
+            {
+                if (value < 500)
+                    throw new ArgumentOutOfRangeException("The setting value should be greater than or equal to 500.");
+                else
+                    __expected_disk_write_interval = value;
+            }
+        }
+
+        private int __data_file_size = 1024;
+        public int DataFileSize
+        {
+            get { return __data_file_size; }
+            set
+            {
+                if (value < 4)
+                    throw new ArgumentOutOfRangeException("The setting value should be greater than or equal to 4(k).");
+                else
+                    __data_file_size = value;
+            }
+        }
+
+        public string DataFilePath { set; get; } = "DAQ";
+
+        public string DataFileNamePrefix { set; get; } = "Data";
+
+        private int __internal_reserved_buffer_size = 4*1024*1024;
         public int InternalReservedBufferSize
         {
             get { return __internal_reserved_buffer_size; }
@@ -69,8 +114,22 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Oceanus.Settings
             }
         }
 
+        public string MongoDBConnectionString { get; set; } = "mongodb://localhost:27017/?connectTimeoutMS=60000&serverSelectionTimeoutMS=10000&compressors=zlib,zstd";
+
+        private int __expected_db_write_interval = 1000;
+        public int ExpectedDatabaseWriteInterval
+        {
+            get { return __expected_db_write_interval; }
+            set
+            {
+                if (value < 500)
+                    throw new ArgumentOutOfRangeException("The setting value should be greater than or equal to 500.");
+                else
+                    __expected_db_write_interval = value;
+            }
+        }
         public string MongoDBDatabaseName { get; set; } = "DAQ";
-        public string MongoDBCollectionName { get; set; } = "Oceanus";
+        public string MongoDBCollectionName { get; set; } = "Data";
 
         private long __mongo_db_collection_size = 100 * 1024 * 1024;
         public long MongoDBCollectionSize
@@ -85,20 +144,12 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Oceanus.Settings
             }
         }
 
-        private int __expected_db_write_interval = 1000;
-        public int ExpectedDatabaseWriteInterval
-        {
-            get { return __expected_db_write_interval; }
-            set
-            {
-                if (value < 500)
-                    throw new ArgumentOutOfRangeException("The setting value should be greater than or equal to 500.");
-                else
-                    __expected_db_write_interval = value;
-            }
-        }
 
-        public string MongoDBConnectionString { get; set; } = "mongodb://localhost:27017/?connectTimeoutMS=60000&serverSelectionTimeoutMS=10000&compressors=snappy,zlib,zstd";
+
+        public override string ToString()
+        {
+            return $"DAQ Property:\n{JsonSerializer.Serialize(this, __JSON_OPTION)}";
+        }
 
         private static JsonSerializerOptions __JSON_OPTION = new JsonSerializerOptions
         {
@@ -108,14 +159,14 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Oceanus.Settings
                     new JsonStringEnumConverter(null, false)
                 }
         };
+        public void Save(Utf8JsonWriter writer)
+        {
+            JsonSerializer.Serialize(writer, this, __JSON_OPTION);
+        }
 
-        public static DAQTargetProperty? RESTORE(ref Utf8JsonReader reader)
+        public static DAQTargetProperty RESTORE(ref Utf8JsonReader reader)
         {
             return JsonSerializer.Deserialize<DAQTargetProperty>(ref reader, __JSON_OPTION);
-        }
-        public override string ToString()
-        {
-            return $"DAQ Property:\n{JsonSerializer.Serialize(this, __JSON_OPTION)}";
         }
     }
 }

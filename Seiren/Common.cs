@@ -1,4 +1,5 @@
 ﻿using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia;
+using AMEC.PCSoftware.CommunicationProtocol.CrazyHein.OrbmentDAQ.Storage;
 using Syncfusion.Data;
 using System;
 using System.Collections;
@@ -833,6 +834,24 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             }
             else
                 throw new ArgumentException();
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class StorageSchemaVisibilityConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            DAQStorageSchema res = (DAQStorageSchema)value;
+            DAQStorageSchema schema = (DAQStorageSchema)parameter;
+            if (res == schema)
+                return Visibility.Visible;
+            else
+                return Visibility.Collapsed;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren"
         xmlns:debugger="clr-namespace:AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Debugger"
-        xmlns:daq="clr-namespace:AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.DAQ"
+        xmlns:daq="clr-namespace:AMEC.PCSoftware.CommunicationProtocol.CrazyHein.OrbmentDAQ.Storage;assembly=Tirasweel"
         xmlns:utility="clr-namespace:AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility"
         xmlns:sync="http://schemas.syncfusion.com/wpf"
         xmlns:syncfusionskin ="clr-namespace:Syncfusion.SfSkinManager;assembly=Syncfusion.SfSkinManager.WPF"
@@ -167,7 +167,7 @@
                                 <x:Type TypeName="daq:DAQStorageSchema" />
                             </ObjectDataProvider.MethodParameters>
                         </ObjectDataProvider>
-                        <daq:StorageSchemaVisibilityConverter x:Key="storageschemavisibilityconverter"/>
+                        <local:StorageSchemaVisibilityConverter x:Key="storageschemavisibilityconverter"/>
                     </Grid.Resources>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="auto" />

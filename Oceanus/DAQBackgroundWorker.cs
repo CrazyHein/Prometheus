@@ -1,4 +1,5 @@
 using AMEC.PCSoftware.CommunicationProtocol.CrazyHein.OrbmentDAQ.Protocol;
+using AMEC.PCSoftware.CommunicationProtocol.CrazyHein.OrbmentDAQ.Storage;
 using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia;
 using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Oceanus.Management;
 using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Oceanus.Settings;
@@ -32,12 +33,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Oceanus
 
 
         private Stage __stage = Stage.ReadOfflineIOConfiguration;
-
-        private AcquisitionUnitState __ac_unit_state = AcquisitionUnitState.Idle;
-        private string __ac_unit_exception_message = string.Empty;
-        private AcquisitionUnitStatus __ac_unit_status = new AcquisitionUnitStatus();
-        private int __ac_unit_write_interval = 0;
-        private uint __ac_unit_heartbeat = 0;
+        private AcquisitionRange __range = AcquisitionRange.None;
 
         private (VariableDictionary? vd, ControllerConfiguration? cc, ObjectDictionary? od,
                 ProcessDataImage? txdiag, ProcessDataImage? txbit, ProcessDataImage? txblk,
@@ -98,20 +94,37 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Oceanus
                                 }
                             }
                             else
+                            {
                                 _logger.LogError($"{DateTimeOffset.Now}: \n{WorkerStage}:\n{__io_online_configuration.ex.Message}");
+                                WorkerStage = Stage.ReadOfflineIOConfiguration;
+                            }
                             break;
                         case Stage.StartupDataAcquisionTask:
-                            __data_acquisition_unit = new DataAcquisitionUnit();
+                            __data_acquisition_unit = IOAcquisition.BuildDataAcquisitionUnit();
+                            AcquisitionRange range = AcquisitionRange.IOConfiguration;
+                            if (__io_offline_configuration.txdiag.ProcessDatas.Concat(__io_offline_configuration.txbit.ProcessDatas).Concat(__io_offline_configuration.txblk.ProcessDatas).
+                                Concat(__io_offline_configuration.rxctl.ProcessDatas).Concat(__io_offline_configuration.rxbit.ProcessDatas).Concat(__io_offline_configuration.rxblk.ProcessDatas).
+                                Any(d => d.DAQ == true) == false)
+                                range = AcquisitionRange.FullIOImage;
+
                             var ret = await __data_acquisition_unit.Startup(__daq_property,
                                 __io_offline_configuration.txdiag.ProcessDatas, __io_offline_configuration.txbit.ProcessDatas, __io_offline_configuration.txblk.ProcessDatas,
-                                __io_offline_configuration.rxctl.ProcessDatas, __io_offline_configuration.rxbit.ProcessDatas, __io_offline_configuration.rxblk.ProcessDatas);
+                                __io_offline_configuration.rxctl.ProcessDatas, __io_offline_configuration.rxbit.ProcessDatas, __io_offline_configuration.rxblk.ProcessDatas,
+                                range);
                             if (ret != AcquisitionUnitState.Exception)
                             {
-                                _logger.LogInformation($"{DateTimeOffset.Now}: \n{WorkerStage}:\nEntering into [{Stage.DataAcquisiting}]");
+                                _logger.LogInformation($"{DateTimeOffset.Now}: \n{WorkerStage}:\nEntering into [{Stage.DataAcquisiting}]\nIO acquisition range: {range}");
                                 WorkerStage = Stage.DataAcquisiting;
+                                Range = range;
                             }
                             else
+                            {
                                 _logger.LogError($"{DateTimeOffset.Now}: \n{WorkerStage}:\n{__data_acquisition_unit.ExceptionMessage}");
+
+                                await __data_acquisition_unit.Stop();
+                                WorkerStage = Stage.ReadOfflineIOConfiguration;
+                                Range = AcquisitionRange.None;
+                            }
                             break;
                         case Stage.DataAcquisiting:
                             if(__data_acquisition_unit.State == AcquisitionUnitState.Exception)
@@ -119,22 +132,12 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Oceanus
                                 _logger.LogError($"{DateTimeOffset.Now}: \n{WorkerStage}:\n{__data_acquisition_unit.ExceptionMessage}");
 
                                 await __data_acquisition_unit.Stop();
-
                                 WorkerStage = Stage.ReadOfflineIOConfiguration;
-
-                                AcquisitionUnitState =  AcquisitionUnitState.Idle;
-                                AcquisitionUnitExceptionMessage = string.Empty;
-                                AcquisitionUnitStatus = new AcquisitionUnitStatus();
-                                AcquisitionUnitWriteInterval = 0;
-                                AcquisitionUnitHeartbeat = 0;
+                                Range = AcquisitionRange.None;
                             }
                             else
                             {
-                                AcquisitionUnitState = __data_acquisition_unit.State;
-                                AcquisitionUnitExceptionMessage = __data_acquisition_unit.ExceptionMessage;
-                                AcquisitionUnitStatus = __data_acquisition_unit.Status;
-                                AcquisitionUnitWriteInterval = __data_acquisition_unit.DiskWriteInterval;
-                                AcquisitionUnitHeartbeat = __data_acquisition_unit.Counter;
+
                             }
                             break;
                     }
@@ -182,17 +185,30 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Oceanus
             }
         }
 
+        public AcquisitionRange Range
+        {
+            get
+            {
+                lock (__sync_property_access_lock)
+                {
+                    return __range;
+                }
+            }
+            private set
+            {
+                lock (__sync_property_access_lock)
+                {
+                    __range = value;
+                }
+            }
+        }
+
         public AcquisitionUnitState AcquisitionUnitState
         {
             get
             {
                 lock (__sync_property_access_lock)
-                    return __ac_unit_state;
-            }
-            private set
-            {
-                lock (__sync_property_access_lock)
-                    __ac_unit_state = value;
+                    return __data_acquisition_unit.State;
             }
         }
 
@@ -201,12 +217,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Oceanus
             get
             {
                 lock (__sync_property_access_lock)
-                    return __ac_unit_exception_message;
-            }
-            private set
-            {
-                lock (__sync_property_access_lock)
-                    __ac_unit_exception_message = value;
+                    return __data_acquisition_unit.ExceptionMessage;
             }
         }
 
@@ -215,12 +226,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Oceanus
             get
             {
                 lock (__sync_property_access_lock)
-                    return __ac_unit_status;
-            }
-            private set
-            {
-                lock (__sync_property_access_lock)
-                    __ac_unit_status = value;
+                    return __data_acquisition_unit.Status;
             }
         }
 
@@ -229,12 +235,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Oceanus
             get
             {
                 lock (__sync_property_access_lock)
-                    return __ac_unit_write_interval;
-            }
-            private set
-            {
-                lock (__sync_property_access_lock)
-                    __ac_unit_write_interval = value;
+                    return __data_acquisition_unit.DiskWriteInterval;
             }
         }
 
@@ -243,12 +244,29 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Oceanus
             get
             {
                 lock (__sync_property_access_lock)
-                    return __ac_unit_heartbeat;
+                    return __data_acquisition_unit.Counter;
             }
-            private set
+        }
+
+        public string ServiceStatusSummary
+        {
+            get
             {
                 lock (__sync_property_access_lock)
-                    __ac_unit_heartbeat = value;
+                {
+                    if (__stage != Stage.DataAcquisiting)
+                        return $"Current Task: {__stage}";
+                    else
+                        return $"Current Task: {__stage}\nRange: {__range}\nTask Status: {__data_acquisition_unit.StatusSummary}";
+                }
+            }
+        }
+
+        public string ServiceConfigurationSummary
+        {
+            get
+            {
+                return $"{__ftp_property.ToString()}\n{__daq_property.ToString()}\n{__grpc_property.ToString()}";
             }
         }
     }

@@ -7,11 +7,10 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.TaskbarClock;
 
-namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.DAQ
+namespace AMEC.PCSoftware.CommunicationProtocol.CrazyHein.OrbmentDAQ.Storage
 {
-    internal class CsvDataStorage: IDataStorage
+    public class CsvDataStorage: IDataStorage
     {
         public static readonly string FILE_TIMESTAMP_FORMAT = @"yyMMddHHmmssfff";
         public static readonly string RECORD_TIMESTAMP_FORMAT = @"yyMMdd HH:mm:ss:fff";

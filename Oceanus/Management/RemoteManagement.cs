@@ -17,15 +17,17 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Oceanus.Management
         {
             __background_worker = worker;
         }
-        public override Task<Status> QueryStatue(Dummy request, ServerCallContext context)
+        public override Task<StatusSummary> QueryStatus(Dummy request, ServerCallContext context)
         {
-            return Task.FromResult<Status>(new Status() { 
-                WorkerStage = __background_worker.WorkerStage.ToString(),
-                AcquisitionUnitState = __background_worker.AcquisitionUnitState.ToString(),
-                AcquisitionUnitExceptionMessage = __background_worker.AcquisitionUnitExceptionMessage,
-                AcquisitionUnitWriteInterval = __background_worker.AcquisitionUnitWriteInterval,
-                AcquisitionUnitHeartbeat = __background_worker.AcquisitionUnitHeartbeat,
-                AcquisitionUnitStatus = __background_worker.AcquisitionUnitStatus.ToString()
+            return Task.FromResult<StatusSummary>(new StatusSummary() { 
+                Status = __background_worker.ServiceStatusSummary
+            });
+        }
+
+        public override Task<ConfigurationSummary> QueryConfiguration(Dummy request, ServerCallContext context)
+        {
+            return Task.FromResult<ConfigurationSummary>(new ConfigurationSummary() {
+                Configuration = __background_worker.ServiceConfigurationSummary
             });
         }
 

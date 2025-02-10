@@ -2,7 +2,7 @@
 using AMEC.PCSoftware.CommunicationProtocol.CrazyHein.SLMP.IOUtility;
 using AMEC.PCSoftware.CommunicationProtocol.CrazyHein.SLMP.Master;
 using AMEC.PCSoftware.CommunicationProtocol.CrazyHein.SLMP.Message;
-using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.DAQ;
+using AMEC.PCSoftware.CommunicationProtocol.CrazyHein.OrbmentDAQ.Storage;
 using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Debugger;
 using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility;
 using System;

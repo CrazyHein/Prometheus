@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AMEC.PCSoftware.CommunicationProtocol.CrazyHein.OrbmentDAQ.Storage;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -53,6 +54,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Oceanus.Settings
             {
                 ftp ??= new FTPTargetProperty();
                 daq ??= new DAQTargetProperty();
+                daq.DAQStorageSchema = DAQStorageSchema.MongoDB;
                 grpc ??= new GRPCServerProperty();
             }
 

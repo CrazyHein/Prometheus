@@ -1,6 +1,6 @@
 ﻿using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia;
 using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Console;
-using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.DAQ;
+using AMEC.PCSoftware.CommunicationProtocol.CrazyHein.OrbmentDAQ.Storage;
 using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Debugger;
 using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility;
 using Syncfusion.SfSkinManager;
@@ -463,7 +463,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             __main_model.IsBusy = true;
             BusyDialog diag = new BusyDialog(__data_acquisition_unit.Startup(__settings.DAQTargetProperty, 
                 __tx_diagnostic_area.ProcessDatas, __tx_bit_area.ProcessDatas, __tx_block_area.ProcessDatas,
-                __rx_control_area.ProcessDatas, __rx_bit_area.ProcessDatas, __rx_block_area.ProcessDatas));
+                __rx_control_area.ProcessDatas, __rx_bit_area.ProcessDatas, __rx_block_area.ProcessDatas, AcquisitionRange.IOConfiguration));
             diag.ShowDialog();
             __main_model.IsBusy = false;
 

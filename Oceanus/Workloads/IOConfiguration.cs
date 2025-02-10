@@ -12,6 +12,7 @@ using DAQPort = AMEC.PCSoftware.CommunicationProtocol.CrazyHein.OrbmentDAQ.IOUti
 using DAQMaster = AMEC.PCSoftware.CommunicationProtocol.CrazyHein.OrbmentDAQ.Protocol.Master;
 using AMEC.PCSoftware.CommunicationProtocol.CrazyHein.OrbmentDAQ.Protocol;
 using System.Runtime.InteropServices;
+using AMEC.PCSoftware.CommunicationProtocol.CrazyHein.OrbmentDAQ.Storage;
 
 namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Oceanus.Workloads
 {
