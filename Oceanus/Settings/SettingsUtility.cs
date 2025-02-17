@@ -37,7 +37,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Oceanus.Settings
                                     daq = DAQTargetProperty.RESTORE(ref reader); break;
                                 case "FTP":
                                     ftp = FTPTargetProperty.RESTORE(ref reader); break;
-                                case "GRPC":
+                                case "gRPC":
                                     grpc = GRPCServerProperty.RESTORE(ref reader);break;
                             }
                             break;

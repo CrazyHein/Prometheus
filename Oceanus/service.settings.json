@@ -22,7 +22,7 @@
     "IOListPath": "/2/io_list.xml",
     "VariableDictionaryPath": "/2/variable_catalogue.xml"
   },
-  "GRPC": {
+  "gRPC": {
     "ServerPort": 50003
   }
 }

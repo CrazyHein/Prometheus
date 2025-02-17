@@ -299,7 +299,7 @@ namespace AMEC.PCSoftware.CommunicationProtocol.CrazyHein.OrbmentDAQ.Storage
             {
                 lock(__sync_property_access_lock)
                 {
-                    return $"{__state} | {__exception_message} |{__disk_write_interval} | {__heartbeat_counter} | {__status}";
+                    return $"{__state} | {__exception_message} | {__disk_write_interval} | {__heartbeat_counter} | {__status}";
                 }
             }
         }

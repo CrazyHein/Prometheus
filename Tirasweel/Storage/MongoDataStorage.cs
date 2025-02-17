@@ -63,7 +63,9 @@ namespace AMEC.PCSoftware.CommunicationProtocol.CrazyHein.OrbmentDAQ.Storage
                     if (createIfNotExist)
                     {
                         client.GetDatabase(databaseName).CreateCollection(collectionName, new CreateCollectionOptions() { Capped = true, MaxSize = preferSize });
-                        return new ValidateResult() { IsCapped = true, Size = preferSize, New = true, Client = client, Collection = client.GetDatabase(databaseName).GetCollection<BsonDocument>(collectionName) };
+                        var collection = client.GetDatabase(databaseName).GetCollection<BsonDocument>(collectionName);
+                        collection.Indexes.CreateOne(new CreateIndexModel<BsonDocument>("{'time':1}", new CreateIndexOptions { Name = "time_ascending" }));
+                        return new ValidateResult() { IsCapped = true, Size = preferSize, New = true, Client = client, Collection = collection };
                     }
                     else
                         return new ValidateResult();
@@ -127,21 +129,54 @@ namespace AMEC.PCSoftware.CommunicationProtocol.CrazyHein.OrbmentDAQ.Storage
                                 ReadOnlySpan<byte> ctrldata, ReadOnlySpan<byte> rxbitdata, ReadOnlySpan<byte> rxblkdata)
         {
             __last_data_acquisition_date_time += TimeSpan.FromMilliseconds((time - __last_time + 500) / 1000);
-            BsonDocument bsonDocument = new BsonDocument("time", new BsonDateTime(__last_data_acquisition_date_time));
-            foreach (var f in __diag_area)
-                bsonDocument.Add($"{f.FriendlyName}[0.{f.BitPos}]", f.DataBsonValue(diagdata));
-            foreach (var f in __tx_bit_area)
-                bsonDocument.Add($"{f.FriendlyName}[1.{f.BitPos}]", f.DataBsonValue(txbitdata));
-            foreach (var f in __tx_blk_area)
-                bsonDocument.Add($"{f.FriendlyName}[2.{f.BitPos}]", f.DataBsonValue(txblkdata));
-            foreach (var f in __ctrl_area)
-                bsonDocument.Add($"{f.FriendlyName}[3.{f.BitPos}]", f.DataBsonValue(ctrldata));
-            foreach (var f in __rx_bit_area)
-                bsonDocument.Add($"{f.FriendlyName}[4.{f.BitPos}]", f.DataBsonValue(rxbitdata));
-            foreach (var f in __rx_blk_area)
-                bsonDocument.Add($"{f.FriendlyName}[5.{f.BitPos}]", f.DataBsonValue(rxblkdata));
+            BsonDocument rootBsonDocument = new BsonDocument("time", new BsonDateTime(__last_data_acquisition_date_time));
+            BsonArray variables = new BsonArray();
 
-            __documents.Add(bsonDocument);
+            foreach (var f in __diag_area)
+            {
+                BsonDocument variable = new BsonDocument("name", f.FriendlyName);
+                variable.Add("bits", $"0.{f.BitPos}");
+                variable.Add("value", f.DataBsonValue(diagdata));
+                variables.Add(variable);
+            }
+            foreach (var f in __tx_bit_area)
+            {
+                BsonDocument variable = new BsonDocument("name", f.FriendlyName);
+                variable.Add("bits", $"1.{f.BitPos}");
+                variable.Add("value", f.DataBsonValue(diagdata));
+                variables.Add(variable);
+            }
+            foreach (var f in __tx_blk_area)
+            {
+                BsonDocument variable = new BsonDocument("name", f.FriendlyName);
+                variable.Add("bits", $"2.{f.BitPos}");
+                variable.Add("value", f.DataBsonValue(diagdata));
+                variables.Add(variable);
+            }
+            foreach (var f in __ctrl_area)
+            {
+                BsonDocument variable = new BsonDocument("name", f.FriendlyName);
+                variable.Add("bits", $"3.{f.BitPos}");
+                variable.Add("value", f.DataBsonValue(diagdata));
+                variables.Add(variable);
+            }
+            foreach (var f in __rx_bit_area)
+            {
+                BsonDocument variable = new BsonDocument("name", f.FriendlyName);
+                variable.Add("bits", $"4.{f.BitPos}");
+                variable.Add("value", f.DataBsonValue(diagdata));
+                variables.Add(variable);
+            }
+            foreach (var f in __rx_blk_area)
+            {
+                BsonDocument variable = new BsonDocument("name", f.FriendlyName);
+                variable.Add("bits", $"5.{f.BitPos}");
+                variable.Add("value", f.DataBsonValue(diagdata));
+                variables.Add(variable);
+            }
+
+            rootBsonDocument.Add("variables", variables);
+            __documents.Add(rootBsonDocument);
 
             __last_time = time;
         }
