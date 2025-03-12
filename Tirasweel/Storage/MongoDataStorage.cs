@@ -10,6 +10,19 @@ namespace AMEC.PCSoftware.CommunicationProtocol.CrazyHein.OrbmentDAQ.Storage
 {
     public class MongoDataStorage : IDataStorage
     {
+        private static readonly byte[] __DUMMY_MD5 = new byte[16];
+
+        public static readonly string TIME_FIELD = "time";
+        public static readonly string TIME_INDEX_NAME = "time_ascending";
+
+        public static readonly string RECIPE_ENGINE_STATE_VARIABLE_NAME = "Recipe Engine State";
+        public static readonly string RECIPE_ENGINE_STATE_FIELD = "engine_state";
+        public static AcquisitionDataType RECIPE_ENGINE_STATE_VARIABLE_TYPE = AcquisitionDataType.UINT;
+        public static readonly string RECIPE_ID_VARIABLE_NAME = "Recipe ID";
+        public static readonly string RECIPE_ID_FIELD = "recipe_id";
+        public static AcquisitionDataType RECIPE_ID_TYPE = AcquisitionDataType.FINGERPRINT;
+        public static readonly string RECIPE_PROCESS_DATA_INDEX_NAME = "recipe_process_data";
+
         public class ValidateResult : IDisposable
         {
             private bool disposedValue;
@@ -64,7 +77,10 @@ namespace AMEC.PCSoftware.CommunicationProtocol.CrazyHein.OrbmentDAQ.Storage
                     {
                         client.GetDatabase(databaseName).CreateCollection(collectionName, new CreateCollectionOptions() { Capped = true, MaxSize = preferSize });
                         var collection = client.GetDatabase(databaseName).GetCollection<BsonDocument>(collectionName);
-                        collection.Indexes.CreateOne(new CreateIndexModel<BsonDocument>("{'time':1}", new CreateIndexOptions { Name = "time_ascending" }));
+                        collection.Indexes.CreateOne(new CreateIndexModel<BsonDocument>($"{{'{TIME_FIELD}': 1}}", new CreateIndexOptions { Name = TIME_INDEX_NAME }));
+
+                        collection.Indexes.CreateOne(new CreateIndexModel<BsonDocument>($"{{'{RECIPE_ID_FIELD}': 1, '{RECIPE_ENGINE_STATE_FIELD}': 1}}", new CreateIndexOptions { Name = RECIPE_PROCESS_DATA_INDEX_NAME }));
+
                         return new ValidateResult() { IsCapped = true, Size = preferSize, New = true, Client = client, Collection = collection };
                     }
                     else
@@ -130,52 +146,73 @@ namespace AMEC.PCSoftware.CommunicationProtocol.CrazyHein.OrbmentDAQ.Storage
         {
             __last_data_acquisition_date_time += TimeSpan.FromMilliseconds((time - __last_time + 500) / 1000);
             BsonDocument rootBsonDocument = new BsonDocument("time", new BsonDateTime(__last_data_acquisition_date_time));
-            BsonArray variables = new BsonArray();
+            rootBsonDocument.Add("recipe_id", new BsonBinaryData(__DUMMY_MD5, BsonBinarySubType.MD5));
+            rootBsonDocument.Add("engine_state", new BsonInt64(0));
 
+            BsonArray variables = new BsonArray();
             foreach (var f in __diag_area)
             {
                 BsonDocument variable = new BsonDocument("name", f.FriendlyName);
-                variable.Add("bits", $"0.{f.BitPos}");
+                variable.Add("bits", f.BitPos);
                 variable.Add("value", f.DataBsonValue(diagdata));
                 variables.Add(variable);
+                if(f.FriendlyName == RECIPE_ENGINE_STATE_VARIABLE_NAME &&  f.DataType == RECIPE_ENGINE_STATE_VARIABLE_TYPE)
+                    rootBsonDocument[RECIPE_ENGINE_STATE_FIELD] = variable["value"].AsBsonValue;
             }
+            rootBsonDocument.Add("tx_diagnostic_area", variables);
+
+            variables = new BsonArray();
             foreach (var f in __tx_bit_area)
             {
                 BsonDocument variable = new BsonDocument("name", f.FriendlyName);
-                variable.Add("bits", $"1.{f.BitPos}");
-                variable.Add("value", f.DataBsonValue(diagdata));
+                variable.Add("bits", f.BitPos);
+                variable.Add("value", f.DataBsonValue(txbitdata));
                 variables.Add(variable);
             }
+            rootBsonDocument.Add("tx_bit_area", variables);
+
+            variables = new BsonArray();
             foreach (var f in __tx_blk_area)
             {
                 BsonDocument variable = new BsonDocument("name", f.FriendlyName);
-                variable.Add("bits", $"2.{f.BitPos}");
-                variable.Add("value", f.DataBsonValue(diagdata));
+                variable.Add("bits", f.BitPos);
+                variable.Add("value", f.DataBsonValue(txblkdata));
                 variables.Add(variable);
             }
+            rootBsonDocument.Add("tx_block_area", variables);
+
+            variables = new BsonArray();
             foreach (var f in __ctrl_area)
             {
                 BsonDocument variable = new BsonDocument("name", f.FriendlyName);
-                variable.Add("bits", $"3.{f.BitPos}");
-                variable.Add("value", f.DataBsonValue(diagdata));
+                variable.Add("bits", f.BitPos);
+                variable.Add("value", f.DataBsonValue(ctrldata));
                 variables.Add(variable);
+                if (f.FriendlyName == RECIPE_ID_VARIABLE_NAME && f.DataType == RECIPE_ID_TYPE)
+                    rootBsonDocument[RECIPE_ID_FIELD] = variable["value"].AsBsonValue;
             }
+            rootBsonDocument.Add("rx_control_area", variables);
+
+            variables = new BsonArray();
             foreach (var f in __rx_bit_area)
             {
                 BsonDocument variable = new BsonDocument("name", f.FriendlyName);
-                variable.Add("bits", $"4.{f.BitPos}");
-                variable.Add("value", f.DataBsonValue(diagdata));
+                variable.Add("bits", f.BitPos);
+                variable.Add("value", f.DataBsonValue(rxbitdata));
                 variables.Add(variable);
             }
+            rootBsonDocument.Add("rx_bit_area", variables);
+
+            variables = new BsonArray();
             foreach (var f in __rx_blk_area)
             {
                 BsonDocument variable = new BsonDocument("name", f.FriendlyName);
-                variable.Add("bits", $"5.{f.BitPos}");
-                variable.Add("value", f.DataBsonValue(diagdata));
+                variable.Add("bits", f.BitPos);
+                variable.Add("value", f.DataBsonValue(rxblkdata));
                 variables.Add(variable);
             }
+            rootBsonDocument.Add("rx_block_area", variables);
 
-            rootBsonDocument.Add("variables", variables);
             __documents.Add(rootBsonDocument);
 
             __last_time = time;

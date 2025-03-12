@@ -6,7 +6,7 @@
     "SendTimeoutValue": 2000,
     "ReceiveTimeoutValue": 10000,
     "InternalReservedBufferSize": 4194304,
-    "MongoDBConnectionString": "mongodb://192.168.17.200:27017/?connectTimeoutMS=60000\u0026serverSelectionTimeoutMS=10000\u0026compressors=zlib,zstd",
+    "MongoDBConnectionString": "mongodb://127.0.0.1:27017/?connectTimeoutMS=60000\u0026serverSelectionTimeoutMS=10000\u0026compressors=zlib,zstd",
     "ExpectedDatabaseWriteInterval": 1000,
     "MongoDBDatabaseName": "DAQ",
     "MongoDBCollectionName": "Oceanus",

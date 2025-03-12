@@ -154,6 +154,12 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Oceanus
                 _logger.LogError($"{DateTimeOffset.Now}: \n{WorkerStage}:\n{ex.Message}");
                 Environment.Exit(1);
             }
+            finally
+            {
+                if (__data_acquisition_unit != null)
+                    await __data_acquisition_unit.Stop();
+                __data_acquisition_unit = null;
+            }
         }
 
         public override async Task StopAsync(CancellationToken cancellationToken)
@@ -161,9 +167,11 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Oceanus
             if (__management_service != null)
                 await RemoteManagementService.StopAsync(__management_service);
             __management_service = null;
+            /*
             if (__data_acquisition_unit != null)
                 await __data_acquisition_unit.Stop();
             __data_acquisition_unit = null;
+            */
             await base.StopAsync(cancellationToken);
         }
 
