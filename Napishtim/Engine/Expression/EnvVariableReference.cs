@@ -20,12 +20,14 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ex
         EXTICK = 8,
         EXSTEP = 9,
         EXSTBEGIN = 10,
-        EXSTDURA = 11
+        EXSTDURA = 11,
+
+        INTLK = 12,
     }
 
     public class EnvVariableReference : Operand, IEquatable<EnvVariableReference>
     {
-        public static readonly Regex PATTERN = new Regex("^&(DEBUG|TICK|STEP|RETURN|STBEGIN|STDURA|EXTICK|EXSTEP|EXSTBEGIN|EXSTDURA|USER([0-9]{1,3}))$", RegexOptions.Compiled);
+        public static readonly Regex PATTERN = new Regex("^&(DEBUG|TICK|STEP|RETURN|STBEGIN|STDURA|EXTICK|EXSTEP|EXSTBEGIN|EXSTDURA|USER([0-9]{1,3})|INTLK([0-9]{1,3}))$", RegexOptions.Compiled);
         private static Dictionary<ENV_VARIABLE_TYPE_T, string> __ENV_VARIABLE_INFO;
         public static IReadOnlyDictionary<ENV_VARIABLE_TYPE_T, string> ENV_VARIABLE_INFO { get { return __ENV_VARIABLE_INFO; } }
         private ENV_VARIABLE_TYPE_T __env_variable_type;
@@ -50,6 +52,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ex
             __ENV_VARIABLE_INFO[ENV_VARIABLE_TYPE_T.EXSTEP] = "Returns the number of step that is being executed when an exception occurs.";
             __ENV_VARIABLE_INFO[ENV_VARIABLE_TYPE_T.EXSTBEGIN] = "Returns the value of engine internal clock of the step began in milliseconds when an exception occurs.";
             __ENV_VARIABLE_INFO[ENV_VARIABLE_TYPE_T.EXSTDURA] = "Returns the time(milliseconds) since the current step has been executed when an exception occurs.";
+
+            __ENV_VARIABLE_INFO[ENV_VARIABLE_TYPE_T.INTLK] = "Return whether the specified interlock is triggered.";
         }
 
         public EnvVariableReference(string value) : base()
@@ -89,8 +93,16 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ex
                     __env_variable_type = ENV_VARIABLE_TYPE_T.EXSTDURA;
                     break;
                 default:
-                    __env_variable_type = ENV_VARIABLE_TYPE_T.USER;
-                    __env_user_index = uint.Parse(value.Substring(5));
+                    if (value.StartsWith("&USER"))
+                    {
+                        __env_variable_type = ENV_VARIABLE_TYPE_T.USER;
+                        __env_user_index = uint.Parse(value.Substring(5));
+                    }
+                    else
+                    {
+                        __env_variable_type = ENV_VARIABLE_TYPE_T.INTLK;
+                        __env_user_index = uint.Parse(value.Substring(6));
+                    }
                     break;
             }
         }
@@ -121,6 +133,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ex
                     return "&EXSTDURA";
                 case ENV_VARIABLE_TYPE_T.USER:
                     return $"&USER{__env_user_index}";
+                case ENV_VARIABLE_TYPE_T.INTLK:
+                    return $"&INTLK{__env_user_index}";
                 default:
                     return "&DEBUG";
             }

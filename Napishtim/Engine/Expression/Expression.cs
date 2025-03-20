@@ -42,7 +42,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ex
         }
 
         private static Regex __OBJECT_REFERENCE_SEARCH_PATTERN = new Regex("@0[xX][0-9a-fA-F]{1,8}", RegexOptions.Compiled);
-        private static Regex __ENV_VARIABLE_REFERENCE_SEARCH_PATTERN = new Regex("&(DEBUG|TICK|STEP|RETURN|STBEGIN|STDURA|EXTICK|EXSTEP|EXSTBEGIN|EXSTDURA|USER([0-9]{1,3}))", RegexOptions.Compiled);
+        private static Regex __ENV_VARIABLE_REFERENCE_SEARCH_PATTERN = new Regex("&(DEBUG|TICK|STEP|RETURN|STBEGIN|STDURA|EXTICK|EXSTEP|EXSTBEGIN|EXSTDURA|USER([0-9]{1,3})|INTLK([0-9]{1,3}))", RegexOptions.Compiled);
         private static Regex __IMMEDIATE_OPERAND_SEARCH_PATTERN = new Regex("(-?(([1-9][0-9]{0,})|0))(\\.[0-9]{1,})?", RegexOptions.Compiled);
         private static Regex __PATH_SEARCH_PATTERN = new Regex("[a-zA-z_]+[0-9a-zA-z_]*\\(", RegexOptions.Compiled);
         private List<Element> __post_order_vector = new List<Element>();
