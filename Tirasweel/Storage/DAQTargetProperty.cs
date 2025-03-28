@@ -114,7 +114,7 @@ namespace AMEC.PCSoftware.CommunicationProtocol.CrazyHein.OrbmentDAQ.Storage
             }
         }
 
-        public string MongoDBConnectionString { get; set; } = "mongodb://localhost:27017/?connectTimeoutMS=60000&serverSelectionTimeoutMS=10000&compressors=zlib,zstd";
+        public string MongoDBConnectionString { get; set; } = "mongodb://localhost:27017/?connectTimeoutMS=60000&serverSelectionTimeoutMS=10000";
 
         private int __expected_db_write_interval = 1000;
         public int ExpectedDatabaseWriteInterval

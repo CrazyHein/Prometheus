@@ -1,15 +1,29 @@
 syntax = "proto3";
 
+import "google/protobuf/duration.proto";  
+import "google/protobuf/timestamp.proto";
+
 option csharp_namespace = "AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Oceanus.Management";
 
 package AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Oceanus.Management;
 
 service RemoteManagement {
+	rpc QueryVersion(Dummy) returns (VersionSummary);
 	rpc QueryConfiguration (Dummy) returns (ConfigurationSummary);
 	rpc QueryStatus (Dummy) returns (StatusSummary);
+	rpc QueryDatabaseSummary (Dummy) returns (DatabaseSummary);
+	rpc QueryDatabaseLatest(LatestDocumentsRequest) returns (stream Document);
+	rpc QueryDatabaseHead(NumberOfDocumentsRequest) returns (stream Document);
+	rpc QueryDatabaseTail(NumberOfDocumentsRequest) returns (stream Document);
+	rpc QueryDatabase(ScopeOfDatabaseRequest) returns (stream Document);
+	rpc QueryWaferHistory(WaferHistoryRequest) returns (stream Document);
 }
 
 message Dummy{}
+
+message VersionSummary{
+	string version = 1;
+}
 
 message ConfigurationSummary{
 	string configuration = 1;
@@ -17,4 +31,37 @@ message ConfigurationSummary{
 
 message StatusSummary{
 	string status = 1;
+}
+
+message DatabaseSummary
+{
+	int64 documents_count = 1;
+	google.protobuf.Timestamp start = 2;
+	google.protobuf.Timestamp end = 3;
+}
+
+message LatestDocumentsRequest
+{
+	int32 milliseconds = 1;
+}
+
+message NumberOfDocumentsRequest
+{
+	int32 counts = 1;
+}
+
+message ScopeOfDatabaseRequest
+{
+	google.protobuf.Timestamp start = 1;
+	google.protobuf.Timestamp end = 2;
+}
+
+message WaferHistoryRequest
+{
+	bytes wafer_hash_code = 1; 
+}
+
+message Document
+{
+	bytes document_in_bson = 1; 
 }

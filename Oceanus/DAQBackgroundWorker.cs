@@ -8,12 +8,17 @@ using Grpc.Core;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.EventLog;
 using System.Net;
+using System.Net.Http.Headers;
+using Tirasweel.Storage;
 using static System.Net.WebRequestMethods;
 
 namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Oceanus
 {
     public class DAQBackgroundWorker : BackgroundService
     {
+        public static string OceanusVersion { get; } = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
+        public static string LombardiaVersion { get; } = System.Reflection.Assembly.GetAssembly(typeof(IOCelcetaHelper)).GetName().Version.ToString();
+        public static string TirasweelVersion { get; } = System.Reflection.Assembly.GetAssembly(typeof(AMEC.PCSoftware.CommunicationProtocol.CrazyHein.OrbmentDAQ.Protocol.Master)).GetName().Version.ToString();
         public enum Stage: int
         {
             ReadOfflineIOConfiguration = 0,
@@ -24,12 +29,14 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Oceanus
 
         private readonly ILogger<DAQBackgroundWorker> _logger;
         private object __sync_property_access_lock = new object();
+        private SemaphoreSlim __sync_datebase_retrieval = new SemaphoreSlim(16);
         private FTPTargetProperty __ftp_property;
         private DAQTargetProperty __daq_property;
         private GRPCServerProperty __grpc_property;
         private DataTypeCatalogue __data_types;
         private ControllerModelCatalogue __controller_models;
         private DataAcquisitionUnit? __data_acquisition_unit;
+        private MongoDataRetrieval? __data_retrieval;
 
 
         private Stage __stage = Stage.ReadOfflineIOConfiguration;
@@ -56,9 +63,11 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Oceanus
             __data_types = datatypes;
             __controller_models = models;
 
+            __data_retrieval = new MongoDataRetrieval(daq.MongoDBConnectionString, daq.MongoDBDatabaseName, daq.MongoDBCollectionName);
+
             __management_service = RemoteManagementService.Start("0.0.0.0", grpc.ServerPort, this);
 
-            _logger.LogInformation($"{DateTimeOffset.Now}: \n{ftp.ToString()}\n{daq.ToString()}\n{grpc.ToString()}");
+            _logger.LogInformation($"{DateTimeOffset.Now}: \nOceanus Version: {OceanusVersion}\nLombardia Version: {LombardiaVersion}\nTirasweel Version: {TirasweelVersion}\n{ftp.ToString()}\n{daq.ToString()}\n{grpc.ToString()}");
 
         }
 
@@ -167,6 +176,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Oceanus
             if (__management_service != null)
                 await RemoteManagementService.StopAsync(__management_service);
             __management_service = null;
+
+            __data_retrieval?.Dispose();
+            __data_retrieval = null;
             /*
             if (__data_acquisition_unit != null)
                 await __data_acquisition_unit.Stop();
@@ -276,6 +288,74 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Oceanus
             {
                 return $"{__ftp_property.ToString()}\n{__daq_property.ToString()}\n{__grpc_property.ToString()}";
             }
+        }
+
+        public (long counts, DateTime start, DateTime end) StorageSummay(CancellationToken cancel)
+        {
+            if (__sync_datebase_retrieval.Wait(1000))
+            {
+                try
+                {
+                    return __data_retrieval.Summary(cancel);
+                }
+                finally
+                {
+                    __sync_datebase_retrieval.Release();
+                }
+            }
+            else
+                throw new ApplicationException("The previous procedure call is in progress."); 
+        }
+
+        public IEnumerable<byte[]> StorageLatest(int milliseconds, CancellationToken cancel)
+        {
+            if (__sync_datebase_retrieval.Wait(1000))
+            {
+                try
+                {
+                    return __data_retrieval.Latest(milliseconds, cancel);
+                }
+                finally
+                {
+                    __sync_datebase_retrieval.Release();
+                }
+            }
+            else
+                throw new ApplicationException("The previous procedure call is in progress.");
+        }
+
+        public IEnumerable<byte[]> StorageHead(int counts, CancellationToken cancel)
+        {
+            if (__sync_datebase_retrieval.Wait(1000))
+            {
+                try
+                {
+                    return __data_retrieval.Head(counts, cancel);
+                }
+                finally
+                {
+                    __sync_datebase_retrieval.Release();
+                }
+            }
+            else
+                throw new ApplicationException("The previous procedure call is in progress.");
+        }
+
+        public IEnumerable<byte[]> StorageTail(int counts, CancellationToken cancel)
+        {
+            if (__sync_datebase_retrieval.Wait(1000))
+            {
+                try
+                {
+                    return __data_retrieval.Tail(counts, cancel);
+                }
+                finally
+                {
+                    __sync_datebase_retrieval.Release();
+                }
+            }
+            else
+                throw new ApplicationException("The previous procedure call is in progress.");
         }
     }
 }
