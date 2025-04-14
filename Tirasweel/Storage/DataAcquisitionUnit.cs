@@ -107,39 +107,39 @@ namespace AMEC.PCSoftware.CommunicationProtocol.CrazyHein.OrbmentDAQ.Storage
                     case DAQStorageSchema.CSV:
                         if(range == AcquisitionRange.IOConfiguration)
                             storage = new CsvDataStorage(property.DataFilePath, property.DataFileNamePrefix, property.DataFileSize,
-                                    diag.Where(d => d.DAQ).Select(d => new AcquisitionDataIndex(d.ProcessObject.Variable.Type.Name) { BitPos = d.BitPos, FriendlyName = d.ProcessObject.Variable.Name }),
-                                    txbit.Where(d => d.DAQ).Select(d => new AcquisitionDataIndex(d.ProcessObject.Variable.Type.Name) { BitPos = d.BitPos, FriendlyName = d.ProcessObject.Variable.Name }),
-                                    txblk.Where(d => d.DAQ).Select(d => new AcquisitionDataIndex(d.ProcessObject.Variable.Type.Name) { BitPos = d.BitPos, FriendlyName = d.ProcessObject.Variable.Name }),
-                                    ctrl.Where(d => d.DAQ).Select(d => new AcquisitionDataIndex(d.ProcessObject.Variable.Type.Name) { BitPos = d.BitPos, FriendlyName = d.ProcessObject.Variable.Name }),
-                                    rxbit.Where(d => d.DAQ).Select(d => new AcquisitionDataIndex(d.ProcessObject.Variable.Type.Name) { BitPos = d.BitPos, FriendlyName = d.ProcessObject.Variable.Name }),
-                                    rxblk.Where(d => d.DAQ).Select(d => new AcquisitionDataIndex(d.ProcessObject.Variable.Type.Name) { BitPos = d.BitPos, FriendlyName = d.ProcessObject.Variable.Name }));
+                                    diag.Where(d => d.DAQ).Select(d => new AcquisitionDataIndex(d.ProcessObject.Variable.Type.Name) { Index = d.ProcessObject.Index, BitPos = d.BitPos, FriendlyName = d.ProcessObject.Variable.Name }),
+                                    txbit.Where(d => d.DAQ).Select(d => new AcquisitionDataIndex(d.ProcessObject.Variable.Type.Name) { Index = d.ProcessObject.Index, BitPos = d.BitPos, FriendlyName = d.ProcessObject.Variable.Name }),
+                                    txblk.Where(d => d.DAQ).Select(d => new AcquisitionDataIndex(d.ProcessObject.Variable.Type.Name) { Index = d.ProcessObject.Index, BitPos = d.BitPos, FriendlyName = d.ProcessObject.Variable.Name }),
+                                    ctrl.Where(d => d.DAQ).Select(d => new AcquisitionDataIndex(d.ProcessObject.Variable.Type.Name) { Index = d.ProcessObject.Index, BitPos = d.BitPos, FriendlyName = d.ProcessObject.Variable.Name }),
+                                    rxbit.Where(d => d.DAQ).Select(d => new AcquisitionDataIndex(d.ProcessObject.Variable.Type.Name) { Index = d.ProcessObject.Index, BitPos = d.BitPos, FriendlyName = d.ProcessObject.Variable.Name }),
+                                    rxblk.Where(d => d.DAQ).Select(d => new AcquisitionDataIndex(d.ProcessObject.Variable.Type.Name) { Index = d.ProcessObject.Index, BitPos = d.BitPos, FriendlyName = d.ProcessObject.Variable.Name }));
                         else
                             storage = new CsvDataStorage(property.DataFilePath, property.DataFileNamePrefix, property.DataFileSize,
-                                    diag.Select(d => new AcquisitionDataIndex(d.ProcessObject.Variable.Type.Name) { BitPos = d.BitPos, FriendlyName = d.ProcessObject.Variable.Name }),
-                                    txbit.Select(d => new AcquisitionDataIndex(d.ProcessObject.Variable.Type.Name) { BitPos = d.BitPos, FriendlyName = d.ProcessObject.Variable.Name }),
-                                    txblk.Select(d => new AcquisitionDataIndex(d.ProcessObject.Variable.Type.Name) { BitPos = d.BitPos, FriendlyName = d.ProcessObject.Variable.Name }),
-                                    ctrl.Select(d => new AcquisitionDataIndex(d.ProcessObject.Variable.Type.Name) { BitPos = d.BitPos, FriendlyName = d.ProcessObject.Variable.Name }),
-                                    rxbit.Select(d => new AcquisitionDataIndex(d.ProcessObject.Variable.Type.Name) { BitPos = d.BitPos, FriendlyName = d.ProcessObject.Variable.Name }),
-                                    rxblk.Select(d => new AcquisitionDataIndex(d.ProcessObject.Variable.Type.Name) { BitPos = d.BitPos, FriendlyName = d.ProcessObject.Variable.Name }));
+                                    diag.Select(d => new AcquisitionDataIndex(d.ProcessObject.Variable.Type.Name) { Index = d.ProcessObject.Index, BitPos = d.BitPos, FriendlyName = d.ProcessObject.Variable.Name }),
+                                    txbit.Select(d => new AcquisitionDataIndex(d.ProcessObject.Variable.Type.Name) { Index = d.ProcessObject.Index, BitPos = d.BitPos, FriendlyName = d.ProcessObject.Variable.Name }),
+                                    txblk.Select(d => new AcquisitionDataIndex(d.ProcessObject.Variable.Type.Name) { Index = d.ProcessObject.Index, BitPos = d.BitPos, FriendlyName = d.ProcessObject.Variable.Name }),
+                                    ctrl.Select(d => new AcquisitionDataIndex(d.ProcessObject.Variable.Type.Name) { Index = d.ProcessObject.Index, BitPos = d.BitPos, FriendlyName = d.ProcessObject.Variable.Name }),
+                                    rxbit.Select(d => new AcquisitionDataIndex(d.ProcessObject.Variable.Type.Name) { Index = d.ProcessObject.Index, BitPos = d.BitPos, FriendlyName = d.ProcessObject.Variable.Name }),
+                                    rxblk.Select(d => new AcquisitionDataIndex(d.ProcessObject.Variable.Type.Name) { Index = d.ProcessObject.Index, BitPos = d.BitPos, FriendlyName = d.ProcessObject.Variable.Name }));
                         writeInterval = property.ExpectedDiskWriteInterval;
                         break;
                     case DAQStorageSchema.MongoDB:
                         if (range == AcquisitionRange.IOConfiguration)
                             storage = new MongoDataStorage(property.MongoDBConnectionString, property.MongoDBDatabaseName, property.MongoDBCollectionName, property.MongoDBCollectionSize,
-                                    diag.Where(d => d.DAQ).Select(d => new AcquisitionDataIndex(d.ProcessObject.Variable.Type.Name) { BitPos = d.BitPos, FriendlyName = d.ProcessObject.Variable.Name }),
-                                    txbit.Where(d => d.DAQ).Select(d => new AcquisitionDataIndex(d.ProcessObject.Variable.Type.Name) { BitPos = d.BitPos, FriendlyName = d.ProcessObject.Variable.Name }),
-                                    txblk.Where(d => d.DAQ).Select(d => new AcquisitionDataIndex(d.ProcessObject.Variable.Type.Name) { BitPos = d.BitPos, FriendlyName = d.ProcessObject.Variable.Name }),
-                                    ctrl.Where(d => d.DAQ).Select(d => new AcquisitionDataIndex(d.ProcessObject.Variable.Type.Name) { BitPos = d.BitPos, FriendlyName = d.ProcessObject.Variable.Name }),
-                                    rxbit.Where(d => d.DAQ).Select(d => new AcquisitionDataIndex(d.ProcessObject.Variable.Type.Name) { BitPos = d.BitPos, FriendlyName = d.ProcessObject.Variable.Name }),
-                                    rxblk.Where(d => d.DAQ).Select(d => new AcquisitionDataIndex(d.ProcessObject.Variable.Type.Name) { BitPos = d.BitPos, FriendlyName = d.ProcessObject.Variable.Name }));
+                                    diag.Where(d => d.DAQ).Select(d => new AcquisitionDataIndex(d.ProcessObject.Variable.Type.Name) { Index = d.ProcessObject.Index, BitPos = d.BitPos, FriendlyName = d.ProcessObject.Variable.Name }),
+                                    txbit.Where(d => d.DAQ).Select(d => new AcquisitionDataIndex(d.ProcessObject.Variable.Type.Name) { Index = d.ProcessObject.Index, BitPos = d.BitPos, FriendlyName = d.ProcessObject.Variable.Name }),
+                                    txblk.Where(d => d.DAQ).Select(d => new AcquisitionDataIndex(d.ProcessObject.Variable.Type.Name) { Index = d.ProcessObject.Index, BitPos = d.BitPos, FriendlyName = d.ProcessObject.Variable.Name }),
+                                    ctrl.Where(d => d.DAQ).Select(d => new AcquisitionDataIndex(d.ProcessObject.Variable.Type.Name) { Index = d.ProcessObject.Index, BitPos = d.BitPos, FriendlyName = d.ProcessObject.Variable.Name }),
+                                    rxbit.Where(d => d.DAQ).Select(d => new AcquisitionDataIndex(d.ProcessObject.Variable.Type.Name) { Index = d.ProcessObject.Index, BitPos = d.BitPos, FriendlyName = d.ProcessObject.Variable.Name }),
+                                    rxblk.Where(d => d.DAQ).Select(d => new AcquisitionDataIndex(d.ProcessObject.Variable.Type.Name) { Index = d.ProcessObject.Index, BitPos = d.BitPos, FriendlyName = d.ProcessObject.Variable.Name }));
                         else
                             storage = new MongoDataStorage(property.MongoDBConnectionString, property.MongoDBDatabaseName, property.MongoDBCollectionName, property.MongoDBCollectionSize,
-                                    diag.Select(d => new AcquisitionDataIndex(d.ProcessObject.Variable.Type.Name) { BitPos = d.BitPos, FriendlyName = d.ProcessObject.Variable.Name }),
-                                    txbit.Select(d => new AcquisitionDataIndex(d.ProcessObject.Variable.Type.Name) { BitPos = d.BitPos, FriendlyName = d.ProcessObject.Variable.Name }),
-                                    txblk.Select(d => new AcquisitionDataIndex(d.ProcessObject.Variable.Type.Name) { BitPos = d.BitPos, FriendlyName = d.ProcessObject.Variable.Name }),
-                                    ctrl.Select(d => new AcquisitionDataIndex(d.ProcessObject.Variable.Type.Name) { BitPos = d.BitPos, FriendlyName = d.ProcessObject.Variable.Name }),
-                                    rxbit.Select(d => new AcquisitionDataIndex(d.ProcessObject.Variable.Type.Name) { BitPos = d.BitPos, FriendlyName = d.ProcessObject.Variable.Name }),
-                                    rxblk.Select(d => new AcquisitionDataIndex(d.ProcessObject.Variable.Type.Name) { BitPos = d.BitPos, FriendlyName = d.ProcessObject.Variable.Name }));
+                                    diag.Select(d => new AcquisitionDataIndex(d.ProcessObject.Variable.Type.Name) { Index = d.ProcessObject.Index, BitPos = d.BitPos, FriendlyName = d.ProcessObject.Variable.Name }),
+                                    txbit.Select(d => new AcquisitionDataIndex(d.ProcessObject.Variable.Type.Name) { Index = d.ProcessObject.Index, BitPos = d.BitPos, FriendlyName = d.ProcessObject.Variable.Name }),
+                                    txblk.Select(d => new AcquisitionDataIndex(d.ProcessObject.Variable.Type.Name) { Index = d.ProcessObject.Index, BitPos = d.BitPos, FriendlyName = d.ProcessObject.Variable.Name }),
+                                    ctrl.Select(d => new AcquisitionDataIndex(d.ProcessObject.Variable.Type.Name) { Index = d.ProcessObject.Index, BitPos = d.BitPos, FriendlyName = d.ProcessObject.Variable.Name }),
+                                    rxbit.Select(d => new AcquisitionDataIndex(d.ProcessObject.Variable.Type.Name) { Index = d.ProcessObject.Index, BitPos = d.BitPos, FriendlyName = d.ProcessObject.Variable.Name }),
+                                    rxblk.Select(d => new AcquisitionDataIndex(d.ProcessObject.Variable.Type.Name) { Index = d.ProcessObject.Index, BitPos = d.BitPos, FriendlyName = d.ProcessObject.Variable.Name }));
                         writeInterval = property.ExpectedDatabaseWriteInterval;
                         break;
                 }

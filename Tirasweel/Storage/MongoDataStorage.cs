@@ -152,7 +152,8 @@ namespace AMEC.PCSoftware.CommunicationProtocol.CrazyHein.OrbmentDAQ.Storage
             BsonArray variables = new BsonArray();
             foreach (var f in __diag_area)
             {
-                BsonDocument variable = new BsonDocument("name", f.FriendlyName);
+                BsonDocument variable = new BsonDocument("index", f.Index);
+                variable.Add("name", f.FriendlyName);
                 variable.Add("bits", f.BitPos);
                 variable.Add("value", f.DataBsonValue(diagdata));
                 variables.Add(variable);
@@ -164,7 +165,8 @@ namespace AMEC.PCSoftware.CommunicationProtocol.CrazyHein.OrbmentDAQ.Storage
             variables = new BsonArray();
             foreach (var f in __tx_bit_area)
             {
-                BsonDocument variable = new BsonDocument("name", f.FriendlyName);
+                BsonDocument variable = new BsonDocument("index", f.Index);
+                variable.Add("name", f.FriendlyName);
                 variable.Add("bits", f.BitPos);
                 variable.Add("value", f.DataBsonValue(txbitdata));
                 variables.Add(variable);
@@ -174,7 +176,8 @@ namespace AMEC.PCSoftware.CommunicationProtocol.CrazyHein.OrbmentDAQ.Storage
             variables = new BsonArray();
             foreach (var f in __tx_blk_area)
             {
-                BsonDocument variable = new BsonDocument("name", f.FriendlyName);
+                BsonDocument variable = new BsonDocument("index", f.Index);
+                variable.Add("name", f.FriendlyName);
                 variable.Add("bits", f.BitPos);
                 variable.Add("value", f.DataBsonValue(txblkdata));
                 variables.Add(variable);
@@ -184,7 +187,8 @@ namespace AMEC.PCSoftware.CommunicationProtocol.CrazyHein.OrbmentDAQ.Storage
             variables = new BsonArray();
             foreach (var f in __ctrl_area)
             {
-                BsonDocument variable = new BsonDocument("name", f.FriendlyName);
+                BsonDocument variable = new BsonDocument("index", f.Index);
+                variable.Add("name", f.FriendlyName);
                 variable.Add("bits", f.BitPos);
                 variable.Add("value", f.DataBsonValue(ctrldata));
                 variables.Add(variable);
@@ -196,7 +200,8 @@ namespace AMEC.PCSoftware.CommunicationProtocol.CrazyHein.OrbmentDAQ.Storage
             variables = new BsonArray();
             foreach (var f in __rx_bit_area)
             {
-                BsonDocument variable = new BsonDocument("name", f.FriendlyName);
+                BsonDocument variable = new BsonDocument("index", f.Index);
+                variable.Add("name", f.FriendlyName);
                 variable.Add("bits", f.BitPos);
                 variable.Add("value", f.DataBsonValue(rxbitdata));
                 variables.Add(variable);
@@ -206,7 +211,8 @@ namespace AMEC.PCSoftware.CommunicationProtocol.CrazyHein.OrbmentDAQ.Storage
             variables = new BsonArray();
             foreach (var f in __rx_blk_area)
             {
-                BsonDocument variable = new BsonDocument("name", f.FriendlyName);
+                BsonDocument variable = new BsonDocument("index", f.Index);
+                variable.Add("name", f.FriendlyName);
                 variable.Add("bits", f.BitPos);
                 variable.Add("value", f.DataBsonValue(rxblkdata));
                 variables.Add(variable);

@@ -41,8 +41,9 @@ namespace AMEC.PCSoftware.CommunicationProtocol.CrazyHein.OrbmentDAQ.Storage
 
     public class AcquisitionDataIndex
     {
-        public string FriendlyName { get; init; }
-        public uint BitPos { get; init; }
+        public required uint Index { get; init; }
+        public required string FriendlyName { get; init; }
+        public required uint BitPos { get; init; }
         public uint BytePos { get { return BitPos / 8; } }
         public AcquisitionDataType DataType { get; private set; }
 
