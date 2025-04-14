@@ -31,8 +31,17 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Napishtim
             __shaders = new ObservableCollection<ShaderModel>(step.Shaders.Select(x => new ShaderModel(x) { Owner = this}));
             __post_shaders = new ObservableCollection<ShaderModel>(step.PostShaders.Select(x => new ShaderModel(x) { Owner = this}));
             __abort_shaders = new ObservableCollection<ShaderModel>(step.AbortShaders.Select(x => new ShaderModel(x) { Owner = this }));
-            __termination_condition = step.TerminationCondition;
-            __aborot_condition = step.AbortCondition;
+            __break_shaders = new ObservableCollection<ShaderModel>(step.BreakShaders.Select(x => new ShaderModel(x) { Owner = this }));
+            __continue_shaders = new ObservableCollection<ShaderModel>(step.ContinueShaders.Select(x => new ShaderModel(x) { Owner = this }));
+            __completion_condition = step.CompletionCondition;
+            __abort_condition = step.AbortCondition;
+            __break_condition = step.BreakCondition;
+            __continue_condition = step.ContinueCondition;
+
+            __completion_priority = step.CompletionPriority;
+            __abort_priority = step.AbortPriority;
+            __break_priority = step.BreakPriority;
+            __continue_priority = step.ContinuePriority;
         }
 
         public SimpleStepModel(SimpleStepWithTimeout_S step, Sequential_S seq, SequentialModel seqm) : base(step, seq, seqm)
@@ -58,8 +67,17 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Napishtim
             __shaders = new ObservableCollection<ShaderModel>(step.Shaders.Select(x => new ShaderModel(x) { Owner = this }));
             __post_shaders = new ObservableCollection<ShaderModel>(step.PostShaders.Select(x => new ShaderModel(x) { Owner = this }));
             __abort_shaders = new ObservableCollection<ShaderModel>(step.AbortShaders.Select(x => new ShaderModel(x) { Owner = this }));
-            __termination_condition = step.TerminationCondition;
-            __aborot_condition = step.AbortCondition;
+            __break_shaders = new ObservableCollection<ShaderModel>(step.BreakShaders.Select(x => new ShaderModel(x) { Owner = this }));
+            __continue_shaders = new ObservableCollection<ShaderModel>(step.ContinueShaders.Select(x => new ShaderModel(x) { Owner = this }));
+            __completion_condition = step.CompletionCondition;
+            __abort_condition = step.AbortCondition;
+            __break_condition = step.BreakCondition;
+            __continue_condition = step.ContinueCondition;
+
+            __completion_priority = step.CompletionPriority;
+            __abort_priority = step.AbortPriority;
+            __break_priority = step.BreakPriority;
+            __continue_priority = step.ContinuePriority;
         }
 
 
@@ -117,8 +135,23 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Napishtim
                     foreach (var s in simpleStep.AbortShaders.Select(x => new ShaderModel(x) { Owner = this }))
                         __abort_shaders.Add(s);
 
-                    TerminationCondition = simpleStep.TerminationCondition;
+                    __break_shaders.Clear();
+                    foreach (var s in simpleStep.BreakShaders.Select(x => new ShaderModel(x) { Owner = this }))
+                        __break_shaders.Add(s);
+
+                    __continue_shaders.Clear();
+                    foreach (var s in simpleStep.ContinueShaders.Select(x => new ShaderModel(x) { Owner = this }))
+                        __continue_shaders.Add(s);
+
+                    CompletionCondition = simpleStep.CompletionCondition;
                     AbortCondition = simpleStep.AbortCondition;
+                    BreakCondition = simpleStep.BreakCondition;
+                    ContinueCondition = simpleStep.ContinueCondition;
+
+                    CompletionPriority = simpleStep.CompletionPriority;
+                    AbortPriority = simpleStep.AbortPriority;
+                    BreakPriority = simpleStep.BreakPriority;
+                    ContinuePriority = simpleStep.ContinuePriority;
                 }
                 else
                 {
@@ -157,8 +190,23 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Napishtim
                     foreach (var s in simpleStep.AbortShaders.Select(x => new ShaderModel(x) { Owner = this }))
                         __abort_shaders.Add(s);
 
-                    TerminationCondition = simpleStep.TerminationCondition;
+                    __break_shaders.Clear();
+                    foreach (var s in simpleStep.BreakShaders.Select(x => new ShaderModel(x) { Owner = this }))
+                        __break_shaders.Add(s);
+
+                    __continue_shaders.Clear();
+                    foreach (var s in simpleStep.ContinueShaders.Select(x => new ShaderModel(x) { Owner = this }))
+                        __continue_shaders.Add(s);
+
+                    CompletionCondition = simpleStep.CompletionCondition;
                     AbortCondition = simpleStep.AbortCondition;
+                    BreakCondition = simpleStep.BreakCondition;
+                    ContinueCondition = simpleStep.ContinueCondition;
+
+                    CompletionPriority = simpleStep.CompletionPriority;
+                    AbortPriority = simpleStep.AbortPriority;
+                    BreakPriority = simpleStep.BreakPriority;
+                    ContinuePriority = simpleStep.ContinuePriority;
                 }
                 __enable_summary_update_notification = true;
                 _notify_property_changed("Summary");
@@ -242,16 +290,16 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Napishtim
         private ObservableCollection<ShaderModel> __shaders;
         public IEnumerable<ShaderModel> Shaders { get { return __shaders; } }
 
-        private string __termination_condition = "";
-        public string TerminationCondition
+        private string __completion_condition = "";
+        public string CompletionCondition
         {
-            get { return __termination_condition; }
+            get { return __completion_condition; }
             set 
             {
                 value = value.Trim();
-                if (value != __termination_condition) 
+                if (value != __completion_condition) 
                 { 
-                    __termination_condition = value; 
+                    __completion_condition = value; 
                     _notify_property_changed();
                     if (__enable_summary_update_notification)
                         _reload_property("Summary"); 
@@ -259,20 +307,148 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Napishtim
             }
         }
 
-        private string __aborot_condition = "";
+        private string __abort_condition = "";
         public string AbortCondition
         {
-            get { return __aborot_condition; }
+            get { return __abort_condition; }
             set
             {
                 value = value.Trim();
-                if (value != __aborot_condition)
+                if (value != __abort_condition)
                 {
-                    __aborot_condition = value;
+                    __abort_condition = value;
+                    _notify_property_changed();
+                    _notify_property_changed("AbortPriority");
+                    _notify_property_changed("AbortBranchIsEnabled");
+                    if (__enable_summary_update_notification)
+                        _reload_property("Summary");
+                }
+            }
+        }
+
+        private string __break_condition = "";
+        public string BreakCondition
+        {
+            get { return __break_condition; }
+            set
+            {
+                value = value.Trim();
+                if (value != __break_condition)
+                {
+                    __break_condition = value;
+                    _notify_property_changed();
+                    _notify_property_changed("BreakPriority");
+                    _notify_property_changed("BreakBranchIsEnabled");
+                    if (__enable_summary_update_notification)
+                        _reload_property("Summary");
+                }
+            }
+        }
+
+        private string __continue_condition = "";
+        public string ContinueCondition
+        {
+            get { return __continue_condition; }
+            set
+            {
+                value = value.Trim();
+                if (value != __continue_condition)
+                {
+                    __continue_condition = value;
+                    _notify_property_changed();
+                    _notify_property_changed("ContinuePriority");
+                    _notify_property_changed("ContinueBranchIsEnabled");
+                    if (__enable_summary_update_notification)
+                        _reload_property("Summary");
+                }
+            }
+        }
+
+        private byte __completion_priority = 0;
+        public byte CompletionPriority
+        {
+            get {  return __completion_priority; }
+            set
+            {
+                if (value != __completion_priority)
+                {
+                    __completion_priority = value;
                     _notify_property_changed();
                     if (__enable_summary_update_notification)
                         _reload_property("Summary");
                 }
+            }
+        }
+
+        private byte __abort_priority = 0;
+        public byte AbortPriority
+        {
+            get { return AbortCondition.Length == 0 ? (byte)0 : __abort_priority; }
+            set
+            {
+                if (value != __abort_priority)
+                {
+                    __abort_priority = value;
+                    _notify_property_changed();
+                    if (__enable_summary_update_notification)
+                        _reload_property("Summary");
+                }
+            }
+        }
+
+        private byte __break_priority = 0;
+        public byte BreakPriority
+        {
+            get { return BreakCondition.Length == 0 ? (byte)0 : __break_priority; }
+            set
+            {
+                if (value != __break_priority)
+                {
+                    __break_priority = value;
+                    _notify_property_changed();
+                    if (__enable_summary_update_notification)
+                        _reload_property("Summary");
+                }
+            }
+        }
+
+        private byte __continue_priority = 0;
+        public byte ContinuePriority
+        {
+            get { return ContinueCondition.Length == 0 ? (byte)0 : __continue_priority; }
+            set
+            {
+                if (value != __continue_priority)
+                {
+                    __continue_priority = value;
+                    _notify_property_changed();
+                    if (__enable_summary_update_notification)
+                        _reload_property("Summary");
+                }
+            }
+        }
+
+        public bool AbortBranchIsEnabled
+        {
+            get
+            {
+                return AbortCondition.Length != 0;
+            }
+        }
+
+        public bool BreakBranchIsEnabled
+        {
+            get
+            {
+                return BreakCondition.Length != 0;
+            }
+        }
+
+        public bool ContinueBranchIsEnabled
+        {
+            get
+            {
+                return ContinueCondition.Length != 0;
             }
         }
 
@@ -281,6 +457,12 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Napishtim
 
         private ObservableCollection<ShaderModel> __abort_shaders;
         public IEnumerable<ShaderModel> AbortShaders { get { return __abort_shaders; } }
+
+        private ObservableCollection<ShaderModel> __break_shaders;
+        public IEnumerable<ShaderModel> BreakShaders { get { return __break_shaders; } }
+
+        private ObservableCollection<ShaderModel> __continue_shaders;
+        public IEnumerable<ShaderModel> ContinueShaders { get { return __continue_shaders; } }
 
         public override string Summary
         {
@@ -321,6 +503,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Napishtim
                 s.EvaluateOmissible();
             foreach (var s in __abort_shaders)
                 s.EvaluateOmissible();
+            foreach (var s in __break_shaders)
+                s.EvaluateOmissible();
+            foreach (var s in __continue_shaders)
+                s.EvaluateOmissible();
             _notify_property_changed("Summary");
         }
 
@@ -332,6 +518,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Napishtim
             foreach (var s in __post_shaders)
                 s.EvaluateOmissible();
             foreach (var s in __abort_shaders)
+                s.EvaluateOmissible();
+            foreach (var s in __break_shaders)
+                s.EvaluateOmissible();
+            foreach (var s in __continue_shaders)
                 s.EvaluateOmissible();
             _notify_property_changed("Summary");
         }
@@ -346,6 +536,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Napishtim
                 s.EvaluateOmissible();
             foreach (var s in __abort_shaders)
                 s.EvaluateOmissible();
+            foreach (var s in __break_shaders)
+                s.EvaluateOmissible();
+            foreach (var s in __continue_shaders)
+                s.EvaluateOmissible();
             _notify_property_changed("Summary");
         }
 
@@ -357,6 +551,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Napishtim
             foreach (var s in __post_shaders)
                 s.EvaluateOmissible();
             foreach (var s in __abort_shaders)
+                s.EvaluateOmissible();
+            foreach (var s in __break_shaders)
+                s.EvaluateOmissible();
+            foreach (var s in __continue_shaders)
                 s.EvaluateOmissible();
             _notify_property_changed("Summary");
         }
@@ -370,6 +568,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Napishtim
             foreach (var s in __post_shaders)
                 s.EvaluateOmissible();
             foreach (var s in __abort_shaders)
+                s.EvaluateOmissible();
+            foreach (var s in __break_shaders)
+                s.EvaluateOmissible();
+            foreach (var s in __continue_shaders)
                 s.EvaluateOmissible();
             _notify_property_changed("Summary");
         }
@@ -387,6 +589,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Napishtim
                 s.EvaluateOmissible();
             foreach (var s in __abort_shaders)
                 s.EvaluateOmissible();
+            foreach (var s in __break_shaders)
+                s.EvaluateOmissible();
+            foreach (var s in __continue_shaders)
+                s.EvaluateOmissible();
             _notify_property_changed("Summary");
         }
 
@@ -403,6 +609,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Napishtim
             foreach (var s in __post_shaders)
                 s.EvaluateOmissible();
             foreach (var s in __abort_shaders)
+                s.EvaluateOmissible();
+            foreach (var s in __break_shaders)
+                s.EvaluateOmissible();
+            foreach (var s in __continue_shaders)
                 s.EvaluateOmissible();
 
             _notify_property_changed("Summary");
@@ -480,10 +690,38 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Napishtim
             _notify_property_changed("Summary");
         }
 
+        public void ClearBreakStepAction()
+        {
+            __break_shaders.Clear();
+            _notify_property_changed("Summary");
+        }
+
+        public void ClearContinueStepAction()
+        {
+            __continue_shaders.Clear();
+            _notify_property_changed("Summary");
+        }
+
         public void AddAbortStepAction()
         {
             __abort_shaders.Add(new ShaderModel() { Owner = this });
             foreach (var s in __abort_shaders.SkipLast(1))
+                s.EvaluateOmissible();
+            _notify_property_changed("Summary");
+        }
+
+        public void AddBreakStepAction()
+        {
+            __break_shaders.Add(new ShaderModel() { Owner = this });
+            foreach (var s in __break_shaders.SkipLast(1))
+                s.EvaluateOmissible();
+            _notify_property_changed("Summary");
+        }
+
+        public void AddContinueStepAction()
+        {
+            __continue_shaders.Add(new ShaderModel() { Owner = this });
+            foreach (var s in __continue_shaders.SkipLast(1))
                 s.EvaluateOmissible();
             _notify_property_changed("Summary");
         }
@@ -497,10 +735,44 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Napishtim
             _notify_property_changed("Summary");
         }
 
+        public void AddBreakStepActions(JsonArray array)
+        {
+            foreach (var shader in array.Select(x => new ShaderModel(x.AsObject()) { Owner = this }))
+                __break_shaders.Add(shader);
+            foreach (var s in __break_shaders.SkipLast(array.Count))
+                s.EvaluateOmissible();
+            _notify_property_changed("Summary");
+        }
+
+        public void AddContinueStepActions(JsonArray array)
+        {
+            foreach (var shader in array.Select(x => new ShaderModel(x.AsObject()) { Owner = this }))
+                __continue_shaders.Add(shader);
+            foreach (var s in __continue_shaders.SkipLast(array.Count))
+                s.EvaluateOmissible();
+            _notify_property_changed("Summary");
+        }
+
         public void InsertAbortStepAction(int pos)
         {
             __abort_shaders.Insert(pos, new ShaderModel() { Owner = this });
             foreach (var s in __abort_shaders.SkipLast(__abort_shaders.Count - pos))
+                s.EvaluateOmissible();
+            _notify_property_changed("Summary");
+        }
+
+        public void InsertBreakStepAction(int pos)
+        {
+            __break_shaders.Insert(pos, new ShaderModel() { Owner = this });
+            foreach (var s in __break_shaders.SkipLast(__break_shaders.Count - pos))
+                s.EvaluateOmissible();
+            _notify_property_changed("Summary");
+        }
+
+        public void InsertContinueStepAction(int pos)
+        {
+            __continue_shaders.Insert(pos, new ShaderModel() { Owner = this });
+            foreach (var s in __continue_shaders.SkipLast(__continue_shaders.Count - pos))
                 s.EvaluateOmissible();
             _notify_property_changed("Summary");
         }
@@ -514,6 +786,24 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Napishtim
             _notify_property_changed("Summary");
         }
 
+        public void InsertBreakStepActions(int pos, JsonArray array)
+        {
+            foreach (var shader in array.Select(x => new ShaderModel(x.AsObject()) { Owner = this }).Reverse())
+                __break_shaders.Insert(pos, shader);
+            foreach (var s in __break_shaders.SkipLast(__break_shaders.Count - pos))
+                s.EvaluateOmissible();
+            _notify_property_changed("Summary");
+        }
+
+        public void InsertContinueStepActions(int pos, JsonArray array)
+        {
+            foreach (var shader in array.Select(x => new ShaderModel(x.AsObject()) { Owner = this }).Reverse())
+                __continue_shaders.Insert(pos, shader);
+            foreach (var s in __continue_shaders.SkipLast(__continue_shaders.Count - pos))
+                s.EvaluateOmissible();
+            _notify_property_changed("Summary");
+        }
+
         public void RemoveAbortStepActionAt(int pos)
         {
             var removed = __abort_shaders[pos];
@@ -521,6 +811,30 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Napishtim
             if (removed.CanBeOmitted == false)
             {
                 foreach (var s in __abort_shaders.SkipLast(__abort_shaders.Count - pos))
+                    s.EvaluateOmissible();
+            }
+            _notify_property_changed("Summary");
+        }
+
+        public void RemoveBreakStepActionAt(int pos)
+        {
+            var removed = __break_shaders[pos];
+            __break_shaders.RemoveAt(pos);
+            if (removed.CanBeOmitted == false)
+            {
+                foreach (var s in __break_shaders.SkipLast(__break_shaders.Count - pos))
+                    s.EvaluateOmissible();
+            }
+            _notify_property_changed("Summary");
+        }
+
+        public void RemoveContinueStepActionAt(int pos)
+        {
+            var removed = __continue_shaders[pos];
+            __continue_shaders.RemoveAt(pos);
+            if (removed.CanBeOmitted == false)
+            {
+                foreach (var s in __continue_shaders.SkipLast(__continue_shaders.Count - pos))
                     s.EvaluateOmissible();
             }
             _notify_property_changed("Summary");
@@ -540,6 +854,34 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Napishtim
             _notify_property_changed("Summary");
         }
 
+        public void RemoveBreakStepActions(IEnumerable<ShaderModel> shaders)
+        {
+            List<ShaderModel> temp = new List<ShaderModel>(shaders);
+            int max = shaders.Select(x => __break_shaders.IndexOf(x)).Max();
+
+            foreach (var sh in temp)
+                __break_shaders.Remove(sh);
+
+            foreach (var s in __break_shaders.SkipLast(temp.Count - max - 1))
+                s.EvaluateOmissible();
+
+            _notify_property_changed("Summary");
+        }
+
+        public void RemoveContinueStepActions(IEnumerable<ShaderModel> shaders)
+        {
+            List<ShaderModel> temp = new List<ShaderModel>(shaders);
+            int max = shaders.Select(x => __continue_shaders.IndexOf(x)).Max();
+
+            foreach (var sh in temp)
+                __continue_shaders.Remove(sh);
+
+            foreach (var s in __continue_shaders.SkipLast(temp.Count - max - 1))
+                s.EvaluateOmissible();
+
+            _notify_property_changed("Summary");
+        }
+
         public override ProcessStepSource ExportToProcessStepSource(Sequential_S? seq = null)
         {
             Dictionary<uint, (string name, Event evt)>? locals = null;
@@ -548,6 +890,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Napishtim
             JsonArray? completionCondition = null;
             ProcessShaders? abortShaders = null;
             JsonArray? abortCondition = null;
+            ProcessShaders? breakShaders = null;
+            JsonArray? breakCondition = null;
+            ProcessShaders? continueShaders = null;
+            JsonArray? continueCondition = null;
 
             if (LocalEvents.Events.Count() != 0)
                 locals = new Dictionary<uint, (string name, Event evt)>(LocalEvents.Events.Select(x => KeyValuePair.Create(x.Index, (x.Name, x.Event.ToEvent()))));
@@ -557,10 +903,14 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Napishtim
                 postShaders = new UserProcessShaders(__post_shaders.Select(x => (x.Name, x.LeftValue, x.RightValue)));
             if (__abort_shaders.Count != 0)
                 abortShaders = new UserProcessShaders(__abort_shaders.Select(x => (x.Name, x.LeftValue, x.RightValue)));
-            if (TerminationCondition.Length != 0)
+            if (__break_shaders.Count != 0)
+                breakShaders = new UserProcessShaders(__break_shaders.Select(x => (x.Name, x.LeftValue, x.RightValue)));
+            if (__continue_shaders.Count != 0)
+                continueShaders = new UserProcessShaders(__continue_shaders.Select(x => (x.Name, x.LeftValue, x.RightValue)));
+            if (CompletionCondition.Length != 0)
             {
                 completionCondition = new JsonArray();
-                foreach (var line in TerminationCondition.Split('\n').Select(x => x.TrimEnd()))
+                foreach (var line in CompletionCondition.Split('\n').Select(x => x.TrimEnd()))
                     completionCondition.Add(line);
             }
             if(AbortCondition.Length != 0)
@@ -569,17 +919,45 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Napishtim
                 foreach (var line in AbortCondition.Split('\n').Select(x => x.TrimEnd()))
                     abortCondition.Add(line);
             }
+            if (BreakCondition.Length != 0)
+            {
+                breakCondition = new JsonArray();
+                foreach (var line in BreakCondition.Split('\n').Select(x => x.TrimEnd()))
+                    breakCondition.Add(line);
+            }
+            if (ContinueCondition.Length != 0)
+            {
+                continueCondition = new JsonArray();
+                foreach (var line in ContinueCondition.Split('\n').Select(x => x.TrimEnd()))
+                    continueCondition.Add(line);
+            }
 
             if (WithTimeout == false)
-                return new SimpleStep_S(Name, locals, shaders, completionCondition, postShaders, abortCondition, abortShaders);
+                return new SimpleStep_S(Name, locals, shaders, 
+                    completionCondition, postShaders, CompletionPriority, 
+                    abortCondition, abortShaders, AbortPriority, 
+                    breakCondition, breakShaders, BreakPriority, 
+                    continueCondition, continueShaders, ContinuePriority);
             else if (SpecifyTimeoutDirectly)
-                return new SimpleStepWithTimeout_S(Name, locals, shaders, TimeoutValue, completionCondition, postShaders, abortCondition, abortShaders);
+                return new SimpleStepWithTimeout_S(Name, locals, shaders, TimeoutValue, 
+                    completionCondition, postShaders, CompletionPriority, 
+                    abortCondition, abortShaders, AbortPriority, 
+                    breakCondition, breakShaders, BreakPriority, 
+                    continueCondition, continueShaders, ContinuePriority);
             else
             {
                 if(seq != null)
-                    return new SimpleStepWithTimeout_S(Name, locals, shaders, seq[Sequential.IndexOf(StepTimeToTimeout.Step)] as SimpleStepWithTimeout_S, completionCondition, postShaders, abortCondition, abortShaders);
+                    return new SimpleStepWithTimeout_S(Name, locals, shaders, seq[Sequential.IndexOf(StepTimeToTimeout.Step)] as SimpleStepWithTimeout_S, 
+                        completionCondition, postShaders, CompletionPriority, 
+                        abortCondition, abortShaders, AbortPriority, 
+                        breakCondition, breakShaders, BreakPriority, 
+                        continueCondition, continueShaders, ContinuePriority);
                 else
-                    return new SimpleStepWithTimeout_S(Name, locals, shaders, StepTimeToTimeout.Step as SimpleStepWithTimeout_S, completionCondition, postShaders, abortCondition, abortShaders);
+                    return new SimpleStepWithTimeout_S(Name, locals, shaders, StepTimeToTimeout.Step as SimpleStepWithTimeout_S, 
+                        completionCondition, postShaders, CompletionPriority, 
+                        abortCondition, abortShaders, AbortPriority, 
+                        breakCondition, breakShaders, BreakPriority, 
+                        continueCondition, continueShaders, ContinuePriority);
             }
         }
 
@@ -609,6 +987,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Napishtim
                 s.EvaluateOmissible();
             foreach (var s in AbortShaders.Where(x => x.IsObjectDirectAssignment))
                 s.EvaluateOmissible();
+            foreach (var s in BreakShaders.Where(x => x.IsObjectDirectAssignment))
+                s.EvaluateOmissible();
+            foreach (var s in ContinueShaders.Where(x => x.IsObjectDirectAssignment))
+                s.EvaluateOmissible();
         }
 
         public override void SubComponentChangesApplied(Component sub)
@@ -623,6 +1005,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Napishtim
                 int shaderPos = __shaders.IndexOf(sub as ShaderModel);
                 int postShaderPos = __post_shaders.IndexOf(sub as ShaderModel);
                 int abortShaderPos = __abort_shaders.IndexOf(sub as ShaderModel);
+                int breakShaderPos = __break_shaders.IndexOf(sub as ShaderModel);
+                int continueShaderPos = __continue_shaders.IndexOf(sub as ShaderModel);
                 if (shaderPos != -1)
                 {
                     foreach (var s in __shaders.SkipLast(__shaders.Count - shaderPos).SkipWhile(s => s == sub).Where(x => x.IsObjectDirectAssignment))
@@ -640,6 +1024,16 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Napishtim
                 else if(abortShaderPos != -1)
                 {
                     foreach (var s in __abort_shaders.SkipLast(__abort_shaders.Count - abortShaderPos).SkipWhile(s => s == sub).Where(x => x.IsObjectDirectAssignment))
+                        s.EvaluateOmissible();
+                }
+                else if (breakShaderPos != -1)
+                {
+                    foreach (var s in __break_shaders.SkipLast(__break_shaders.Count - breakShaderPos).SkipWhile(s => s == sub).Where(x => x.IsObjectDirectAssignment))
+                        s.EvaluateOmissible();
+                }
+                else if (continueShaderPos != -1)
+                {
+                    foreach (var s in __continue_shaders.SkipLast(__continue_shaders.Count - continueShaderPos).SkipWhile(s => s == sub).Where(x => x.IsObjectDirectAssignment))
                         s.EvaluateOmissible();
                 }
             }

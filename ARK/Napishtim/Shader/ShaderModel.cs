@@ -210,9 +210,39 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Napishtim
                     var seq = step.Owner as SequentialModel;
                     int stepPos = seq.SubSteps.IndexOf(step);
                     int abortShaderPos = step.AbortShaders.IndexOf(this);
+                    int breakShaderPos = step.BreakShaders.IndexOf(this);
+                    int continueShaderPos = step.ContinueShaders.IndexOf(this);
                     int postShaderPos = step.PostShaders.IndexOf(this);
                     int shaderPos = step.Shaders.IndexOf(this);
-                    if(abortShaderPos != -1)
+                    if(breakShaderPos != -1)
+                    {
+                        if (step.BreakShaders.TakeLast(step.BreakShaders.Count() - breakShaderPos - 1).Any(x => x.IsObjectDirectAssignment && x.LeftValue == LeftValue))
+                            omissible = true;
+                        else
+                        {
+                            var range = seq.SubSteps.Cast<SimpleStepModel>().Take(stepPos).SelectMany(x => x.Shaders.Concat(x.PostShaders)).Concat(step.Shaders).Where(x => x.IsObjectDirectAssignment).Reverse();
+                            var ret = range.FirstOrDefault(x => x.LeftValue == LeftValue);
+                            if (ret != null && ret.__shader.Shader.Expr.Equals(__shader.Shader.Expr))
+                                omissible = true;
+                            else
+                                omissible = false;
+                        }
+                    }
+                    else if(continueShaderPos != -1)
+                    {
+                        if (step.ContinueShaders.TakeLast(step.ContinueShaders.Count() - continueShaderPos - 1).Any(x => x.IsObjectDirectAssignment && x.LeftValue == LeftValue))
+                            omissible = true;
+                        else
+                        {
+                            var range = seq.SubSteps.Cast<SimpleStepModel>().Take(stepPos).SelectMany(x => x.Shaders.Concat(x.PostShaders)).Concat(step.Shaders).Where(x => x.IsObjectDirectAssignment).Reverse();
+                            var ret = range.FirstOrDefault(x => x.LeftValue == LeftValue);
+                            if (ret != null && ret.__shader.Shader.Expr.Equals(__shader.Shader.Expr))
+                                omissible = true;
+                            else
+                                omissible = false;
+                        }
+                    }
+                    else if (abortShaderPos != -1)
                     {
                         if (step.AbortShaders.TakeLast(step.AbortShaders.Count() - abortShaderPos - 1).Any(x => x.IsObjectDirectAssignment && x.LeftValue == LeftValue))
                             omissible = true;

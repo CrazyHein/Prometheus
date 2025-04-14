@@ -237,7 +237,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
             //Level = __branches.Max(x => x.action.Level) + 1;
         }
 
-        public override ControlBlockObject ResolveTarget(uint next, uint abort, Context context, IReadOnlyDictionary<uint, Event> globals, ReadOnlyMemory<uint> stepLinkMapping, ReadOnlyMemory<uint> userVariableMapping, Dictionary<uint, string> stepNameMapping)
+        public override ControlBlockObject ResolveTarget(uint next, uint abort, uint? breakp, uint? continuep, Context context, IReadOnlyDictionary<uint, Event> globals, ReadOnlyMemory<uint> stepLinkMapping, ReadOnlyMemory<uint> userVariableMapping, Dictionary<uint, string> stepNameMapping)
         {
             if (__branches.Count == 0)
                 throw new NaposhtimDocumentException(NaposhtimExceptionCode.CONTROL_BLOCK_ARGUMENTS_ERROR, $"The number of Switch({FullName}) Control Block branches is zero.");
@@ -258,12 +258,12 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
             //foreach (var b in __branches)
                 //b.action.Next = __conditional_statement.Next;
 
-            var c = conditionalStatement.ResolveTarget(next, abort, context, globals, stepLinkMapping, userVariableMapping, stepNameMapping);
+            var c = conditionalStatement.ResolveTarget(next, abort, breakp, continuep, context, globals, stepLinkMapping, userVariableMapping, stepNameMapping);
             List<ControlBlockObject> a = new List<ControlBlockObject>(__branches.Count);
             int spos = 1, upos = 0;
             foreach (var b in __branches)
             {
-                a.Add(b.action.ResolveTarget(next, abort, context, globals, stepLinkMapping.Slice(spos), userVariableMapping.Slice(upos), stepNameMapping));
+                a.Add(b.action.ResolveTarget(next, abort, breakp, continuep, context, globals, stepLinkMapping.Slice(spos), userVariableMapping.Slice(upos), stepNameMapping));
                 spos += b.action.StepFootprint;
                 upos += b.action.UserVariableFootprint;
             }

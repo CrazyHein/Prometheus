@@ -43,14 +43,6 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Ex
             }
         }
 
-        public IEnumerable<string> TerminationConditions
-        {
-            get
-            {
-                foreach(var e in _exception_response["END_POINTS"].AsArray())
-                    yield return string.Join('\n', e["TRIGGER"].AsArray().Select(x => x.GetValue<string>()));
-            }
-        }
 
         public override IEnumerable<uint> GlobalEventReference
         {

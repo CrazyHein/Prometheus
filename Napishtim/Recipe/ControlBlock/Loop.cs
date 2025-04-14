@@ -121,7 +121,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
 
 
 
-        public override ControlBlockObject ResolveTarget(uint next, uint abort, Context context, IReadOnlyDictionary<uint, Event> globals, ReadOnlyMemory<uint> stepLinkMapping, ReadOnlyMemory<uint> userVariableMapping, Dictionary<uint, string> stepNameMapping)
+        public override ControlBlockObject ResolveTarget(uint next, uint abort, uint? breakp, uint? continuep, Context context, IReadOnlyDictionary<uint, Event> globals, ReadOnlyMemory<uint> stepLinkMapping, ReadOnlyMemory<uint> userVariableMapping, Dictionary<uint, string> stepNameMapping)
         {
             if (LoopBody == null)
                 throw new NaposhtimDocumentException(NaposhtimExceptionCode.CONTROL_BLOCK_ARGUMENTS_ERROR, $"The loop body of Loop({FullName}) Control Block is empty.");
@@ -139,9 +139,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
             //conditionalStatement.Next = Next;
             //LoopBody.Next = conditionalStatement;
 
-            var c = conditionalStatement.ResolveTarget(next, abort, context, globals, stepLinkMapping.Slice(1), userVariableMapping, stepNameMapping);
-            var i = initializationStatement.ResolveTarget(stepLinkMapping.Span[1], abort, context, globals, stepLinkMapping, userVariableMapping, stepNameMapping);
-            var b = LoopBody.ResolveTarget(stepLinkMapping.Span[1], abort, context, globals, stepLinkMapping.Slice(2), userVariableMapping.Slice(1), stepNameMapping);
+            var c = conditionalStatement.ResolveTarget(next, abort, null, null, context, globals, stepLinkMapping.Slice(1), userVariableMapping, stepNameMapping);
+            var i = initializationStatement.ResolveTarget(stepLinkMapping.Span[1], abort, null, null, context, globals, stepLinkMapping, userVariableMapping, stepNameMapping);
+            var b = LoopBody.ResolveTarget(stepLinkMapping.Span[1], abort, next, stepLinkMapping.Span[1], context, globals, stepLinkMapping.Slice(2), userVariableMapping.Slice(1), stepNameMapping);
 
             return new Loop_O(Name, i, c, b, StepFootprint, UserVariableFootprint);
         }

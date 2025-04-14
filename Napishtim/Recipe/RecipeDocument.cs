@@ -468,7 +468,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe
             var blk = __regular_control_block_list.Last;
             int st0 = RegularStepFootprint.Value - blk.Value.StepFootprint;
             //int st1 = RegularUserVariablesFootprint.Value - blk.Value.UserVariableFootprint;
-            compiledBlocks.AddFirst(blk.Value.ResolveTarget((uint)StepFootprint, (uint)RegularStepFootprint, __context, GlobalEvents, stepalloc.Slice(st0, blk.Value.StepFootprint), varalloc.Slice(0/*st1*/, blk.Value.UserVariableFootprint), __compiled_step_names));
+            compiledBlocks.AddFirst(blk.Value.ResolveTarget((uint)StepFootprint, (uint)RegularStepFootprint, null, null, __context, GlobalEvents, stepalloc.Slice(st0, blk.Value.StepFootprint), varalloc.Slice(0/*st1*/, blk.Value.UserVariableFootprint), __compiled_step_names));
             while(blk.Previous != null)
             {
                 blk = blk.Previous;
@@ -476,7 +476,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe
                 //st1 = st1 - blk.Value.UserVariableFootprint;
                 if (compiledBlocks.First.Value.ID == null)
                     throw new NaposhtimDocumentException(NaposhtimExceptionCode.DOCUMENT_INVALID_OPERATION, "The next Control Block ID is unresolved.");
-                compiledBlocks.AddFirst(blk.Value.ResolveTarget(compiledBlocks.First.Value.ID.Value, (uint)RegularStepFootprint, __context, GlobalEvents, stepalloc.Slice(st0, blk.Value.StepFootprint), varalloc.Slice(0/*st1*/, blk.Value.UserVariableFootprint), __compiled_step_names));
+                compiledBlocks.AddFirst(blk.Value.ResolveTarget(compiledBlocks.First.Value.ID.Value, (uint)RegularStepFootprint, null, null, __context, GlobalEvents, stepalloc.Slice(st0, blk.Value.StepFootprint), varalloc.Slice(0/*st1*/, blk.Value.UserVariableFootprint), __compiled_step_names));
             }
 
 
@@ -491,13 +491,13 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe
                 blk = __exception_handling_block_list.Last;
                 st0 = StepFootprint.Value - blk.Value.StepFootprint;
                 //st1 = ExceptionUserVariablesFootprint.Value - blk.Value.UserVariableFootprint;
-                compiledBlocks.AddFirst(blk.Value.ResolveTarget((uint)StepFootprint, (uint)StepFootprint, __context, GlobalEvents, stepalloc.Slice(st0, blk.Value.StepFootprint), varalloc.Slice(0/*st1*/, blk.Value.UserVariableFootprint), __compiled_step_names));
+                compiledBlocks.AddFirst(blk.Value.ResolveTarget((uint)StepFootprint, (uint)StepFootprint, null, null, __context, GlobalEvents, stepalloc.Slice(st0, blk.Value.StepFootprint), varalloc.Slice(0/*st1*/, blk.Value.UserVariableFootprint), __compiled_step_names));
                 while (blk.Previous != null)
                 {
                     blk = blk.Previous;
                     st0 = st0 - blk.Value.StepFootprint;
                     //st1 = st1 - blk.Value.UserVariableFootprint;
-                    compiledBlocks.AddFirst(blk.Value.ResolveTarget(compiledBlocks.First.Value.ID!.Value, (uint)StepFootprint, __context, GlobalEvents, stepalloc.Slice(st0, blk.Value.StepFootprint), varalloc.Slice(0/*st1*/, blk.Value.UserVariableFootprint), __compiled_step_names));
+                    compiledBlocks.AddFirst(blk.Value.ResolveTarget(compiledBlocks.First.Value.ID!.Value, (uint)StepFootprint, null, null, __context, GlobalEvents, stepalloc.Slice(st0, blk.Value.StepFootprint), varalloc.Slice(0/*st1*/, blk.Value.UserVariableFootprint), __compiled_step_names));
                 }
 
                 foreach (var cblk in compiledBlocks)

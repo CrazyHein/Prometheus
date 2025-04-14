@@ -7,7 +7,7 @@
     <ImplicitUsings>disable</ImplicitUsings>
     <UseWPF>true</UseWPF>
     <RootNamespace>AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK</RootNamespace>
-    <Version>0.1.0.0</Version>
+    <Version>0.2.0.0</Version>
     <Authors>CrazyHein</Authors>
     <Company>AMEC</Company>
     <UseWindowsForms>True</UseWindowsForms>

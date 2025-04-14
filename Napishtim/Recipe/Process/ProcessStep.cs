@@ -42,7 +42,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Pr
     public abstract class ProcessStepSource : ProcessStep
     {
         protected JsonObject _step { get; set; } = new JsonObject();
-        public abstract ProcessStepObject ResolveTarget(uint next, uint abort, Context context, IReadOnlyDictionary<uint, Event> globals, ReadOnlyMemory<uint> stepLinkMapping, ReadOnlyMemory<uint> userVariableMapping, Sequential_S container, Dictionary<uint, string> stepNameMapping);
+        public abstract ProcessStepObject ResolveTarget(uint next, uint abort, uint? breakp, uint? continuep, Context context, IReadOnlyDictionary<uint, Event> globals, ReadOnlyMemory<uint> stepLinkMapping, ReadOnlyMemory<uint> userVariableMapping, Sequential_S container, Dictionary<uint, string> stepNameMapping);
         public SortedSet<uint> __shader_user_variables_usage = new SortedSet<uint>();
         public IEnumerable<uint> ShaderUserVariablesUsage { get { return __shader_user_variables_usage; } }
 
@@ -112,9 +112,15 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Pr
         public abstract IEnumerable<ProcessShader> Shaders { get; }
         public abstract IEnumerable<ProcessShader> PostShaders { get; }
         public abstract IEnumerable<ProcessShader> AbortShaders { get; }
+        public abstract IEnumerable<ProcessShader> BreakShaders { get; }
+        public abstract IEnumerable<ProcessShader> ContinueShaders { get; }
         public IEnumerable<ProcessShader> ShaderObjectDirectAssignments => Shaders.Reverse().Where(x => x.Shader.Operand is ObjectReference && x.Shader.Expr.IsImmediateOperand).DistinctBy(x => x.Shader.Operand).Reverse();
         public IEnumerable<ProcessShader> PostShaderObjectDirectAssignments => PostShaders.Reverse().Where(x => x.Shader.Operand is ObjectReference && x.Shader.Expr.IsImmediateOperand).DistinctBy(x => x.Shader.Operand).Reverse();
         public IEnumerable<ProcessShader> AbortShaderObjectDirectAssignments => AbortShaders.Reverse().Where(x => x.Shader.Operand is ObjectReference && x.Shader.Expr.IsImmediateOperand).DistinctBy(x => x.Shader.Operand).Reverse();
+        public IEnumerable<ProcessShader> BreakShaderObjectDirectAssignments => BreakShaders.Reverse().Where(x => x.Shader.Operand is ObjectReference && x.Shader.Expr.IsImmediateOperand).DistinctBy(x => x.Shader.Operand).Reverse();
+        public IEnumerable<ProcessShader> ContiuneShaderObjectDirectAssignments => ContinueShaders.Reverse().Where(x => x.Shader.Operand is ObjectReference && x.Shader.Expr.IsImmediateOperand).DistinctBy(x => x.Shader.Operand).Reverse();
+
+
         public abstract IEnumerable<KeyValuePair<uint, (string name, Event evt)>> LocalEvents { get; }
     }
 

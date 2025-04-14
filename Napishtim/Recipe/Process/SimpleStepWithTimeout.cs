@@ -64,7 +64,33 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Pr
         {
             get
             {
-                if (_step["END_POINTS"].AsArray().Count == 3 && _step["END_POINTS"][2].AsObject().TryGetPropertyValue("POST_SHADERS", out var shaders))
+                if (_step.ContainsKey("ABORT_POINT") && _step["ABORT_POINT"].AsObject().TryGetPropertyValue("POST_SHADERS", out var shaders))
+                {
+                    return shaders.AsArray().Select(x => new ProcessShader(DEFAULT_NAME(x["NAME"]), new Shader(x["OBJECT"].GetValue<string>(), x["VALUE"].GetValue<string>())));
+                }
+                else
+                    return Enumerable.Empty<ProcessShader>();
+            }
+        }
+
+        public override IEnumerable<ProcessShader> BreakShaders
+        {
+            get
+            {
+                if (_step.ContainsKey("BREAK_POINT") && _step["BREAK_POINT"].AsObject().TryGetPropertyValue("POST_SHADERS", out var shaders))
+                {
+                    return shaders.AsArray().Select(x => new ProcessShader(DEFAULT_NAME(x["NAME"]), new Shader(x["OBJECT"].GetValue<string>(), x["VALUE"].GetValue<string>())));
+                }
+                else
+                    return Enumerable.Empty<ProcessShader>();
+            }
+        }
+
+        public override IEnumerable<ProcessShader> ContinueShaders
+        {
+            get
+            {
+                if (_step.ContainsKey("CONTINUE_POINT") && _step["CONTINUE_POINT"].AsObject().TryGetPropertyValue("POST_SHADERS", out var shaders))
                 {
                     return shaders.AsArray().Select(x => new ProcessShader(DEFAULT_NAME(x["NAME"]), new Shader(x["OBJECT"].GetValue<string>(), x["VALUE"].GetValue<string>())));
                 }
@@ -87,7 +113,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Pr
             }
         }
 
-        public string TerminationCondition
+        public string CompletionCondition
         {
             get
             {
@@ -99,15 +125,52 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Pr
         {
             get
             {
-                if (_step["END_POINTS"].AsArray().Count == 3)
-                    return string.Join('\n', _step["END_POINTS"][2]["TRIGGER"].AsArray().Select(x => x.GetValue<string>()));
+                if (_step.ContainsKey("ABORT_POINT"))
+                    return string.Join('\n', _step["ABORT_POINT"]["TRIGGER"].AsArray().Select(x => x.GetValue<string>()));
                 else
                     return string.Empty;
             }
         }
 
-        public SimpleStepWithTimeout_S(string name, IReadOnlyDictionary<uint, (string name, Event evt)>? locals, ProcessShaders? shaders, int timeout, JsonArray completionCondition, ProcessShaders? postShaders = null, JsonArray? abortCondition = null, ProcessShaders? abortShaders = null) : base(name)
+        public string BreakCondition
         {
+            get
+            {
+                if (_step.ContainsKey("BREAK_POINT"))
+                    return string.Join('\n', _step["BREAK_POINT"]["TRIGGER"].AsArray().Select(x => x.GetValue<string>()));
+                else
+                    return string.Empty;
+            }
+        }
+
+        public string ContinueCondition
+        {
+            get
+            {
+                if (_step.ContainsKey("CONTINUE_POINT"))
+                    return string.Join('\n', _step["CONTINUE_POINT"]["TRIGGER"].AsArray().Select(x => x.GetValue<string>()));
+                else
+                    return string.Empty;
+            }
+        }
+
+        private List<(byte, string)> __branch_priorities = new List<(byte, string)>();
+        public byte CompletionPriority { get; init; }
+        public byte AbortPriority { get; init; }
+        public byte BreakPriority { get; init; }
+        public byte ContinuePriority { get; init; }
+
+        public SimpleStepWithTimeout_S(string name, IReadOnlyDictionary<uint, (string name, Event evt)>? locals, ProcessShaders? shaders, int timeout, 
+            JsonArray completionCondition, ProcessShaders? postShaders = null, byte priorityCompletion = 0,
+            JsonArray? abortCondition = null, ProcessShaders? abortShaders = null, byte priorityAbort = 0,
+            JsonArray? breakCondition = null, ProcessShaders? breakShaders = null, byte priorityBreak = 0,
+            JsonArray? continueCondition = null, ProcessShaders? continueShaders = null, byte priorityContinue = 0) : base(name)
+        {
+            CompletionPriority = priorityCompletion;
+            AbortPriority = priorityAbort;
+            BreakPriority = priorityBreak;
+            ContinuePriority = priorityContinue;
+
             Timeout = timeout;
             if (locals != null && locals.Count > 0)
             {
@@ -127,13 +190,16 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Pr
 
             JsonObject timeoutBranch = new JsonObject();
             //timeoutBranch["TRIGGER"] = new JsonArray() { (new TIM(timeout)).ToJson().ToJsonString() };
-
+            if (completionCondition == null || completionCondition.Count == 0)
+                throw new NaposhtimDocumentException(NaposhtimExceptionCode.PROCESS_COMPONENT_ARGUMENTS_ERROR, $"You must define <Completion Condition>.");
             JsonObject defaultBranch = new JsonObject();
             defaultBranch["TRIGGER"] = completionCondition.DeepClone();
             if (postShaders != null)
                 defaultBranch["POST_SHADERS"] = postShaders.ToJson();
 
+            defaultBranch["PRIORITY"] = priorityCompletion;
             _step["END_POINTS"] = new JsonArray() { timeoutBranch, defaultBranch };
+            __branch_priorities.Add((priorityCompletion, "COMPLETION_POINT"));
 
             if (abortCondition != null && abortCondition.Count > 0)
             {
@@ -141,23 +207,73 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Pr
                 abortBranch["TRIGGER"] = abortCondition.DeepClone();
                 if (abortShaders != null)
                     abortBranch["POST_SHADERS"] = abortShaders.ToJson();
-                _step["END_POINTS"].AsArray().Add(abortBranch);
+                abortBranch["PRIORITY"] = priorityAbort;
+                _step["ABORT_POINT"] = abortBranch;
+                __branch_priorities.Add((priorityAbort, "ABORT_POINT"));
             }
+            else if (abortShaders?.Shaders.Count() > 0)
+                throw new NaposhtimDocumentException(NaposhtimExceptionCode.PROCESS_COMPONENT_ARGUMENTS_ERROR, $"You must define <Abort Condition> to enable <Abort Shaders>.");
+
+            if (breakCondition != null && breakCondition.Count > 0)
+            {
+                JsonObject breakPoint = new JsonObject();
+                breakPoint["TRIGGER"] = breakCondition.DeepClone();
+                if (breakShaders != null)
+                    breakPoint["POST_SHADERS"] = breakShaders.ToJson();
+                breakPoint["PRIORITY"] = priorityBreak;
+                _step["BREAK_POINT"] = breakPoint;
+                __branch_priorities.Add((priorityBreak, "BREAK_POINT"));
+            }
+            else if (breakShaders?.Shaders.Count() > 0)
+                throw new NaposhtimDocumentException(NaposhtimExceptionCode.PROCESS_COMPONENT_ARGUMENTS_ERROR, $"You must define <Break Condition> to enable <Break Shaders>.");
+
+            if (continueCondition != null && continueCondition.Count > 0)
+            {
+                JsonObject continuePoint = new JsonObject();
+                continuePoint["TRIGGER"] = continueCondition.DeepClone();
+                if (continueShaders != null)
+                    continuePoint["POST_SHADERS"] = continueShaders.ToJson();
+                continuePoint["PRIORITY"] = priorityContinue;
+                _step["CONTINUE_POINT"] = continuePoint;
+                __branch_priorities.Add((priorityContinue, "CONTINUE_POINT"));
+            }
+            else if (continueShaders?.Shaders.Count() > 0)
+                throw new NaposhtimDocumentException(NaposhtimExceptionCode.PROCESS_COMPONENT_ARGUMENTS_ERROR, $"You must define <Continue Condition> to enable <Continue Shaders>.");
+
+            __branch_priorities.Sort(delegate (ValueTuple<byte, string> x, ValueTuple<byte, string> y)
+            {
+                return x.Item1.CompareTo(y.Item1);
+            });
 
             StepFootprint = 1;
             UserVariableFootprint = 1;
             AddGlobalEventRefernce(completionCondition);
             AddGlobalEventRefernce(abortCondition);
+            AddGlobalEventRefernce(breakCondition);
+            AddGlobalEventRefernce(continueCondition);
             if (shaders != null)
                 AddShaderUserVariablesUsage(shaders.Shaders.SelectMany(x => x.Shader.UserVariablesUsage));
             if (postShaders != null)
                 AddShaderUserVariablesUsage(postShaders.Shaders.SelectMany(x => x.Shader.UserVariablesUsage));
             if (abortShaders != null)
                 AddShaderUserVariablesUsage(abortShaders.Shaders.SelectMany(x => x.Shader.UserVariablesUsage));
+            if (breakShaders != null)
+                AddShaderUserVariablesUsage(breakShaders.Shaders.SelectMany(x => x.Shader.UserVariablesUsage));
+            if (continueShaders != null)
+                AddShaderUserVariablesUsage(continueShaders.Shaders.SelectMany(x => x.Shader.UserVariablesUsage));
         }
 
-        public SimpleStepWithTimeout_S(string name, IReadOnlyDictionary<uint, (string name, Event evt)>? locals, ProcessShaders? shaders, SimpleStepWithTimeout_S timeout, JsonArray completionCondition, ProcessShaders? postShaders = null, JsonArray? abortCondition = null, ProcessShaders? abortShaders = null) : base(name)
+        public SimpleStepWithTimeout_S(string name, IReadOnlyDictionary<uint, (string name, Event evt)>? locals, ProcessShaders? shaders, SimpleStepWithTimeout_S timeout, 
+            JsonArray completionCondition, ProcessShaders? postShaders = null, byte priorityCompletion = 0,
+            JsonArray? abortCondition = null, ProcessShaders? abortShaders = null, byte priorityAbort = 0,
+            JsonArray? breakCondition = null, ProcessShaders? breakShaders = null, byte priorityBreak = 0,
+            JsonArray? continueCondition = null, ProcessShaders? continueShaders = null, byte priorityContinue = 0) : base(name)
         {
+            CompletionPriority = priorityCompletion;
+            AbortPriority = priorityAbort;
+            BreakPriority = priorityBreak;
+            ContinuePriority = priorityContinue;
+
             EmployPreceding = timeout;
             if (locals != null && locals.Count > 0)
             {
@@ -177,13 +293,16 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Pr
 
             JsonObject timeoutBranch = new JsonObject();
             //timeoutBranch["TRIGGER"] = new JsonArray();
-
+            if (completionCondition == null || completionCondition.Count == 0)
+                throw new NaposhtimDocumentException(NaposhtimExceptionCode.PROCESS_COMPONENT_ARGUMENTS_ERROR, $"You must define <Completion Condition>.");
             JsonObject defaultBranch = new JsonObject();
             defaultBranch["TRIGGER"] = completionCondition.DeepClone();
             if (postShaders != null)
                 defaultBranch["POST_SHADERS"] = postShaders.ToJson();
 
+            defaultBranch["PRIORITY"] = priorityCompletion;
             _step["END_POINTS"] = new JsonArray() { timeoutBranch, defaultBranch };
+            __branch_priorities.Add((priorityCompletion, "COMPLETION_POINT"));
 
             if (abortCondition != null && abortCondition.Count > 0)
             {
@@ -191,36 +310,142 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Pr
                 abortBranch["TRIGGER"] = abortCondition.DeepClone();
                 if (abortShaders != null)
                     abortBranch["POST_SHADERS"] = abortShaders.ToJson();
-                _step["END_POINTS"].AsArray().Add(abortBranch);
+                abortBranch["PRIORITY"] = priorityAbort;
+                _step["ABORT_POINT"] = abortBranch;
+                __branch_priorities.Add((priorityAbort, "ABORT_POINT"));
             }
+            else if(abortShaders?.Shaders.Count() > 0)
+                throw new NaposhtimDocumentException(NaposhtimExceptionCode.PROCESS_COMPONENT_ARGUMENTS_ERROR, $"You must define <Abort Condition> to enable <Abort Shaders>.");
+
+            if (breakCondition != null && breakCondition.Count > 0)
+            {
+                JsonObject breakPoint = new JsonObject();
+                breakPoint["TRIGGER"] = breakCondition.DeepClone();
+                if (breakShaders != null)
+                    breakPoint["POST_SHADERS"] = breakShaders.ToJson();
+                breakPoint["PRIORITY"] = priorityBreak;
+                _step["BREAK_POINT"] = breakPoint;
+                __branch_priorities.Add((priorityBreak, "BREAK_POINT"));
+            }
+            else if (breakShaders?.Shaders.Count() > 0)
+                throw new NaposhtimDocumentException(NaposhtimExceptionCode.PROCESS_COMPONENT_ARGUMENTS_ERROR, $"You must define <Break Condition> to enable <Break Shaders>.");
+
+            if (continueCondition != null && continueCondition.Count > 0)
+            {
+                JsonObject continuePoint = new JsonObject();
+                continuePoint["TRIGGER"] = continueCondition.DeepClone();
+                if (continueShaders != null)
+                    continuePoint["POST_SHADERS"] = continueShaders.ToJson();
+                continuePoint["PRIORITY"] = priorityContinue;
+                _step["CONTINUE_POINT"] = continuePoint;
+                __branch_priorities.Add((priorityContinue, "CONTINUE_POINT"));
+            }
+            else if (continueShaders?.Shaders.Count() > 0)
+                throw new NaposhtimDocumentException(NaposhtimExceptionCode.PROCESS_COMPONENT_ARGUMENTS_ERROR, $"You must define <Continue Condition> to enable <Continue Shaders>.");
+
+            __branch_priorities.Sort(delegate (ValueTuple<byte, string> x, ValueTuple<byte, string> y)
+            {
+                return x.Item1.CompareTo(y.Item1);
+            });
 
             StepFootprint = 1;
             UserVariableFootprint = 1;
             AddGlobalEventRefernce(completionCondition);
             AddGlobalEventRefernce(abortCondition);
+            AddGlobalEventRefernce(breakCondition);
+            AddGlobalEventRefernce(continueCondition);
             if (shaders != null)
                 AddShaderUserVariablesUsage(shaders.Shaders.SelectMany(x => x.Shader.UserVariablesUsage));
             if (postShaders != null)
                 AddShaderUserVariablesUsage(postShaders.Shaders.SelectMany(x => x.Shader.UserVariablesUsage));
             if (abortShaders != null)
                 AddShaderUserVariablesUsage(abortShaders.Shaders.SelectMany(x => x.Shader.UserVariablesUsage));
+            if (breakShaders != null)
+                AddShaderUserVariablesUsage(breakShaders.Shaders.SelectMany(x => x.Shader.UserVariablesUsage));
+            if (continueShaders != null)
+                AddShaderUserVariablesUsage(continueShaders.Shaders.SelectMany(x => x.Shader.UserVariablesUsage));
         }
 
         private SimpleStepWithTimeout_S(JsonObject node, Sequential_S container) : base(node["NAME"].GetValue<string>())
         {
             _step = node["STEP"].DeepClone().AsObject();
             AddGlobalEventRefernce(_step["END_POINTS"][1]["TRIGGER"].AsArray());
+
             if (_step.ContainsKey("SHADERS"))
                 AddShaderUserVariablesUsage(_step["SHADERS"].AsArray());
             if (_step["END_POINTS"][1].AsObject().ContainsKey("POST_SHADERS"))
                 AddShaderUserVariablesUsage(_step["END_POINTS"][1]["POST_SHADERS"].AsArray());
+            if (_step["END_POINTS"][1].AsObject().ContainsKey("PRIORITY"))
+            {
+                __branch_priorities.Add((_step["END_POINTS"][1]["PRIORITY"].GetValue<byte>(), "COMPLETION_POINT"));
+                CompletionPriority = _step["END_POINTS"][1]["PRIORITY"].GetValue<byte>();
+            }
+            else
+            {
+                __branch_priorities.Add((0, "COMPLETION_POINT"));
+                CompletionPriority = 0;
+            }
 
             if (_step["END_POINTS"].AsArray().Count == 3)
             {
-                AddGlobalEventRefernce(_step["END_POINTS"][2]["TRIGGER"].AsArray());
-                if (_step["END_POINTS"][2].AsObject().ContainsKey("POST_SHADERS"))
-                    AddShaderUserVariablesUsage(_step["END_POINTS"][2]["POST_SHADERS"].AsArray());
+                _step["ABORT_POINT"] = _step["END_POINTS"][2].DeepClone();
+                _step["END_POINTS"].AsArray().RemoveAt(2);
             }
+
+            if (_step.ContainsKey("ABORT_POINT"))
+            {
+                AddGlobalEventRefernce(_step["ABORT_POINT"]["TRIGGER"].AsArray());
+                if (_step["ABORT_POINT"].AsObject().ContainsKey("POST_SHADERS"))
+                    AddShaderUserVariablesUsage(_step["ABORT_POINT"]["POST_SHADERS"].AsArray());
+                if (_step["ABORT_POINT"].AsObject().ContainsKey("PRIORITY"))
+                {
+                    __branch_priorities.Add((_step["ABORT_POINT"]["PRIORITY"].GetValue<byte>(), "ABORT_POINT"));
+                    AbortPriority = _step["ABORT_POINT"]["PRIORITY"].GetValue<byte>();
+                }
+                else
+                {
+                    __branch_priorities.Add((0, "ABORT_POINT"));
+                    AbortPriority = 0;
+                }
+            }
+
+            if (_step.ContainsKey("BREAK_POINT"))
+            {
+                AddGlobalEventRefernce(_step["BREAK_POINT"]["TRIGGER"].AsArray());
+                if (_step["BREAK_POINT"].AsObject().ContainsKey("POST_SHADERS"))
+                    AddShaderUserVariablesUsage(_step["BREAK_POINT"]["POST_SHADERS"].AsArray());
+                if (_step["BREAK_POINT"].AsObject().ContainsKey("PRIORITY"))
+                {
+                    __branch_priorities.Add((_step["BREAK_POINT"]["PRIORITY"].GetValue<byte>(), "BREAK_POINT"));
+                    BreakPriority = _step["BREAK_POINT"]["PRIORITY"].GetValue<byte>();
+                }
+                else
+                {
+                    __branch_priorities.Add((0, "BREAK_POINT"));
+                    BreakPriority = 0;
+                }
+            }
+            if (_step.ContainsKey("CONTINUE_POINT"))
+            {
+                AddGlobalEventRefernce(_step["CONTINUE_POINT"]["TRIGGER"].AsArray());
+                if (_step["CONTINUE_POINT"].AsObject().ContainsKey("POST_SHADERS"))
+                    AddShaderUserVariablesUsage(_step["CONTINUE_POINT"]["POST_SHADERS"].AsArray());
+                if (_step["CONTINUE_POINT"].AsObject().ContainsKey("PRIORITY"))
+                {
+                    __branch_priorities.Add((_step["CONTINUE_POINT"]["PRIORITY"].GetValue<byte>(), "CONTINUE_POINT"));
+                    ContinuePriority = _step["CONTINUE_POINT"]["PRIORITY"].GetValue<byte>();
+                }
+                else
+                {
+                    __branch_priorities.Add((0, "CONTINUE_POINT"));
+                    ContinuePriority = 0;
+                }
+            }
+
+            __branch_priorities.Sort(delegate (ValueTuple<byte, string> x, ValueTuple<byte, string> y)
+            {
+                return x.Item1.CompareTo(y.Item1);
+            });
 
             StepFootprint = 1;
             UserVariableFootprint = 1;
@@ -238,15 +463,92 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Pr
                 throw new NaposhtimDocumentException(NaposhtimExceptionCode.PROCESS_COMPONENT_ARGUMENTS_ERROR, $"Can not restore SimpleStepWithTimeout_S object from node:\n{node.ToString()}");
         }
 
-        public override ProcessStepObject ResolveTarget(uint next, uint abort, Context context, IReadOnlyDictionary<uint, Event> globals, ReadOnlyMemory<uint> stepLinkMapping, ReadOnlyMemory<uint> userVariableMapping, Sequential_S container, Dictionary<uint, string> stepNameMapping)
+        public override ProcessStepObject ResolveTarget(uint next, uint abort, uint? breakp, uint? continuep, Context context, IReadOnlyDictionary<uint, Event> globals, ReadOnlyMemory<uint> stepLinkMapping, ReadOnlyMemory<uint> userVariableMapping, Sequential_S container, Dictionary<uint, string> stepNameMapping)
         {
-            JsonObject chewed;
-            chewed = _step.DeepClone().AsObject();
+            JsonObject chewed = new JsonObject();
+            //chewed = _step.DeepClone().AsObject();
+            if (_step.ContainsKey("EVENTS"))
+                chewed["EVENTS"] = _step["EVENTS"].DeepClone();
+            if (_step.ContainsKey("SHADERS"))
+                chewed["SHADERS"] = _step["SHADERS"].DeepClone();
+            chewed["ID"] = stepLinkMapping.Span[0];
+
+            int completionIdx = -1, abortIdx = -1, breakIdx = -1, continueIdx = -1;
+            JsonNode branch;
+            chewed["END_POINTS"] = new JsonArray();
+            for (int p = 0; p < __branch_priorities.Count; ++p)
+            {
+                switch (__branch_priorities[p].Item2)
+                {
+                    case "COMPLETION_POINT":
+                        if (container.TimeToTimeout.ContainsKey(this) == false)
+                            container.TimeToTimeout[this] = new Expression($"&USER{userVariableMapping.Span[0]}", null);
+
+                        branch = new JsonObject();
+                        branch["POST_SHADERS"] = new JsonArray() 
+                        { 
+                            new JsonObject { { "OBJECT", $"&USER{userVariableMapping.Span[0]}" },{ "VALUE", $"0" } } 
+                        };
+                        branch["TARGET"] = next;
+                        chewed["END_POINTS"].AsArray().Add(branch);
+
+                        branch = _step["END_POINTS"][1].DeepClone();
+                        branch.AsObject().Remove("PRIORITY");
+                        branch["TARGET"] = next;
+                        if (branch.AsObject().ContainsKey("POST_SHADERS"))
+                            branch["POST_SHADERS"].AsArray().Add(new JsonObject { { "OBJECT", $"&USER{userVariableMapping.Span[0]}" } , { "VALUE", $"0" } });
+                        else
+                            branch["POST_SHADERS"] = new JsonArray()
+                            {
+                                new JsonObject { { "OBJECT", $"&USER{userVariableMapping.Span[0]}" },{ "VALUE", $"0" } }
+                            };
+                        chewed["END_POINTS"].AsArray().Add(branch);
+                        completionIdx = chewed["END_POINTS"].AsArray().Count - 1;
+                        break;
+                    case "ABORT_POINT":
+                        branch = _step["ABORT_POINT"].DeepClone();
+                        branch.AsObject().Remove("PRIORITY");
+                        branch["TARGET"] = abort;
+                        chewed["END_POINTS"].AsArray().Add(branch);
+                        abortIdx = chewed["END_POINTS"].AsArray().Count - 1;
+                        break;
+                    case "BREAK_POINT":
+                        if (breakp == null)
+                            throw new NaposhtimDocumentException(NaposhtimExceptionCode.PROCESS_COMPONENT_ARGUMENTS_ERROR, $"Must provide break branch target to resolve ProcessStepSource with BREAK_POINT.");
+                        branch = _step["BREAK_POINT"].DeepClone();
+                        branch.AsObject().Remove("PRIORITY");
+                        branch["TARGET"] = breakp;
+                        if (branch.AsObject().ContainsKey("POST_SHADERS"))
+                            branch["POST_SHADERS"].AsArray().Add(new JsonObject { { "OBJECT", $"&USER{userVariableMapping.Span[0]}" } , { "VALUE", $"0" }});
+                        else
+                            branch["POST_SHADERS"] = new JsonArray(){new JsonObject { { "OBJECT", $"&USER{userVariableMapping.Span[0]}" }, { "VALUE", $"0" }}};
+                        chewed["END_POINTS"].AsArray().Add(branch);
+                        breakIdx = chewed["END_POINTS"].AsArray().Count - 1;
+                        break;
+                    case "CONTINUE_POINT":
+                        if (continuep == null)
+                            throw new NaposhtimDocumentException(NaposhtimExceptionCode.PROCESS_COMPONENT_ARGUMENTS_ERROR, $"Must provide continue branch target to resolve ProcessStepSource with CONTINUE_POINT.");
+                        branch = _step["CONTINUE_POINT"].DeepClone();
+                        branch.AsObject().Remove("PRIORITY");
+                        branch["TARGET"] = continuep;
+                        if (branch.AsObject().ContainsKey("POST_SHADERS"))
+                            branch["POST_SHADERS"].AsArray().Add(new JsonObject { { "OBJECT", $"&USER{userVariableMapping.Span[0]}"}, { "VALUE", $"0" }});
+                        else
+                            branch["POST_SHADERS"] = new JsonArray(){new JsonObject { { "OBJECT", $"&USER{userVariableMapping.Span[0]}" } ,{"VALUE",$"0"}}};
+                        chewed["END_POINTS"].AsArray().Add(branch);
+                        continueIdx = chewed["END_POINTS"].AsArray().Count - 1;
+                        break;
+                }
+            }
+
+            stepNameMapping[stepLinkMapping.Span[0]] = String.Join('/', container.FullName, Name);
 
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////
             int pos = container.IndexOf(this);
 
             var abortShaderSearchRange = container.OriginalProcessSteps.Take(pos).SelectMany(x => x.ShaderObjectDirectAssignments.Concat(x.PostShaderObjectDirectAssignments)).Concat(ShaderObjectDirectAssignments).Reverse();
+            var breaskShaderSearchRange = container.OriginalProcessSteps.Take(pos).SelectMany(x => x.ShaderObjectDirectAssignments.Concat(x.PostShaderObjectDirectAssignments)).Concat(ShaderObjectDirectAssignments).Reverse();
+            var continueShaderSearchRange = container.OriginalProcessSteps.Take(pos).SelectMany(x => x.ShaderObjectDirectAssignments.Concat(x.PostShaderObjectDirectAssignments)).Concat(ShaderObjectDirectAssignments).Reverse();
             var postShaderSearchRange = container.OriginalProcessSteps.Take(pos).SelectMany(x => x.ShaderObjectDirectAssignments.Concat(x.PostShaderObjectDirectAssignments)).Concat(ShaderObjectDirectAssignments).Reverse();
             var shaderSearchRange = container.OriginalProcessSteps.Take(pos).SelectMany(x => x.ShaderObjectDirectAssignments.Concat(x.PostShaderObjectDirectAssignments)).Reverse();
 
@@ -259,9 +561,27 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Pr
                     (AbortShaders.TakeLast(AbortShaders.Count() - p - 1).FirstOrDefault(y => x.Shader.Operand.Equals(y.Shader.Operand)) == null &&
                     !(abortShaderSearchRange.FirstOrDefault(z => x.Shader.Operand.Equals(z.Shader.Operand))?.Shader.Expr.Equals(x.Shader.Expr) == true)));
 
-                chewed["END_POINTS"][2]["POST_SHADERS"] = new JsonArray(tempShaders.Select(x => x.ToJson()).ToArray());
-                if ((chewed["END_POINTS"][2]["POST_SHADERS"] as JsonArray).Count == 0)
-                    chewed["END_POINTS"][2].AsObject().Remove("POST_SHADERS");
+                chewed["END_POINTS"][abortIdx]["POST_SHADERS"] = new JsonArray(tempShaders.Select(x => x.ToJson()).ToArray());
+                if ((chewed["END_POINTS"][abortIdx]["POST_SHADERS"] as JsonArray).Count == 0)
+                    chewed["END_POINTS"][abortIdx].AsObject().Remove("POST_SHADERS");
+            }
+
+            if (BreakShaders.Count() != 0)
+            {
+                tempShaders = BreakShaders.Where(
+                    (x, p) => !(x.Shader.Operand is ObjectReference) || x.Shader.Expr.IsImmediateOperand == false ||
+                    (BreakShaders.TakeLast(BreakShaders.Count() - p - 1).FirstOrDefault(y => x.Shader.Operand.Equals(y.Shader.Operand)) == null &&
+                    !(breaskShaderSearchRange.FirstOrDefault(z => x.Shader.Operand.Equals(z.Shader.Operand))?.Shader.Expr.Equals(x.Shader.Expr) == true)));
+                chewed["END_POINTS"][breakIdx]["POST_SHADERS"] = new JsonArray(tempShaders.Select(x => x.ToJson()).ToArray());
+            }
+
+            if (ContinueShaders.Count() != 0)
+            {
+                tempShaders = ContinueShaders.Where(
+                    (x, p) => !(x.Shader.Operand is ObjectReference) || x.Shader.Expr.IsImmediateOperand == false ||
+                    (ContinueShaders.TakeLast(ContinueShaders.Count() - p - 1).FirstOrDefault(y => x.Shader.Operand.Equals(y.Shader.Operand)) == null &&
+                    !(continueShaderSearchRange.FirstOrDefault(z => x.Shader.Operand.Equals(z.Shader.Operand))?.Shader.Expr.Equals(x.Shader.Expr) == true)));
+                chewed["END_POINTS"][continueIdx]["POST_SHADERS"] = new JsonArray(tempShaders.Select(x => x.ToJson()).ToArray());
             }
 
             if (PostShaders.Count() != 0)
@@ -271,9 +591,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Pr
                 (PostShaders.TakeLast(PostShaders.Count() - p - 1).FirstOrDefault(y => x.Shader.Operand.Equals(y.Shader.Operand)) == null &&
                 !(postShaderSearchRange.FirstOrDefault(z => x.Shader.Operand.Equals(z.Shader.Operand))?.Shader.Expr.Equals(x.Shader.Expr) == true)));
 
-                chewed["END_POINTS"][1]["POST_SHADERS"] = new JsonArray(tempShaders.Select(x => x.ToJson()).ToArray());
-                if ((chewed["END_POINTS"][1]["POST_SHADERS"] as JsonArray).Count == 0)
-                    chewed["END_POINTS"][1].AsObject().Remove("POST_SHADERS");
+                chewed["END_POINTS"][completionIdx]["POST_SHADERS"] = new JsonArray(tempShaders.Select(x => x.ToJson()).ToArray());
             }
 
             if (Shaders.Count() != 0)
@@ -290,30 +608,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Pr
 
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-
-
-            JsonArray postShaders = new JsonArray();
-            JsonObject postShader = new JsonObject();
-            postShader["OBJECT"] = $"&USER{userVariableMapping.Span[0]}";
-            //postShader["VALUE"] = $"{Timeout}-&STDURA";
-            if (container.TimeToTimeout.ContainsKey(this) == false)
-                container.TimeToTimeout[this] = new Expression(postShader["OBJECT"].GetValue<string>(), null);
-            if (chewed["END_POINTS"][1].AsObject().TryGetPropertyValue("POST_SHADERS", out _))
-                chewed["END_POINTS"][1]["POST_SHADERS"].AsArray().Add(postShader);
-            else
-            {
-                postShaders.Add(postShader);
-                chewed["END_POINTS"][1]["POST_SHADERS"] = postShaders;
-            }
-
-            chewed["ID"] = stepLinkMapping.Span[0];
-            chewed["END_POINTS"][0]["TARGET"] = next;
-            chewed["END_POINTS"][1]["TARGET"] = next;
-            if (chewed["END_POINTS"].AsArray().Count == 3)
-                chewed["END_POINTS"][2]["TARGET"] = abort;
-            stepNameMapping[stepLinkMapping.Span[0]] = String.Join('/', container.FullName, Name);
-
-            return new SimpleStepWithTimeout_O(Name, chewed, StepFootprint, UserVariableFootprint, EmployPreceding, Timeout);
+            return new SimpleStepWithTimeout_O(Name, chewed, StepFootprint, UserVariableFootprint, EmployPreceding, Timeout,  completionIdx, breakIdx, continueIdx);
         }
 
         public override JsonObject SaveAsJson(Sequential_S container)
@@ -381,40 +676,71 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Pr
                 foreach (var s in shaders.AsArray())
                     sb.Append($"\n\t{DEFAULT_NAME(s["NAME"])}: {s["OBJECT"].GetValue<string>()} := {s["VALUE"].GetValue<string>()}");
             }
-            sb.Append("\nTermination conditions:");
 
-            sb.Append($"\n\tPriority 0:\n\t\tIf:");
-            if (EmployPreceding == null)
-                sb.Append($"\n\t\t\t{Timeout} millisecond(s) passed");
-            else
-                sb.Append($"\n\t\t\t[{EmployPreceding.__time_to_timeout_string(container)}] millisecond(s) passed"); ;
-            JsonObject defaultBranch = _step["END_POINTS"][1].AsObject();
-            sb.Append($"\n\tPriority 1:\n\t\tIf:");
-            foreach (var line in defaultBranch["TRIGGER"].AsArray())
-                sb.Append($"\n\t\t\t{line.GetValue<string>()}");
-            if (defaultBranch.TryGetPropertyValue("POST_SHADERS", out var post))
+            foreach (var p in __branch_priorities)
             {
-                sb.Append($"\n\t\tThen:");
-                foreach (var s in post.AsArray())
-                    sb.Append($"\n\t\t\t{DEFAULT_NAME(s["NAME"])}: {s["OBJECT"].GetValue<string>()} := {s["VALUE"].GetValue<string>()}");
-            }
-
-            if (_step["END_POINTS"].AsArray().Count == 3)
-            {
-                sb.Append("\nAbort conditions:");
-                JsonObject abortBranch = _step["END_POINTS"][2].AsObject();
-                sb.Append($"\n\tPriority 0:\n\t\tIf:");
-
-                foreach (var line in abortBranch["TRIGGER"].AsArray())
-                    sb.Append($"\n\t\t\t{line.GetValue<string>()}");
-                if (abortBranch.TryGetPropertyValue("POST_SHADERS", out var abort))
+                switch (p.Item2)
                 {
-                    sb.Append($"\n\t\tThen:");
-                    foreach (var s in abort.AsArray())
-                        sb.Append($"\n\t\t\t{DEFAULT_NAME(s["NAME"])}: {s["OBJECT"].GetValue<string>()} := {s["VALUE"].GetValue<string>()}");
+                    case "COMPLETION_POINT":
+                        sb.Append("\nCompletion conditions:");
+                        sb.Append($"\n\tPriority {p.Item1}.0:\n\t\tIf:");
+                        if (EmployPreceding == null)
+                            sb.Append($"\n\t\t\t{Timeout} millisecond(s) passed");
+                        else
+                            sb.Append($"\n\t\t\t[{EmployPreceding.__time_to_timeout_string(container)}] millisecond(s) passed"); ;
+                        JsonObject defaultBranch = _step["END_POINTS"][1].AsObject();
+                        sb.Append($"\n\tPriority {p.Item1}.1:\n\t\tIf:");
+                        foreach (var line in defaultBranch["TRIGGER"].AsArray())
+                            sb.Append($"\n\t\t\t{line.GetValue<string>()}");
+                        if (defaultBranch.TryGetPropertyValue("POST_SHADERS", out var post))
+                        {
+                            sb.Append($"\n\t\tThen:");
+                            foreach (var s in post.AsArray())
+                                sb.Append($"\n\t\t\t{DEFAULT_NAME(s["NAME"])}: {s["OBJECT"].GetValue<string>()} := {s["VALUE"].GetValue<string>()}");
+                        }
+                        break;
+                    case "ABORT_POINT":
+                        sb.Append("\nAbort conditions:");
+                        JsonObject abortBranch = _step["ABORT_POINT"].AsObject();
+                        sb.Append($"\n\tPriority {p.Item1}.0:\n\t\tIf:");
+
+                        foreach (var line in abortBranch["TRIGGER"].AsArray())
+                            sb.Append($"\n\t\t\t{line.GetValue<string>()}");
+                        if (abortBranch.TryGetPropertyValue("POST_SHADERS", out var abort))
+                        {
+                            sb.Append($"\n\t\tThen:");
+                            foreach (var s in abort.AsArray())
+                                sb.Append($"\n\t\t\t{DEFAULT_NAME(s["NAME"])}: {s["OBJECT"].GetValue<string>()} := {s["VALUE"].GetValue<string>()}");
+                        }
+                        break;
+                    case "BREAK_POINT":
+                        sb.Append("\nBreak conditions:");
+                        JsonObject breakBranch = _step["BREAK_POINT"].AsObject();
+                        sb.Append($"\n\tPriority {p.Item1}.0:\n\t\tIf:");
+                        foreach (var line in breakBranch["TRIGGER"].AsArray())
+                            sb.Append($"\n\t\t\t{line.GetValue<string>()}");
+                        if (breakBranch.AsObject().TryGetPropertyValue("POST_SHADERS", out var breakp))
+                        {
+                            sb.Append($"\n\t\tThen:");
+                            foreach (var s in breakp.AsArray())
+                                sb.Append($"\n\t\t\t{DEFAULT_NAME(s["NAME"])}: {s["OBJECT"].GetValue<string>()} := {s["VALUE"].GetValue<string>()}");
+                        }
+                        break;
+                    case "CONTINUE_POINT":
+                        sb.Append("\nContinue conditions:");
+                        JsonObject continueBranch = _step["CONTINUE_POINT"].AsObject();
+                        sb.Append($"\n\tPriority  {p.Item1}.0:\n\t\tIf:");
+                        foreach (var line in continueBranch["TRIGGER"].AsArray())
+                            sb.Append($"\n\t\t\t{line.GetValue<string>()}");
+                        if (continueBranch.AsObject().TryGetPropertyValue("POST_SHADERS", out var continuep))
+                        {
+                            sb.Append($"\n\t\tThen:");
+                            foreach (var s in continuep.AsArray())
+                                sb.Append($"\n\t\t\t{DEFAULT_NAME(s["NAME"])}: {s["OBJECT"].GetValue<string>()} := {s["VALUE"].GetValue<string>()}");
+                        }
+                        break;
                 }
             }
-
             return sb.ToString();
         }
 
@@ -428,13 +754,19 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Pr
     {
         public SimpleStepWithTimeout_S? EmployPreceding { get; private init; }
         public int Timeout { get; private init; }
+        public int CompletionIdx { get; private init; }
+        public int BreakIdx { get; private init; }
+        public int ContinueIdx { get; private init; }
 
-        internal SimpleStepWithTimeout_O(string name, JsonObject step, int stepFootprint, int userVariableFootprint, SimpleStepWithTimeout_S? employPreceding, int timeout) : base(name, step)
+        internal SimpleStepWithTimeout_O(string name, JsonObject step, int stepFootprint, int userVariableFootprint, SimpleStepWithTimeout_S? employPreceding, int timeout, int completionIdx, int breakIdx, int continueIdx) : base(name, step)
         {
             StepFootprint = stepFootprint;
             UserVariableFootprint = userVariableFootprint;
             EmployPreceding = employPreceding;
             Timeout = timeout;
+            CompletionIdx = completionIdx;
+            BreakIdx = breakIdx;
+            ContinueIdx = continueIdx;
         }
 
         public override Step Build(Context context, IReadOnlyDictionary<uint, Event> globals, Sequential_O container)
@@ -447,14 +779,22 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Pr
                 else
                 {
                     var node = new TIM("TIM", ("TIMEOUT", container.TimeToTimeout[EmployPreceding]));
-                    chewed["END_POINTS"][0]["TRIGGER"] = new JsonArray() { node.ToJson().ToJsonString() };
+                    chewed["END_POINTS"][CompletionIdx - 1]["TRIGGER"] = new JsonArray() { node.ToJson().ToJsonString() };
                 }
-                chewed["END_POINTS"][1]["POST_SHADERS"].AsArray()[^1]["VALUE"] = $"{container.TimeToTimeout[EmployPreceding]}-&STDURA";
+                chewed["END_POINTS"][CompletionIdx]["POST_SHADERS"].AsArray()[^1]["VALUE"] = $"{container.TimeToTimeout[EmployPreceding]}-&STDURA";
+                if (BreakIdx != -1)
+                    chewed["END_POINTS"][BreakIdx]["POST_SHADERS"].AsArray()[^1]["VALUE"] = $"{container.TimeToTimeout[EmployPreceding]}-&STDURA";
+                if (ContinueIdx != -1)
+                    chewed["END_POINTS"][ContinueIdx]["POST_SHADERS"].AsArray()[^1]["VALUE"] = $"{container.TimeToTimeout[EmployPreceding]}-&STDURA";
             }
             else
             {
-                chewed["END_POINTS"][0]["TRIGGER"] = new JsonArray() { new TIM(Timeout).ToJson().ToJsonString() };
-                chewed["END_POINTS"][1]["POST_SHADERS"].AsArray()[^1]["VALUE"] = $"{Timeout}-&STDURA";
+                chewed["END_POINTS"][CompletionIdx - 1]["TRIGGER"] = new JsonArray() { new TIM(Timeout).ToJson().ToJsonString() };
+                chewed["END_POINTS"][CompletionIdx]["POST_SHADERS"].AsArray()[^1]["VALUE"] = $"{Timeout}-&STDURA";
+                if (BreakIdx != -1)
+                    chewed["END_POINTS"][BreakIdx]["POST_SHADERS"].AsArray()[^1]["VALUE"] = $"{Timeout}-&STDURA";
+                if (ContinueIdx != -1)
+                    chewed["END_POINTS"][ContinueIdx]["POST_SHADERS"].AsArray()[^1]["VALUE"] = $"{Timeout}-&STDURA";
             }
 
             uint inlineEvent = 10000;

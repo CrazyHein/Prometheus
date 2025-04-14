@@ -24,6 +24,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Pr
         public override IEnumerable<ProcessShader> PostShaders => throw new NotImplementedException();
         public override IEnumerable<ProcessShader> AbortShaders => throw new NotImplementedException();
 
+        public override IEnumerable<ProcessShader> BreakShaders => throw new NotImplementedException();
+
+        public override IEnumerable<ProcessShader> ContinueShaders => throw new NotImplementedException();
+
         public override IEnumerable<KeyValuePair<uint, (string name, Event evt)>> LocalEvents => throw new NotImplementedException();
 
         public BranchStep_S(string name, IEnumerable<(string name, string condition, Expression a, Expression b, ProcessShaders? postShader, uint next)> branches) : base(name)
@@ -105,7 +109,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Pr
             UserVariableFootprint = 0;
         }
 
-        public override ProcessStepObject ResolveTarget(uint next, uint abort, Context context, IReadOnlyDictionary<uint, Event> globals, ReadOnlyMemory<uint> stepLinkMapping, ReadOnlyMemory<uint> userVariableMapping, Sequential_S container, Dictionary<uint, string> stepNameMapping)
+        public override ProcessStepObject ResolveTarget(uint next, uint abort, uint? breakp, uint? continuep, Context context, IReadOnlyDictionary<uint, Event> globals, ReadOnlyMemory<uint> stepLinkMapping, ReadOnlyMemory<uint> userVariableMapping, Sequential_S container, Dictionary<uint, string> stepNameMapping)
         {
             JsonObject chewed;
             chewed = _step.DeepClone().AsObject();

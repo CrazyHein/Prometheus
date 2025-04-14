@@ -331,7 +331,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
         }
 
 
-        public override ControlBlockObject ResolveTarget(uint next,uint abort, Context context, IReadOnlyDictionary<uint, Event> globals, ReadOnlyMemory<uint> stepLinkMapping, ReadOnlyMemory<uint> userVariableMapping, Dictionary<uint, string> stepNameMapping)
+        public override ControlBlockObject ResolveTarget(uint next,uint abort, uint? breakp, uint? continuep, Context context, IReadOnlyDictionary<uint, Event> globals, ReadOnlyMemory<uint> stepLinkMapping, ReadOnlyMemory<uint> userVariableMapping, Dictionary<uint, string> stepNameMapping)
         {
             if (__original_process_steps.Count == 0)
                 throw new NaposhtimDocumentException(NaposhtimExceptionCode.CONTROL_BLOCK_ARGUMENTS_ERROR, $"Can not find any process step in Sequential({FullName}) Control Block.");
@@ -344,7 +344,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
 
             try
             {
-                compiledProcessSteps.AddFirst(step.Value.ResolveTarget(next, abort, context, globals, stepLinkMapping.Slice(st0, step.Value.StepFootprint), userVariableMapping.Slice(st1, step.Value.UserVariableFootprint), this, stepNameMapping));
+                compiledProcessSteps.AddFirst(step.Value.ResolveTarget(next, abort, breakp, continuep, context, globals, stepLinkMapping.Slice(st0, step.Value.StepFootprint), userVariableMapping.Slice(st1, step.Value.UserVariableFootprint), this, stepNameMapping));
 
                 while (step.Previous != null)
                 {
@@ -353,7 +353,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
                     st1 = st1 - step.Value.UserVariableFootprint;
 
 
-                    compiledProcessSteps.AddFirst(step.Value.ResolveTarget(compiledProcessSteps.First.Value.ID!.Value, abort,//step.Next.Value.ID.Value,
+                    compiledProcessSteps.AddFirst(step.Value.ResolveTarget(compiledProcessSteps.First.Value.ID!.Value, abort, breakp, continuep,//step.Next.Value.ID.Value,
                                                     context, globals,
                                                     stepLinkMapping.Slice(st0, step.Value.StepFootprint),
                                                     userVariableMapping.Slice(st1, step.Value.UserVariableFootprint), this, stepNameMapping));

@@ -257,7 +257,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
             __original_control_blocks.Clear();
         }
 
-        public override ControlBlockObject ResolveTarget(uint next, uint abort, Context context, IReadOnlyDictionary<uint, Event> globals, ReadOnlyMemory<uint> stepLinkMapping, ReadOnlyMemory<uint> userVariableMapping, Dictionary<uint, string> stepNameMapping)
+        public override ControlBlockObject ResolveTarget(uint next, uint abort, uint? breakp, uint? continuep, Context context, IReadOnlyDictionary<uint, Event> globals, ReadOnlyMemory<uint> stepLinkMapping, ReadOnlyMemory<uint> userVariableMapping, Dictionary<uint, string> stepNameMapping)
         {
             if (__original_control_blocks.Count == 0)
                 throw new NaposhtimDocumentException(NaposhtimExceptionCode.CONTROL_BLOCK_ARGUMENTS_ERROR, $"Can not find any control block in Compound({FullName}) Control Block.");
@@ -266,14 +266,14 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
             var blk = __original_control_blocks.Last;
             int st0 = StepFootprint - blk.Value.StepFootprint, st1 = UserVariableFootprint - blk.Value.UserVariableFootprint;
 
-            compiledControlBlocks.AddFirst(blk.Value.ResolveTarget(next, abort, context, globals, stepLinkMapping.Slice(st0, blk.Value.StepFootprint), userVariableMapping.Slice(st1, blk.Value.UserVariableFootprint), stepNameMapping));
+            compiledControlBlocks.AddFirst(blk.Value.ResolveTarget(next, abort, breakp, continuep, context, globals, stepLinkMapping.Slice(st0, blk.Value.StepFootprint), userVariableMapping.Slice(st1, blk.Value.UserVariableFootprint), stepNameMapping));
 
             while (blk.Previous != null)
             {
                 blk = blk.Previous;
                 st0 = st0 - blk.Value.StepFootprint;
                 st1 = st1 - blk.Value.UserVariableFootprint;
-                compiledControlBlocks.AddFirst(blk.Value.ResolveTarget(compiledControlBlocks.First.Value.ID!.Value, abort,//step.Next.Value.ID.Value,
+                compiledControlBlocks.AddFirst(blk.Value.ResolveTarget(compiledControlBlocks.First.Value.ID!.Value, abort, breakp, continuep,//step.Next.Value.ID.Value,
                                                 context, globals,
                                                 stepLinkMapping.Slice(st0, blk.Value.StepFootprint),
                                                 userVariableMapping.Slice(st1, blk.Value.UserVariableFootprint), stepNameMapping));
