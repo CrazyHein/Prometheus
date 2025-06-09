@@ -25,6 +25,31 @@
                     <TextBlock Grid.Column="1" Text="Labels" VerticalAlignment="Center" Margin="8,0,0,0"/>
                 </Grid>
             </ListBoxItem>
+            <ListBoxItem Tag="Initialization" x:Name="ListBoxItemInitialization">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="25"/>
+                        <ColumnDefinition Width="auto"/>
+                        <ColumnDefinition Width="auto"/>
+                    </Grid.ColumnDefinitions>
+                    <Image Source="{Binding Initialization.ImageIcon}"  VerticalAlignment="Center" HorizontalAlignment="Center" Height="25"/>
+                    <TextBlock Grid.Column="1" Text="{Binding Initialization.Header}" VerticalAlignment="Center" Margin="8,0,0,0"/>
+                    <Image Grid.Column="2" Width="20" Margin="16,0,0,0">
+                        <Image.Visibility>
+                            <MultiBinding Converter="{StaticResource ComponentStateVisibility}">
+                                <Binding Path="Initialization.Modified"/>
+                                <Binding Path="Initialization.Validated"/>
+                            </MultiBinding>
+                        </Image.Visibility>
+                        <Image.Source>
+                            <MultiBinding Converter="{StaticResource ComponentStateImage}">
+                                <Binding Path="Initialization.Modified"/>
+                                <Binding Path="Initialization.Validated"/>
+                            </MultiBinding>
+                        </Image.Source>
+                    </Image>
+                </Grid>
+            </ListBoxItem>
             <ListBoxItem Tag="Exception" x:Name="ListBoxItemException">
                 <Grid>
                     <Grid.ColumnDefinitions>

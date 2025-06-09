@@ -40,6 +40,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
 
                 return new Compound_S(node) { Owner = owner };
             }
+            catch (NaposhtimException)
+            {
+                throw;
+            }
             catch (Exception ex)
             {
                 throw new NaposhtimDocumentException(NaposhtimExceptionCode.CONTROL_BLOCK_ARGUMENTS_ERROR, $"Can not restore Compound_S object from node:\n{node.ToString()}", ex);

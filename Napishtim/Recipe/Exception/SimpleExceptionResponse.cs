@@ -115,6 +115,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Ex
 
                 return new SimpleExceptionResponse_S(node);
             }
+            catch (NaposhtimException)
+            {
+                throw;
+            }
             catch (Exception ex)
             {
                 throw new NaposhtimDocumentException(NaposhtimExceptionCode.EXCEPTION_HANDLING_ARGUMENTS_ERROR, $"Can not restore SimpleExceptionResponse_S object from node:\n{node.ToString()}", ex);

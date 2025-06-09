@@ -135,6 +135,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim
         SCRIPT_EVENT_ARGUMENTS_ERROR                                = 0x4013,
         SCRIPT_ENV_VAR_ARGUMENTS_ERROR                              = 0x4014,
         SCRIPT_EXCEPTION_RESPONSE_PARSE_ERROR                       = 0x4015,
+        SCRIPT_INITIALIZATION_PARSE_ERROR                           = 0x4016,
 
         DOCUMENT_INVALID_OPERATION                                  = 0x5001,
         DOCUMENT_INVALID_ARGUMENTS                                  = 0x5002,
@@ -152,6 +153,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim
 
         EXCEPTION_HANDLING_ARGUMENTS_ERROR                          = 0x5031,
         EXCEPTION_HANDLING_INVALID_OPERATION                        = 0x5032,
+
+        INITIALIZATION_BLOCK_ARGUMENTS_ERROR                     = 0x5041,
+        INITIALIZATION_BLOCK_INVALID_OPERATION                   = 0x5042,
 
         RUNTIME_EXCEPTION                                           = 0x8000
     }

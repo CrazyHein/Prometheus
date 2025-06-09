@@ -7,7 +7,7 @@
     <ImplicitUsings>disable</ImplicitUsings>
     <UseWPF>true</UseWPF>
     <RootNamespace>AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK</RootNamespace>
-    <Version>0.2.0.0</Version>
+    <Version>0.3.0.0</Version>
     <Authors>CrazyHein</Authors>
     <Company>AMEC</Company>
     <UseWindowsForms>True</UseWindowsForms>
@@ -30,6 +30,7 @@
     <None Remove="imgs\download.png" />
     <None Remove="imgs\edit.png" />
     <None Remove="imgs\global_events.png" />
+    <None Remove="imgs\initial_values.png" />
     <None Remove="imgs\insert-before.png" />
     <None Remove="imgs\insert_before.png" />
     <None Remove="imgs\json.png" />
@@ -66,6 +67,7 @@
     <Resource Include="imgs\context.png" />
     <Resource Include="imgs\download.png" />
     <Resource Include="imgs\edit.png" />
+    <Resource Include="imgs\initial_values.png" />
     <Resource Include="imgs\insert_before.png" />
     <Resource Include="imgs\json.png" />
     <Resource Include="imgs\labels.png" />

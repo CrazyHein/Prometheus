@@ -508,7 +508,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK
             try
             {
                 __rcp_document.BuildSteps();
-                ScriptViewer scriptViewer = new ScriptViewer(__settings.ILinkProperty, __rcp_document.Globals, __rcp_document.CompiledControlSteps, __rcp_document.CompiledExceptionResponse) { Owner = this };
+                ScriptViewer scriptViewer = new ScriptViewer(__settings.ILinkProperty, __rcp_document.InitializationConfiguration.Export(), __rcp_document.Globals, __rcp_document.CompiledControlSteps, __rcp_document.CompiledExceptionResponse) { Owner = this };
                 scriptViewer.ShowDialog();
             }
             catch (Exception ex)

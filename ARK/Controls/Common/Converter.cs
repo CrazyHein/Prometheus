@@ -150,4 +150,23 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Controls.Common
             throw new NotImplementedException();
         }
     }
+
+    public class GenericRecordBackgroundBrush : IValueConverter
+    {
+        public Brush Default { get; set; } = new SolidColorBrush(Colors.Transparent);
+        public Brush Invalid { get; set; } = new SolidColorBrush(Colors.Red);
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            bool isValid = (bool)value;
+            if (isValid == false)
+                return Invalid;
+            else
+                return Default;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
 }

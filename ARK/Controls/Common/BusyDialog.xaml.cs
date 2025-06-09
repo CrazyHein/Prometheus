@@ -20,6 +20,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Controls.Common
     public partial class BusyDialog : Window
     {
         private Task __async_task;
+        public Exception? Exception { get; private set; } = null;
         public BusyDialog(Task task)
         {
             InitializeComponent();
@@ -34,6 +35,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Controls.Common
             }
             catch (Exception ex)
             {
+                Exception = ex;
                 MessageBox.Show("At least one exception has occurred during the operation :\n" + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
             Close();

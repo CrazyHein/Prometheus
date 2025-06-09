@@ -11,6 +11,7 @@ using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Protocol;
 using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.ControlBlock;
 using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.ExceptionHandling;
 using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Globals;
+using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Initialization;
 using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Process;
 using Spire.Xls.Core;
 using System;
@@ -40,8 +41,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe
     }
     public class RecipeDocument
     {
-        public static uint SupportedSourceFileFormatVersion { get; } = 1;
-        public static uint SupportedScriptFileFormatVersion { get; } = 1;
+        public static uint SupportedSourceFileFormatVersion { get; } = 2;
+        public static uint SupportedScriptFileFormatVersion { get; } = 2;
 
         private List<Step>? __compiled_regular_control_steps;
 
@@ -98,9 +99,12 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe
         private Dictionary<uint, string>? __compiled_step_names;
         public IReadOnlyDictionary<uint, string>? CompiledStepNames => __compiled_step_names;
 
+        public InitializationConfiguration InitializationConfiguration { get; set; } = new InitializationConfiguration();
+
         public RecipeDocument()
         {
             __context = new Context();
+            InitializationConfiguration = new InitializationConfiguration();
             __global_events = new GlobalEvents();
         }
 
@@ -603,6 +607,23 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe
             await Task.Run(() => Download(globals, steps, exceptionResponse, ip, port, sendTimeout, recvTimeout));
         }
 
+        public static void Initialize(JsonObject initialization, string ip, ushort port = 8367, int sendTimeout = 5000, int recvTimeout = 5000)
+        {
+            using (TCP io = new TCP(new IPEndPoint(IPAddress.Any, 0), new IPEndPoint(IPAddress.Parse(ip), port), sendTimeout, recvTimeout))
+            {
+                DataPackager packager = new DataPackager(io, null);
+                Master master = new Master(packager, null);
+                io.Connect();
+
+                master.Initialize(Encoding.ASCII.GetBytes(initialization.ToJsonString() + '\0'));
+            }
+        }
+
+        public static async Task InitializeAsync(JsonObject initialization, string ip, ushort port = 8367, int sendTimeout = 5000, int recvTimeout = 5000)
+        {
+            await Task.Run(() => Initialize(initialization, ip, port, sendTimeout, recvTimeout));
+        }
+
         public void SaveAs(string path, IEnumerable<uint> globalIndexes)
         {
             var options = new JsonWriterOptions { Indented = false };
@@ -613,6 +634,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe
 
                 writer.WriteNumber("VERSION", SupportedSourceFileFormatVersion);
                 writer.WriteString("SOURCE_ASSEMBLY", typeof(RecipeDocument).FullName);
+
+                writer.WritePropertyName("INITIALIZATION_CONFIGURATION");
+                writer.WriteRawValue(InitializationConfiguration.SaveAsJson().ToJsonString());
 
                 writer.WritePropertyName("GLOBAL_EVENTS");
                 writer.WriteStartArray();
@@ -668,6 +692,11 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe
                 if (assembly != typeof(RecipeDocument).FullName)
                     throw new NaposhtimDocumentException(NaposhtimExceptionCode.DOCUMENT_FILE_ASSEMBLY_MISMATCH, $"Read assembly: {assembly}; \nDesired assmebly: {typeof(RecipeDocument).FullName};");
 
+                if(root.TryGetPropertyValue("INITIALIZATION_CONFIGURATION", out var initializationNode) && initializationNode.GetValueKind() == JsonValueKind.Object)
+                    InitializationConfiguration = new InitializationConfiguration(initializationNode.AsObject());
+                else
+                    InitializationConfiguration = new InitializationConfiguration();
+
                 if (root.TryGetPropertyValue("GLOBAL_EVENTS", out var globalEventsNode) && globalEventsNode.GetValueKind() == JsonValueKind.Array)
                 {
                     foreach (var globalEventNode in globalEventsNode.AsArray())
@@ -710,7 +739,11 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe
         public override string ToString()
         {
             StringBuilder sb = new StringBuilder(this.GetType().FullName);
-            if(GlobalEvents.Count > 0)
+            sb.Append("\nInitialization Configuration:");
+            foreach (var line in InitializationConfiguration.ToString().Split('\n'))
+                sb.Append("\n\t").Append(line);
+
+            if (GlobalEvents.Count > 0)
             {
                 sb.Append("\nGlobal Event(s):");
                 foreach (var g in GlobalEvents)
@@ -753,7 +786,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe
             return sb.ToString();
         }
 
-        public static void SaveScript(string path, IEnumerable<(uint, string, Event)> globalEvents, IEnumerable<(string, Prometheus.Napishtim.Engine.StepMechansim.Step)> steps, ExceptionResponse? exceptionResponse)
+        public static void SaveScript(string path, InitializationList initializationList, IEnumerable<(uint, string, Event)> globalEvents, IEnumerable<(string, Prometheus.Napishtim.Engine.StepMechansim.Step)> steps, ExceptionResponse? exceptionResponse)
         {
             var options = new JsonWriterOptions { Indented = false };
             using (var stream = File.Create(path))
@@ -763,6 +796,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe
 
                 writer.WriteNumber("VERSION", SupportedSourceFileFormatVersion);
                 writer.WriteString("SCRIPT_ASSEMBLY", typeof(RecipeDocument).FullName);
+
+
+                writer.WritePropertyName("INITIALIZATION_LIST");
+                writer.WriteRawValue(initializationList.ToJson().ToJsonString());
 
                 writer.WritePropertyName("GLOBAL_EVENTS");
                 writer.WriteStartArray();
@@ -799,11 +836,12 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe
             }
         }
 
-        public static (IEnumerable<(uint, string, Event)> globalEvents, IEnumerable<(string, Prometheus.Napishtim.Engine.StepMechansim.Step)> steps, ExceptionResponse? exceptionResponse) ParseScript(string path)
+        public static (InitializationList initializationList, IEnumerable<(uint, string, Event)> globalEvents, IEnumerable<(string, Prometheus.Napishtim.Engine.StepMechansim.Step)> steps, ExceptionResponse? exceptionResponse) ParseScript(string path)
         {
             List<(uint idx, string name, Event evt)> globals = new List<(uint idx, string name, Event evt)>();
             List<(string name, Prometheus.Napishtim.Engine.StepMechansim.Step stp)> steps = new List<(string name, Step stp)>();
             ExceptionResponse? exception = null;
+            InitializationList initializationList;
             uint version = 0;
             string assembly = string.Empty;
 
@@ -822,6 +860,11 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe
                 throw new NaposhtimDocumentException(NaposhtimExceptionCode.DOCUMENT_FILE_ASSEMBLY_MISMATCH, $"No assembly information is read or the assembly information is invalid.");
             if (assembly != typeof(RecipeDocument).FullName)
                 throw new NaposhtimDocumentException(NaposhtimExceptionCode.DOCUMENT_FILE_ASSEMBLY_MISMATCH, $"Read assembly: {assembly}; \nDesired assmebly: {typeof(RecipeDocument).FullName};");
+
+            if (root.TryGetPropertyValue("INITIALIZATION_LIST", out var initializationNode) && initializationNode.GetValueKind() == JsonValueKind.Object)
+                initializationList = new InitializationList(initializationNode.AsObject());
+            else
+                initializationList = new InitializationList();
 
             if (root.TryGetPropertyValue("GLOBAL_EVENTS", out var globalNodes) && globalNodes.GetValueKind() == JsonValueKind.Array)
             {
@@ -852,7 +895,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe
                 }
             }
 
-            return (globals, steps, exception);
+            return (initializationList, globals, steps, exception);
         }
     }
 }

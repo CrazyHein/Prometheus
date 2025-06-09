@@ -62,9 +62,12 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Napishtim
                 ExceptionResponse = new SimpleExceptionResponseModel(doc.ExceptionResponseSource as SimpleExceptionResponse_S, this) { Owner = null };
             else
                 throw new ArgumentException("Unsupported exception response source.");
+
+            Initialization = new InitializationModel(doc.InitializationConfiguration, this) { Owner = null };
         }
 
         public RecipeDocument RecipeDocument { get; }
         public ExceptionResponseModel ExceptionResponse { get; }
+        public InitializationModel Initialization { get; }
     }
 }

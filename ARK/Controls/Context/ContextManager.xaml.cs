@@ -25,6 +25,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Controls
         ContentControl __context_context_control;
         LabelsControl __labels_control;
         ExceptionResponseControl __exception_response_control;
+        InitializationControl __initialization_control;
+
+        Dictionary<string, UserControl> __context_content = new Dictionary<string, UserControl>();
 
         public ContextManager(ContextModel context, ContentControl content)
         {
@@ -34,24 +37,30 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Controls
 
             __labels_control = new LabelsControl();
             __exception_response_control = new ExceptionResponseControl((DataContext as ContextModel).ExceptionResponse);
+            __initialization_control = new InitializationControl((DataContext as ContextModel).Initialization);
+
+            __context_content["Labels"] = __labels_control;
+            __context_content["Exception"] = __exception_response_control;
+            __context_content["Initialization"] = __initialization_control;
         }
 
         private void ContextListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if(e.RemovedItems.Count > 0)
             {
-                if ((e.RemovedItems[0] as ListBoxItem).Tag.ToString() == "Exception")
+                if(__context_content[(e.RemovedItems[0] as ListBoxItem).Tag.ToString()].DataContext is Component)
                 {
-                    if ((__exception_response_control.DataContext as ExceptionResponseModel).Modified)
+                    var component = __context_content[(e.RemovedItems[0] as ListBoxItem).Tag.ToString()].DataContext as Component;
+                    if (component.Modified)
                     {
                         var ret = MessageBox.Show("Changes have been detected.\nClick 'Yes' to apply the changes or 'No' to discard the changes.", "Question", MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
                         if (ret == MessageBoxResult.No)
-                            (__exception_response_control.DataContext as ExceptionResponseModel).DiscardChanges();
+                            component.DiscardChanges();
                         else if (ret == MessageBoxResult.Yes)
                         {
                             try
                             {
-                                (__exception_response_control.DataContext as ExceptionResponseModel).ApplyChanges();
+                                component.ApplyChanges();
                             }
                             catch (Exception ex)
                             {
@@ -72,10 +81,13 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Controls
             }
             if(e.AddedItems.Count > 0)
             {
+                /*
                 if ((e.AddedItems[0] as ListBoxItem).Tag.ToString() == "Labels")
                     __context_context_control.Content = __labels_control;
                 else if ((e.AddedItems[0] as ListBoxItem).Tag.ToString() == "Exception")
                     __context_context_control.Content = __exception_response_control;
+                */
+                __context_context_control.Content = __context_content[(e.AddedItems[0] as ListBoxItem).Tag.ToString()];
             }
             e.Handled = true;
         }

@@ -35,6 +35,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Protocol
         ECHO = 0x02,
         CLEAR = 0x03,
         INFO = 0x10,
+        INITIALIZE = 0x20,
 
         RESPONSE_FLAG = 0x80
     }
@@ -119,6 +120,19 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Protocol
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    struct RECIPE_INITIALIZE_REQUEST_HEAD_T
+    {
+        public uint content_size_in_byte;
+    }
+
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    struct RECIPE_INITIALIZE_RESPONSE_HEAD_T
+    {
+        public uint content_size_in_byte;
+        public int exception;
+    }
+
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
     struct RECIPE_DOWNLOAD_REQUEST_FRAME_T
     {
         public PROTOCOL_HEAD_T protocol_head;
@@ -181,5 +195,19 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Protocol
         public ENGINE_INFO_RESPONSE_HEAD_T response;
     }
 
-    
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    struct RECIPE_INITIALIZE_REQUEST_FRAME_T
+    {
+        public PROTOCOL_HEAD_T protocol_head;
+        public FUNCTION_HEAD_T function_head;
+        public RECIPE_INITIALIZE_REQUEST_HEAD_T request;
+    }
+
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    struct RECIPE_INITIALIZE_RESPONSE_FRAME_T
+    {
+        public PROTOCOL_HEAD_T protocol_head;
+        public FUNCTION_HEAD_T function_head;
+        public RECIPE_INITIALIZE_RESPONSE_HEAD_T response;
+    }
 }
