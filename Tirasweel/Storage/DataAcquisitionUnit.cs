@@ -357,7 +357,7 @@ namespace AMEC.PCSoftware.CommunicationProtocol.CrazyHein.OrbmentDAQ.Storage
                         //rxframedata = new byte[rxframesize * expected];
 
                         master.ResetAcquisitionData(trans++, 0);
-                        System.DateTime now = System.DateTime.Now;
+                        //System.DateTime now = System.DateTime.Now;
 
                         do
                             master.AcquisiteData(true, trans++, 1, out txreceived, out txresidual, out txcorrupted, out data);
@@ -368,6 +368,7 @@ namespace AMEC.PCSoftware.CommunicationProtocol.CrazyHein.OrbmentDAQ.Storage
                         while (rxreceived != 1);
                         var trx = MemoryMarshal.Read<uint>(data.Span);
 
+                        System.DateTime now = System.DateTime.Now;
                         storage.InitializeTimestamp(now, ttx);
 
                         if (ttx != trx)

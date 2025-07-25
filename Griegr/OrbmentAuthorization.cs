@@ -11,60 +11,37 @@ namespace AMEC.PCSoftware.Crypto.CrazyHein.Orbment
     {
         public class Licence
         {
-            public ReadOnlyMemory<byte> Modulus { get; } 
-            public ReadOnlyMemory<byte> Exponent { get; }
             public ReadOnlyMemory<byte> Encrypted { get; }
 
-            public Licence(ReadOnlySpan<byte> modulus, ReadOnlySpan<byte> exponent, ReadOnlySpan<byte> encrypted) 
+            public Licence(ReadOnlySpan<byte> encrypted) 
             {
-                if (modulus.Length > 256 || exponent.Length > 256 || encrypted.Length > 256)
-                {
-                    throw new ArgumentException("Modulus, Exponent, and Encrypted data must be at most 256 bytes each.");
-                }
+                if (encrypted.Length != 256)
+                    throw new ArgumentException("Encrypted data must be 256 bytes.");
 
-                var data = new byte[modulus.Length];
-                modulus.CopyTo(data);
-                Modulus = data.AsMemory();
-
-                data = new byte[exponent.Length];
-                exponent.CopyTo(data);
-                Exponent = data.AsMemory();
-
-                data = new byte[encrypted.Length];
+                var data = new byte[encrypted.Length];
                 encrypted.CopyTo(data);
                 Encrypted = data.AsMemory();
             }
 
             public byte[] ToByteArray()
             {
-                byte[] ret = new byte[4 + 256 + 4 + 256 + 4 + 256];
-                BitConverter.GetBytes(Modulus.Length).CopyTo(ret, 0);
-                Modulus.CopyTo(ret.AsMemory().Slice(4));
-                BitConverter.GetBytes(Exponent.Length).CopyTo(ret, 4 + 256);
-                Exponent.CopyTo(ret.AsMemory().Slice(4 + 256 + 4));
-                BitConverter.GetBytes(Encrypted.Length).CopyTo(ret, 4 + 256 + 4 + 256);
-                Encrypted.CopyTo(ret.AsMemory().Slice(4 + 256 + 4 + 256 + 4));
+                byte[] ret = new byte[4 + 256];
+                BitConverter.GetBytes(Encrypted.Length).CopyTo(ret, 0);
+                Encrypted.CopyTo(ret.AsMemory().Slice(4));
                 return ret;
             }
 
             public static Licence FromByteArray(ReadOnlySpan<byte> data)
             {
-                if (data.Length < 4 + 256 + 4 + 256 + 4 + 256)
-                {
-                    throw new ArgumentException("Data is too short to be a valid licence.");
-                }
-                int modulusLength = BitConverter.ToInt32(data.Slice(0, 4));
-                int exponentLength = BitConverter.ToInt32(data.Slice(4 + 256, 4));
-                int encryptedLength = BitConverter.ToInt32(data.Slice(4 + 256 + 4 + 256, 4));
-                if (modulusLength > 256 || exponentLength > 256 || encryptedLength > 256)
-                {
-                    throw new ArgumentException("Modulus, Exponent, and Encrypted data must be at most 256 bytes each.");
-                }
+                if (data.Length != 4 + 256)
+                    throw new ArgumentException("Byte array must be 260 bytes (4 bytes for length + 256 bytes for encrypted data).");
 
-                ReadOnlySpan<byte> modulus = data.Slice(4, modulusLength);
-                ReadOnlySpan<byte> exponent = data.Slice(4 + 256 + 4, exponentLength);
-                ReadOnlySpan<byte> encrypted = data.Slice(4 + 256 + 4 + 256 + 4, encryptedLength);
-                return new Licence(modulus, exponent, encrypted);
+                int encryptedLength = BitConverter.ToInt32(data.Slice(4 + 256 + 4 + 256, 4));
+                if (encryptedLength != 256)
+                    throw new ArgumentException("Encrypted data must be 256 bytes.");
+
+                ReadOnlySpan<byte> encrypted = data.Slice(4, encryptedLength);
+                return new Licence(encrypted);
             }
         }
 
@@ -94,7 +71,7 @@ namespace AMEC.PCSoftware.Crypto.CrazyHein.Orbment
 
             public byte[] ToByteArray()
             {
-                byte[] ret = new byte[16 + 6 +6 + 4];
+                byte[] ret = new byte[16 + 6 + 6 + 4];
                 SerialNo.CopyTo(ret.AsMemory().Slice(0));
                 PHY_CH1.CopyTo(ret.AsMemory().Slice(16));
                 PHY_CH2.CopyTo(ret.AsMemory().Slice(16 + 6));
@@ -129,13 +106,13 @@ namespace AMEC.PCSoftware.Crypto.CrazyHein.Orbment
             return (Convert.FromBase64String(modulus), Convert.FromBase64String(exponent));
         }
 
-        public static Licence GenerateLicence(ReadOnlySpan<byte> serialNo, PhysicalAddress phy0, PhysicalAddress phy1, AuthorizationCode code, string privateKey, string publicKey)
+        public static Licence GenerateLicence(ReadOnlySpan<byte> serialNo, PhysicalAddress phy0, PhysicalAddress phy1, AuthorizationCode code, string privateKey)
         {
             using (RSA rsa = RSA.Create(2048))
             {
                 rsa.FromXmlString(privateKey);
 
-                var publicKeyByteArray = ExportPublicKey(publicKey);
+                //var publicKeyByteArray = ExportPublicKey(publicKey);
 
 
                 //对象标识符(OBJECT IDENTIFIER, OID) 的编码规则
@@ -150,15 +127,14 @@ namespace AMEC.PCSoftware.Crypto.CrazyHein.Orbment
                 Authorization authorization = new Authorization(serialNo, phy0, phy1, code);
                 byte[] encrypted = rsa.SignHash(authorization.ToByteArray(), HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1);
 
-                return new Licence(publicKeyByteArray.m, publicKeyByteArray.e, encrypted);
+                return new Licence(encrypted);
             }
         }
 
-        public static bool VerifyLicence(Licence licence, ReadOnlySpan<byte> serialNo, PhysicalAddress phy0, PhysicalAddress phy1, AuthorizationCode code)
+        public static bool VerifyLicence(Licence licence, ReadOnlySpan<byte> serialNo, PhysicalAddress phy0, PhysicalAddress phy1, AuthorizationCode code, string publicKey)
         {
             using (RSA rsa = RSA.Create(2048))
             {
-                string publicKey = $"<RSAKeyValue><Modulus>{Convert.ToBase64String(licence.Modulus.Span)}</Modulus><Exponent>{Convert.ToBase64String(licence.Exponent.Span)}</Exponent></RSAKeyValue>";
                 rsa.FromXmlString(publicKey);
 
                 Authorization authorization = new Authorization(serialNo, phy0, phy1, code);

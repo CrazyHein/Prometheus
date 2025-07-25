@@ -1,5 +1,9 @@
-﻿using System.Net.NetworkInformation;
+﻿using System.IO;
+using System.Net.NetworkInformation;
+using System.Reflection;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 using static AMEC.PCSoftware.Crypto.CrazyHein.Orbment.OrbmentAuthorization;
 
 namespace AMEC.PCSoftware.Crypto.CrazyHein.Orbment
@@ -18,6 +22,33 @@ namespace AMEC.PCSoftware.Crypto.CrazyHein.Orbment
             {
                 privateKey = System.IO.File.ReadAllText("./keys/private.xml");
                 publicKey = System.IO.File.ReadAllText("./keys/public.xml");
+
+                if (System.IO.File.Exists("./keys/public_tips.json") == false)
+                {
+                    var (m, e) = ExportPublicKey(publicKey);
+                    var disturb = ASCIIEncoding.ASCII.GetBytes("AMEC Next Generation Control System");
+                    using (var stream = File.Create("./keys/public_tips.json"))
+                    using (var writer = new Utf8JsonWriter(stream))
+                    {
+                        writer.WriteStartObject();
+
+                        writer.WriteNumber("ModulusLength", m.Length);
+                        writer.WritePropertyName("ModulusArray");
+                        writer.WriteStartArray();
+                        for (int i = 0; i < m.Length; ++i)
+                            writer.WriteNumberValue(m[i] ^ disturb[i % disturb.Length]);
+                        writer.WriteEndArray();
+
+                        writer.WriteNumber("ExponentLength", e.Length);
+                        writer.WritePropertyName("ExponentArray");
+                        writer.WriteStartArray();
+                        for (int i = 0; i < e.Length; ++i)
+                            writer.WriteNumberValue(e[i] ^ disturb[i % disturb.Length]);
+                        writer.WriteEndArray();
+
+                        writer.WriteEndObject();
+                    }
+                }
             }
             catch(Exception ex)
             {
@@ -59,7 +90,7 @@ namespace AMEC.PCSoftware.Crypto.CrazyHein.Orbment
 
             try
             {
-                var lic = OrbmentAuthorization.GenerateLicence(serialNumber, phy0, phy1, code, privateKey, publicKey);
+                var lic = OrbmentAuthorization.GenerateLicence(serialNumber, phy0, phy1, code, privateKey);
 
                 SaveFileDialog saveFileDialog = new SaveFileDialog
                 {
