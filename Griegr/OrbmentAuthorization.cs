@@ -36,7 +36,7 @@ namespace AMEC.PCSoftware.Crypto.CrazyHein.Orbment
                 if (data.Length != 4 + 256)
                     throw new ArgumentException("Byte array must be 260 bytes (4 bytes for length + 256 bytes for encrypted data).");
 
-                int encryptedLength = BitConverter.ToInt32(data.Slice(4 + 256 + 4 + 256, 4));
+                int encryptedLength = BitConverter.ToInt32(data.Slice(0, 4));
                 if (encryptedLength != 256)
                     throw new ArgumentException("Encrypted data must be 256 bytes.");
 
