@@ -31,7 +31,7 @@
                 <sync:BoolNegationConverter x:Key="boolnegation"/>
                 <local:HEX32StringConverter x:Key="hex32string"/>
             </TabControl.Resources>
-            <TabItem Header="Debugger" Width="135" Name="DebuggerSettingsTab">
+            <TabItem Header="Debugger" Width="125" Name="DebuggerSettingsTab">
                 <Grid d:DataContext="{d:DesignInstance Type=debugger:SlmpTargetProperty}" x:Name="DebuggerSettings" Validation.Error="DebuggerSettings_Error">
                     <Grid.Resources>
                         <ObjectDataProvider ObjectType="{x:Type sys:Enum}" MethodName="GetValues" x:Key="datacodes">
@@ -159,7 +159,41 @@
                     </GroupBox>
                 </Grid>
             </TabItem>
-            <TabItem Header="DAQ" Width="135" Name="DAQSettingsTab">
+            <TabItem Header="Debugger (FINS)" Width="125" Name="DebuggerFinsSettingsTab">
+                <Grid d:DataContext="{d:DesignInstance Type=debugger:FinsTargetProperty}" x:Name="DebuggerFinsSettings" Validation.Error="DebuggerFinsSettings_Error">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="auto" />
+                    </Grid.RowDefinitions>
+                    <sync:SfBusyIndicator  Grid.RowSpan="3" Name="FINSBusyIndicator" IsBusy="False"/>
+                    <Button Grid.Row="2" Content="Communication Test"  Height="30" Margin="0,4,0,4" Click="FINSTest_Click" IsEnabled="{Binding ElementName=DebuggerFinsSettingsTab, Path=IsSelected}"/>
+                    <GroupBox Header="Destination Endpoint" Grid.Row="0" Padding="3,0,3,0" Margin="0,4,0,0">
+                        <UniformGrid Columns="2">
+                            <sync:SfTextInputLayout Hint="IPv4" FontSize="12" FontStyle="Italic" ContainerType="Filled" Margin="4" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}">
+                                <TextBox FontStyle="Normal" Text="{Binding DestinationIPv4String, ValidatesOnExceptions=True, NotifyOnValidationError=True}"/>
+                            </sync:SfTextInputLayout>
+                            <sync:SfTextInputLayout Hint="Port" FontSize="12" FontStyle="Italic" ContainerType="Filled" Margin="4" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}">
+                                <TextBox FontStyle="Normal" Text="{Binding DestinationPort, ValidatesOnExceptions=True, NotifyOnValidationError=True}"/>
+                            </sync:SfTextInputLayout>
+                        </UniformGrid>
+                    </GroupBox>
+                    <GroupBox Header="User Configuration" Grid.Row="1" Padding="3,0,3,0" Margin="0,4,0,0">
+                        <UniformGrid Columns="4">
+                            <sync:SfTextInputLayout Hint="Send Timeout (ms)"  FontSize="12" FontStyle="Italic" ContainerType="Filled" Margin="4" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}">
+                                <TextBox FontStyle="Normal" Text="{Binding SendTimeoutValue, ValidatesOnExceptions=True, NotifyOnValidationError=True}" />
+                            </sync:SfTextInputLayout>
+                            <sync:SfTextInputLayout Hint="Receive Timeout (ms)"  FontSize="12" FontStyle="Italic" ContainerType="Filled" Margin="4" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}">
+                                <TextBox FontStyle="Normal" Text="{Binding ReceiveTimeoutValue, ValidatesOnExceptions=True, NotifyOnValidationError=True}" />
+                            </sync:SfTextInputLayout>
+                            <sync:SfTextInputLayout Hint="Polling Interval (ms)"  FontSize="12" FontStyle="Italic" ContainerType="Filled" Margin="4" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}">
+                                <TextBox FontStyle="Normal" Text="{Binding PollingInterval, ValidatesOnExceptions=True, NotifyOnValidationError=True}" />
+                            </sync:SfTextInputLayout>
+                        </UniformGrid>
+                    </GroupBox>
+                </Grid>
+            </TabItem>
+            <TabItem Header="DAQ" Width="125" Name="DAQSettingsTab">
                 <Grid d:DataContext="{d:DesignInstance Type=daq:DAQTargetProperty}" x:Name="DAQSettings" Validation.Error="DAQSettings_Error">
                     <Grid.Resources>
                         <ObjectDataProvider ObjectType="{x:Type sys:Enum}" MethodName="GetValues" x:Key="storageschemas">
@@ -272,7 +306,7 @@
                     </GroupBox>
                 </Grid>
             </TabItem>
-            <TabItem Header="FTP" Width="135" Name="FTPSettingsTab">
+            <TabItem Header="FTP" Width="125" Name="FTPSettingsTab">
                 <Grid d:DataContext="{d:DesignInstance Type=utility:FTPTargetProperty}" x:Name="FTPSettings" Validation.Error="FTPSettings_Error">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="auto"/>
@@ -304,7 +338,7 @@
                     </sync:SfTextInputLayout>
                 </Grid>
             </TabItem>
-            <TabItem Header="AppInstaller" Width="135" Name="AppInstallerSettingsTab">
+            <TabItem Header="AppInstaller" Width="125" Name="AppInstallerSettingsTab">
                 <Grid d:DataContext="{d:DesignInstance Type=utility:AppInstallerProperty}" x:Name="AppInstallerSettings" Validation.Error="AppInstallerSettings_Error">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="auto"/>
@@ -328,7 +362,7 @@
                     </sync:SfTextInputLayout>
                 </Grid>
             </TabItem>
-            <TabItem Header="Preferences"  Width="135" x:Name="PreferenceSettings">
+            <TabItem Header="Preferences"  Width="125" x:Name="PreferenceSettings">
                 <ScrollViewer>
                     <Grid Validation.Error="DebuggerSettings_Error">
                         <Grid.RowDefinitions>

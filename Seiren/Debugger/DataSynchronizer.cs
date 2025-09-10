@@ -1,4 +1,8 @@
-﻿using AMEC.PCSoftware.CommunicationProtocol.CrazyHein.SLMP;
+﻿using AMEC.PCSoftware.CommunicationProtocol.CrazyHein.FINS;
+using AMEC.PCSoftware.CommunicationProtocol.CrazyHein.FINS.IOUtility;
+using AMEC.PCSoftware.CommunicationProtocol.CrazyHein.FINS.Master;
+using AMEC.PCSoftware.CommunicationProtocol.CrazyHein.FINS.Message;
+using AMEC.PCSoftware.CommunicationProtocol.CrazyHein.SLMP;
 using AMEC.PCSoftware.CommunicationProtocol.CrazyHein.SLMP.IOUtility;
 using AMEC.PCSoftware.CommunicationProtocol.CrazyHein.SLMP.Master;
 using AMEC.PCSoftware.CommunicationProtocol.CrazyHein.SLMP.Message;
@@ -6,12 +10,25 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Net;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using FINS = AMEC.PCSoftware.CommunicationProtocol.CrazyHein.FINS;
+using FINS_ScoketInterface = AMEC.PCSoftware.CommunicationProtocol.CrazyHein.FINS.IOUtility.SocketInterface;
+using FINS_TCP = AMEC.PCSoftware.CommunicationProtocol.CrazyHein.FINS.IOUtility.TCP;
+using SLMP_SocketInterface = AMEC.PCSoftware.CommunicationProtocol.CrazyHein.SLMP.IOUtility.SocketInterface;
+using SLMP_TCP = AMEC.PCSoftware.CommunicationProtocol.CrazyHein.SLMP.IOUtility.TCP;
+using SLMP_UDP = AMEC.PCSoftware.CommunicationProtocol.CrazyHein.SLMP.IOUtility.UDP;
 
 namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Debugger
 {
+    public enum DataSyncProtocol
+    {
+        SLMP,
+        FINS,
+    }
     public enum DataSynchronizerState : byte
     {
         Exception = 0x01,
@@ -31,7 +48,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Debugger
     {
         private object __sync_property_access_lock = new object();
         private SemaphoreSlim __sync_operation_access_lock = new SemaphoreSlim(1);
-        SocketInterface __io = null;
+        SLMP_SocketInterface __slmp_io = null;
+        FINS_ScoketInterface __fins_io = null;
         private string __sync_exception_message = "";
         private int __polling_interval = 0;
         private List<(uint start, ushort size, DataSyncMode access, ushort[] data, int blk, uint blkStart, ushort blkSize)> __process_data;
@@ -43,11 +61,26 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Debugger
         private DataSynchronizerState __sync_state = DataSynchronizerState.Ready;
         private uint __heartbeat_counter = 0;
 
+        private DataSyncProtocol __protocol;
+
         public ushort NumberOfDevicePoints { get; } = 960;
 
-        public DataSynchronizer(IEnumerable<(uint start, uint size, IEnumerable<(uint bitpos, uint bitsize)> layout, DataSyncMode access)> datas)
+        public DataSynchronizer(IEnumerable<(uint start, uint size, IEnumerable<(uint bitpos, uint bitsize)> layout, DataSyncMode access)> datas, DataSyncProtocol protocol = DataSyncProtocol.SLMP)
         {
             __process_data = new List<(uint start, ushort size, DataSyncMode access, ushort[] data, int blk, uint blkStart, ushort blkSize)>();
+            __protocol = protocol;
+            switch(protocol)
+            {
+                case DataSyncProtocol.SLMP:
+                    NumberOfDevicePoints = 960;
+                    break;
+                case DataSyncProtocol.FINS:
+                    NumberOfDevicePoints = 1000;
+                    break;
+                default:
+                    throw new NotSupportedException("The protocol is not supported.");
+            }
+            
             foreach (var (index, data) in datas.Select((v, i) => (i, v)))
             {
                 uint start = 0;
@@ -76,11 +109,78 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Debugger
             __internal_process_data_end = 0;
         }
 
+        public async Task<DataSynchronizerState> Startup(FinsTargetProperty target, IReadOnlyList<ushort[]> datas)
+        {
+            __sync_operation_access_lock.Wait();
+            try
+            {
+                if (__protocol != DataSyncProtocol.FINS)
+                    throw new InvalidOperationException("The protocol setting is not matched.");
+
+                switch (State)
+                {
+                    case DataSynchronizerState.Connected:
+                        return DataSynchronizerState.Connected;
+                    case DataSynchronizerState.Exception:
+                        if (__data_sync_thread != null)
+                        {
+                            __data_sync_thread.Join();
+                            __data_sync_thread = null;
+                        }
+                        break;
+                    case DataSynchronizerState.Ready:
+                        break;
+                }
+
+                __stop_event.Reset();
+
+                __fins_io = new FINS_TCP(new System.Net.IPEndPoint(IPAddress.Any, 0),
+                                            new System.Net.IPEndPoint(target.DestinationIPv4, target.DestinationPort),
+                                            target.SendTimeoutValue, target.ReceiveTimeoutValue);
+
+                byte[] send = new byte[Marshal.SizeOf<FINS.Message.MESSAGE_T>()];
+                byte[] recv = new byte[Marshal.SizeOf<FINS.Message.MESSAGE_T>()];
+                object sync = new object();
+                FINS.Master.HandshakeMaster handshake = new FINS.Master.HandshakeMaster(__fins_io, 0, target.ServerNodeAddress, send, recv, sync);
+                FINS.Master.MemoryAreaAccessMaster master = new FINS.Master.MemoryAreaAccessMaster(__fins_io, 0, target.ServerNodeAddress, send, recv, sync);
+
+                State = DataSynchronizerState.Connecting;
+                await Task.Run(() => (__fins_io as FINS_TCP).Connect());
+                await Task.Run(() => handshake.Handshake());
+
+                State = DataSynchronizerState.Connected;
+                ExceptionMessage = "N/A";
+
+                await Task.Run(() => __init_rx_data_via_fins(Tuple.Create(master, datas)));
+
+                if (State == DataSynchronizerState.Exception)
+                    return State;
+
+                __heartbeat_counter = 0;
+                __data_sync_thread = new Thread(new ParameterizedThreadStart(__data_sync_routine_via_fins));
+                __data_sync_thread.Start(Tuple.Create(master, target.PollingInterval));
+                return State;
+            }
+            catch (Exception ex)
+            {
+                State = DataSynchronizerState.Exception;
+                ExceptionMessage = ex.Message;
+                return DataSynchronizerState.Exception;
+            }
+            finally
+            {
+                __sync_operation_access_lock.Release();
+            }
+        }
+
         public async Task<DataSynchronizerState> Startup(SlmpTargetProperty target, IReadOnlyList<ushort[]> datas)
         {
             __sync_operation_access_lock.Wait();
             try
             {
+                if (__protocol != DataSyncProtocol.SLMP)
+                    throw new InvalidOperationException("The protocol setting is not matched.");
+
                 switch (State)
                 {
                     case DataSynchronizerState.Connected:
@@ -98,16 +198,16 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Debugger
 
                 __stop_event.Reset();
                 if (target.UDPTransportLayer)
-                    __io = new UDP(new System.Net.IPEndPoint(target.SourceIPv4, target.SourcePort),
+                    __slmp_io = new SLMP_UDP(new System.Net.IPEndPoint(target.SourceIPv4, target.SourcePort),
                                     new System.Net.IPEndPoint(target.DestinationIPv4, target.DestinationPort),
                                     target.ReceiveBufferSize, target.SendTimeoutValue, target.ReceiveTimeoutValue);
                 else
-                    __io = new TCP(new System.Net.IPEndPoint(target.SourceIPv4, 0),
+                    __slmp_io = new SLMP_TCP(new System.Net.IPEndPoint(target.SourceIPv4, 0),
                                     new System.Net.IPEndPoint(target.DestinationIPv4, target.DestinationPort),
                                     target.SendTimeoutValue, target.ReceiveTimeoutValue);
                 DESTINATION_ADDRESS_T destination = new DESTINATION_ADDRESS_T(target.NetworkNumber, target.StationNumber, target.ModuleIONumber, target.MultidropNumber, target.ExtensionStationNumber);
 
-                DeviceAccessMaster master = new DeviceAccessMaster(target.FrameType, target.DataCode, target.R_DedicatedMessageFormat, __io,
+                DeviceAccessMaster master = new DeviceAccessMaster(target.FrameType, target.DataCode, target.R_DedicatedMessageFormat, __slmp_io,
                                                                     ref destination, target.SendBufferSize, target.ReceiveBufferSize);
                 DeviceAccessMode deviceReadMode, deviceWriteMode;
                 if (target.DeviceReadMode == DeviceAccessMode.Auto)
@@ -138,10 +238,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Debugger
                 else
                     deviceWriteMode = target.DeviceWriteMode;
 
-                if (__io is TCP)
+                if (__slmp_io is SLMP_TCP)
                 {
                     State = DataSynchronizerState.Connecting;
-                    await Task.Run(() => (__io as TCP).Connect());
+                    await Task.Run(() => (__slmp_io as SLMP_TCP).Connect());
                     //await Task.Delay(1000);
                 }
 
@@ -200,10 +300,15 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Debugger
                     await Task.Run(() => __data_sync_thread.Join());
                     __data_sync_thread = null;
                 }
-                if (__io != null)
+                if (__slmp_io != null)
                 {
-                    __io.Dispose();
-                    __io = null;
+                    __slmp_io.Dispose();
+                    __slmp_io = null;
+                }
+                if (__fins_io != null)
+                {
+                    __fins_io.Dispose();
+                    __fins_io = null;
                 }
                 State = DataSynchronizerState.Ready;
                 return DataSynchronizerState.Ready;
@@ -227,6 +332,37 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Debugger
                         Array.Copy(datas[__process_data[i].blk], __process_data[i].blkStart, __internal_process_data[i], 0, __process_data[i].blkSize);
                 }
                 end = __internal_process_data_end;
+            }
+        }
+
+        private void __init_rx_data_via_fins(object param)
+        {
+            (FINS.Master.MemoryAreaAccessMaster master, IReadOnlyList<ushort[]> datas) = (Tuple<FINS.Master.MemoryAreaAccessMaster, IReadOnlyList<ushort[]>>)param;
+            ushort end = 0;
+
+            for (int i = 0; i < __process_data.Count; ++i)
+            {
+                if (__process_data[i].access == DataSyncMode.Write && __process_data[i].size > 0)
+                {
+                    Array.Copy(master.ReadInWord("DM@WORD", (ushort)__process_data[i].start, __process_data[i].size, out end), __process_data[i].data, __process_data[i].size);
+                    __process_data_end = end;
+                    if (end != 0)
+                    {
+                        ExceptionMessage = $"End Code : {end:X04}";
+                        Counter = 0;
+                        State = DataSynchronizerState.Exception;
+                        return;
+                    }
+                }
+            }
+
+            for (int i = 0; i < __process_data.Count; ++i)
+            {
+                if (__process_data[i].access == DataSyncMode.Write)
+                {
+                    Array.Copy(__process_data[i].data, 0, datas[__process_data[i].blk], __process_data[i].blkStart, __process_data[i].blkSize);
+                    __process_data[i].data.CopyTo(__internal_process_data[i], 0);
+                }
             }
         }
 
@@ -281,6 +417,83 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Debugger
                     Array.Copy(__process_data[i].data, 0, datas[__process_data[i].blk], __process_data[i].blkStart, __process_data[i].blkSize);
                     __process_data[i].data.CopyTo(__internal_process_data[i], 0);
                 }
+            }
+        }
+
+        private void __data_sync_routine_via_fins(object param)
+        {
+            (FINS.Master.MemoryAreaAccessMaster master, int interval) = (Tuple<FINS.Master.MemoryAreaAccessMaster, int>)param;
+            uint counter = 0;
+            ushort end = 0;
+            Stopwatch sw = new Stopwatch();
+
+            sw.Start();
+            while(true)
+            {
+                if (__stop_event.WaitOne(0))
+                {
+                    break;
+                }
+                try
+                {
+                    for (int i = 0; i < __process_data.Count; ++i)
+                    {
+                        if (__process_data[i].access == DataSyncMode.Read && __process_data[i].size > 0)
+                        {
+                            Array.Copy(master.ReadInWord("DM@WORD", (ushort)__process_data[i].start, __process_data[i].size, out end), __process_data[i].data, __process_data[i].size);
+                            __process_data_end = end;
+                            if (end != 0)
+                            {
+                                ExceptionMessage = $"End Code : {end:X04}";
+                                Counter = 0;
+                                State = DataSynchronizerState.Exception;
+                                return;
+                            }
+                        }
+                    }
+
+                    for (int i = 0; i < __process_data.Count; ++i)
+                    {
+                        if (__process_data[i].access == DataSyncMode.Write && __process_data[i].size > 0)
+                        {
+                            master.WriteInWord("DM@WORD", (ushort)__process_data[i].start, __process_data[i].size, __process_data[i].data, out end);
+                            __process_data_end = end;
+                            if (end != 0)
+                            {
+                                ExceptionMessage = $"End Code : {end:X04}";
+                                Counter = 0;
+                                State = DataSynchronizerState.Exception;
+                                return;
+                            }
+                        }
+                    }
+
+                    Counter = counter++;
+                }
+                catch (Exception ex)
+                {
+                    ExceptionMessage = ex.Message;
+                    Counter = 0;
+                    State = DataSynchronizerState.Exception;
+                    return;
+                }
+
+                lock (__sync_property_access_lock)
+                {
+                    for (int i = 0; i < __process_data.Count; ++i)
+                    {
+                        if (__process_data[i].access == DataSyncMode.Read)
+                            __process_data[i].data.CopyTo(__internal_process_data[i], 0);
+                        else
+                            __internal_process_data[i].CopyTo(__process_data[i].data, 0);
+                    }
+                    __internal_process_data_end = __process_data_end;
+                }
+                int ms = (int)(sw.ElapsedMilliseconds);
+                if (ms < interval)
+                    Thread.Sleep(interval - ms);
+                PollingInterval = (int)sw.ElapsedMilliseconds;
+                sw.Restart();
             }
         }
 

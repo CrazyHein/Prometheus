@@ -1,33 +1,26 @@
-﻿using AMEC.PCSoftware.CommunicationProtocol.CrazyHein.SLMP;
+﻿using AMEC.PCSoftware.CommunicationProtocol.CrazyHein.FINS;
+using AMEC.PCSoftware.CommunicationProtocol.CrazyHein.OrbmentDAQ;
+using AMEC.PCSoftware.CommunicationProtocol.CrazyHein.OrbmentDAQ.Protocol;
+using AMEC.PCSoftware.CommunicationProtocol.CrazyHein.OrbmentDAQ.Storage;
+using AMEC.PCSoftware.CommunicationProtocol.CrazyHein.SLMP;
 using AMEC.PCSoftware.CommunicationProtocol.CrazyHein.SLMP.IOUtility;
 using AMEC.PCSoftware.CommunicationProtocol.CrazyHein.SLMP.Master;
 using AMEC.PCSoftware.CommunicationProtocol.CrazyHein.SLMP.Message;
-using AMEC.PCSoftware.CommunicationProtocol.CrazyHein.OrbmentDAQ.Storage;
 using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Debugger;
 using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility;
 using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.Diagnostics;
+using System.Net;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
-using DAQInterface = AMEC.PCSoftware.CommunicationProtocol.CrazyHein.OrbmentDAQ.IOUtility.SocketInterface;
-using DAQPort = AMEC.PCSoftware.CommunicationProtocol.CrazyHein.OrbmentDAQ.IOUtility.TCP;
 using DAQMaster = AMEC.PCSoftware.CommunicationProtocol.CrazyHein.OrbmentDAQ.Protocol.Master;
-using AMEC.PCSoftware.CommunicationProtocol.CrazyHein.OrbmentDAQ.Protocol;
-using AMEC.PCSoftware.CommunicationProtocol.CrazyHein.OrbmentDAQ;
-using System.Threading;
-using System.Runtime.InteropServices;
-using System.Runtime;
-using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Console;
-using System.Diagnostics;
+using DAQPort = AMEC.PCSoftware.CommunicationProtocol.CrazyHein.OrbmentDAQ.IOUtility.TCP;
+using FINSInterface = AMEC.PCSoftware.CommunicationProtocol.CrazyHein.FINS.IOUtility.SocketInterface;
+using FINSMaster = AMEC.PCSoftware.CommunicationProtocol.CrazyHein.FINS.Master;
+using FINSPort = AMEC.PCSoftware.CommunicationProtocol.CrazyHein.FINS.IOUtility.TCP;
 
 namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
 {
@@ -44,6 +37,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             InitializeComponent();
             Settings = settings;
             DebuggerSettings.DataContext = Settings.SlmpTargetProperty.Copy();
+            DebuggerFinsSettings.DataContext = Settings.FinsTargetProperty.Copy();
             DAQSettings.DataContext = Settings.DAQTargetProperty.Copy();
             PreferenceSettings.DataContext = Settings.PreferenceProperty.Copy();
             FTPSettings.DataContext = Settings.FTPTargetProperty.Copy();
@@ -55,6 +49,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             InitializeComponent();
             Settings = settings;
             DebuggerSettings.DataContext = import.SlmpTargetProperty.Copy();
+            DebuggerFinsSettings.DataContext = import.FinsTargetProperty.Copy();
             DAQSettings.DataContext = import.DAQTargetProperty.Copy();
             PreferenceSettings.DataContext = import.PreferenceProperty.Copy();
             FTPSettings.DataContext = import.FTPTargetProperty.Copy();
@@ -69,6 +64,13 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                 __errors--;
         }
         private void DAQSettings_Error(object sender, ValidationErrorEventArgs e)
+        {
+            if (e.Action == ValidationErrorEventAction.Added)
+                __errors++;
+            else
+                __errors--;
+        }
+        private void DebuggerFinsSettings_Error(object sender, ValidationErrorEventArgs e)
         {
             if (e.Action == ValidationErrorEventAction.Added)
                 __errors++;
@@ -97,6 +99,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             else
             {
                 Settings.SlmpTargetProperty = DebuggerSettings.DataContext as SlmpTargetProperty;
+                Settings.FinsTargetProperty = DebuggerFinsSettings.DataContext as FinsTargetProperty;
                 Settings.DAQTargetProperty = DAQSettings.DataContext as DAQTargetProperty;
                 Settings.PreferenceProperty = PreferenceSettings.DataContext as PreferenceProperty;
                 Settings.FTPTargetProperty = FTPSettings.DataContext as FTPTargetProperty;
@@ -151,6 +154,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                     try
                     {
                         Settings s = new Settings(DebuggerSettings.DataContext as SlmpTargetProperty,
+                            DebuggerFinsSettings.DataContext as FinsTargetProperty,
                             DAQSettings.DataContext as DAQTargetProperty,
                             FTPSettings.DataContext as FTPTargetProperty,
                             AppInstallerSettings.DataContext as AppInstallerProperty,
@@ -219,6 +223,48 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                 finally
                 {
                     SLMPBusyIndicator.IsBusy = false;
+                    IsEnabled = true;
+                    if (com != null) com.Dispose();
+                    com = null;
+                }
+            }
+        }
+
+        private async void FINSTest_Click(object sender, RoutedEventArgs e)
+        {
+            if (HasError)
+                MessageBox.Show("At least one user input is invalid.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            else
+            {
+                var property = DebuggerFinsSettings.DataContext as FinsTargetProperty;
+                FINSInterface com = null;
+
+                FINSBusyIndicator.IsBusy = true;
+                IsEnabled = false;
+                try
+                {
+                    com = new FINSPort(new System.Net.IPEndPoint(IPAddress.Any, 0),
+                                new System.Net.IPEndPoint(property.DestinationIPv4, property.DestinationPort),
+                                property.SendTimeoutValue, property.ReceiveTimeoutValue);
+                    await Task.Run(() => (com as FINSPort).Connect());
+
+                    FINSMaster.HandshakeMaster handshake = new FINSMaster.HandshakeMaster(com, 0, property.ServerNodeAddress, null, null);
+                    await Task.Run(() => handshake.Handshake());
+
+                    MessageBox.Show(this, $"Successfully connected with the remote controller.", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
+
+                }
+                catch (FINSException ex)
+                {
+                    MessageBox.Show(this, "At least one unexpected error occured while doing communication test.\n" + ex.Message, "Error Message", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(this, "At least one unexpected error occured while doing communication test.\n" + ex.Message, "Error Message", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+                finally
+                {
+                    FINSBusyIndicator.IsBusy = false;
                     IsEnabled = true;
                     if (com != null) com.Dispose();
                     com = null;

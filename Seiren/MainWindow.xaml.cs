@@ -308,10 +308,18 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             (__miscellaneous_viewer.DataContext as MiscellaneousModel).CommitChanges();
         }
 
-        private void __startup_debugger(DataSyncMode rxbit, DataSyncMode rxblock, DataSyncMode rxcotrol)
+        private void __startup_debugger(DataSyncMode rxbit, DataSyncMode rxblock, DataSyncMode rxcotrol, DataSyncProtocol protocol)
         {
-            if (MessageBox.Show($"Establish communication(SLMP) with the controller: {__settings.SlmpTargetProperty.DestinationIPv4String}:{__settings.SlmpTargetProperty.DestinationPort} ?", "Question", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.No)
-                return;
+            if (protocol == DataSyncProtocol.SLMP)
+            {
+                if (MessageBox.Show($"Establish communication({protocol}) with the controller: {__settings.SlmpTargetProperty.DestinationIPv4String}:{__settings.SlmpTargetProperty.DestinationPort} ?", "Question", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.No)
+                    return;
+            }
+            else
+            {
+                if (MessageBox.Show($"Establish communication({protocol}) with the controller: {__settings.FinsTargetProperty.DestinationIPv4String}:{__settings.FinsTargetProperty.DestinationPort} ?", "Question", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.No)
+                    return;
+            }
             DebugConsole.WriteInfo("Startup Debugger");
             (__objects_viewer.DataContext as ObjectsModel).TxDiagnosticObjects.ResetProcessDataValue();
             (__objects_viewer.DataContext as ObjectsModel).TxBitObjects.ResetProcessDataValue();
@@ -345,9 +353,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                 (__rx_block_area.OffsetInWord, (__rx_block_area.ActualSizeInWord),  __rx_block_area.ProcessDatas.Select(p => new ValueTuple<uint, uint>(p.BitPos, p.ProcessObject.Variable.Type.BitSize)), rxblock)
             };
 
-            __data_synchronizer = new DataSynchronizer(areas);
+            __data_synchronizer = new DataSynchronizer(areas, protocol);
             __main_model.IsBusy = true;
-            BusyDialog diag = new BusyDialog(__data_synchronizer.Startup(__settings.SlmpTargetProperty, __area_data_array));
+            BusyDialog diag = protocol == DataSyncProtocol.SLMP ? new BusyDialog(__data_synchronizer.Startup(__settings.SlmpTargetProperty, __area_data_array)) : new BusyDialog(__data_synchronizer.Startup(__settings.FinsTargetProperty, __area_data_array));
             diag.ShowDialog();
             //await __data_synchronizer.Startup(new SlmpTargetProperty());
             __main_model.IsBusy = false;
@@ -383,9 +391,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             __main_model.DebuggerState =  DataSynchronizerState.Ready;
             __main_model.DebuggerPollingInterval = 0;
             __main_model.DebuggerHeartbeat = 0;
-            __main_model.DebuggerTarget = $"{__settings.SlmpTargetProperty.DestinationIPv4String}:{__settings.SlmpTargetProperty.DestinationPort}";
+            __main_model.DebuggerTarget = protocol == DataSyncProtocol.SLMP ? $"{__settings.SlmpTargetProperty.DestinationIPv4String}:{__settings.SlmpTargetProperty.DestinationPort}" :
+                $"{__settings.FinsTargetProperty.DestinationIPv4String}:{__settings.FinsTargetProperty.DestinationPort}";
 
-            __user_interface_synchronizer.Startup(__settings.SlmpTargetProperty.PollingInterval);
+            __user_interface_synchronizer.Startup(protocol == DataSyncProtocol.SLMP ? __settings.SlmpTargetProperty.PollingInterval : __settings.FinsTargetProperty.PollingInterval);
             CommandManager.InvalidateRequerySuggested();
         }
 
@@ -923,12 +932,17 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
 
         private void StartMonitoringCommand_Executed(object sender, System.Windows.Input.ExecutedRoutedEventArgs e)
         {
-            __startup_debugger(DataSyncMode.Read, DataSyncMode.Read, DataSyncMode.Read);
+            if(Keyboard.IsKeyDown(Key.LeftCtrl))
+                __startup_debugger(DataSyncMode.Read, DataSyncMode.Read, DataSyncMode.Read, DataSyncProtocol.FINS);
+            else
+                __startup_debugger(DataSyncMode.Read, DataSyncMode.Read, DataSyncMode.Read, DataSyncProtocol.SLMP);
         }
 
         private void StartDebuggingCommand_Executed(object sender, System.Windows.Input.ExecutedRoutedEventArgs e)
         {
-            if(__settings.PreferenceProperty.RxBitAreaSyncMode == DataSyncMode.Write || 
+            var protocol = Keyboard.IsKeyDown(Key.LeftCtrl) ? DataSyncProtocol.FINS : DataSyncProtocol.SLMP;
+
+            if (__settings.PreferenceProperty.RxBitAreaSyncMode == DataSyncMode.Write || 
                 __settings.PreferenceProperty.RxBlockAreaSyncMode == DataSyncMode.Write)
             {
                 var res = MessageBox.Show("Debugging RxBitArea/TxBlockArea in WRITING_MODE (May conflict with AMEC GUI) ?", "Question", MessageBoxButton.YesNo, MessageBoxImage.Question);
@@ -938,7 +952,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
 
             __startup_debugger(__settings.PreferenceProperty.RxBitAreaSyncMode, 
                 __settings.PreferenceProperty.RxBlockAreaSyncMode, 
-                __settings.PreferenceProperty.RxControlAreaSyncMode);
+                __settings.PreferenceProperty.RxControlAreaSyncMode, protocol);
         }
 
         private void StartDebuggingCommand_CanExecuted(object sender, System.Windows.Input.CanExecuteRoutedEventArgs e)

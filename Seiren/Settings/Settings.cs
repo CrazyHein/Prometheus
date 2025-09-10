@@ -9,7 +9,6 @@ using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.IO;
 using System.Linq;
-using System.Security.RightsManagement;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -26,9 +25,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             Restore(path);
         }
 
-        public Settings(SlmpTargetProperty slmp, DAQTargetProperty daq, FTPTargetProperty ftp, AppInstallerProperty app, PreferenceProperty pref )
+        public Settings(SlmpTargetProperty slmp, FinsTargetProperty fins, DAQTargetProperty daq, FTPTargetProperty ftp, AppInstallerProperty app, PreferenceProperty pref )
         {
             SlmpTargetProperty = slmp;
+            FinsTargetProperty = fins;
             DAQTargetProperty = daq;
             FTPTargetProperty = ftp;
             AppInstallerProperty = app;
@@ -75,6 +75,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         public static string TirasweelVersion { get; } = System.Reflection.Assembly.GetAssembly(typeof(AMEC.PCSoftware.CommunicationProtocol.CrazyHein.OrbmentDAQ.Protocol.Master)).GetName().Version.ToString();
 
         public SlmpTargetProperty SlmpTargetProperty { get; set; }
+        public FinsTargetProperty FinsTargetProperty { get; set; }
         public DAQTargetProperty DAQTargetProperty { get; set; }
         public FTPTargetProperty FTPTargetProperty { get; set; }
         public AppInstallerProperty AppInstallerProperty { get; set; }
@@ -93,6 +94,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                 writer.WriteStartObject();
                 writer.WritePropertyName("Debugger");
                 SlmpTargetProperty.Save(writer);
+                writer.WritePropertyName("Debugger-Fins");
+                FinsTargetProperty.Save(writer);
                 writer.WritePropertyName("DAQ");
                 DAQTargetProperty.Save(writer);
                 writer.WritePropertyName("FTP");
@@ -139,6 +142,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                             {
                                 case "Debugger":
                                     SlmpTargetProperty = SlmpTargetProperty.RESTORE(ref reader); break;
+                                case "Debugger-Fins":
+                                    FinsTargetProperty = FinsTargetProperty.RESTORE(ref reader); break;
                                 case "DAQ":
                                     DAQTargetProperty = DAQTargetProperty.RESTORE(ref reader); break;
                                 case "FTP":
@@ -161,6 +166,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             finally
             {
                 SlmpTargetProperty ??= new SlmpTargetProperty();
+                FinsTargetProperty ??= new FinsTargetProperty();
                 DAQTargetProperty ??= new DAQTargetProperty();
                 FTPTargetProperty ??= new FTPTargetProperty();
                 AppInstallerProperty ??= new AppInstallerProperty();
