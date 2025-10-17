@@ -9,6 +9,7 @@ using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using LogicExpression = AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.EventMechansim.NeoTriggerMechansim.LogicExpression;
 
 namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.EventMechansim.TriggerMechansim
 {
@@ -24,7 +25,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ev
         NOT,
         XOR,
         NAND,
-        NOR
+        NOR,
+        ROOT
     }
     public abstract class Element
     {
@@ -127,6 +129,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ev
         public const int MaxNesting = 5;
         private Element __logic_tree;
 
+        private LogicExpression __logic_expression;
+
         public static Regex GLOBAL_EVENT_PATTERN = new Regex("^GEVENT(([0-9])|([1-9][0-9]{0,}))$", RegexOptions.Compiled);
         public static Regex LOCAL_EVENT_PATTERN = new Regex("^EVENT(([0-9])|([1-9][0-9]{0,}))$", RegexOptions.Compiled);
         public static Regex INLINE_EVENT_PATTERN = new Regex("^\\{.+\\}$", RegexOptions.Compiled);
@@ -140,6 +144,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ev
             int start = 0;
             List<__Statement> buffer = new List<__Statement>();
             __converter(node, buffer, globalEvts, localEvts, ref inlineEventIndex);
+            __logic_expression = new LogicExpression(buffer);
             __logic_tree = __search_logic_element(buffer, ref start, null);
             ReferencedGlobalEvents = __referenced_global_events;
             ReferencedLocalEvents = __referenced_local_events;
@@ -151,6 +156,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ev
             int start = 0;
             List<__Statement> buffer = new List<__Statement>();
             __converter(jsonArray, buffer, globalEvts, localEvts, ref inlineEventIndex);
+            __logic_expression = new LogicExpression(buffer);
             __logic_tree = __search_logic_element(buffer, ref start, null);
             ReferencedGlobalEvents = __referenced_global_events;
             ReferencedLocalEvents = __referenced_local_events;

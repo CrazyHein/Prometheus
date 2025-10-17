@@ -144,7 +144,7 @@ namespace AMEC.PCSoftware.CommunicationProtocol.CrazyHein.OrbmentDAQ.Storage
                                 ReadOnlySpan<byte> diagdata, ReadOnlySpan<byte> txbitdata, ReadOnlySpan<byte> txblkdata,
                                 ReadOnlySpan<byte> ctrldata, ReadOnlySpan<byte> rxbitdata, ReadOnlySpan<byte> rxblkdata)
         {
-            __last_data_acquisition_date_time += TimeSpan.FromMilliseconds((time - __last_time + 500) / 1000);
+            __last_data_acquisition_date_time += TimeSpan.FromMicroseconds(time - __last_time);
             BsonDocument rootBsonDocument = new BsonDocument("time", new BsonDateTime(__last_data_acquisition_date_time));
             rootBsonDocument.Add("recipe_id", new BsonBinaryData(__DUMMY_MD5, BsonBinarySubType.MD5));
             rootBsonDocument.Add("engine_state", new BsonInt64(0));

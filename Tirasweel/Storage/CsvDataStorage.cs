@@ -13,7 +13,7 @@ namespace AMEC.PCSoftware.CommunicationProtocol.CrazyHein.OrbmentDAQ.Storage
     public class CsvDataStorage: IDataStorage
     {
         public static readonly string FILE_TIMESTAMP_FORMAT = @"yyMMddHHmmssfff";
-        public static readonly string RECORD_TIMESTAMP_FORMAT = @"yyMMdd HH:mm:ss:fff";
+        public static readonly string RECORD_TIMESTAMP_FORMAT = @"yyMMdd HH:mm:ss:ffffff";
         private string __storage_file_path;
         private string __storage_file_name_prefix;
         private int __storage_file_size_limit = 0;
@@ -92,7 +92,7 @@ namespace AMEC.PCSoftware.CommunicationProtocol.CrazyHein.OrbmentDAQ.Storage
                 __csv_writer.NextRecord();
             }
 
-            __last_data_acquisition_date_time += TimeSpan.FromMilliseconds((time - __last_time + 500) / 1000);
+            __last_data_acquisition_date_time += TimeSpan.FromMicroseconds(time - __last_time);
             __csv_writer.WriteField(__last_data_acquisition_date_time.ToString(RECORD_TIMESTAMP_FORMAT));
             foreach (var f in __diag_area)
                 __csv_writer.WriteField(f.DataStringValue(diagdata));
