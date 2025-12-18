@@ -38,7 +38,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Br
             }
             catch (Exception ex)
             {
-                throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_BRANCH_PARSE_ERROR, $"{node.ToString()}\nis not a valid BRANCH object.", ex);//ok
+                throw new NapishtimScriptException(NapishtimExceptionCode.SCRIPT_BRANCH_PARSE_ERROR, $"{node.ToString()}\nis not a valid BRANCH object.", ex);//ok
             }
         }
 

@@ -13,7 +13,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ex
         public AND(IReadOnlyList<Expression> parameters) : base(parameters)
         {
             if (parameters.Count == 0)
-                throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EXPRESSION_SPRITE_SYNTAX_ERROR,
+                throw new NapishtimScriptException(NapishtimExceptionCode.SCRIPT_EXPRESSION_SPRITE_SYNTAX_ERROR,
                     this.GetType().GetCustomAttribute<ArithmeticUnitUsageAttribute>().Usage);
         }
         public override string Name => "AND";
@@ -30,7 +30,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ex
         public OR(IReadOnlyList<Expression> parameters) : base(parameters)
         {
             if (parameters.Count == 0)
-                throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EXPRESSION_SPRITE_SYNTAX_ERROR,
+                throw new NapishtimScriptException(NapishtimExceptionCode.SCRIPT_EXPRESSION_SPRITE_SYNTAX_ERROR,
                     this.GetType().GetCustomAttribute<ArithmeticUnitUsageAttribute>().Usage);
         }
         public override string Name => "OR";
@@ -47,7 +47,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ex
         public NOT(IReadOnlyList<Expression> parameters) : base(parameters)
         {
             if (parameters.Count != 1)
-                throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EXPRESSION_SPRITE_SYNTAX_ERROR,
+                throw new NapishtimScriptException(NapishtimExceptionCode.SCRIPT_EXPRESSION_SPRITE_SYNTAX_ERROR,
                     this.GetType().GetCustomAttribute<ArithmeticUnitUsageAttribute>().Usage);
         }
         public override string Name => "NOT";
@@ -64,7 +64,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ex
         public XOR(IReadOnlyList<Expression> parameters) : base(parameters)
         {
             if (parameters.Count != 2)
-                throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EXPRESSION_SPRITE_SYNTAX_ERROR,
+                throw new NapishtimScriptException(NapishtimExceptionCode.SCRIPT_EXPRESSION_SPRITE_SYNTAX_ERROR,
                     this.GetType().GetCustomAttribute<ArithmeticUnitUsageAttribute>().Usage);
         }
         public override string Name => "XOR";
@@ -81,7 +81,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ex
         public NAND(IReadOnlyList<Expression> parameters) : base(parameters)
         {
             if (parameters.Count == 0)
-                throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EXPRESSION_SPRITE_SYNTAX_ERROR,
+                throw new NapishtimScriptException(NapishtimExceptionCode.SCRIPT_EXPRESSION_SPRITE_SYNTAX_ERROR,
                     this.GetType().GetCustomAttribute<ArithmeticUnitUsageAttribute>().Usage);
         }
         public override string Name => "NAND";
@@ -98,7 +98,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ex
         public NOR(IReadOnlyList<Expression> parameters) : base(parameters)
         {
             if (parameters.Count == 0)
-                throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EXPRESSION_SPRITE_SYNTAX_ERROR,
+                throw new NapishtimScriptException(NapishtimExceptionCode.SCRIPT_EXPRESSION_SPRITE_SYNTAX_ERROR,
                     this.GetType().GetCustomAttribute<ArithmeticUnitUsageAttribute>().Usage);
         }
         public override string Name => "NOR";
@@ -115,7 +115,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ex
         public ISBITON(IReadOnlyList<Expression> parameters) : base(parameters)
         {
             if (parameters.Count != 2)
-                throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EXPRESSION_SPRITE_SYNTAX_ERROR,
+                throw new NapishtimScriptException(NapishtimExceptionCode.SCRIPT_EXPRESSION_SPRITE_SYNTAX_ERROR,
                     this.GetType().GetCustomAttribute<ArithmeticUnitUsageAttribute>().Usage);
         }
         public override string Name => "ISBITON";
@@ -132,7 +132,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ex
         public ISBITOFF(IReadOnlyList<Expression> parameters) : base(parameters)
         {
             if (parameters.Count != 2)
-                throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EXPRESSION_SPRITE_SYNTAX_ERROR,
+                throw new NapishtimScriptException(NapishtimExceptionCode.SCRIPT_EXPRESSION_SPRITE_SYNTAX_ERROR,
                     this.GetType().GetCustomAttribute<ArithmeticUnitUsageAttribute>().Usage);
         }
         public override string Name => "ISBITOFF";
@@ -149,7 +149,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ex
         public SETBIT(IReadOnlyList<Expression> parameters) : base(parameters)
         {
             if (parameters.Count != 2)
-                throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EXPRESSION_SPRITE_SYNTAX_ERROR,
+                throw new NapishtimScriptException(NapishtimExceptionCode.SCRIPT_EXPRESSION_SPRITE_SYNTAX_ERROR,
                     this.GetType().GetCustomAttribute<ArithmeticUnitUsageAttribute>().Usage);
         }
         public override string Name => "SETBIT";
@@ -166,7 +166,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ex
         public CLRBIT(IReadOnlyList<Expression> parameters) : base(parameters)
         {
             if (parameters.Count != 2)
-                throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EXPRESSION_SPRITE_SYNTAX_ERROR,
+                throw new NapishtimScriptException(NapishtimExceptionCode.SCRIPT_EXPRESSION_SPRITE_SYNTAX_ERROR,
                     this.GetType().GetCustomAttribute<ArithmeticUnitUsageAttribute>().Usage);
         }
         public override string Name => "CLRBIT";

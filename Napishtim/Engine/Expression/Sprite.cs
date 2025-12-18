@@ -22,7 +22,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ex
         {
             Layer = upper == null ? 0 : upper.Layer + 1;
             if (Layer == MaxNesting)
-                throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_SPRITE_NESTING_DEPTH_OUT_OF_RANGE, $"The maximum nesting depth of sprite invoking is {MaxNesting}.");
+                throw new NapishtimScriptException(NapishtimExceptionCode.SCRIPT_SPRITE_NESTING_DEPTH_OUT_OF_RANGE, $"The maximum nesting depth of sprite invoking is {MaxNesting}.");
             int counter = 1;
             int i = 0, j = 0;
             while(i < value.Length)

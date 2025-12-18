@@ -58,12 +58,12 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ex
                     if (au != null)
                         return au;
                     else
-                        throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EXPRESSION_SPRITE_SYNTAX_ERROR, $"Unknown sprite name: {name}.");
+                        throw new NapishtimScriptException(NapishtimExceptionCode.SCRIPT_EXPRESSION_SPRITE_SYNTAX_ERROR, $"Unknown sprite name: {name}.");
                 }
                 else
-                    throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EXPRESSION_SPRITE_SYNTAX_ERROR, $"Unknown sprite name: {name}.");
+                    throw new NapishtimScriptException(NapishtimExceptionCode.SCRIPT_EXPRESSION_SPRITE_SYNTAX_ERROR, $"Unknown sprite name: {name}.");
             }
-            catch (NaposhtimException)
+            catch (NapishtimException)
             {
                 throw;
             }

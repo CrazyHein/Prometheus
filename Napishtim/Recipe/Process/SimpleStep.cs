@@ -199,7 +199,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Pr
                 __branch_priorities.Add((priorityAbort, "ABORT_POINT"));
             }
             else if (abortShaders?.Shaders.Count() > 0)
-                throw new NaposhtimDocumentException(NaposhtimExceptionCode.PROCESS_COMPONENT_ARGUMENTS_ERROR, $"You must define <Abort Condition> to enable <Abort Shaders>.");
+                throw new NapishtimDocumentException(NapishtimExceptionCode.PROCESS_COMPONENT_ARGUMENTS_ERROR, $"You must define <Abort Condition> to enable <Abort Shaders>.");
 
             if (breakCondition != null && breakCondition.Count > 0)
             {
@@ -212,7 +212,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Pr
                 __branch_priorities.Add((priorityBreak, "BREAK_POINT"));
             }
             else if (breakShaders?.Shaders.Count() > 0)
-                throw new NaposhtimDocumentException(NaposhtimExceptionCode.PROCESS_COMPONENT_ARGUMENTS_ERROR, $"You must define <Break Condition> to enable <Break Shaders>.");
+                throw new NapishtimDocumentException(NapishtimExceptionCode.PROCESS_COMPONENT_ARGUMENTS_ERROR, $"You must define <Break Condition> to enable <Break Shaders>.");
 
             if (continueCondition != null && continueCondition.Count > 0)
             {
@@ -225,7 +225,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Pr
                 __branch_priorities.Add((priorityContinue, "CONTINUE_POINT"));
             }
             else if (continueShaders?.Shaders.Count() > 0)
-                throw new NaposhtimDocumentException(NaposhtimExceptionCode.PROCESS_COMPONENT_ARGUMENTS_ERROR, $"You must define <Continue Condition> to enable <Continue Shaders>.");
+                throw new NapishtimDocumentException(NapishtimExceptionCode.PROCESS_COMPONENT_ARGUMENTS_ERROR, $"You must define <Continue Condition> to enable <Continue Shaders>.");
  
             __branch_priorities.Sort(delegate (ValueTuple<byte, string> x, ValueTuple<byte, string> y)
             {
@@ -366,7 +366,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Pr
                         break;
                     case "BREAK_POINT":
                         if (breakp == null)
-                            throw new NaposhtimDocumentException(NaposhtimExceptionCode.PROCESS_COMPONENT_ARGUMENTS_ERROR, $"Must provide break branch target to resolve ProcessStepSource with BREAK_POINT.");
+                            throw new NapishtimDocumentException(NapishtimExceptionCode.PROCESS_COMPONENT_ARGUMENTS_ERROR, $"Must provide break branch target to resolve ProcessStepSource with BREAK_POINT.");
                         branch = _step["BREAK_POINT"].DeepClone();
                         branch.AsObject().Remove("PRIORITY");
                         branch["TARGET"] = breakp;
@@ -375,7 +375,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Pr
                         break;
                     case "CONTINUE_POINT":
                         if (continuep == null)
-                            throw new NaposhtimDocumentException(NaposhtimExceptionCode.PROCESS_COMPONENT_ARGUMENTS_ERROR, $"Must provide continue branch target to resolve ProcessStepSource with CONTINUE_POINT.");
+                            throw new NapishtimDocumentException(NapishtimExceptionCode.PROCESS_COMPONENT_ARGUMENTS_ERROR, $"Must provide continue branch target to resolve ProcessStepSource with CONTINUE_POINT.");
                         branch = _step["CONTINUE_POINT"].DeepClone();
                         branch.AsObject().Remove("PRIORITY");
                         branch["TARGET"] = continuep;
@@ -476,13 +476,13 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Pr
             try
             {
                 if (node["ASSEMBLY"].GetValue<string>() != typeof(SimpleStep_S).FullName)
-                    throw new NaposhtimDocumentException(NaposhtimExceptionCode.PROCESS_COMPONENT_ARGUMENTS_ERROR, $"Assmebly name mismatch: {node["ASSEMBLY"].GetValue<string>()} vs {typeof(SimpleStep_S).FullName}.");
+                    throw new NapishtimDocumentException(NapishtimExceptionCode.PROCESS_COMPONENT_ARGUMENTS_ERROR, $"Assmebly name mismatch: {node["ASSEMBLY"].GetValue<string>()} vs {typeof(SimpleStep_S).FullName}.");
 
                 return new SimpleStep_S(node);
             }
             catch (Exception ex)
             {
-                throw new NaposhtimDocumentException(NaposhtimExceptionCode.PROCESS_COMPONENT_ARGUMENTS_ERROR, $"Can not restore SimpleStep_S object from node:\n{node.ToString()}", ex);
+                throw new NapishtimDocumentException(NapishtimExceptionCode.PROCESS_COMPONENT_ARGUMENTS_ERROR, $"Can not restore SimpleStep_S object from node:\n{node.ToString()}", ex);
             }
         }
 

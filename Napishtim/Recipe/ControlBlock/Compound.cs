@@ -36,17 +36,17 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
             try
             {
                 if (node["ASSEMBLY"].GetValue<string>() != typeof(Compound_S).FullName)
-                    throw new NaposhtimDocumentException(NaposhtimExceptionCode.CONTROL_BLOCK_ARGUMENTS_ERROR, $"Assmebly name mismatch: {node["ASSEMBLY"].GetValue<string>()} vs {typeof(Compound_S).FullName}.");
+                    throw new NapishtimDocumentException(NapishtimExceptionCode.CONTROL_BLOCK_ARGUMENTS_ERROR, $"Assmebly name mismatch: {node["ASSEMBLY"].GetValue<string>()} vs {typeof(Compound_S).FullName}.");
 
                 return new Compound_S(node) { Owner = owner };
             }
-            catch (NaposhtimException)
+            catch (NapishtimException)
             {
                 throw;
             }
             catch (Exception ex)
             {
-                throw new NaposhtimDocumentException(NaposhtimExceptionCode.CONTROL_BLOCK_ARGUMENTS_ERROR, $"Can not restore Compound_S object from node:\n{node.ToString()}", ex);
+                throw new NapishtimDocumentException(NapishtimExceptionCode.CONTROL_BLOCK_ARGUMENTS_ERROR, $"Can not restore Compound_S object from node:\n{node.ToString()}", ex);
             }
         }
 
@@ -119,9 +119,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
         public void AddControlBlockFirst(ControlBlockSource blk)
         {
             if (this.Nesting + blk.Height > MAX_NESTING_DEPTH)
-                throw new NaposhtimDocumentException(NaposhtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, $"The nesting depth of a Control Block exceeds the limit(MAX: {ControlBlockSource.MAX_NESTING_DEPTH}).");
+                throw new NapishtimDocumentException(NapishtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, $"The nesting depth of a Control Block exceeds the limit(MAX: {ControlBlockSource.MAX_NESTING_DEPTH}).");
             if (blk.Owner != null)
-                throw new NaposhtimDocumentException(NaposhtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, $"The Control Block already has an owner.");
+                throw new NapishtimDocumentException(NapishtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, $"The Control Block already has an owner.");
 
             __original_control_blocks.AddFirst(blk);
             blk.Owner = this;
@@ -130,9 +130,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
         public void AddControlBlockLast(ControlBlockSource blk)
         {
             if (this.Nesting + blk.Height > MAX_NESTING_DEPTH)
-                throw new NaposhtimDocumentException(NaposhtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, $"The nesting depth of a Control Block exceeds the limit(MAX: {ControlBlockSource.MAX_NESTING_DEPTH}).");
+                throw new NapishtimDocumentException(NapishtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, $"The nesting depth of a Control Block exceeds the limit(MAX: {ControlBlockSource.MAX_NESTING_DEPTH}).");
             if (blk.Owner != null)
-                throw new NaposhtimDocumentException(NaposhtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, $"The Control Block already has an owner.");
+                throw new NapishtimDocumentException(NapishtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, $"The Control Block already has an owner.");
 
             __original_control_blocks.AddLast(blk);
             blk.Owner = this;
@@ -141,11 +141,11 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
         public void AddControlBlockAfter(LinkedListNode<ControlBlockSource> node, ControlBlockSource blk)
         {
             if (node.List != __original_control_blocks)
-                throw new NaposhtimDocumentException(NaposhtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, "The specified node does not in the Linked List.");
+                throw new NapishtimDocumentException(NapishtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, "The specified node does not in the Linked List.");
             if (this.Nesting + blk.Height > MAX_NESTING_DEPTH)
-                throw new NaposhtimDocumentException(NaposhtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, $"The nesting depth of a Control Block exceeds the limit(MAX: {ControlBlockSource.MAX_NESTING_DEPTH}).");
+                throw new NapishtimDocumentException(NapishtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, $"The nesting depth of a Control Block exceeds the limit(MAX: {ControlBlockSource.MAX_NESTING_DEPTH}).");
             if (blk.Owner != null)
-                throw new NaposhtimDocumentException(NaposhtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, $"The Control Block already has an owner.");
+                throw new NapishtimDocumentException(NapishtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, $"The Control Block already has an owner.");
 
             __original_control_blocks.AddAfter(node, blk);
             blk.Owner = this;
@@ -153,11 +153,11 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
         public void AddControlBlockBefore(LinkedListNode<ControlBlockSource> node, ControlBlockSource blk)
         {
             if (node.List != __original_control_blocks)
-                throw new NaposhtimDocumentException(NaposhtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, "The specified node does not in the Linked List.");
+                throw new NapishtimDocumentException(NapishtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, "The specified node does not in the Linked List.");
             if (this.Nesting + blk.Height > MAX_NESTING_DEPTH)
-                throw new NaposhtimDocumentException(NaposhtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, $"The nesting depth of a Control Block exceeds the limit(MAX: {ControlBlockSource.MAX_NESTING_DEPTH}).");
+                throw new NapishtimDocumentException(NapishtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, $"The nesting depth of a Control Block exceeds the limit(MAX: {ControlBlockSource.MAX_NESTING_DEPTH}).");
             if (blk.Owner != null)
-                throw new NaposhtimDocumentException(NaposhtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, $"The Control Block already has an owner.");
+                throw new NapishtimDocumentException(NapishtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, $"The Control Block already has an owner.");
 
             __original_control_blocks.AddBefore(node, blk);
             blk.Owner = this;
@@ -166,7 +166,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
         public ControlBlockSource RemoveControlBlockFirst()
         {
             if (__original_control_blocks.Count == 0)
-                throw new NaposhtimDocumentException(NaposhtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, "Can not find any control block in 'Compound' Control Block.");
+                throw new NapishtimDocumentException(NapishtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, "Can not find any control block in 'Compound' Control Block.");
 
             var blk = __original_control_blocks.First.Value;
             __original_control_blocks.RemoveFirst();
@@ -177,7 +177,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
         public ControlBlockSource RemoveControlBlockLast()
         {
             if (__original_control_blocks.Count == 0)
-                throw new NaposhtimDocumentException(NaposhtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, "Can not find any control block in 'Compound' Control Block.");
+                throw new NapishtimDocumentException(NapishtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, "Can not find any control block in 'Compound' Control Block.");
 
             var blk = __original_control_blocks.Last.Value;
             __original_control_blocks.RemoveLast();
@@ -188,7 +188,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
         public ControlBlockSource RemoveControlBlock(LinkedListNode<ControlBlockSource> node)
         {
             if (node.List != __original_control_blocks)
-                throw new NaposhtimDocumentException(NaposhtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, "The specified node does not in the Linked List.");
+                throw new NapishtimDocumentException(NapishtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, "The specified node does not in the Linked List.");
 
             __original_control_blocks.Remove(node);
             node.Value.Owner = null;
@@ -201,9 +201,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
             {
                 var originalBlk = ControlBlockAt(idx);
                 if (originalBlk == null)
-                    throw new NaposhtimDocumentException(NaposhtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, $"The index {idx} is invalid to a linked-list of length {__original_control_blocks.Count}.");
+                    throw new NapishtimDocumentException(NapishtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, $"The index {idx} is invalid to a linked-list of length {__original_control_blocks.Count}.");
                 if (value.Owner != null)
-                    throw new NaposhtimDocumentException(NaposhtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, $"The Control Block already has an owner.");
+                    throw new NapishtimDocumentException(NapishtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, $"The Control Block already has an owner.");
                 var node = NodeAt(idx);
                 __original_control_blocks.AddBefore(node, value);
                 __original_control_blocks.Remove(node);
@@ -214,7 +214,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
             {
                 var blk = ControlBlockAt(idx);
                 if (blk == null)
-                    throw new NaposhtimDocumentException(NaposhtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, $"The index {idx} is invalid to a linked-list of length {__original_control_blocks.Count}.");
+                    throw new NapishtimDocumentException(NapishtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, $"The index {idx} is invalid to a linked-list of length {__original_control_blocks.Count}.");
                 return blk;
             }
         }
@@ -222,9 +222,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
         public ControlBlockSource ReplaceControlBlockWith(LinkedListNode<ControlBlockSource> node, ControlBlockSource blk)
         {
             if (node.List != __original_control_blocks)
-                throw new NaposhtimDocumentException(NaposhtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, "The specified node does not in the Linked List.");
+                throw new NapishtimDocumentException(NapishtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, "The specified node does not in the Linked List.");
             if (blk.Owner != null)
-                throw new NaposhtimDocumentException(NaposhtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, $"The Control Block already has an owner.");
+                throw new NapishtimDocumentException(NapishtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, $"The Control Block already has an owner.");
             __original_control_blocks.AddBefore(node, blk);
             __original_control_blocks.Remove(node);
             blk.Owner = this;
@@ -235,9 +235,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
         public void MoveAfter(LinkedListNode<ControlBlockSource> source, LinkedListNode<ControlBlockSource> target)
         {
             if (source.List != __original_control_blocks || target.List != __original_control_blocks)
-                throw new NaposhtimDocumentException(NaposhtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, "The specified node does not in the Linked List.");
+                throw new NapishtimDocumentException(NapishtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, "The specified node does not in the Linked List.");
             if (source == target)
-                throw new NaposhtimDocumentException(NaposhtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, "The source node and target node cannot be the same node.");
+                throw new NapishtimDocumentException(NapishtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, "The source node and target node cannot be the same node.");
 
             __original_control_blocks.Remove(source);
             __original_control_blocks.AddAfter(target, source);
@@ -246,9 +246,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
         public void MoveBefore(LinkedListNode<ControlBlockSource> source, LinkedListNode<ControlBlockSource> target)
         {
             if (source.List != __original_control_blocks || target.List != __original_control_blocks)
-                throw new NaposhtimDocumentException(NaposhtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, "The specified node does not in the Linked List.");
+                throw new NapishtimDocumentException(NapishtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, "The specified node does not in the Linked List.");
             if (source == target)
-                throw new NaposhtimDocumentException(NaposhtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, "The source node and target node cannot be the same node.");
+                throw new NapishtimDocumentException(NapishtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, "The source node and target node cannot be the same node.");
 
             __original_control_blocks.Remove(source);
             __original_control_blocks.AddBefore(target, source);
@@ -264,7 +264,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
         public override ControlBlockObject ResolveTarget(uint next, uint abort, uint? breakp, uint? continuep, Context context, IReadOnlyDictionary<uint, Event> globals, ReadOnlyMemory<uint> stepLinkMapping, ReadOnlyMemory<uint> userVariableMapping, Dictionary<uint, string> stepNameMapping)
         {
             if (__original_control_blocks.Count == 0)
-                throw new NaposhtimDocumentException(NaposhtimExceptionCode.CONTROL_BLOCK_ARGUMENTS_ERROR, $"Can not find any control block in Compound({FullName}) Control Block.");
+                throw new NapishtimDocumentException(NapishtimExceptionCode.CONTROL_BLOCK_ARGUMENTS_ERROR, $"Can not find any control block in Compound({FullName}) Control Block.");
 
             var compiledControlBlocks = new LinkedList<ControlBlockObject>();
             var blk = __original_control_blocks.Last;

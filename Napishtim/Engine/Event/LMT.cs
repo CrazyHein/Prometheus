@@ -73,7 +73,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ev
             try
             {
                 if ((string)node["TYPE"] != Tag)
-                    throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EVENT_PARSE_ERROR, $"Type name '{(string)node["TYPE"]}' is not supported by {Tag} event object.");
+                    throw new NapishtimScriptException(NapishtimExceptionCode.SCRIPT_EVENT_PARSE_ERROR, $"Type name '{(string)node["TYPE"]}' is not supported by {Tag} event object.");
 
                 if (node.AsObject().TryGetPropertyValue("DISABLED", out var opt))
                     DISABLED = opt.AsValue().GetValue<string>();
@@ -99,14 +99,14 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ev
             }
             catch (Exception ex)
             {
-                throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EVENT_PARSE_ERROR, $"{node.ToString()}\nis not a valid LMT event object.", ex);//ok
+                throw new NapishtimScriptException(NapishtimExceptionCode.SCRIPT_EVENT_PARSE_ERROR, $"{node.ToString()}\nis not a valid LMT event object.", ex);//ok
             }
         }
 
         public LMT(string name, params (string pname, Expression.Expression pvalue)[] parameters)
         {
             if (name != Tag)
-                throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EVENT_ARGUMENTS_ERROR, "LMT([DISABLED], EXPRESSION, [LOWER], [UPPER], [REVERSED])");
+                throw new NapishtimScriptException(NapishtimExceptionCode.SCRIPT_EVENT_ARGUMENTS_ERROR, "LMT([DISABLED], EXPRESSION, [LOWER], [UPPER], [REVERSED])");
             foreach (var param in parameters)
             {
                 switch(param.pname)
@@ -119,24 +119,24 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ev
                         if (param.pvalue.IsImmediateOperand)
                             REVERSED = param.pvalue.Value(true, 0.0) == 0.0 ? false : true;
                         else
-                            throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EVENT_ARGUMENTS_ERROR, "The value of property 'REVERSED' should be an immediate operand.");
+                            throw new NapishtimScriptException(NapishtimExceptionCode.SCRIPT_EVENT_ARGUMENTS_ERROR, "The value of property 'REVERSED' should be an immediate operand.");
                         break;
                     case "LOWER":
                         if (param.pvalue.IsImmediateOperand)
                             LOWER = param.pvalue.Value(true, 0.0);
                         else
-                            throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EVENT_ARGUMENTS_ERROR, "The value of property 'LOWER' should be an immediate operand."); 
+                            throw new NapishtimScriptException(NapishtimExceptionCode.SCRIPT_EVENT_ARGUMENTS_ERROR, "The value of property 'LOWER' should be an immediate operand."); 
                         break;
                     case "UPPER":
                         if (param.pvalue.IsImmediateOperand)
                             UPPER = param.pvalue.Value(true, 0.0);
                         else
-                            throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EVENT_ARGUMENTS_ERROR, "The value of property 'UPPER' should be an immediate operand.");
+                            throw new NapishtimScriptException(NapishtimExceptionCode.SCRIPT_EVENT_ARGUMENTS_ERROR, "The value of property 'UPPER' should be an immediate operand.");
                         break;
                 }
             }
             if (EXPRESSION == null)
-                throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EVENT_ARGUMENTS_ERROR, "LMT([DISABLED], EXPRESSION, [LOWER], [UPPER], [REVERSED])");
+                throw new NapishtimScriptException(NapishtimExceptionCode.SCRIPT_EVENT_ARGUMENTS_ERROR, "LMT([DISABLED], EXPRESSION, [LOWER], [UPPER], [REVERSED])");
         }
 
         public LMT(Expression.Expression a, Expression.Expression? disabled = null)

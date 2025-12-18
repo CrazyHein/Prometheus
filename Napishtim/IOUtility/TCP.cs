@@ -29,7 +29,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.IOUtility
             }
             catch (System.Exception e)
             {
-                throw new NaposhtimIOException(NaposhtimExceptionCode.RUNTIME_EXCEPTION, "Socket API threw an exception.", e);
+                throw new NapishtimIOException(NapishtimExceptionCode.RUNTIME_EXCEPTION, "Socket API threw an exception.", e);
             }
         }
 
@@ -47,7 +47,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.IOUtility
             }
             catch (System.Exception e)
             {
-                throw new NaposhtimIOException(NaposhtimExceptionCode.RUNTIME_EXCEPTION, "Socket API threw an exception.", e);
+                throw new NapishtimIOException(NapishtimExceptionCode.RUNTIME_EXCEPTION, "Socket API threw an exception.", e);
             }
         }
 
@@ -60,16 +60,16 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.IOUtility
                 {
                     length += __tcp.Receive(buffer, offset + length, size - length, socketFlags);
                     if (length == 0)
-                        throw new NaposhtimIOException(NaposhtimExceptionCode.REMOTE_SERVER_DISCONNECTED);
+                        throw new NapishtimIOException(NapishtimExceptionCode.REMOTE_SERVER_DISCONNECTED);
                 }
             }
-            catch(NaposhtimException)
+            catch(NapishtimException)
             {
                 throw;
             }
             catch (System.Exception e)
             {
-                throw new NaposhtimIOException(NaposhtimExceptionCode.RUNTIME_EXCEPTION, "Socket API threw an exception.", e);
+                throw new NapishtimIOException(NapishtimExceptionCode.RUNTIME_EXCEPTION, "Socket API threw an exception.", e);
             }
             return size;
         }
@@ -82,7 +82,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.IOUtility
             }
             catch (System.Exception e)
             {
-                throw new NaposhtimIOException(NaposhtimExceptionCode.RUNTIME_EXCEPTION, "Socket API threw an exception.", e);
+                throw new NapishtimIOException(NapishtimExceptionCode.RUNTIME_EXCEPTION, "Socket API threw an exception.", e);
             }
         }
 

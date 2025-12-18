@@ -29,7 +29,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Pr
             set
             {
                 if (value < 0)
-                    throw new NaposhtimDocumentException(NaposhtimExceptionCode.PROCESS_COMPONENT_ARGUMENTS_ERROR, $"The timeout period({value}) must be a positive integer.");
+                    throw new NapishtimDocumentException(NapishtimExceptionCode.PROCESS_COMPONENT_ARGUMENTS_ERROR, $"The timeout period({value}) must be a positive integer.");
                 __timeout = value;
             }
         }
@@ -191,7 +191,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Pr
             JsonObject timeoutBranch = new JsonObject();
             //timeoutBranch["TRIGGER"] = new JsonArray() { (new TIM(timeout)).ToJson().ToJsonString() };
             if (completionCondition == null || completionCondition.Count == 0)
-                throw new NaposhtimDocumentException(NaposhtimExceptionCode.PROCESS_COMPONENT_ARGUMENTS_ERROR, $"You must define <Completion Condition>.");
+                throw new NapishtimDocumentException(NapishtimExceptionCode.PROCESS_COMPONENT_ARGUMENTS_ERROR, $"You must define <Completion Condition>.");
             JsonObject defaultBranch = new JsonObject();
             defaultBranch["TRIGGER"] = completionCondition.DeepClone();
             if (postShaders != null)
@@ -212,7 +212,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Pr
                 __branch_priorities.Add((priorityAbort, "ABORT_POINT"));
             }
             else if (abortShaders?.Shaders.Count() > 0)
-                throw new NaposhtimDocumentException(NaposhtimExceptionCode.PROCESS_COMPONENT_ARGUMENTS_ERROR, $"You must define <Abort Condition> to enable <Abort Shaders>.");
+                throw new NapishtimDocumentException(NapishtimExceptionCode.PROCESS_COMPONENT_ARGUMENTS_ERROR, $"You must define <Abort Condition> to enable <Abort Shaders>.");
 
             if (breakCondition != null && breakCondition.Count > 0)
             {
@@ -225,7 +225,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Pr
                 __branch_priorities.Add((priorityBreak, "BREAK_POINT"));
             }
             else if (breakShaders?.Shaders.Count() > 0)
-                throw new NaposhtimDocumentException(NaposhtimExceptionCode.PROCESS_COMPONENT_ARGUMENTS_ERROR, $"You must define <Break Condition> to enable <Break Shaders>.");
+                throw new NapishtimDocumentException(NapishtimExceptionCode.PROCESS_COMPONENT_ARGUMENTS_ERROR, $"You must define <Break Condition> to enable <Break Shaders>.");
 
             if (continueCondition != null && continueCondition.Count > 0)
             {
@@ -238,7 +238,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Pr
                 __branch_priorities.Add((priorityContinue, "CONTINUE_POINT"));
             }
             else if (continueShaders?.Shaders.Count() > 0)
-                throw new NaposhtimDocumentException(NaposhtimExceptionCode.PROCESS_COMPONENT_ARGUMENTS_ERROR, $"You must define <Continue Condition> to enable <Continue Shaders>.");
+                throw new NapishtimDocumentException(NapishtimExceptionCode.PROCESS_COMPONENT_ARGUMENTS_ERROR, $"You must define <Continue Condition> to enable <Continue Shaders>.");
 
             __branch_priorities.Sort(delegate (ValueTuple<byte, string> x, ValueTuple<byte, string> y)
             {
@@ -294,7 +294,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Pr
             JsonObject timeoutBranch = new JsonObject();
             //timeoutBranch["TRIGGER"] = new JsonArray();
             if (completionCondition == null || completionCondition.Count == 0)
-                throw new NaposhtimDocumentException(NaposhtimExceptionCode.PROCESS_COMPONENT_ARGUMENTS_ERROR, $"You must define <Completion Condition>.");
+                throw new NapishtimDocumentException(NapishtimExceptionCode.PROCESS_COMPONENT_ARGUMENTS_ERROR, $"You must define <Completion Condition>.");
             JsonObject defaultBranch = new JsonObject();
             defaultBranch["TRIGGER"] = completionCondition.DeepClone();
             if (postShaders != null)
@@ -315,7 +315,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Pr
                 __branch_priorities.Add((priorityAbort, "ABORT_POINT"));
             }
             else if(abortShaders?.Shaders.Count() > 0)
-                throw new NaposhtimDocumentException(NaposhtimExceptionCode.PROCESS_COMPONENT_ARGUMENTS_ERROR, $"You must define <Abort Condition> to enable <Abort Shaders>.");
+                throw new NapishtimDocumentException(NapishtimExceptionCode.PROCESS_COMPONENT_ARGUMENTS_ERROR, $"You must define <Abort Condition> to enable <Abort Shaders>.");
 
             if (breakCondition != null && breakCondition.Count > 0)
             {
@@ -328,7 +328,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Pr
                 __branch_priorities.Add((priorityBreak, "BREAK_POINT"));
             }
             else if (breakShaders?.Shaders.Count() > 0)
-                throw new NaposhtimDocumentException(NaposhtimExceptionCode.PROCESS_COMPONENT_ARGUMENTS_ERROR, $"You must define <Break Condition> to enable <Break Shaders>.");
+                throw new NapishtimDocumentException(NapishtimExceptionCode.PROCESS_COMPONENT_ARGUMENTS_ERROR, $"You must define <Break Condition> to enable <Break Shaders>.");
 
             if (continueCondition != null && continueCondition.Count > 0)
             {
@@ -341,7 +341,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Pr
                 __branch_priorities.Add((priorityContinue, "CONTINUE_POINT"));
             }
             else if (continueShaders?.Shaders.Count() > 0)
-                throw new NaposhtimDocumentException(NaposhtimExceptionCode.PROCESS_COMPONENT_ARGUMENTS_ERROR, $"You must define <Continue Condition> to enable <Continue Shaders>.");
+                throw new NapishtimDocumentException(NapishtimExceptionCode.PROCESS_COMPONENT_ARGUMENTS_ERROR, $"You must define <Continue Condition> to enable <Continue Shaders>.");
 
             __branch_priorities.Sort(delegate (ValueTuple<byte, string> x, ValueTuple<byte, string> y)
             {
@@ -456,11 +456,11 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Pr
                 int index = preceding.GetValue<int>();
                 ProcessStepSource? step = container.ProcessStepAt(index);
                 if (step == null || !(step is SimpleStepWithTimeout_S))
-                    throw new NaposhtimDocumentException(NaposhtimExceptionCode.PROCESS_COMPONENT_ARGUMENTS_ERROR, "Can not find the referenced SimpleStepWithTimeout_S in the 'Sequential' Control Block.");
+                    throw new NapishtimDocumentException(NapishtimExceptionCode.PROCESS_COMPONENT_ARGUMENTS_ERROR, "Can not find the referenced SimpleStepWithTimeout_S in the 'Sequential' Control Block.");
                 EmployPreceding = step as SimpleStepWithTimeout_S;
             }
             else
-                throw new NaposhtimDocumentException(NaposhtimExceptionCode.PROCESS_COMPONENT_ARGUMENTS_ERROR, $"Can not restore SimpleStepWithTimeout_S object from node:\n{node.ToString()}");
+                throw new NapishtimDocumentException(NapishtimExceptionCode.PROCESS_COMPONENT_ARGUMENTS_ERROR, $"Can not restore SimpleStepWithTimeout_S object from node:\n{node.ToString()}");
         }
 
         public override ProcessStepObject ResolveTarget(uint next, uint abort, uint? breakp, uint? continuep, Context context, IReadOnlyDictionary<uint, Event> globals, ReadOnlyMemory<uint> stepLinkMapping, ReadOnlyMemory<uint> userVariableMapping, Sequential_S container, Dictionary<uint, string> stepNameMapping)
@@ -514,7 +514,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Pr
                         break;
                     case "BREAK_POINT":
                         if (breakp == null)
-                            throw new NaposhtimDocumentException(NaposhtimExceptionCode.PROCESS_COMPONENT_ARGUMENTS_ERROR, $"Must provide break branch target to resolve ProcessStepSource with BREAK_POINT.");
+                            throw new NapishtimDocumentException(NapishtimExceptionCode.PROCESS_COMPONENT_ARGUMENTS_ERROR, $"Must provide break branch target to resolve ProcessStepSource with BREAK_POINT.");
                         branch = _step["BREAK_POINT"].DeepClone();
                         branch.AsObject().Remove("PRIORITY");
                         branch["TARGET"] = breakp;
@@ -527,7 +527,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Pr
                         break;
                     case "CONTINUE_POINT":
                         if (continuep == null)
-                            throw new NaposhtimDocumentException(NaposhtimExceptionCode.PROCESS_COMPONENT_ARGUMENTS_ERROR, $"Must provide continue branch target to resolve ProcessStepSource with CONTINUE_POINT.");
+                            throw new NapishtimDocumentException(NapishtimExceptionCode.PROCESS_COMPONENT_ARGUMENTS_ERROR, $"Must provide continue branch target to resolve ProcessStepSource with CONTINUE_POINT.");
                         branch = _step["CONTINUE_POINT"].DeepClone();
                         branch.AsObject().Remove("PRIORITY");
                         branch["TARGET"] = continuep;
@@ -632,13 +632,13 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Pr
             try
             {
                 if (node["ASSEMBLY"].GetValue<string>() != typeof(SimpleStepWithTimeout_S).FullName)
-                    throw new NaposhtimDocumentException(NaposhtimExceptionCode.PROCESS_COMPONENT_ARGUMENTS_ERROR, $"Assmebly name mismatch: {node["ASSEMBLY"].GetValue<string>()} vs {typeof(SimpleStepWithTimeout_S).FullName}.");
+                    throw new NapishtimDocumentException(NapishtimExceptionCode.PROCESS_COMPONENT_ARGUMENTS_ERROR, $"Assmebly name mismatch: {node["ASSEMBLY"].GetValue<string>()} vs {typeof(SimpleStepWithTimeout_S).FullName}.");
 
                 return new SimpleStepWithTimeout_S(node, container);
             }
             catch (Exception ex)
             {
-                throw new NaposhtimDocumentException(NaposhtimExceptionCode.PROCESS_COMPONENT_ARGUMENTS_ERROR, $"Can not restore SimpleStepWithTimeout_S object from node:\n{node.ToString()}", ex);
+                throw new NapishtimDocumentException(NapishtimExceptionCode.PROCESS_COMPONENT_ARGUMENTS_ERROR, $"Can not restore SimpleStepWithTimeout_S object from node:\n{node.ToString()}", ex);
             }
         }
 
@@ -775,7 +775,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Pr
             if (EmployPreceding != null)
             {
                 if (container.TimeToTimeout.ContainsKey(EmployPreceding) == false)
-                    throw new NaposhtimDocumentException(NaposhtimExceptionCode.PROCESS_COMPONENT_INVALID_OPERATION, "Can not get the remaining time EXPRESSION of the specific 'SimpleStepWithTimeout'.");
+                    throw new NapishtimDocumentException(NapishtimExceptionCode.PROCESS_COMPONENT_INVALID_OPERATION, "Can not get the remaining time EXPRESSION of the specific 'SimpleStepWithTimeout'.");
                 else
                 {
                     var node = new TIM("TIM", ("TIMEOUT", container.TimeToTimeout[EmployPreceding]));

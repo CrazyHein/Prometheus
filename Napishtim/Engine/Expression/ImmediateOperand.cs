@@ -19,7 +19,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ex
             if (PATTERN.IsMatch(value) && double.TryParse(value, out var result))
                 __value = result;
             else
-                throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EXPRESSION_PARSE_ERROR, $"{value} -> double");
+                throw new NapishtimScriptException(NapishtimExceptionCode.SCRIPT_EXPRESSION_PARSE_ERROR, $"{value} -> double");
         }
 
         public ImmediateOperand(double value)

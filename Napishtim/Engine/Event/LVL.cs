@@ -106,7 +106,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ev
             try
             {
                 if ((string)node["TYPE"] != Tag)
-                    throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EVENT_PARSE_ERROR, $"Type name '{(string)node["TYPE"]}' is not supported by {Tag} event object.");
+                    throw new NapishtimScriptException(NapishtimExceptionCode.SCRIPT_EVENT_PARSE_ERROR, $"Type name '{(string)node["TYPE"]}' is not supported by {Tag} event object.");
                 
                 if (node.AsObject().TryGetPropertyValue("DISABLED", out var opt))
                     DISABLED = opt.AsValue().GetValue<string>();
@@ -137,14 +137,14 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ev
             }
             catch (Exception ex)
             {
-                throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EVENT_PARSE_ERROR, $"{node.ToString()}\nis not a valid LVL event object.", ex);//ok
+                throw new NapishtimScriptException(NapishtimExceptionCode.SCRIPT_EVENT_PARSE_ERROR, $"{node.ToString()}\nis not a valid LVL event object.", ex);//ok
             }
         }
 
         public LVL(string name, params (string pname, Expression.Expression pvalue)[] parameters)
         {
             if (name != Tag)
-                throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EVENT_ARGUMENTS_ERROR, "LVL([DISABLED], EXPRESSION, [PATTERN], [LOWER], [UPPER], [INITIAL_VALUE])");
+                throw new NapishtimScriptException(NapishtimExceptionCode.SCRIPT_EVENT_ARGUMENTS_ERROR, "LVL([DISABLED], EXPRESSION, [PATTERN], [LOWER], [UPPER], [INITIAL_VALUE])");
             foreach (var param in parameters)
             {
                 switch (param.pname)
@@ -157,30 +157,30 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ev
                         if (param.pvalue.IsImmediateOperand)
                             PATTERN = param.pvalue.Value(true, 0.0) == 0 ? LevelAlertPattern.Below : LevelAlertPattern.Above;
                         else
-                            throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EVENT_ARGUMENTS_ERROR, "The value of property 'PATTERN' should be an immediate operand.");
+                            throw new NapishtimScriptException(NapishtimExceptionCode.SCRIPT_EVENT_ARGUMENTS_ERROR, "The value of property 'PATTERN' should be an immediate operand.");
                         break;
                     case "LOWER":
                         if (param.pvalue.IsImmediateOperand)
                             LOWER = param.pvalue.Value(true, 0.0);
                         else
-                            throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EVENT_ARGUMENTS_ERROR, "The value of property 'LOWER' should be an immediate operand.");
+                            throw new NapishtimScriptException(NapishtimExceptionCode.SCRIPT_EVENT_ARGUMENTS_ERROR, "The value of property 'LOWER' should be an immediate operand.");
                         break;
                     case "UPPER":
                         if (param.pvalue.IsImmediateOperand)
                             UPPER = param.pvalue.Value(true, 0.0);
                         else
-                            throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EVENT_ARGUMENTS_ERROR, "The value of property 'UPPER' should be an immediate operand.");
+                            throw new NapishtimScriptException(NapishtimExceptionCode.SCRIPT_EVENT_ARGUMENTS_ERROR, "The value of property 'UPPER' should be an immediate operand.");
                         break;
                     case "INITIAL_VALUE":
                         if (param.pvalue.IsImmediateOperand)
                             INITIAL_VALUE = param.pvalue.Value(true, 0.0) == 0.0 ? false : true;
                         else
-                            throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EVENT_ARGUMENTS_ERROR, "The value of property 'INITIAL_VALUE' should be an immediate operand.");
+                            throw new NapishtimScriptException(NapishtimExceptionCode.SCRIPT_EVENT_ARGUMENTS_ERROR, "The value of property 'INITIAL_VALUE' should be an immediate operand.");
                         break;
                 }
             }
             if (EXPRESSION == null)
-                throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EVENT_ARGUMENTS_ERROR, "LVL([DISABLED], EXPRESSION, [PATTERN], [LOWER], [UPPER], [INITIAL_VALUE])");
+                throw new NapishtimScriptException(NapishtimExceptionCode.SCRIPT_EVENT_ARGUMENTS_ERROR, "LVL([DISABLED], EXPRESSION, [PATTERN], [LOWER], [UPPER], [INITIAL_VALUE])");
         }
 
         public LVL(Expression.Expression a, Expression.Expression? disabled = null)

@@ -23,7 +23,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ev
             get { return __timeout; }
             init {
                 if (value.HasValue && value.Value < 0)
-                    throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EVENT_ARGUMENTS_ERROR, $"The timeout period({value}) must be a positive integer.");
+                    throw new NapishtimScriptException(NapishtimExceptionCode.SCRIPT_EVENT_ARGUMENTS_ERROR, $"The timeout period({value}) must be a positive integer.");
                 __timeout = value;
             }
         }
@@ -100,7 +100,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ev
         public TIM(string name, params (string pname, Expression.Expression pvalue)[] parameters)
         {
             if (name != Tag)
-                throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EVENT_ARGUMENTS_ERROR, "TIM([DISABLED], TIMEOUT)");
+                throw new NapishtimScriptException(NapishtimExceptionCode.SCRIPT_EVENT_ARGUMENTS_ERROR, "TIM([DISABLED], TIMEOUT)");
 
             bool timeout = false;
             foreach (var param in parameters)
@@ -120,7 +120,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ev
             }
 
             if(timeout == false)
-                throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EVENT_ARGUMENTS_ERROR, "TIM([DISABLED], TIMEOUT)");
+                throw new NapishtimScriptException(NapishtimExceptionCode.SCRIPT_EVENT_ARGUMENTS_ERROR, "TIM([DISABLED], TIMEOUT)");
         }
 
         public TIM(int timeout, Expression.Expression? disabled = null)
@@ -135,7 +135,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ev
             try 
             {
                 if ((string)node["TYPE"] != Tag)
-                    throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EVENT_PARSE_ERROR, $"Event type {(string)node["TYPE"]}' is not supported by {Tag} event object.");
+                    throw new NapishtimScriptException(NapishtimExceptionCode.SCRIPT_EVENT_PARSE_ERROR, $"Event type {(string)node["TYPE"]}' is not supported by {Tag} event object.");
                 
                 if (node.AsObject().TryGetPropertyValue("DISABLED", out var opt))
                     DISABLED = opt.AsValue().GetValue<string>();
@@ -144,7 +144,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ev
 
                 var propertyNode = node["TIMEOUT"];
                 if(propertyNode == null)
-                    throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EVENT_PARSE_ERROR, $"Property with name 'TIMEOUT' must be provided.");
+                    throw new NapishtimScriptException(NapishtimExceptionCode.SCRIPT_EVENT_PARSE_ERROR, $"Property with name 'TIMEOUT' must be provided.");
                 var t = propertyNode.GetValueKind();
                 if (t == System.Text.Json.JsonValueKind.Number && (int)propertyNode >= 0)
                 {
@@ -157,11 +157,11 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ev
                     TIMEOUT = null;
                 }
                 else
-                    throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EVENT_PARSE_ERROR, $"Property with name 'TIMEOUT' must be of type int or string.");
+                    throw new NapishtimScriptException(NapishtimExceptionCode.SCRIPT_EVENT_PARSE_ERROR, $"Property with name 'TIMEOUT' must be of type int or string.");
             }
             catch (Exception ex)
             {
-                throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EVENT_PARSE_ERROR, $"{node.ToString()}\nis not a valid {Tag} event object.", ex);
+                throw new NapishtimScriptException(NapishtimExceptionCode.SCRIPT_EVENT_PARSE_ERROR, $"{node.ToString()}\nis not a valid {Tag} event object.", ex);
             }
         }
 

@@ -139,13 +139,13 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Pr
             try
             {
                 if (node["ASSEMBLY"].GetValue<string>() != typeof(BranchStep_S).FullName)
-                    throw new NaposhtimDocumentException(NaposhtimExceptionCode.CONTROL_BLOCK_ARGUMENTS_ERROR, $"Assmebly name mismatch: {node["ASSEMBLY"].GetValue<string>()} vs {typeof(BranchStep_S).FullName}.");
+                    throw new NapishtimDocumentException(NapishtimExceptionCode.CONTROL_BLOCK_ARGUMENTS_ERROR, $"Assmebly name mismatch: {node["ASSEMBLY"].GetValue<string>()} vs {typeof(BranchStep_S).FullName}.");
 
                 return new BranchStep_S(node);
             }
             catch (Exception ex)
             {
-                throw new NaposhtimDocumentException(NaposhtimExceptionCode.CONTROL_BLOCK_ARGUMENTS_ERROR, $"Can not restore BranchStep_S object from node:\n{node.ToString()}", ex);
+                throw new NapishtimDocumentException(NapishtimExceptionCode.CONTROL_BLOCK_ARGUMENTS_ERROR, $"Can not restore BranchStep_S object from node:\n{node.ToString()}", ex);
             }
         }
 
@@ -196,9 +196,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Pr
 
                 return s;
             }
-            catch (NaposhtimException e)
+            catch (NapishtimException e)
             {
-                throw new NaposhtimDocumentException(NaposhtimExceptionCode.DOCUMENT_STEP_BUILD_ERROR,
+                throw new NapishtimDocumentException(NapishtimExceptionCode.DOCUMENT_STEP_BUILD_ERROR,
                     $"Can not build BranchStep with the following JSON node:\n{_step.ToString()}", e);
             }
         }

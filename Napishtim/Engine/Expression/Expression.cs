@@ -127,7 +127,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ex
                 }
             }
             if (start < expr.Length)
-                throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EXPRESSION_PARSE_ERROR, expr);
+                throw new NapishtimScriptException(NapishtimExceptionCode.SCRIPT_EXPRESSION_PARSE_ERROR, expr);
 
             __original_order_vector.Add(Operator.MAKE('\0'));
             operatorStack.Push(Operator.MAKE('\0'));
@@ -151,7 +151,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ex
                         }
                         else if (priority == 'X')
                         {
-                            throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EXPRESSION_PARSE_ERROR, expr);
+                            throw new NapishtimScriptException(NapishtimExceptionCode.SCRIPT_EXPRESSION_PARSE_ERROR, expr);
                         }
                         else if (priority == '>')
                         {
@@ -177,7 +177,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ex
                     break;
             }
             if (operatorStack.Count() != 0 || __post_order_vector.Count == 0)
-                throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EXPRESSION_PARSE_ERROR, expr);
+                throw new NapishtimScriptException(NapishtimExceptionCode.SCRIPT_EXPRESSION_PARSE_ERROR, expr);
 
             __post_order_walk_through();
         }
@@ -280,7 +280,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ex
                 else
                 {
                     if(__post_order_buffer.Count < 2)
-                        throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EXPRESSION_PARSE_ERROR, __original_expression);
+                        throw new NapishtimScriptException(NapishtimExceptionCode.SCRIPT_EXPRESSION_PARSE_ERROR, __original_expression);
 
                     switch((e as Operator).Name)
                     {
@@ -298,12 +298,12 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ex
                             break;
                         case OPERATOR_T.DIVIDE:
                             if (dividbyzeroException && __post_order_buffer[__post_order_buffer.Count - 1] == 0)
-                                throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EXPRESSION_ZERO_DIVISION, __original_expression);
+                                throw new NapishtimScriptException(NapishtimExceptionCode.SCRIPT_EXPRESSION_ZERO_DIVISION, __original_expression);
                             __post_order_buffer[__post_order_buffer.Count - 2] /= __post_order_buffer[__post_order_buffer.Count - 1];
                             __post_order_buffer.RemoveAt(__post_order_buffer.Count - 1);
                             break;
                         default:
-                            throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EXPRESSION_PARSE_ERROR, __original_expression);
+                            throw new NapishtimScriptException(NapishtimExceptionCode.SCRIPT_EXPRESSION_PARSE_ERROR, __original_expression);
                     }
                 }
             }
@@ -313,7 +313,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ex
             else if (__post_order_buffer.Count == 0)
                 return defaultValue;
             else
-                throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EXPRESSION_PARSE_ERROR, __original_expression);
+                throw new NapishtimScriptException(NapishtimExceptionCode.SCRIPT_EXPRESSION_PARSE_ERROR, __original_expression);
         }
 
         private void __post_order_walk_through()
@@ -326,7 +326,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ex
                 else
                 {
                     if (__post_order_buffer.Count < 2)
-                        throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EXPRESSION_PARSE_ERROR, __original_expression);
+                        throw new NapishtimScriptException(NapishtimExceptionCode.SCRIPT_EXPRESSION_PARSE_ERROR, __original_expression);
 
                     switch ((e as Operator).Name)
                     {
@@ -343,7 +343,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ex
                             __post_order_buffer.RemoveAt(__post_order_buffer.Count - 1);
                             break;
                         default:
-                            throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EXPRESSION_PARSE_ERROR, __original_expression);
+                            throw new NapishtimScriptException(NapishtimExceptionCode.SCRIPT_EXPRESSION_PARSE_ERROR, __original_expression);
                     }
                 }
             }
@@ -353,7 +353,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ex
             else if (__post_order_buffer.Count == 0)
                 return;
             else
-                throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EXPRESSION_PARSE_ERROR, __original_expression);
+                throw new NapishtimScriptException(NapishtimExceptionCode.SCRIPT_EXPRESSION_PARSE_ERROR, __original_expression);
         }
 
         public bool Equals(Expression? other)

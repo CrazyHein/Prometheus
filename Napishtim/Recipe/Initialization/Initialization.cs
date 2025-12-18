@@ -21,7 +21,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.In
         public UserVariableInitialValue(string comment, string name, double value)
         {
             if (USER_VARIABLE_NAME_PATTERN.IsMatch(name.Trim()) == false)
-                throw new NaposhtimDocumentException(NaposhtimExceptionCode.INITIALIZATION_BLOCK_ARGUMENTS_ERROR, $"Invalid user variable name '{name.Trim()}'. The name should match the pattern: {USER_VARIABLE_NAME_PATTERN}.");
+                throw new NapishtimDocumentException(NapishtimExceptionCode.INITIALIZATION_BLOCK_ARGUMENTS_ERROR, $"Invalid user variable name '{name.Trim()}'. The name should match the pattern: {USER_VARIABLE_NAME_PATTERN}.");
 
             Comment = comment.Trim();
             Name = name.Trim();
@@ -38,7 +38,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.In
             }
             catch (Exception ex)
             {
-                throw new NaposhtimDocumentException(NaposhtimExceptionCode.INITIALIZATION_BLOCK_ARGUMENTS_ERROR, $"Can not restore UserVariableInitialValue from node:\n{node.ToString()}", ex);
+                throw new NapishtimDocumentException(NapishtimExceptionCode.INITIALIZATION_BLOCK_ARGUMENTS_ERROR, $"Can not restore UserVariableInitialValue from node:\n{node.ToString()}", ex);
             }
         }
 
@@ -68,7 +68,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.In
             try
             {
                 if (settings.TryGetPropertyValue("ASSEMBLY", out var node) && node.GetValue<string>() != typeof(InitializationConfiguration).FullName)
-                    throw new NaposhtimDocumentException(NaposhtimExceptionCode.CONTROL_BLOCK_ARGUMENTS_ERROR, $"Assmebly name mismatch: {node.GetValue<string>()} vs {typeof(InitializationConfiguration).FullName}.");
+                    throw new NapishtimDocumentException(NapishtimExceptionCode.CONTROL_BLOCK_ARGUMENTS_ERROR, $"Assmebly name mismatch: {node.GetValue<string>()} vs {typeof(InitializationConfiguration).FullName}.");
 
                 if (settings.TryGetPropertyValue("USER_VARIABLES", out node))
                 {
@@ -76,13 +76,13 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.In
                         UserVariableInitialValues.Add(new UserVariableInitialValue(sub.AsObject()));
                 }
             }
-            catch(NaposhtimException)
+            catch(NapishtimException)
             {
                 throw;
             }
             catch (Exception ex)
             {
-                throw new NaposhtimDocumentException(NaposhtimExceptionCode.INITIALIZATION_BLOCK_ARGUMENTS_ERROR, $"Can not restore InitializationConfiguration from node:\n{settings.ToString()}", ex);
+                throw new NapishtimDocumentException(NapishtimExceptionCode.INITIALIZATION_BLOCK_ARGUMENTS_ERROR, $"Can not restore InitializationConfiguration from node:\n{settings.ToString()}", ex);
             }
         }
 

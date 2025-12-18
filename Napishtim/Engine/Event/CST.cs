@@ -41,19 +41,19 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ev
             try
             {
                 if ((string)node["TYPE"] != Tag)
-                    throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EVENT_PARSE_ERROR, $"Type name '{(string)node["TYPE"]}' is not supported by {Tag} event object.");
+                    throw new NapishtimScriptException(NapishtimExceptionCode.SCRIPT_EVENT_PARSE_ERROR, $"Type name '{(string)node["TYPE"]}' is not supported by {Tag} event object.");
                 EVAL = (bool)node["EVAL"];
             }
             catch (Exception ex)
             {
-                throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EVENT_PARSE_ERROR, $"{node.ToString()}\nis not a valid {Tag} event object.", ex);
+                throw new NapishtimScriptException(NapishtimExceptionCode.SCRIPT_EVENT_PARSE_ERROR, $"{node.ToString()}\nis not a valid {Tag} event object.", ex);
             }
         }
 
         public CST(string name, params (string pname, Expression.Expression pvalue)[] parameters)
         {
             if (name != Tag || parameters.Length != 1 || parameters[0].pvalue.IsImmediateOperand == false || parameters[0].pname != "EVAL")
-                throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EVENT_ARGUMENTS_ERROR, "CST(EVAL)");
+                throw new NapishtimScriptException(NapishtimExceptionCode.SCRIPT_EVENT_ARGUMENTS_ERROR, "CST(EVAL)");
             EVAL = parameters[0].pvalue.Value(true, 0.0) == 0.0 ? false : true;
         }
 

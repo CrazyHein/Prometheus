@@ -14,7 +14,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ex
         public MAX(IReadOnlyList<Expression> parameters) : base(parameters)
         {
             if (parameters.Count == 0)
-                throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EXPRESSION_SPRITE_SYNTAX_ERROR,
+                throw new NapishtimScriptException(NapishtimExceptionCode.SCRIPT_EXPRESSION_SPRITE_SYNTAX_ERROR,
                     this.GetType().GetCustomAttribute<ArithmeticUnitUsageAttribute>().Usage);
         }
 
@@ -33,7 +33,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ex
         public MIN(IReadOnlyList<Expression> parameters) : base(parameters)
         {
             if (parameters.Count == 0)
-                throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EXPRESSION_SPRITE_SYNTAX_ERROR,
+                throw new NapishtimScriptException(NapishtimExceptionCode.SCRIPT_EXPRESSION_SPRITE_SYNTAX_ERROR,
                     this.GetType().GetCustomAttribute<ArithmeticUnitUsageAttribute>().Usage);
         }
 
@@ -51,7 +51,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ex
         public SUM(IReadOnlyList<Expression> parameters) : base(parameters)
         {
             if (parameters.Count == 0)
-                throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EXPRESSION_SPRITE_SYNTAX_ERROR,
+                throw new NapishtimScriptException(NapishtimExceptionCode.SCRIPT_EXPRESSION_SPRITE_SYNTAX_ERROR,
                     this.GetType().GetCustomAttribute<ArithmeticUnitUsageAttribute>().Usage);
         }
 
@@ -69,7 +69,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ex
         public MEAN(IReadOnlyList<Expression> parameters) : base(parameters)
         {
             if (parameters.Count == 0)
-                throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EXPRESSION_SPRITE_SYNTAX_ERROR,
+                throw new NapishtimScriptException(NapishtimExceptionCode.SCRIPT_EXPRESSION_SPRITE_SYNTAX_ERROR,
                     this.GetType().GetCustomAttribute<ArithmeticUnitUsageAttribute>().Usage);
         }
 
@@ -87,7 +87,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ex
         public DMEAN(IReadOnlyList<Expression> parameters) : base(parameters)
         {
             if (parameters.Count == 0)
-                throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EXPRESSION_SPRITE_SYNTAX_ERROR,
+                throw new NapishtimScriptException(NapishtimExceptionCode.SCRIPT_EXPRESSION_SPRITE_SYNTAX_ERROR,
                     this.GetType().GetCustomAttribute<ArithmeticUnitUsageAttribute>().Usage);
         }
 
@@ -105,7 +105,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ex
         public STDEV(IReadOnlyList<Expression> parameters) : base(parameters)
         {
             if (parameters.Count < 2)
-                throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EXPRESSION_SPRITE_SYNTAX_ERROR,
+                throw new NapishtimScriptException(NapishtimExceptionCode.SCRIPT_EXPRESSION_SPRITE_SYNTAX_ERROR,
                     this.GetType().GetCustomAttribute<ArithmeticUnitUsageAttribute>().Usage);
         }
 
@@ -123,7 +123,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ex
         public DSTDEV(IReadOnlyList<Expression> parameters) : base(parameters)
         {
             if (parameters.Count < 2)
-                throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EXPRESSION_SPRITE_SYNTAX_ERROR,
+                throw new NapishtimScriptException(NapishtimExceptionCode.SCRIPT_EXPRESSION_SPRITE_SYNTAX_ERROR,
                     this.GetType().GetCustomAttribute<ArithmeticUnitUsageAttribute>().Usage);
         }
 

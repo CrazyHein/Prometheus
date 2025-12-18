@@ -23,7 +23,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ex
             if (PATTERN.IsMatch(value))
                 __object_index = Convert.ToUInt32(value.Substring(1), 16);
             else
-                throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EXPRESSION_PARSE_ERROR, $"{value} -> uint");
+                throw new NapishtimScriptException(NapishtimExceptionCode.SCRIPT_EXPRESSION_PARSE_ERROR, $"{value} -> uint");
 
             //if (?.RegisterProcessDataReference(__object_index) == false)
                 //throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_OBJECT_REF_NOT_FOUND, $"Can not find object with index {value} in process data images.");

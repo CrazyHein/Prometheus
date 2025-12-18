@@ -59,7 +59,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ex
         public EnvVariableReference(string value) : base()
         {
             if (PATTERN.IsMatch(value) == false)
-                throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EXPRESSION_PARSE_ERROR, $"Unknown environment variable: {value}.");
+                throw new NapishtimScriptException(NapishtimExceptionCode.SCRIPT_EXPRESSION_PARSE_ERROR, $"Unknown environment variable: {value}.");
             switch(value)
             {
                 case "&DEBUG":

@@ -13,7 +13,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ex
         public EQU(IReadOnlyList<Expression> parameters) : base(parameters)
         {
             if (parameters.Count != 6)
-                throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EXPRESSION_SPRITE_SYNTAX_ERROR,
+                throw new NapishtimScriptException(NapishtimExceptionCode.SCRIPT_EXPRESSION_SPRITE_SYNTAX_ERROR,
                     this.GetType().GetCustomAttribute<ArithmeticUnitUsageAttribute>().Usage);
         }
         public override string Name => "EQU";
@@ -30,7 +30,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ex
         public GTE(IReadOnlyList<Expression> parameters) : base(parameters)
         {
             if (parameters.Count != 5)
-                throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EXPRESSION_SPRITE_SYNTAX_ERROR,
+                throw new NapishtimScriptException(NapishtimExceptionCode.SCRIPT_EXPRESSION_SPRITE_SYNTAX_ERROR,
                     this.GetType().GetCustomAttribute<ArithmeticUnitUsageAttribute>().Usage);
         }
         public override string Name => "GTE";
@@ -47,7 +47,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ex
         public GRT(IReadOnlyList<Expression> parameters) : base(parameters)
         {
             if (parameters.Count != 5)
-                throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EXPRESSION_SPRITE_SYNTAX_ERROR,
+                throw new NapishtimScriptException(NapishtimExceptionCode.SCRIPT_EXPRESSION_SPRITE_SYNTAX_ERROR,
                     this.GetType().GetCustomAttribute<ArithmeticUnitUsageAttribute>().Usage);
         }
         public override string Name => "GRT";
@@ -64,7 +64,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ex
         public LTE(IReadOnlyList<Expression> parameters) : base(parameters)
         {
             if (parameters.Count != 5)
-                throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EXPRESSION_SPRITE_SYNTAX_ERROR,
+                throw new NapishtimScriptException(NapishtimExceptionCode.SCRIPT_EXPRESSION_SPRITE_SYNTAX_ERROR,
                     this.GetType().GetCustomAttribute<ArithmeticUnitUsageAttribute>().Usage);
         }
         public override string Name => "LTE";
@@ -81,7 +81,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ex
         public LES(IReadOnlyList<Expression> parameters) : base(parameters)
         {
             if (parameters.Count != 5)
-                throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EXPRESSION_SPRITE_SYNTAX_ERROR,
+                throw new NapishtimScriptException(NapishtimExceptionCode.SCRIPT_EXPRESSION_SPRITE_SYNTAX_ERROR,
                     this.GetType().GetCustomAttribute<ArithmeticUnitUsageAttribute>().Usage);
         }
         public override string Name => "LES";

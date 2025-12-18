@@ -33,7 +33,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine
                 }
                 catch (Exception ex)
                 {
-                    throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_INITIALIZATION_PARSE_ERROR, $"Can not restore InitializationList from node:\n{node.ToString()}", ex);
+                    throw new NapishtimScriptException(NapishtimExceptionCode.SCRIPT_INITIALIZATION_PARSE_ERROR, $"Can not restore InitializationList from node:\n{node.ToString()}", ex);
                 }
             }
             UserVariableInitialValues = userVariableInitialValues;

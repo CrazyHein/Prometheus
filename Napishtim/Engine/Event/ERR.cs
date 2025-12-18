@@ -114,7 +114,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ev
             try
             {
                 if ((string)node["TYPE"] != Tag)
-                    throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EVENT_PARSE_ERROR, $"Type name '{(string)node["TYPE"]}' is not supported by {Tag} event object.");
+                    throw new NapishtimScriptException(NapishtimExceptionCode.SCRIPT_EVENT_PARSE_ERROR, $"Type name '{(string)node["TYPE"]}' is not supported by {Tag} event object.");
 
                 if (node.AsObject().TryGetPropertyValue("DISABLED", out var opt))
                     DISABLED = opt.AsValue().GetValue<string>();
@@ -196,14 +196,14 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ev
             }
             catch (Exception ex)
             {
-                throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EVENT_PARSE_ERROR, $"{node.ToString()}\nis not a valid {Tag} event object.", ex);
+                throw new NapishtimScriptException(NapishtimExceptionCode.SCRIPT_EVENT_PARSE_ERROR, $"{node.ToString()}\nis not a valid {Tag} event object.", ex);
             }
         }
 
         public ERR(string name, params (string pname, Expression.Expression pvalue)[] parameters)
         {
             if (name != Tag)
-                throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EVENT_ARGUMENTS_ERROR, "ERR([DISABLED], SETPOINT, FEEDBACK, [INITIAL_VALUE], [INITIAL_STATE], [POSITIVE_TOLERANCE], [NEGATIVE_TOLERANCE], [STABLE_POSITIVE_TOLERANCE], [STABLE_NEGATIVE_TOLERANCE], [ON_DELAY], [OFF_DELAY], [STABLE_DELAY], [DELAY_TIME_PRIORITY], [IN_PROPORTION])");
+                throw new NapishtimScriptException(NapishtimExceptionCode.SCRIPT_EVENT_ARGUMENTS_ERROR, "ERR([DISABLED], SETPOINT, FEEDBACK, [INITIAL_VALUE], [INITIAL_STATE], [POSITIVE_TOLERANCE], [NEGATIVE_TOLERANCE], [STABLE_POSITIVE_TOLERANCE], [STABLE_NEGATIVE_TOLERANCE], [ON_DELAY], [OFF_DELAY], [STABLE_DELAY], [DELAY_TIME_PRIORITY], [IN_PROPORTION])");
             bool sp = false, fb = false;
             foreach (var param in parameters)
             {
@@ -219,25 +219,25 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ev
                         if (param.pvalue.IsImmediateOperand)
                             INITIAL_VALUE = param.pvalue.Value(true, 0.0) == 0.0 ? false : true;
                         else
-                            throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EVENT_ARGUMENTS_ERROR, "The value of property 'INITIAL_VALUE' should be an immediate operand.");
+                            throw new NapishtimScriptException(NapishtimExceptionCode.SCRIPT_EVENT_ARGUMENTS_ERROR, "The value of property 'INITIAL_VALUE' should be an immediate operand.");
                         break;
                     case "INITIAL_STATE":
                         if (param.pvalue.IsImmediateOperand)
                             INITIAL_STATE = param.pvalue.Value(true, 0.0) == 0.0 ? false : true;
                         else
-                            throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EVENT_ARGUMENTS_ERROR, "The value of property 'INITIAL_STATE' should be an immediate operand.");
+                            throw new NapishtimScriptException(NapishtimExceptionCode.SCRIPT_EVENT_ARGUMENTS_ERROR, "The value of property 'INITIAL_STATE' should be an immediate operand.");
                         break;
                     case "POSITIVE_TOLERANCE":
                         if (param.pvalue.IsImmediateOperand)
                             POSITIVE_TOLERANCE = param.pvalue.Value(true, 0.0);
                         else
-                            throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EVENT_ARGUMENTS_ERROR, "The value of property 'POSITIVE_TOLERANCE' should be an immediate operand.");
+                            throw new NapishtimScriptException(NapishtimExceptionCode.SCRIPT_EVENT_ARGUMENTS_ERROR, "The value of property 'POSITIVE_TOLERANCE' should be an immediate operand.");
                         break;
                     case "NEGATIVE_TOLERANCE":
                         if (param.pvalue.IsImmediateOperand)
                             NEGATIVE_TOLERANCE = param.pvalue.Value(true, 0.0);
                         else
-                            throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EVENT_ARGUMENTS_ERROR, "The value of property 'NEGATIVE_TOLERANCE' should be an immediate operand.");
+                            throw new NapishtimScriptException(NapishtimExceptionCode.SCRIPT_EVENT_ARGUMENTS_ERROR, "The value of property 'NEGATIVE_TOLERANCE' should be an immediate operand.");
                         break;
                     case "ON_DELAY":
                         if (param.pvalue.IsImmediateOperand)
@@ -261,30 +261,30 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ev
                         if (param.pvalue.IsImmediateOperand)
                             STABLE_POSITIVE_TOLERANCE = param.pvalue.Value(true, 0.0);
                         else
-                            throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EVENT_ARGUMENTS_ERROR, "The value of property 'STABLE_POSITIVE_TOLERANCE' should be an immediate operand.");
+                            throw new NapishtimScriptException(NapishtimExceptionCode.SCRIPT_EVENT_ARGUMENTS_ERROR, "The value of property 'STABLE_POSITIVE_TOLERANCE' should be an immediate operand.");
                         break;
                     case "STABLE_NEGATIVE_TOLERANCE":
                         if (param.pvalue.IsImmediateOperand)
                             STABLE_NEGATIVE_TOLERANCE = param.pvalue.Value(true, 0.0);
                         else
-                            throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EVENT_ARGUMENTS_ERROR, "The value of property 'STABLE_NEGATIVE_TOLERANCE' should be an immediate operand.");
+                            throw new NapishtimScriptException(NapishtimExceptionCode.SCRIPT_EVENT_ARGUMENTS_ERROR, "The value of property 'STABLE_NEGATIVE_TOLERANCE' should be an immediate operand.");
                         break;
                     case "DELAY_TIME_PRIORITY":
                         if (param.pvalue.IsImmediateOperand)
                             DELAY_TIME_PRIORITY = param.pvalue.Value(true, 0.0) == 0.0 ? false : true;
                         else
-                            throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EVENT_ARGUMENTS_ERROR, "The value of property 'DELAY_TIME_PRIORITY' should be an immediate operand.");
+                            throw new NapishtimScriptException(NapishtimExceptionCode.SCRIPT_EVENT_ARGUMENTS_ERROR, "The value of property 'DELAY_TIME_PRIORITY' should be an immediate operand.");
                         break;
                     case "IN_PROPORTION":
                         if (param.pvalue.IsImmediateOperand)
                             IN_PROPORTION = param.pvalue.Value(true, 0.0) == 0.0 ? false : true;
                         else
-                            throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EVENT_ARGUMENTS_ERROR, "The value of property 'IN_PROPORTION' should be an immediate operand.");
+                            throw new NapishtimScriptException(NapishtimExceptionCode.SCRIPT_EVENT_ARGUMENTS_ERROR, "The value of property 'IN_PROPORTION' should be an immediate operand.");
                         break;
                 }
             }
             if(sp == false || fb == false)
-                throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EVENT_ARGUMENTS_ERROR, "ERR([DISABLED], SETPOINT, FEEDBACK, [INITIAL_VALUE], [INITIAL_STATE], [POSITIVE_TOLERANCE], [NEGATIVE_TOLERANCE], [STABLE_POSITIVE_TOLERANCE], [STABLE_NEGATIVE_TOLERANCE], [ON_DELAY], [OFF_DELAY], [STABLE_DELAY], [DELAY_TIME_PRIORITY], [IN_PROPORTION])");
+                throw new NapishtimScriptException(NapishtimExceptionCode.SCRIPT_EVENT_ARGUMENTS_ERROR, "ERR([DISABLED], SETPOINT, FEEDBACK, [INITIAL_VALUE], [INITIAL_STATE], [POSITIVE_TOLERANCE], [NEGATIVE_TOLERANCE], [STABLE_POSITIVE_TOLERANCE], [STABLE_NEGATIVE_TOLERANCE], [ON_DELAY], [OFF_DELAY], [STABLE_DELAY], [DELAY_TIME_PRIORITY], [IN_PROPORTION])");
         }
 
         public override JsonNode ToJson()

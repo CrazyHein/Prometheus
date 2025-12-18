@@ -54,7 +54,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ex
                 case ')':
                     return __operators[(int)OPERATOR_T.RIGHT_PARENTHESIS];
                 default:
-                    throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EXPRESSION_PARSE_ERROR, $"Unknown operator: {ch}");
+                    throw new NapishtimScriptException(NapishtimExceptionCode.SCRIPT_EXPRESSION_PARSE_ERROR, $"Unknown operator: {ch}");
             }
         }
 
@@ -84,7 +84,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ex
                     __operator = OPERATOR_T.RIGHT_PARENTHESIS;
                     break;
                 default:
-                    throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EXPRESSION_PARSE_ERROR, $"Unknown operator: {ch}");
+                    throw new NapishtimScriptException(NapishtimExceptionCode.SCRIPT_EXPRESSION_PARSE_ERROR, $"Unknown operator: {ch}");
             }
         }
         public override string ToString()

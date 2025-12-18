@@ -28,7 +28,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
                 if ((step as SimpleStepWithTimeout_S)?.EmployPreceding != null)
                 {
                     if (__original_process_steps.Find((step as SimpleStepWithTimeout_S).EmployPreceding) == null)
-                        throw new NaposhtimDocumentException(NaposhtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, "The 'SimpleStepWithTimeout' that is not in the same 'Sequential' Control Block is referenced or the referenced 'SimpleStepWithTimeout' is located after the referer.");
+                        throw new NapishtimDocumentException(NapishtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, "The 'SimpleStepWithTimeout' that is not in the same 'Sequential' Control Block is referenced or the referenced 'SimpleStepWithTimeout' is located after the referer.");
                 }
                 __original_process_steps.AddLast(step);
                 //StepFootprint += step.StepFootprint;
@@ -54,17 +54,17 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
             try
             {
                 if (node["ASSEMBLY"].GetValue<string>() != typeof(Sequential_S).FullName)
-                    throw new NaposhtimDocumentException(NaposhtimExceptionCode.CONTROL_BLOCK_ARGUMENTS_ERROR, $"Assmebly name mismatch: {node["ASSEMBLY"].GetValue<string>()} vs {typeof(Sequential_S).FullName}.");
+                    throw new NapishtimDocumentException(NapishtimExceptionCode.CONTROL_BLOCK_ARGUMENTS_ERROR, $"Assmebly name mismatch: {node["ASSEMBLY"].GetValue<string>()} vs {typeof(Sequential_S).FullName}.");
 
                 return new Sequential_S(node) { Owner = owner };
             }
-            catch (NaposhtimException)
+            catch (NapishtimException)
             {
                 throw;
             }
             catch (Exception ex)
             {
-                throw new NaposhtimDocumentException(NaposhtimExceptionCode.CONTROL_BLOCK_ARGUMENTS_ERROR, $"Can not restore Sequential_S object from node:\n{node.ToString()}", ex);
+                throw new NapishtimDocumentException(NapishtimExceptionCode.CONTROL_BLOCK_ARGUMENTS_ERROR, $"Can not restore Sequential_S object from node:\n{node.ToString()}", ex);
             }
         }
 
@@ -113,7 +113,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
         {
             SimpleStepWithTimeout_S? employ = (step as SimpleStepWithTimeout_S)?.EmployPreceding;
             if (employ != null)
-                throw new NaposhtimDocumentException(NaposhtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, "The 'SimpleStepWithTimeout' that is not in the same 'Sequential' Control Block is referenced or the referenced 'SimpleStepWithTimeout' is located after the referer.");
+                throw new NapishtimDocumentException(NapishtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, "The 'SimpleStepWithTimeout' that is not in the same 'Sequential' Control Block is referenced or the referenced 'SimpleStepWithTimeout' is located after the referer.");
 
             __original_process_steps.AddFirst(step);
             //StepFootprint += step.StepFootprint;
@@ -124,7 +124,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
         {
             SimpleStepWithTimeout_S? employ = (step as SimpleStepWithTimeout_S)?.EmployPreceding;
             if (employ != null && __original_process_steps.Find(employ) == null)
-                throw new NaposhtimDocumentException(NaposhtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, "The 'SimpleStepWithTimeout' that is not in the same 'Sequential' Control Block is referenced or the referenced 'SimpleStepWithTimeout' is located after the referer.");
+                throw new NapishtimDocumentException(NapishtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, "The 'SimpleStepWithTimeout' that is not in the same 'Sequential' Control Block is referenced or the referenced 'SimpleStepWithTimeout' is located after the referer.");
 
             __original_process_steps.AddLast(step);
             //StepFootprint += step.StepFootprint;
@@ -134,11 +134,11 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
         public void AddProcessStepAfter(LinkedListNode<ProcessStepSource> node, ProcessStepSource step)
         {
             if (node.List != __original_process_steps)
-                throw new NaposhtimDocumentException(NaposhtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, "The specified node does not in the Linked List.");
+                throw new NapishtimDocumentException(NapishtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, "The specified node does not in the Linked List.");
 
             SimpleStepWithTimeout_S? employ = (step as SimpleStepWithTimeout_S)?.EmployPreceding;
             if (employ != null && (__original_process_steps.Find(employ) == null || (IndexOf(node.Value) < IndexOf(employ))))
-                throw new NaposhtimDocumentException(NaposhtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, "The 'SimpleStepWithTimeout' that is not in the same 'Sequential' Control Block is referenced or the referenced 'SimpleStepWithTimeout' is located after the referer.");
+                throw new NapishtimDocumentException(NapishtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, "The 'SimpleStepWithTimeout' that is not in the same 'Sequential' Control Block is referenced or the referenced 'SimpleStepWithTimeout' is located after the referer.");
 
             __original_process_steps.AddAfter(node, step);
             //StepFootprint += step.StepFootprint;
@@ -147,11 +147,11 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
         public void AddProcessStepBefore(LinkedListNode<ProcessStepSource> node, ProcessStepSource step)
         {
             if (node.List != __original_process_steps)
-                throw new NaposhtimDocumentException(NaposhtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, "The specified node does not in the Linked List.");
+                throw new NapishtimDocumentException(NapishtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, "The specified node does not in the Linked List.");
 
             SimpleStepWithTimeout_S? employ = (step as SimpleStepWithTimeout_S)?.EmployPreceding;
             if (employ != null && (__original_process_steps.Find(employ) == null || (IndexOf(node.Value) <= IndexOf(employ))))
-                throw new NaposhtimDocumentException(NaposhtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, "The 'SimpleStepWithTimeout' that is not in the same 'Sequential' Control Block is referenced or the referenced 'SimpleStepWithTimeout' is located after the referer.");
+                throw new NapishtimDocumentException(NapishtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, "The 'SimpleStepWithTimeout' that is not in the same 'Sequential' Control Block is referenced or the referenced 'SimpleStepWithTimeout' is located after the referer.");
 
             __original_process_steps.AddBefore(node, step);
             //StepFootprint += step.StepFootprint;
@@ -160,10 +160,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
         public void RemoveProcessStepFirst()
         {
             if (__original_process_steps.Count == 0)
-                throw new NaposhtimDocumentException(NaposhtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, "Can not find any process step in 'Sequential' Control Block.");
+                throw new NapishtimDocumentException(NapishtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, "Can not find any process step in 'Sequential' Control Block.");
 
             if(__original_process_steps.Any(s => IndexOf((s as SimpleStepWithTimeout_S)?.EmployPreceding) == 0))
-                throw new NaposhtimDocumentException(NaposhtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, "The 'SimpleStepWithTimeout' is referenced by another 'SimpleStepWithTimeout' located in the same 'Sequential' Control Block.");
+                throw new NapishtimDocumentException(NapishtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, "The 'SimpleStepWithTimeout' is referenced by another 'SimpleStepWithTimeout' located in the same 'Sequential' Control Block.");
 
             var step = __original_process_steps.First.Value;
             //StepFootprint -= step.StepFootprint;
@@ -174,7 +174,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
         public void RemoveProcessStepLast()
         {
             if (__original_process_steps.Count == 0)
-                throw new NaposhtimDocumentException(NaposhtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, "Can not find any process step in 'Sequential' Control Block.");
+                throw new NapishtimDocumentException(NapishtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, "Can not find any process step in 'Sequential' Control Block.");
             var step = __original_process_steps.Last.Value;
             //StepFootprint -= step.StepFootprint;
             //UserVariableFootprint -= step.UserVariableFootprint;
@@ -183,10 +183,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
         public void RemoveProcessStep(LinkedListNode<ProcessStepSource> node)
         {
             if (node.List != __original_process_steps)
-                throw new NaposhtimDocumentException(NaposhtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, "The specified node does not in the Linked List.");
+                throw new NapishtimDocumentException(NapishtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, "The specified node does not in the Linked List.");
 
             if (__original_process_steps.Any(s => (s as SimpleStepWithTimeout_S)?.EmployPreceding == node.Value))
-                throw new NaposhtimDocumentException(NaposhtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, "The 'SimpleStepWithTimeout' is referenced by another 'SimpleStepWithTimeout' located in the same 'Sequential' Control Block.");
+                throw new NapishtimDocumentException(NapishtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, "The 'SimpleStepWithTimeout' is referenced by another 'SimpleStepWithTimeout' located in the same 'Sequential' Control Block.");
 
             var step = node.Value;
             //StepFootprint -= step.StepFootprint;
@@ -200,11 +200,11 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
             {
                 var originalStep = ProcessStepAt(idx);
                 if (originalStep == null)
-                    throw new NaposhtimDocumentException(NaposhtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, $"The index {idx} is invalid to a linked-list of length {__original_process_steps.Count}.");
+                    throw new NapishtimDocumentException(NapishtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, $"The index {idx} is invalid to a linked-list of length {__original_process_steps.Count}.");
 
                 SimpleStepWithTimeout_S? employ = (value as SimpleStepWithTimeout_S)?.EmployPreceding;
                 if (employ != null && (__original_process_steps.Find(employ) == null || idx <= IndexOf(employ)))
-                    throw new NaposhtimDocumentException(NaposhtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, "The 'SimpleStepWithTimeout' that is not in the same 'Sequential' Control Block is referenced or the referenced 'SimpleStepWithTimeout' is located after the referer.");
+                    throw new NapishtimDocumentException(NapishtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, "The 'SimpleStepWithTimeout' that is not in the same 'Sequential' Control Block is referenced or the referenced 'SimpleStepWithTimeout' is located after the referer.");
 
                 if (originalStep is SimpleStepWithTimeout_S)
                 {
@@ -216,7 +216,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
                                 (s as SimpleStepWithTimeout_S).EmployPreceding = value as SimpleStepWithTimeout_S;
                         }
                         else
-                            throw new NaposhtimDocumentException(NaposhtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, "The 'SimpleStepWithTimeout_S' that has been referenced by others can not be replaced with a 'SimpleStep_S'.");
+                            throw new NapishtimDocumentException(NapishtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, "The 'SimpleStepWithTimeout_S' that has been referenced by others can not be replaced with a 'SimpleStep_S'.");
                     }
                 }
                 //StepFootprint -= originalStep.StepFootprint;
@@ -234,7 +234,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
             {
                 var step = ProcessStepAt(idx);
                 if (step == null)
-                    throw new NaposhtimDocumentException(NaposhtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, $"The index {idx} is invalid to a linked-list of length {__original_process_steps.Count}.");
+                    throw new NapishtimDocumentException(NapishtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, $"The index {idx} is invalid to a linked-list of length {__original_process_steps.Count}.");
                 return step;
             }
         }
@@ -242,11 +242,11 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
         public void ReplaceProcessStepWith(LinkedListNode<ProcessStepSource> node, ProcessStepSource step)
         {
             if (node.List != __original_process_steps)
-                throw new NaposhtimDocumentException(NaposhtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, "The specified node does not in the Linked List.");
+                throw new NapishtimDocumentException(NapishtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, "The specified node does not in the Linked List.");
 
             SimpleStepWithTimeout_S? employ = (step as SimpleStepWithTimeout_S)?.EmployPreceding;
             if (employ != null && (__original_process_steps.Find(employ) == null || (IndexOf(node.Value) <= IndexOf(employ))))
-                throw new NaposhtimDocumentException(NaposhtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, "The 'SimpleStepWithTimeout' that is not in the same 'Sequential' Control Block is referenced or the referenced 'SimpleStepWithTimeout' is located after the referer.");
+                throw new NapishtimDocumentException(NapishtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, "The 'SimpleStepWithTimeout' that is not in the same 'Sequential' Control Block is referenced or the referenced 'SimpleStepWithTimeout' is located after the referer.");
 
             if (node.Value is SimpleStepWithTimeout_S)
             {
@@ -258,7 +258,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
                             (s as SimpleStepWithTimeout_S).EmployPreceding = step as SimpleStepWithTimeout_S;
                     }
                     else
-                        throw new NaposhtimDocumentException(NaposhtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, "The 'SimpleStepWithTimeout_S' that has been referenced by others can not be replaced with a 'SimpleStep_S'.");
+                        throw new NapishtimDocumentException(NapishtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, "The 'SimpleStepWithTimeout_S' that has been referenced by others can not be replaced with a 'SimpleStep_S'.");
                 }
             }
             var stp = node.Value;
@@ -275,9 +275,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
         public void MoveAfter(LinkedListNode<ProcessStepSource> source, LinkedListNode<ProcessStepSource> target)
         {
             if (source.List != __original_process_steps || target.List != __original_process_steps)
-                throw new NaposhtimDocumentException(NaposhtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, "The specified node does not in the Linked List.");
+                throw new NapishtimDocumentException(NapishtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, "The specified node does not in the Linked List.");
             if(source == target)
-                throw new NaposhtimDocumentException(NaposhtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, "The source node and target node cannot be the same node.");
+                throw new NapishtimDocumentException(NapishtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, "The source node and target node cannot be the same node.");
             
             int sourcePos = IndexOf(source.Value);
             int targetPos = IndexOf(target.Value);
@@ -286,13 +286,13 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
             {
                 var employs = __original_process_steps.Where(x => (x as SimpleStepWithTimeout_S)?.EmployPreceding == source.Value);
                 if (employs.Any(x => IndexOf(x) <= targetPos))
-                    throw new NaposhtimDocumentException(NaposhtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, "The source node has been referenced by some nodes which are located between source node and target node(include target node).");
+                    throw new NapishtimDocumentException(NapishtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, "The source node has been referenced by some nodes which are located between source node and target node(include target node).");
             }
             else
             {
                 var employ = (source.Value as SimpleStepWithTimeout_S)?.EmployPreceding;
                 if (employ != null && IndexOf(employ) < targetPos)
-                    throw new NaposhtimDocumentException(NaposhtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, "The 'SimpleStepWithTimeout_S' referenced by source node is located between source node and target node(exclude target node).");
+                    throw new NapishtimDocumentException(NapishtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, "The 'SimpleStepWithTimeout_S' referenced by source node is located between source node and target node(exclude target node).");
             }
 
             __original_process_steps.Remove(source);
@@ -302,10 +302,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
         public void MoveBefore(LinkedListNode<ProcessStepSource> source, LinkedListNode<ProcessStepSource> target)
         {
             if (source.List != __original_process_steps || target.List != __original_process_steps)
-                throw new NaposhtimDocumentException(NaposhtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, "The specified node does not in the Linked List.");
+                throw new NapishtimDocumentException(NapishtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, "The specified node does not in the Linked List.");
 
             if (source == target)
-                throw new NaposhtimDocumentException(NaposhtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, "The source node and target node cannot be the same node.");
+                throw new NapishtimDocumentException(NapishtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, "The source node and target node cannot be the same node.");
 
             int sourcePos = IndexOf(source.Value);
             int targetPos = IndexOf(target.Value);
@@ -314,13 +314,13 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
             {
                 var employs = __original_process_steps.Where(x => (x as SimpleStepWithTimeout_S)?.EmployPreceding == source.Value);
                 if (employs.Any(x => IndexOf(x) < targetPos))
-                    throw new NaposhtimDocumentException(NaposhtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, "The source node has been referenced by some nodes which are located between source node and target node(exclude target node).");
+                    throw new NapishtimDocumentException(NapishtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, "The source node has been referenced by some nodes which are located between source node and target node(exclude target node).");
             }
             else
             {
                 var employ = (source.Value as SimpleStepWithTimeout_S)?.EmployPreceding;
                 if (employ != null && IndexOf(employ) <= targetPos)
-                    throw new NaposhtimDocumentException(NaposhtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, "The 'SimpleStepWithTimeout_S' referenced by source node is located between source node and target node(include target node).");
+                    throw new NapishtimDocumentException(NapishtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, "The 'SimpleStepWithTimeout_S' referenced by source node is located between source node and target node(include target node).");
             }
 
             __original_process_steps.Remove(source);
@@ -338,7 +338,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
         public override ControlBlockObject ResolveTarget(uint next,uint abort, uint? breakp, uint? continuep, Context context, IReadOnlyDictionary<uint, Event> globals, ReadOnlyMemory<uint> stepLinkMapping, ReadOnlyMemory<uint> userVariableMapping, Dictionary<uint, string> stepNameMapping)
         {
             if (__original_process_steps.Count == 0)
-                throw new NaposhtimDocumentException(NaposhtimExceptionCode.CONTROL_BLOCK_ARGUMENTS_ERROR, $"Can not find any process step in Sequential({FullName}) Control Block.");
+                throw new NapishtimDocumentException(NapishtimExceptionCode.CONTROL_BLOCK_ARGUMENTS_ERROR, $"Can not find any process step in Sequential({FullName}) Control Block.");
 
             var compiledProcessSteps = new LinkedList<ProcessStepObject>();
             var step = __original_process_steps.Last;
@@ -363,9 +363,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
                                                     userVariableMapping.Slice(st1, step.Value.UserVariableFootprint), this, stepNameMapping));
                 }
             }
-            catch (NaposhtimException e)
+            catch (NapishtimException e)
             {
-                throw new NaposhtimDocumentException(NaposhtimExceptionCode.DOCUMENT_STEP_BUILD_ERROR,
+                throw new NapishtimDocumentException(NapishtimExceptionCode.DOCUMENT_STEP_BUILD_ERROR,
                         $"Can not resolve step: {FullName}/{step.Value.Name}.", e);
             }
 
@@ -443,9 +443,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
                 {
                     ret = step.Build(context, globals, this);
                 }
-                catch (NaposhtimException e)
+                catch (NapishtimException e)
                 {
-                    throw new NaposhtimDocumentException(NaposhtimExceptionCode.DOCUMENT_STEP_BUILD_ERROR,
+                    throw new NapishtimDocumentException(NapishtimExceptionCode.DOCUMENT_STEP_BUILD_ERROR,
                         $"Can not build step: {Name}/{step.Name}.", e);
                 }
                 yield return ret;

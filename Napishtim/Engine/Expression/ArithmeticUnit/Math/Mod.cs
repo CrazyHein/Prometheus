@@ -13,7 +13,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ex
         public MOD(IReadOnlyList<Expression> parameters) : base(parameters)
         {
             if (parameters.Count != 2)
-                throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EXPRESSION_SPRITE_SYNTAX_ERROR, 
+                throw new NapishtimScriptException(NapishtimExceptionCode.SCRIPT_EXPRESSION_SPRITE_SYNTAX_ERROR, 
                     this.GetType().GetCustomAttribute<ArithmeticUnitUsageAttribute>().Usage);
         }
 
@@ -31,7 +31,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ex
         public ABS(IReadOnlyList<Expression> parameters) : base(parameters)
         {
             if (parameters.Count != 1)
-                throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EXPRESSION_SPRITE_SYNTAX_ERROR,
+                throw new NapishtimScriptException(NapishtimExceptionCode.SCRIPT_EXPRESSION_SPRITE_SYNTAX_ERROR,
                     this.GetType().GetCustomAttribute<ArithmeticUnitUsageAttribute>().Usage);
         }
 

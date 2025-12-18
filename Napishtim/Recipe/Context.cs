@@ -60,7 +60,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe
             }
             catch (Exception)
             {
-                throw new NaposhtimDocumentException(NaposhtimExceptionCode.DOCUMENT_INVALID_OPERATION, "Please map all required process data objects to activate the recipe engine and map them only once.");
+                throw new NapishtimDocumentException(NapishtimExceptionCode.DOCUMENT_INVALID_OPERATION, "Please map all required process data objects to activate the recipe engine and map them only once.");
             }
         }
 
@@ -72,7 +72,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe
             }
             catch (Exception)
             {
-                throw new NaposhtimDocumentException(NaposhtimExceptionCode.DOCUMENT_INVALID_OPERATION, $"Can not find ProcessData with the specified object index {index}.");
+                throw new NapishtimDocumentException(NapishtimExceptionCode.DOCUMENT_INVALID_OPERATION, $"Can not find ProcessData with the specified object index {index}.");
             }
         }
     }

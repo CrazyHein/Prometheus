@@ -94,7 +94,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.ARK.Controls.Common
                 Expression = new Prometheus.Napishtim.Engine.Expression.Expression(txtExpression.Text.Trim(), null);
                 DialogResult = true;
             }
-            catch(NaposhtimException ex)
+            catch(NapishtimException ex)
             {
                 MessageBox.Show($"The input expression is invalid:\n{ex.ToString()}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }

@@ -99,7 +99,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ev
                         var opRecord = operatorStack.Pop();
 
                         if (opRecord.OperandCounts == 0)
-                            throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_TRIGGER_PARSE_ERROR, $"The number of operands for '{opRecord.Op}' is incorrect.");
+                            throw new NapishtimScriptException(NapishtimExceptionCode.SCRIPT_TRIGGER_PARSE_ERROR, $"The number of operands for '{opRecord.Op}' is incorrect.");
 
                         operandStack.Push(new IntermediateResult(step, opRecord, Enumerable.Range(0, opRecord.OperandCounts).Select(i => operandStack.Pop())) { Priority = opRecord.Priority});
                         step++;
@@ -125,11 +125,11 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ev
                     //throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_TRIGGER_PARSE_ERROR, "One of the operands is missing an operator.");
                     var contextOperator = operatorStack.Peek();
                     if (contextOperator.Priority != st.Tabs - 1)
-                        throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_TRIGGER_PARSE_ERROR, "One of the operands is missing an operator.");
+                        throw new NapishtimScriptException(NapishtimExceptionCode.SCRIPT_TRIGGER_PARSE_ERROR, "One of the operands is missing an operator.");
                     if (contextOperator.Op == TriggerOperator.NOT && contextOperator.OperandCounts > 0)
-                        throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_TRIGGER_PARSE_ERROR, $"The number of operands for '{TriggerOperator.NOT}' is incorrect.");
+                        throw new NapishtimScriptException(NapishtimExceptionCode.SCRIPT_TRIGGER_PARSE_ERROR, $"The number of operands for '{TriggerOperator.NOT}' is incorrect.");
                     if (contextOperator.Op == TriggerOperator.ROOT && contextOperator.OperandCounts > 0)
-                        throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_TRIGGER_PARSE_ERROR, $"The number of operands for '{TriggerOperator.ROOT}' is incorrect.");
+                        throw new NapishtimScriptException(NapishtimExceptionCode.SCRIPT_TRIGGER_PARSE_ERROR, $"The number of operands for '{TriggerOperator.ROOT}' is incorrect.");
 
                     if (contextOperator.OperandCounts > 0)
                     {
@@ -156,7 +156,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ev
 
 
                 if (__expression_string.Length == 0)
-                    throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_TRIGGER_PARSE_ERROR, "A certain operator is missing operands.");
+                    throw new NapishtimScriptException(NapishtimExceptionCode.SCRIPT_TRIGGER_PARSE_ERROR, "A certain operator is missing operands.");
             }
         }
     }

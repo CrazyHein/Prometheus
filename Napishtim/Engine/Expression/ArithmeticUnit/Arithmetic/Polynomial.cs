@@ -14,7 +14,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ex
         public POLY(IReadOnlyList<Expression> parameters) : base(parameters)
         {
             if (parameters.Count % 2 != 1)
-                throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EXPRESSION_SPRITE_SYNTAX_ERROR, 
+                throw new NapishtimScriptException(NapishtimExceptionCode.SCRIPT_EXPRESSION_SPRITE_SYNTAX_ERROR, 
                     this.GetType().GetCustomAttribute<ArithmeticUnitUsageAttribute>().Usage);
         }
 

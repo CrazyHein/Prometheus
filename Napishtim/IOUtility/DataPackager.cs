@@ -55,32 +55,32 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.IOUtility
                     if(totalLength == 0xFFFFFFFF)
                     {
                         if(MakeDataPackageIndex(head.index) != 0)
-                            throw new NaposhtimDataPackageException(NaposhtimExceptionCode.PACKAGE_DATA_CORRUPT, $"Expect to receive package with index 0 but receive package with index {head.index} instead.");
+                            throw new NapishtimDataPackageException(NapishtimExceptionCode.PACKAGE_DATA_CORRUPT, $"Expect to receive package with index 0 but receive package with index {head.index} instead.");
                         else if(head.total_length > (uint)buffer.Length)
-                            throw new NaposhtimDataPackageException(NaposhtimExceptionCode.PACKAGE_RECV_BUFFER_INSUFFICIENT, $"Receive buffer length is {buffer.Length}, the whole data length is {head.total_length}.");
+                            throw new NapishtimDataPackageException(NapishtimExceptionCode.PACKAGE_RECV_BUFFER_INSUFFICIENT, $"Receive buffer length is {buffer.Length}, the whole data length is {head.total_length}.");
                         totalLength = head.total_length;
                         totalPackage = (ushort)(totalLength / __user_data_length_per_package + (totalLength % __user_data_length_per_package != 0 ? 1 : 0));
                         finalPackageLenth = totalLength % __user_data_length_per_package == 0 ? __user_data_length_per_package : totalLength % __user_data_length_per_package;
                         if (totalPackage > MAX_PACKAGE_QUANTITY)
-                            throw new NaposhtimDataPackageException(NaposhtimExceptionCode.PACKAGE_QUANTITY_OUT_OF_RANGE, $"The data received requires {totalPackage} packets. The maximum number of packages is {MAX_PACKAGE_QUANTITY}.");
+                            throw new NapishtimDataPackageException(NapishtimExceptionCode.PACKAGE_QUANTITY_OUT_OF_RANGE, $"The data received requires {totalPackage} packets. The maximum number of packages is {MAX_PACKAGE_QUANTITY}.");
                     }
                     else if(lastPackageIndex != MakeDataPackageIndex(head.index) - 1)
-                        throw new NaposhtimDataPackageException(NaposhtimExceptionCode.PACKAGE_DATA_CORRUPT, $"Expect to receive package with index {lastPackageIndex + 1} but receive package with index {MakeDataPackageIndex(head.index)} instead.");
+                        throw new NapishtimDataPackageException(NapishtimExceptionCode.PACKAGE_DATA_CORRUPT, $"Expect to receive package with index {lastPackageIndex + 1} but receive package with index {MakeDataPackageIndex(head.index)} instead.");
 
                     lastPackageIndex = MakeDataPackageIndex(head.index);
 
                     if (MakeDataPackageIndex(head.index) >= totalPackage)
-                        throw new NaposhtimDataPackageException(NaposhtimExceptionCode.PACKAGE_INDEX_OUT_OF_RANGE, $"The index value {head.index} of the received package is out of range(0 - {totalPackage-1}).");
+                        throw new NapishtimDataPackageException(NapishtimExceptionCode.PACKAGE_INDEX_OUT_OF_RANGE, $"The index value {head.index} of the received package is out of range(0 - {totalPackage-1}).");
                     else if(MakeDataPackageIndex(head.index) == totalPackage - 1 && IsLastDataPackageIndex(head.index) == false)
-                        throw new NaposhtimDataPackageException(NaposhtimExceptionCode.PACKAGE_INDEX_CORRUPT, $"The index value {head.index} of the received package should be decorated with 0x8000.");
+                        throw new NapishtimDataPackageException(NapishtimExceptionCode.PACKAGE_INDEX_CORRUPT, $"The index value {head.index} of the received package should be decorated with 0x8000.");
                     else if (MakeDataPackageIndex(head.index) != totalPackage - 1 && IsLastDataPackageIndex(head.index) == true)
-                        throw new NaposhtimDataPackageException(NaposhtimExceptionCode.PACKAGE_INDEX_CORRUPT, $"The index value {head.index} of the received package should not be decorated with 0x8000.");
+                        throw new NapishtimDataPackageException(NapishtimExceptionCode.PACKAGE_INDEX_CORRUPT, $"The index value {head.index} of the received package should not be decorated with 0x8000.");
                     else if (totalLength != head.total_length)
-                        throw new NaposhtimDataPackageException(NaposhtimExceptionCode.PACKAGE_HEAD_INCONSISTENCY, $"The total length should be {totalLength} bytes, but the subsequent package showed the total length is {head.total_length} bytes.");
+                        throw new NapishtimDataPackageException(NapishtimExceptionCode.PACKAGE_HEAD_INCONSISTENCY, $"The total length should be {totalLength} bytes, but the subsequent package showed the total length is {head.total_length} bytes.");
                     else if(!IsLastDataPackageIndex(head.index) && packageData.Length != __user_data_length_per_package)
-                        throw new NaposhtimDataPackageException(NaposhtimExceptionCode.PACKAGE_DATA_CORRUPT, $"The desired package length is {__user_data_length_per_package} bytes, but the received package length is {packageData.Length} bytes.");
+                        throw new NapishtimDataPackageException(NapishtimExceptionCode.PACKAGE_DATA_CORRUPT, $"The desired package length is {__user_data_length_per_package} bytes, but the received package length is {packageData.Length} bytes.");
                     else if (IsLastDataPackageIndex(head.index) && packageData.Length != finalPackageLenth)
-                        throw new NaposhtimDataPackageException(NaposhtimExceptionCode.PACKAGE_DATA_CORRUPT, $"The desired package length is {finalPackageLenth} bytes, but the received package length is {packageData.Length} bytes.");
+                        throw new NapishtimDataPackageException(NapishtimExceptionCode.PACKAGE_DATA_CORRUPT, $"The desired package length is {finalPackageLenth} bytes, but the received package length is {packageData.Length} bytes.");
 
                     packageData.CopyTo(buffer.Slice((int)recv));
 
@@ -97,7 +97,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.IOUtility
             lock (__lock_me)
             {
                 if (data.Length / __user_data_length_per_package + (data.Length % __user_data_length_per_package != 0 ? 1:0) > MAX_PACKAGE_QUANTITY)
-                    throw new NaposhtimDataPackageException(NaposhtimExceptionCode.PACKAGE_QUANTITY_OUT_OF_RANGE, $"The length({data.Length} bytes) of data to be sent is out of range.");
+                    throw new NapishtimDataPackageException(NapishtimExceptionCode.PACKAGE_QUANTITY_OUT_OF_RANGE, $"The length({data.Length} bytes) of data to be sent is out of range.");
 
                 ushort index = 0;
                 uint send = 0;
@@ -125,9 +125,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.IOUtility
             _port.Receive(__internal_package_buffer, 0, Marshal.SizeOf<DATA_PACKAGE_HEAD_T>());
             head = MemoryMarshal.Read<DATA_PACKAGE_HEAD_T>(__internal_package_buffer);
             if (head.cookies != __COOKIES)
-                throw new NaposhtimDataPackageException(NaposhtimExceptionCode.INVALID_PACKAGE_HEAD, $"The value of Cookies is not 'AMEC'.");
+                throw new NapishtimDataPackageException(NapishtimExceptionCode.INVALID_PACKAGE_HEAD, $"The value of Cookies is not 'AMEC'.");
             else if(head.length == 0 || head.length > __user_data_length_per_package)
-                throw new NaposhtimDataPackageException(NaposhtimExceptionCode.PACKAGE_DATA_LENGTH_OUT_OF_RANGE, $"The length({head.length} bytes) of received package is out of range.");
+                throw new NapishtimDataPackageException(NapishtimExceptionCode.PACKAGE_DATA_LENGTH_OUT_OF_RANGE, $"The length({head.length} bytes) of received package is out of range.");
             _port.Receive(__internal_package_buffer, Marshal.SizeOf<DATA_PACKAGE_HEAD_T>(), head.length);
             return __internal_package_buffer.AsMemory().Slice(Marshal.SizeOf<DATA_PACKAGE_HEAD_T>(), head.length);
         }
@@ -135,7 +135,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.IOUtility
         private void __send_package(ushort index, uint totalLength, ReadOnlyMemory<byte> data)
         {
             if (data.Length > __user_data_length_per_package)
-                throw new NaposhtimDataPackageException(NaposhtimExceptionCode.PACKAGE_DATA_LENGTH_OUT_OF_RANGE, $"The length({data.Length} bytes) of package to be sent is out of range.");
+                throw new NapishtimDataPackageException(NapishtimExceptionCode.PACKAGE_DATA_LENGTH_OUT_OF_RANGE, $"The length({data.Length} bytes) of package to be sent is out of range.");
             DATA_PACKAGE_HEAD_T head;
             head.cookies = __COOKIES;
             head.index = index;

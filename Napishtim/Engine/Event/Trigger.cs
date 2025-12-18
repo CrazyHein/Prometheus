@@ -64,9 +64,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ev
         public override List<string> ToPlainText(IReadOnlyDictionary<uint, Event> globalEvts, IReadOnlyDictionary<uint, Event> localEvts)
         {
             if (__global_region == true && globalEvts.ContainsKey(__index) == false)
-                throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EVENT_REF_NOT_FOUND, $"GEVENT{__index} has not been defined.");
+                throw new NapishtimScriptException(NapishtimExceptionCode.SCRIPT_EVENT_REF_NOT_FOUND, $"GEVENT{__index} has not been defined.");
             if (__global_region == false && localEvts.ContainsKey(__index) == false)
-                throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EVENT_REF_NOT_FOUND, $"EVENT{__index} has not been defined.");
+                throw new NapishtimScriptException(NapishtimExceptionCode.SCRIPT_EVENT_REF_NOT_FOUND, $"EVENT{__index} has not been defined.");
 
             var evt = __global_region ? globalEvts[__index] : localEvts[__index];
             string indent = new string('\x20', Layer);
@@ -166,11 +166,11 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ev
         private void __converter(JsonNode node, List<__Statement> buffer, IReadOnlyDictionary<uint, Event> globalEvts, Dictionary<uint, Event> localEvts, ref uint inlineEventIndex)
         {
             if(node.GetValueKind() != System.Text.Json.JsonValueKind.Array || node.AsArray().Count == 0)
-                throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_TRIGGER_PARSE_ERROR, $"{node.ToString()}\nis not a valid array or the array length is 0.");
+                throw new NapishtimScriptException(NapishtimExceptionCode.SCRIPT_TRIGGER_PARSE_ERROR, $"{node.ToString()}\nis not a valid array or the array length is 0.");
             foreach(var line in node.AsArray())
             {
                 if(line.GetValueKind() != System.Text.Json.JsonValueKind.String)
-                    throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_TRIGGER_PARSE_ERROR, $"{line.ToString()}\nis not a valid string.");
+                    throw new NapishtimScriptException(NapishtimExceptionCode.SCRIPT_TRIGGER_PARSE_ERROR, $"{line.ToString()}\nis not a valid string.");
 
                 string sline = line.GetValue<string>();
                 int tabs = sline.IndexOf(sline.First(c => c != '\x20'));
@@ -208,7 +208,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ev
                         if(globalEvts.ContainsKey(eventIdx))
                             buffer.Add(new __Statement() { Tabs = tabs, Operator = null, Idx = eventIdx, Region = true });
                         else
-                            throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EVENT_REF_NOT_FOUND, $"GEVENT{eventIdx} has not been defined.");
+                            throw new NapishtimScriptException(NapishtimExceptionCode.SCRIPT_EVENT_REF_NOT_FOUND, $"GEVENT{eventIdx} has not been defined.");
                     }
                     else if (LOCAL_EVENT_PATTERN.IsMatch(sline.Substring(tabs)))
                     {
@@ -216,7 +216,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ev
                         if (localEvts.ContainsKey(eventIdx))
                             buffer.Add(new __Statement() { Tabs = tabs, Operator = null, Idx = eventIdx, Region = false });
                         else
-                            throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EVENT_REF_NOT_FOUND, $"EVENT{eventIdx} has not been defined.");
+                            throw new NapishtimScriptException(NapishtimExceptionCode.SCRIPT_EVENT_REF_NOT_FOUND, $"EVENT{eventIdx} has not been defined.");
                     }
                     else if(INLINE_EVENT_PATTERN.IsMatch(sline.Substring(tabs)))
                     {
@@ -227,7 +227,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ev
                         }
                         catch
                         {
-                            throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_TRIGGER_PARSE_ERROR, $"{line.ToString()}\nis not a valid trigger line(Parsing Error).");
+                            throw new NapishtimScriptException(NapishtimExceptionCode.SCRIPT_TRIGGER_PARSE_ERROR, $"{line.ToString()}\nis not a valid trigger line(Parsing Error).");
                         }
                         Event inlineEvent = Event.MAKE(inlineNode);
                         uint inlineIdx;
@@ -241,7 +241,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ev
                         buffer.Add(new __Statement() { Tabs = tabs, Operator = null, Idx = inlineIdx, Region = false });
                     }
                     else
-                        throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_TRIGGER_PARSE_ERROR, $"{line.ToString()}\nis not a valid trigger line.");
+                        throw new NapishtimScriptException(NapishtimExceptionCode.SCRIPT_TRIGGER_PARSE_ERROR, $"{line.ToString()}\nis not a valid trigger line.");
                 }
             }
 
@@ -250,7 +250,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ev
         private Element __search_logic_element(IReadOnlyList<__Statement> buffer, ref int start, LogicTree? root)
         {
             if (root != null && root.Layer == MaxNesting)
-                throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_TRIGGER_LOGIC_TREE_DEPTH_OUT_OF_RANGE, $"The maximum nesting depth of a logical tree is {MaxNesting}.");
+                throw new NapishtimScriptException(NapishtimExceptionCode.SCRIPT_TRIGGER_LOGIC_TREE_DEPTH_OUT_OF_RANGE, $"The maximum nesting depth of a logical tree is {MaxNesting}.");
 
             LogicTree tree = null;
             Element inner = null;
@@ -282,15 +282,15 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ev
                     if((tree.Elements.Count == 0 && tree.Operator == TRIGGER_OPERATOR_T.NOT) || tree.Operator != TRIGGER_OPERATOR_T.NOT)
                         tree.Elements.Add(inner);
                     else
-                        throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_TRIGGER_PARSE_ERROR, $"The number of operands or sub logic trees for '{tree.Operator}' is incorrect.");
+                        throw new NapishtimScriptException(NapishtimExceptionCode.SCRIPT_TRIGGER_PARSE_ERROR, $"The number of operands or sub logic trees for '{tree.Operator}' is incorrect.");
                 }
                 else if (buffer[start + 1].Tabs > st.Tabs + 1)
-                    throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_TRIGGER_PARSE_ERROR, "Too much indentation.");
+                    throw new NapishtimScriptException(NapishtimExceptionCode.SCRIPT_TRIGGER_PARSE_ERROR, "Too much indentation.");
                 else
                     break;
             }
             if(tree.Elements.Count == 0)
-                throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_TRIGGER_PARSE_ERROR, "Operand or sub logic tree missing.");
+                throw new NapishtimScriptException(NapishtimExceptionCode.SCRIPT_TRIGGER_PARSE_ERROR, "Operand or sub logic tree missing.");
             return tree;
         }
 

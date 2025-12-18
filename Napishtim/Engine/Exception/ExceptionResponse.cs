@@ -103,7 +103,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ex
                     {
                         uint eventidx = e["ID"].GetValue<uint>();
                         if (__local_event_stroage.ContainsKey(eventidx))
-                            throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EXCEPTION_RESPONSE_PARSE_ERROR, $"Event with the same ID({eventidx}) already exists.");
+                            throw new NapishtimScriptException(NapishtimExceptionCode.SCRIPT_EXCEPTION_RESPONSE_PARSE_ERROR, $"Event with the same ID({eventidx}) already exists.");
                         else
                             __local_event_stroage[eventidx] = Event.MAKE(e["EVENT"]);
                     }
@@ -120,7 +120,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ex
             }
             catch (Exception ex)
             {
-                throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EXCEPTION_RESPONSE_PARSE_ERROR, $"{node.ToString()}\nis not a valid ExceptionResponse object.", ex);
+                throw new NapishtimScriptException(NapishtimExceptionCode.SCRIPT_EXCEPTION_RESPONSE_PARSE_ERROR, $"{node.ToString()}\nis not a valid ExceptionResponse object.", ex);
             }
         }
 

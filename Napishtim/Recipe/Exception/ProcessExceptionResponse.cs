@@ -22,7 +22,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Ex
         {
             name = name.Trim();
             if (name.Length == 0)
-                throw new NaposhtimDocumentException(NaposhtimExceptionCode.EXCEPTION_HANDLING_ARGUMENTS_ERROR, $"Invaild name for ExceptionResponse(name string length should be greater than zero).");
+                throw new NapishtimDocumentException(NapishtimExceptionCode.EXCEPTION_HANDLING_ARGUMENTS_ERROR, $"Invaild name for ExceptionResponse(name string length should be greater than zero).");
             Name = name;
         }
     }
@@ -64,7 +64,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Ex
         {
             string name = node["ASSEMBLY"].GetValue<string>();
             if (__BUIILD_EXCEPTION_RESPONSE_SOURCE.ContainsKey(name) == false)
-                throw new NaposhtimDocumentException(NaposhtimExceptionCode.EXCEPTION_HANDLING_ARGUMENTS_ERROR, $"Unknown ExceptionResponseSource: {name}.");
+                throw new NapishtimDocumentException(NapishtimExceptionCode.EXCEPTION_HANDLING_ARGUMENTS_ERROR, $"Unknown ExceptionResponseSource: {name}.");
             return __BUIILD_EXCEPTION_RESPONSE_SOURCE[name](node); 
         }
 

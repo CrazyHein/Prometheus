@@ -25,7 +25,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
             {
                 value = value.Trim();
                 if (value.Length == 0)
-                    throw new NaposhtimDocumentException(NaposhtimExceptionCode.CONTROL_BLOCK_ARGUMENTS_ERROR, $"Invaild name for ControlBlock(name string length should be greater than zero).");
+                    throw new NapishtimDocumentException(NapishtimExceptionCode.CONTROL_BLOCK_ARGUMENTS_ERROR, $"Invaild name for ControlBlock(name string length should be greater than zero).");
                 __name = value;
             }
         }
@@ -61,7 +61,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
                 if (value != null)
                 {
                     if (__owner != null)
-                        throw new NaposhtimDocumentException(NaposhtimExceptionCode.CONTROL_BLOCK_ARGUMENTS_ERROR, $"The Control Block already has an owner.");
+                        throw new NapishtimDocumentException(NapishtimExceptionCode.CONTROL_BLOCK_ARGUMENTS_ERROR, $"The Control Block already has an owner.");
                 }
                 __owner = value;
             }
@@ -139,7 +139,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
         {
             string name = node["ASSEMBLY"].GetValue<string>();
             if (__BUIILD_CONTROL_BLOCK.ContainsKey(name) == false)
-                throw new NaposhtimDocumentException(NaposhtimExceptionCode.CONTROL_BLOCK_ARGUMENTS_ERROR, $"Unknown ControlBlock: {name}.");
+                throw new NapishtimDocumentException(NapishtimExceptionCode.CONTROL_BLOCK_ARGUMENTS_ERROR, $"Unknown ControlBlock: {name}.");
             return __BUIILD_CONTROL_BLOCK[name](node, owner);
         }
         static ControlBlockSource()

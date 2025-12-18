@@ -32,7 +32,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
         {
             var height = branches.Count() == 0? 0 : branches.Max(x => x.action.Height);
             if (this.Nesting + height > MAX_NESTING_DEPTH)
-                throw new NaposhtimDocumentException(NaposhtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, $"The nesting depth of the a Control Block exceeds the limit(MAX: {ControlBlockSource.MAX_NESTING_DEPTH}).");
+                throw new NapishtimDocumentException(NapishtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, $"The nesting depth of the a Control Block exceeds the limit(MAX: {ControlBlockSource.MAX_NESTING_DEPTH}).");
 
             if (locals != null)
                 __locals = new Dictionary<uint, (string name, Event evt)>(locals);
@@ -110,17 +110,17 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
             try
             {
                 if (node["ASSEMBLY"].GetValue<string>() != typeof(Switch_S).FullName)
-                    throw new NaposhtimDocumentException(NaposhtimExceptionCode.CONTROL_BLOCK_ARGUMENTS_ERROR, $"Assmebly name mismatch: {node["ASSEMBLY"].GetValue<string>()} vs {typeof(Switch_S).FullName}.");
+                    throw new NapishtimDocumentException(NapishtimExceptionCode.CONTROL_BLOCK_ARGUMENTS_ERROR, $"Assmebly name mismatch: {node["ASSEMBLY"].GetValue<string>()} vs {typeof(Switch_S).FullName}.");
 
                 return new Switch_S(node) { Owner = owner };
             }
-            catch (NaposhtimException)
+            catch (NapishtimException)
             {
                 throw;
             }
             catch (Exception ex)
             {
-                throw new NaposhtimDocumentException(NaposhtimExceptionCode.CONTROL_BLOCK_ARGUMENTS_ERROR, $"Can not restore Switch_S object from node:\n{node.ToString()}", ex);
+                throw new NapishtimDocumentException(NapishtimExceptionCode.CONTROL_BLOCK_ARGUMENTS_ERROR, $"Can not restore Switch_S object from node:\n{node.ToString()}", ex);
             }
         }
 
@@ -148,7 +148,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
         public void AddLocalEvent(uint index, string name, Event evt)
         {
             if(__locals.ContainsKey(index))
-                throw new NaposhtimDocumentException(NaposhtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION,
+                throw new NapishtimDocumentException(NapishtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION,
                      $"The local event with the same index({index}) has existed:\n{__locals[index].name}\n{__locals[index].evt.ToJson().ToString()}");
 
             __locals[index] = (name, evt);
@@ -157,7 +157,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
         public void RemoveLocalEvent(uint index)
         {
             if (__locals.ContainsKey(index) == false)
-                throw new NaposhtimDocumentException(NaposhtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, $"Local event with index({index}) does not exist.");
+                throw new NapishtimDocumentException(NapishtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, $"Local event with index({index}) does not exist.");
 
             __locals.Remove(index);
         }
@@ -178,9 +178,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
         {
             var height = branches.Count() == 0 ? 0 : branches.Max(x => x.action.Height);
             if (this.Nesting + height > MAX_NESTING_DEPTH)
-                throw new NaposhtimDocumentException(NaposhtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, $"The nesting depth of a Control Block exceeds the limit(MAX: {ControlBlockSource.MAX_NESTING_DEPTH}).");
+                throw new NapishtimDocumentException(NapishtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, $"The nesting depth of a Control Block exceeds the limit(MAX: {ControlBlockSource.MAX_NESTING_DEPTH}).");
             if(branches.Any(x => x.action.Owner != null))
-                throw new NaposhtimDocumentException(NaposhtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, $"At least one Control Block already has an owner.");
+                throw new NapishtimDocumentException(NapishtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, $"At least one Control Block already has an owner.");
 
             foreach (var b in branches)
             {
@@ -194,7 +194,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
         public void AddBranch(string name, JsonArray condition, ControlBlockSource action)
         {
             if (this.Nesting + action.Height > MAX_NESTING_DEPTH)
-                throw new NaposhtimDocumentException(NaposhtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, $"The nesting depth of the Control Block exceeds the limit(MAX: {ControlBlockSource.MAX_NESTING_DEPTH}).");
+                throw new NapishtimDocumentException(NapishtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, $"The nesting depth of the Control Block exceeds the limit(MAX: {ControlBlockSource.MAX_NESTING_DEPTH}).");
 
             action.Owner = this;
             __branches.Add((name, condition, action));
@@ -205,9 +205,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
         public void InsertBranch(int pos, string name, JsonArray condition, ControlBlockSource action)
         {
             if (pos >= __branches.Count || pos < 0)
-                throw new NaposhtimDocumentException(NaposhtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, $"The insertion position {pos} is invalid to a list of length {__branches.Count}.");
+                throw new NapishtimDocumentException(NapishtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, $"The insertion position {pos} is invalid to a list of length {__branches.Count}.");
             if (this.Nesting + action.Height > MAX_NESTING_DEPTH)
-                throw new NaposhtimDocumentException(NaposhtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, $"The nesting depth of the the Control Block exceeds the limit(MAX: {ControlBlockSource.MAX_NESTING_DEPTH}).");
+                throw new NapishtimDocumentException(NapishtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, $"The nesting depth of the the Control Block exceeds the limit(MAX: {ControlBlockSource.MAX_NESTING_DEPTH}).");
 
             action.Owner = this;
             __branches.Insert(pos, (name, condition, action));
@@ -218,9 +218,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
         public void MoveBranch(int oldIndex, int newIndex)
         {
             if (oldIndex >= __branches.Count || oldIndex < 0)
-                throw new NaposhtimDocumentException(NaposhtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, $"The old position {oldIndex} is invalid to a list of length {__branches.Count}.");
+                throw new NapishtimDocumentException(NapishtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, $"The old position {oldIndex} is invalid to a list of length {__branches.Count}.");
             if (newIndex >= __branches.Count || newIndex < 0)
-                throw new NaposhtimDocumentException(NaposhtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, $"The new position {newIndex} is invalid to a list of length {__branches.Count}.");
+                throw new NapishtimDocumentException(NapishtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, $"The new position {newIndex} is invalid to a list of length {__branches.Count}.");
         
             var temp = __branches[oldIndex];
             __branches.RemoveAt(oldIndex);
@@ -230,7 +230,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
         public void RemoveBranchAt(int index)
         {
             if(index >= __branches.Count)
-                throw new NaposhtimDocumentException(NaposhtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, $"The removal position {index} is invalid to a list of length {__branches.Count}.");
+                throw new NapishtimDocumentException(NapishtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, $"The removal position {index} is invalid to a list of length {__branches.Count}.");
         
             var branch = __branches[index];
             branch.action.Owner = null;
@@ -244,12 +244,12 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
         public override ControlBlockObject ResolveTarget(uint next, uint abort, uint? breakp, uint? continuep, Context context, IReadOnlyDictionary<uint, Event> globals, ReadOnlyMemory<uint> stepLinkMapping, ReadOnlyMemory<uint> userVariableMapping, Dictionary<uint, string> stepNameMapping)
         {
             if (__branches.Count == 0)
-                throw new NaposhtimDocumentException(NaposhtimExceptionCode.CONTROL_BLOCK_ARGUMENTS_ERROR, $"The number of Switch({FullName}) Control Block branches is zero.");
+                throw new NapishtimDocumentException(NapishtimExceptionCode.CONTROL_BLOCK_ARGUMENTS_ERROR, $"The number of Switch({FullName}) Control Block branches is zero.");
             int pos = 1;
             var trans = delegate (ValueTuple<string, JsonArray, ControlBlockSource> x)
             {
                 if(pos >= stepLinkMapping.Length)
-                    throw new NaposhtimDocumentException(NaposhtimExceptionCode.CONTROL_BLOCK_ARGUMENTS_ERROR, "Can not find any Control Step in sub control blocks of 'Switch' Control Block.");
+                    throw new NapishtimDocumentException(NapishtimExceptionCode.CONTROL_BLOCK_ARGUMENTS_ERROR, "Can not find any Control Step in sub control blocks of 'Switch' Control Block.");
                 var ret = new ValueTuple<string, JsonArray, ProcessShaders?, uint>(x.Item1, x.Item2, null, stepLinkMapping.Span[pos]);
                 pos += x.Item3.StepFootprint;
                 return ret;

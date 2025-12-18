@@ -25,13 +25,13 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Sh
                 else if(EnvVariableReference.PATTERN.IsMatch(o))
                     Operand = new EnvVariableReference(o);
                 else
-                    throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_SHADER_PARSE_ERROR, $"'{o}' is not a valid lvalue of SHADER.");
+                    throw new NapishtimScriptException(NapishtimExceptionCode.SCRIPT_SHADER_PARSE_ERROR, $"'{o}' is not a valid lvalue of SHADER.");
 
                 Expr = new Expression.Expression(node["VALUE"].GetValue<string>(), null);
             }
             catch (Exception ex)
             {
-                throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_SHADER_PARSE_ERROR, $"{node.ToString()}\nis not a valid SHADER object.", ex);
+                throw new NapishtimScriptException(NapishtimExceptionCode.SCRIPT_SHADER_PARSE_ERROR, $"{node.ToString()}\nis not a valid SHADER object.", ex);
             }
         }
 
@@ -42,7 +42,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Sh
             else if (EnvVariableReference.PATTERN.IsMatch(lvalue))
                 Operand = new EnvVariableReference(lvalue);
             else
-                throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_SHADER_ARGUMENTS_ERROR, $"'{lvalue}' can not be used as the lvalue of Shader.");
+                throw new NapishtimScriptException(NapishtimExceptionCode.SCRIPT_SHADER_ARGUMENTS_ERROR, $"'{lvalue}' can not be used as the lvalue of Shader.");
 
             Expr = new Expression.Expression(rvalue, null);
         }

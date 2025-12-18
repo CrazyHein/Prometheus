@@ -64,7 +64,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Pr
                 {
                     var idx = (s.Shader.Operand as EnvVariableReference).UserVariableIndex;
                     if (idx >= Context.UserVariableCapacity)
-                        throw new NaposhtimDocumentException(NaposhtimExceptionCode.DOCUMENT_INVALID_ARGUMENTS, $"The reserved user variable index should between 0 and {Context.UserVariableCapacity - 1}.");
+                        throw new NapishtimDocumentException(NapishtimExceptionCode.DOCUMENT_INVALID_ARGUMENTS, $"The reserved user variable index should between 0 and {Context.UserVariableCapacity - 1}.");
                     //if (idx >= context.ReservedUserVariableCapacity)
                     //throw new NaposhtimDocumentException(NaposhtimExceptionCode.DOCUMENT_INVALID_ARGUMENTS, $"The reserved user variable index should between 0 and {context.ReservedUserVariableCapacity - 1}.");
                 }
@@ -82,7 +82,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Pr
                 {
                     var idx = (s.Shader.Operand as EnvVariableReference).UserVariableIndex;
                     if (idx >= Context.UserVariableCapacity)
-                        throw new NaposhtimDocumentException(NaposhtimExceptionCode.DOCUMENT_INVALID_ARGUMENTS, $"The user variable index should between 0 and {Context.UserVariableCapacity - 1}.");
+                        throw new NapishtimDocumentException(NapishtimExceptionCode.DOCUMENT_INVALID_ARGUMENTS, $"The user variable index should between 0 and {Context.UserVariableCapacity - 1}.");
                     //if (idx < context.ReservedUserVariableCapacity)
                     //throw new NaposhtimDocumentException(NaposhtimExceptionCode.DOCUMENT_INVALID_ARGUMENTS, $"User variable indexes between {context.ReservedUserVariableCapacity} and {Context.UserVariableCapacity - 1} are reserved for system internal use.");
                     //else if (idx >= Context.UserVariableCapacity)

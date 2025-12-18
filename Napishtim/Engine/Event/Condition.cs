@@ -73,7 +73,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ev
                 if(meta.Contains(name))
                     __condition = name;
                 else
-                    throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EVENT_PARSE_ERROR, $"Comparison operator '{name}'is not supported by CONDITION event object.");//ok
+                    throw new NapishtimScriptException(NapishtimExceptionCode.SCRIPT_EVENT_PARSE_ERROR, $"Comparison operator '{name}'is not supported by CONDITION event object.");//ok
 
                 if (node.AsObject().TryGetPropertyValue("DISABLED", out var opt))
                     DISABLED = opt.AsValue().GetValue<string>();
@@ -121,7 +121,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ev
             }
             catch (Exception ex)
             {
-                throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EVENT_PARSE_ERROR, $"{node.ToString()}\nis not a valid CONDITION event object.", ex);//ok
+                throw new NapishtimScriptException(NapishtimExceptionCode.SCRIPT_EVENT_PARSE_ERROR, $"{node.ToString()}\nis not a valid CONDITION event object.", ex);//ok
             }
         }
 
@@ -131,7 +131,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ev
             if (meta.Contains(name))
                 __condition = name;
             else
-                throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EVENT_ARGUMENTS_ERROR, $"'{name}' is not a valid comparison operator.");
+                throw new NapishtimScriptException(NapishtimExceptionCode.SCRIPT_EVENT_ARGUMENTS_ERROR, $"'{name}' is not a valid comparison operator.");
 
             bool a = false, b = false;
             foreach (var param in parameters)
@@ -148,19 +148,19 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ev
                         if (param.pvalue.IsImmediateOperand)
                             INITIAL_VALUE = param.pvalue.Value(true, 0.0) == 0.0 ? false : true;
                         else
-                            throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EVENT_ARGUMENTS_ERROR, "The value of property 'INITIAL_VALUE' should be an immediate operand.");
+                            throw new NapishtimScriptException(NapishtimExceptionCode.SCRIPT_EVENT_ARGUMENTS_ERROR, "The value of property 'INITIAL_VALUE' should be an immediate operand.");
                         break;
                     case "POSITIVE_TOLERANCE":
                         if (param.pvalue.IsImmediateOperand)
                             POSITIVE_TOLERANCE = param.pvalue.Value(true, 0.0);
                         else
-                            throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EVENT_ARGUMENTS_ERROR, "The value of property 'POSITIVE_TOLERANCE' should be an immediate operand.");
+                            throw new NapishtimScriptException(NapishtimExceptionCode.SCRIPT_EVENT_ARGUMENTS_ERROR, "The value of property 'POSITIVE_TOLERANCE' should be an immediate operand.");
                         break;
                     case "NEGATIVE_TOLERANCE":
                         if (param.pvalue.IsImmediateOperand)
                             NEGATIVE_TOLERANCE = param.pvalue.Value(true, 0.0);
                         else
-                            throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EVENT_ARGUMENTS_ERROR, "The value of property 'NEGATIVE_TOLERANCE' should be an immediate operand.");
+                            throw new NapishtimScriptException(NapishtimExceptionCode.SCRIPT_EVENT_ARGUMENTS_ERROR, "The value of property 'NEGATIVE_TOLERANCE' should be an immediate operand.");
                         break;
                     case "ON_DELAY":
                         if (param.pvalue.IsImmediateOperand)
@@ -177,7 +177,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ev
                 }
             }
             if (a == false || b == false)
-                throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EVENT_ARGUMENTS_ERROR, $"{name}([DISABLED], COMPARAND_A, COMPARAND_B, [INITIAL_VALUE], [POSITIVE_TOLERANCE], [NEGATIVE_TOLERANCE], [ON_DELAY, [OFF_DELAY])");
+                throw new NapishtimScriptException(NapishtimExceptionCode.SCRIPT_EVENT_ARGUMENTS_ERROR, $"{name}([DISABLED], COMPARAND_A, COMPARAND_B, [INITIAL_VALUE], [POSITIVE_TOLERANCE], [NEGATIVE_TOLERANCE], [ON_DELAY, [OFF_DELAY])");
         }
 
         public Condition(string condition, Expression.Expression a, Expression.Expression b)
@@ -186,7 +186,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ev
             if (meta.Contains(condition))
                 __condition = condition;
             else
-                throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EVENT_ARGUMENTS_ERROR, $"'{condition}' is not a valid comparison operator.");
+                throw new NapishtimScriptException(NapishtimExceptionCode.SCRIPT_EVENT_ARGUMENTS_ERROR, $"'{condition}' is not a valid comparison operator.");
             COMPARAND_A = a;
             COMPARAND_B = b;
         }

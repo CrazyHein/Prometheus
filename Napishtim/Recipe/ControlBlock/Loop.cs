@@ -23,7 +23,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
             {
                 int delta = (value != null ? value.Height : 0) - (__loop_body != null ? __loop_body.Height : 0);
                 if (this.Nesting + delta > MAX_NESTING_DEPTH)
-                    throw new NaposhtimDocumentException(NaposhtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, $"The nesting depth of the a Control Block exceeds the limit(MAX: {ControlBlockSource.MAX_NESTING_DEPTH}).");
+                    throw new NapishtimDocumentException(NapishtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, $"The nesting depth of the a Control Block exceeds the limit(MAX: {ControlBlockSource.MAX_NESTING_DEPTH}).");
                 if (__loop_body != null)
                 {
                     __loop_body.Owner = null;
@@ -53,7 +53,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
             set
             {
                 if(value <= 0)
-                    throw new NaposhtimDocumentException(NaposhtimExceptionCode.CONTROL_BLOCK_ARGUMENTS_ERROR, "The number of cycles must be an integer greater than zero.");
+                    throw new NapishtimDocumentException(NapishtimExceptionCode.CONTROL_BLOCK_ARGUMENTS_ERROR, "The number of cycles must be an integer greater than zero.");
                 __loop_count = value;
             }
         }
@@ -61,7 +61,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
         public Loop_S(string name, ControlBlockSource body, int count): base(name)
         {
             if(this.Nesting + body.Height > MAX_NESTING_DEPTH)
-                throw new NaposhtimDocumentException(NaposhtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, $"The nesting depth of the Control Block exceeds the limit(MAX: {ControlBlockSource.MAX_NESTING_DEPTH}).");
+                throw new NapishtimDocumentException(NapishtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, $"The nesting depth of the Control Block exceeds the limit(MAX: {ControlBlockSource.MAX_NESTING_DEPTH}).");
 
             body.Owner = this;
             __loop_body = body;
@@ -86,7 +86,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
             {
                 __loop_body = ControlBlockSource.MAKE_BLK(node["BODY"].AsObject(), this);
                 if (this.Nesting + __loop_body.Height > MAX_NESTING_DEPTH)
-                    throw new NaposhtimDocumentException(NaposhtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, $"The nesting depth of the Control Block exceeds the limit(MAX: {ControlBlockSource.MAX_NESTING_DEPTH}).");
+                    throw new NapishtimDocumentException(NapishtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, $"The nesting depth of the Control Block exceeds the limit(MAX: {ControlBlockSource.MAX_NESTING_DEPTH}).");
                 LoopCount = node["COUNT"].GetValue<int>();
 
                 //StepFootprint = 2 + __loop_body.StepFootprint;
@@ -109,17 +109,17 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
             try
             {
                 if (node["ASSEMBLY"].GetValue<string>() != typeof(Loop_S).FullName)
-                    throw new NaposhtimDocumentException(NaposhtimExceptionCode.CONTROL_BLOCK_ARGUMENTS_ERROR, $"Assmebly name mismatch: {node["ASSEMBLY"].GetValue<string>()} vs {typeof(Loop_S).FullName}.");
+                    throw new NapishtimDocumentException(NapishtimExceptionCode.CONTROL_BLOCK_ARGUMENTS_ERROR, $"Assmebly name mismatch: {node["ASSEMBLY"].GetValue<string>()} vs {typeof(Loop_S).FullName}.");
 
                 return new Loop_S(node) { Owner = owner};
             }
-            catch (NaposhtimException)
+            catch (NapishtimException)
             {
                 throw;
             }
             catch (Exception ex)
             {
-                throw new NaposhtimDocumentException(NaposhtimExceptionCode.CONTROL_BLOCK_ARGUMENTS_ERROR, $"Can not restore Loop_S object from node:\n{node.ToString()}", ex);
+                throw new NapishtimDocumentException(NapishtimExceptionCode.CONTROL_BLOCK_ARGUMENTS_ERROR, $"Can not restore Loop_S object from node:\n{node.ToString()}", ex);
             }
         }
 
@@ -128,7 +128,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
         public override ControlBlockObject ResolveTarget(uint next, uint abort, uint? breakp, uint? continuep, Context context, IReadOnlyDictionary<uint, Event> globals, ReadOnlyMemory<uint> stepLinkMapping, ReadOnlyMemory<uint> userVariableMapping, Dictionary<uint, string> stepNameMapping)
         {
             if (LoopBody == null)
-                throw new NaposhtimDocumentException(NaposhtimExceptionCode.CONTROL_BLOCK_ARGUMENTS_ERROR, $"The loop body of Loop({FullName}) Control Block is empty.");
+                throw new NapishtimDocumentException(NapishtimExceptionCode.CONTROL_BLOCK_ARGUMENTS_ERROR, $"The loop body of Loop({FullName}) Control Block is empty.");
             ProcessShaders postShaders = new ReservedProcessShaders([("#Loop Control Variable Initialization#", $"&USER{userVariableMapping.Span[0]}", "0")]);
             ProcessStepSource step = new SimpleStep_S("#InitialStep#", null, null, null, postShaders);
             var initializationStatement = new Sequential_S("#InitialControlBlock#", [step]) { Owner = this };
@@ -228,7 +228,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Co
         public override IEnumerable<Step> Build(Context context, IReadOnlyDictionary<uint, Event> globals)
         {
             if (__initialization_statement == null || __conditional_statement == null)
-                throw new NaposhtimDocumentException(NaposhtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, "Please invoke 'Loop.ResolveTarget' first.");
+                throw new NapishtimDocumentException(NapishtimExceptionCode.CONTROL_BLOCK_INVALID_OPERATION, "Please invoke 'Loop.ResolveTarget' first.");
 
             var x = __initialization_statement.Build(context, globals);
             var y = __conditional_statement.Build(context, globals);

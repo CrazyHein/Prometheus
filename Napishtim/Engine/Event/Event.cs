@@ -87,7 +87,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ev
             try
             {
                 if (node.GetValueKind() != System.Text.Json.JsonValueKind.Object)
-                    throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EVENT_PARSE_ERROR, $"{node.ToString()}\nis not a valid JSON object.");
+                    throw new NapishtimScriptException(NapishtimExceptionCode.SCRIPT_EVENT_PARSE_ERROR, $"{node.ToString()}\nis not a valid JSON object.");
                 if (node.AsObject().TryGetPropertyValue("TYPE", out var name) && name.GetValueKind() == System.Text.Json.JsonValueKind.String)
                 {
                     if (BUILD_EVENT_WITH_JSON.ContainsKey((string)name))
@@ -96,15 +96,15 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ev
                         if (ev != null)
                             return ev;
                         else
-                            throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EVENT_PARSE_ERROR, $"Unknown event type: {(string)name}.");
+                            throw new NapishtimScriptException(NapishtimExceptionCode.SCRIPT_EVENT_PARSE_ERROR, $"Unknown event type: {(string)name}.");
                     }
                     else
-                        throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EVENT_PARSE_ERROR, $"Unknown event type: {(string)name}.");
+                        throw new NapishtimScriptException(NapishtimExceptionCode.SCRIPT_EVENT_PARSE_ERROR, $"Unknown event type: {(string)name}.");
                 }
                 else
-                    throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EVENT_PARSE_ERROR, $"{node.ToString()}\nis not a valid EVENT object.");
+                    throw new NapishtimScriptException(NapishtimExceptionCode.SCRIPT_EVENT_PARSE_ERROR, $"{node.ToString()}\nis not a valid EVENT object.");
             }
-            catch (NaposhtimException)
+            catch (NapishtimException)
             {
                 throw;
             }
@@ -126,12 +126,12 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ev
                     if (ev != null)
                         return ev;
                     else
-                        throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EVENT_ARGUMENTS_ERROR, $"Unknown event type: {(string)name}.");
+                        throw new NapishtimScriptException(NapishtimExceptionCode.SCRIPT_EVENT_ARGUMENTS_ERROR, $"Unknown event type: {(string)name}.");
                 }
                 else
-                    throw new NaposhtimScriptException(NaposhtimExceptionCode.SCRIPT_EVENT_ARGUMENTS_ERROR, $"Unknown event type: {(string)name}.");
+                    throw new NapishtimScriptException(NapishtimExceptionCode.SCRIPT_EVENT_ARGUMENTS_ERROR, $"Unknown event type: {(string)name}.");
             }
-            catch(NaposhtimException)
+            catch(NapishtimException)
             {
                 throw;
             }

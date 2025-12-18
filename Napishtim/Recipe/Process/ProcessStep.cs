@@ -34,7 +34,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Pr
         {
             name = name.Trim();
             if (name.Length == 0)
-                throw new NaposhtimDocumentException(NaposhtimExceptionCode.PROCESS_COMPONENT_ARGUMENTS_ERROR, $"Invaild name for ProcessStep(name string length should be greater than zero).");
+                throw new NapishtimDocumentException(NapishtimExceptionCode.PROCESS_COMPONENT_ARGUMENTS_ERROR, $"Invaild name for ProcessStep(name string length should be greater than zero).");
             Name = name;
         }
     }
@@ -84,7 +84,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Pr
         {
             string name = node["ASSEMBLY"].GetValue<string>();
             if (__BUIILD_PROCESS_STEP_SOURCE.ContainsKey(name) == false)
-                throw new NaposhtimDocumentException(NaposhtimExceptionCode.PROCESS_COMPONENT_ARGUMENTS_ERROR, $"Unknown ProcessStepSource: {name}.");
+                throw new NapishtimDocumentException(NapishtimExceptionCode.PROCESS_COMPONENT_ARGUMENTS_ERROR, $"Unknown ProcessStepSource: {name}.");
             return __BUIILD_PROCESS_STEP_SOURCE[name](node, container);
         }
 

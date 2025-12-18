@@ -28,7 +28,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Protocol
         public void Download(RECIPE_SEGMENT_T segment, ReadOnlyMemory<byte> pJSON)
         {
             if (pJSON.Length > Common.MAX_DOWNLOAD_DATA_SIZE_IN_BYTE)
-                throw new NaposhtimProtocolException(NaposhtimExceptionCode.PROTOCOL_DATA_LENGTH_OUT_RANGE, $"The length({pJSON.Length} bytes) of recipe segment to be downloaded is out of range.");
+                throw new NapishtimProtocolException(NapishtimExceptionCode.PROTOCOL_DATA_LENGTH_OUT_RANGE, $"The length({pJSON.Length} bytes) of recipe segment to be downloaded is out of range.");
             lock (__lock_me)
             {
                 RECIPE_DOWNLOAD_REQUEST_FRAME_T request;
@@ -42,18 +42,18 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Protocol
 
                 var recvLength = __data_packager.DataRecv(__user_data);
                 if(recvLength != Marshal.SizeOf<RECIPE_DOWNLOAD_RESPONSE_FRAME_T>())
-                    throw new NaposhtimProtocolException(NaposhtimExceptionCode.PROTOCOL_RECV_UNKNOWN_RESPONSE, $"The length of download recipe segment response <RECIPE_DOWNLOAD_RESPONSE_FRAME_T> should be {Marshal.SizeOf<RECIPE_DOWNLOAD_RESPONSE_FRAME_T>()} bytes, the received data length is {recvLength} bytes.");
+                    throw new NapishtimProtocolException(NapishtimExceptionCode.PROTOCOL_RECV_UNKNOWN_RESPONSE, $"The length of download recipe segment response <RECIPE_DOWNLOAD_RESPONSE_FRAME_T> should be {Marshal.SizeOf<RECIPE_DOWNLOAD_RESPONSE_FRAME_T>()} bytes, the received data length is {recvLength} bytes.");
                 var response = MemoryMarshal.Read<RECIPE_DOWNLOAD_RESPONSE_FRAME_T>(__user_data);
                 if(response.protocol_head.trans_head != request.protocol_head.trans_head)
-                    throw new NaposhtimProtocolException(NaposhtimExceptionCode.PROTOCOL_TRANSID_MISMATCH, $"TRANS_ID: {request.protocol_head.trans_head:X8} vs {response.protocol_head.trans_head:X8}");
+                    throw new NapishtimProtocolException(NapishtimExceptionCode.PROTOCOL_TRANSID_MISMATCH, $"TRANS_ID: {request.protocol_head.trans_head:X8} vs {response.protocol_head.trans_head:X8}");
                 else if((response.function_head.func_code ^ FUNC_CODE_T.DOWNLOAD) != FUNC_CODE_T.RESPONSE_FLAG)
-                    throw new NaposhtimProtocolException(NaposhtimExceptionCode.PROTOCOL_FUNC_CODE_MISMATCH, $"FUNC_CODE: {(byte)FUNC_CODE_T.DOWNLOAD:X2} vs {(byte)response.function_head.func_code:X2}");
+                    throw new NapishtimProtocolException(NapishtimExceptionCode.PROTOCOL_FUNC_CODE_MISMATCH, $"FUNC_CODE: {(byte)FUNC_CODE_T.DOWNLOAD:X2} vs {(byte)response.function_head.func_code:X2}");
                 else if(response.response.segment != request.request.segment)
-                    throw new NaposhtimProtocolException(NaposhtimExceptionCode.PROTOCOL_SEGMENT_MISMATCH, $"SEGMENT_ID: {(byte)request.request.segment:X2} vs {(byte)response.response.segment:X2}");
+                    throw new NapishtimProtocolException(NapishtimExceptionCode.PROTOCOL_SEGMENT_MISMATCH, $"SEGMENT_ID: {(byte)request.request.segment:X2} vs {(byte)response.response.segment:X2}");
                 else if (response.response.content_size_in_byte != request.request.content_size_in_byte)
-                    throw new NaposhtimProtocolException(NaposhtimExceptionCode.PROTOCOL_SEGMENT_MISMATCH, $"CONTENT_LENGTH: {request.request.content_size_in_byte} vs {response.response.content_size_in_byte}");
+                    throw new NapishtimProtocolException(NapishtimExceptionCode.PROTOCOL_SEGMENT_MISMATCH, $"CONTENT_LENGTH: {request.request.content_size_in_byte} vs {response.response.content_size_in_byte}");
                 else if(response.response.exception != 0)
-                    throw new NaposhtimProtocolException(NaposhtimExceptionCode.PROTOCOL_SERVER_EXCEPTION, $"The server returned an exception code {response.response.exception:X8}.");
+                    throw new NapishtimProtocolException(NapishtimExceptionCode.PROTOCOL_SERVER_EXCEPTION, $"The server returned an exception code {response.response.exception:X8}.");
             }
         }
 
@@ -72,18 +72,18 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Protocol
 
                 var recvLength = __data_packager.DataRecv(__user_data);
                 if (recvLength != Marshal.SizeOf<RECIPE_CLEAR_RESPONSE_FRAME_T>())
-                    throw new NaposhtimProtocolException(NaposhtimExceptionCode.PROTOCOL_RECV_UNKNOWN_RESPONSE, $"The length of clear recipe segment response <RECIPE_CLEAR_RESPONSE_FRAME_T> should be {Marshal.SizeOf<RECIPE_CLEAR_RESPONSE_FRAME_T>()} bytes, the received data length is {recvLength} bytes.");
+                    throw new NapishtimProtocolException(NapishtimExceptionCode.PROTOCOL_RECV_UNKNOWN_RESPONSE, $"The length of clear recipe segment response <RECIPE_CLEAR_RESPONSE_FRAME_T> should be {Marshal.SizeOf<RECIPE_CLEAR_RESPONSE_FRAME_T>()} bytes, the received data length is {recvLength} bytes.");
                 var response = MemoryMarshal.Read<RECIPE_CLEAR_RESPONSE_FRAME_T>(__user_data);
                 if (response.protocol_head.trans_head != request.protocol_head.trans_head)
-                    throw new NaposhtimProtocolException(NaposhtimExceptionCode.PROTOCOL_TRANSID_MISMATCH, $"TRANS_ID: {request.protocol_head.trans_head:X8} vs {response.protocol_head.trans_head:X8}");
+                    throw new NapishtimProtocolException(NapishtimExceptionCode.PROTOCOL_TRANSID_MISMATCH, $"TRANS_ID: {request.protocol_head.trans_head:X8} vs {response.protocol_head.trans_head:X8}");
                 else if ((response.function_head.func_code ^ FUNC_CODE_T.CLEAR) != FUNC_CODE_T.RESPONSE_FLAG)
-                    throw new NaposhtimProtocolException(NaposhtimExceptionCode.PROTOCOL_FUNC_CODE_MISMATCH, $"FUNC_CODE: {(byte)FUNC_CODE_T.CLEAR:X2} vs {(byte)response.function_head.func_code:X2}");
+                    throw new NapishtimProtocolException(NapishtimExceptionCode.PROTOCOL_FUNC_CODE_MISMATCH, $"FUNC_CODE: {(byte)FUNC_CODE_T.CLEAR:X2} vs {(byte)response.function_head.func_code:X2}");
                 else if (response.response.segment != request.request.segment)
-                    throw new NaposhtimProtocolException(NaposhtimExceptionCode.PROTOCOL_SEGMENT_MISMATCH, $"SEGMENT_ID: {(byte)request.request.segment:X2} vs {(byte)response.response.segment:X2}");
+                    throw new NapishtimProtocolException(NapishtimExceptionCode.PROTOCOL_SEGMENT_MISMATCH, $"SEGMENT_ID: {(byte)request.request.segment:X2} vs {(byte)response.response.segment:X2}");
                 else if (response.response.start_index != request.request.start_index || response.response.end_index != request.request.end_index)
-                    throw new NaposhtimProtocolException(NaposhtimExceptionCode.PROTOCOL_SEGMENT_MISMATCH, $"RANGE: [{request.request.start_index - request.request.end_index}] vs [{response.response.start_index - response.response.end_index}]");
+                    throw new NapishtimProtocolException(NapishtimExceptionCode.PROTOCOL_SEGMENT_MISMATCH, $"RANGE: [{request.request.start_index - request.request.end_index}] vs [{response.response.start_index - response.response.end_index}]");
                 else if (response.response.exception != 0)
-                    throw new NaposhtimProtocolException(NaposhtimExceptionCode.PROTOCOL_SERVER_EXCEPTION, $"The server returned an exception code {response.response.exception:X8}.");
+                    throw new NapishtimProtocolException(NapishtimExceptionCode.PROTOCOL_SERVER_EXCEPTION, $"The server returned an exception code {response.response.exception:X8}.");
             }
         }
 
@@ -102,23 +102,23 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Protocol
 
                 var recvLength = __data_packager.DataRecv(__user_data);
                 if (recvLength < Marshal.SizeOf<RECIPE_ECHO_RESPONSE_FRAME_T>())
-                    throw new NaposhtimProtocolException(NaposhtimExceptionCode.PROTOCOL_RECV_UNKNOWN_RESPONSE, $"The length of echo recipe segment response <RECIPE_ECHO_RESPONSE_FRAME_T> should be at least {Marshal.SizeOf<RECIPE_ECHO_RESPONSE_FRAME_T>()} bytes, the received data length is {recvLength} bytes.");
+                    throw new NapishtimProtocolException(NapishtimExceptionCode.PROTOCOL_RECV_UNKNOWN_RESPONSE, $"The length of echo recipe segment response <RECIPE_ECHO_RESPONSE_FRAME_T> should be at least {Marshal.SizeOf<RECIPE_ECHO_RESPONSE_FRAME_T>()} bytes, the received data length is {recvLength} bytes.");
                 var response = MemoryMarshal.Read<RECIPE_ECHO_RESPONSE_FRAME_T>(__user_data);
                 var contentSize = response.response.content_size_in_byte;
                 if(recvLength != Marshal.SizeOf<RECIPE_ECHO_RESPONSE_FRAME_T>() + contentSize)
-                    throw new NaposhtimProtocolException(NaposhtimExceptionCode.PROTOCOL_DATA_CORRUPT, $"The length of echo recipe segment response <RECIPE_ECHO_RESPONSE_FRAME_T> should be {Marshal.SizeOf<RECIPE_ECHO_RESPONSE_FRAME_T>() + contentSize} bytes, the received data length is {recvLength} bytes.");
+                    throw new NapishtimProtocolException(NapishtimExceptionCode.PROTOCOL_DATA_CORRUPT, $"The length of echo recipe segment response <RECIPE_ECHO_RESPONSE_FRAME_T> should be {Marshal.SizeOf<RECIPE_ECHO_RESPONSE_FRAME_T>() + contentSize} bytes, the received data length is {recvLength} bytes.");
                 else if(buffer.Length < contentSize)
-                    throw new NaposhtimProtocolException(NaposhtimExceptionCode.PROTOCOL_RECV_BUFFER_INSUFFICIENT, $"Receive buffer length is {buffer.Length}, the echo recipe segment length is {contentSize}.");
+                    throw new NapishtimProtocolException(NapishtimExceptionCode.PROTOCOL_RECV_BUFFER_INSUFFICIENT, $"Receive buffer length is {buffer.Length}, the echo recipe segment length is {contentSize}.");
                 else if (response.protocol_head.trans_head != request.protocol_head.trans_head)
-                    throw new NaposhtimProtocolException(NaposhtimExceptionCode.PROTOCOL_TRANSID_MISMATCH, $"TRANS_ID: {request.protocol_head.trans_head:X8} vs {response.protocol_head.trans_head:X8}");
+                    throw new NapishtimProtocolException(NapishtimExceptionCode.PROTOCOL_TRANSID_MISMATCH, $"TRANS_ID: {request.protocol_head.trans_head:X8} vs {response.protocol_head.trans_head:X8}");
                 else if ((response.function_head.func_code ^ FUNC_CODE_T.ECHO) != FUNC_CODE_T.RESPONSE_FLAG)
-                    throw new NaposhtimProtocolException(NaposhtimExceptionCode.PROTOCOL_FUNC_CODE_MISMATCH, $"FUNC_CODE: {(byte)FUNC_CODE_T.CLEAR:X2} vs {(byte)response.function_head.func_code:X2}");
+                    throw new NapishtimProtocolException(NapishtimExceptionCode.PROTOCOL_FUNC_CODE_MISMATCH, $"FUNC_CODE: {(byte)FUNC_CODE_T.CLEAR:X2} vs {(byte)response.function_head.func_code:X2}");
                 else if (response.response.segment != request.request.segment)
-                    throw new NaposhtimProtocolException(NaposhtimExceptionCode.PROTOCOL_SEGMENT_MISMATCH, $"SEGMENT_ID: {(byte)request.request.segment:X2} vs {(byte)response.response.segment:X2}");
+                    throw new NapishtimProtocolException(NapishtimExceptionCode.PROTOCOL_SEGMENT_MISMATCH, $"SEGMENT_ID: {(byte)request.request.segment:X2} vs {(byte)response.response.segment:X2}");
                 else if (response.response.start_index != request.request.start_index || response.response.end_index != request.request.end_index)
-                    throw new NaposhtimProtocolException(NaposhtimExceptionCode.PROTOCOL_SEGMENT_MISMATCH, $"RANGE: [{request.request.start_index - request.request.end_index}] vs [{response.response.start_index - response.response.end_index}]");
+                    throw new NapishtimProtocolException(NapishtimExceptionCode.PROTOCOL_SEGMENT_MISMATCH, $"RANGE: [{request.request.start_index - request.request.end_index}] vs [{response.response.start_index - response.response.end_index}]");
                 else if (response.response.exception != 0)
-                    throw new NaposhtimProtocolException(NaposhtimExceptionCode.PROTOCOL_SERVER_EXCEPTION, $"The server returned an exception code {response.response.exception:X8}.");
+                    throw new NapishtimProtocolException(NapishtimExceptionCode.PROTOCOL_SERVER_EXCEPTION, $"The server returned an exception code {response.response.exception:X8}.");
 
                 __user_data.AsMemory<byte>(Marshal.SizeOf<RECIPE_ECHO_RESPONSE_FRAME_T>(), (int)contentSize).CopyTo(buffer);
                 return contentSize;
@@ -139,14 +139,14 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Protocol
 
                     var recvLength = __data_packager.DataRecv(__user_data);
                     if (recvLength != Marshal.SizeOf<ENGINE_INFO_RESPONSE_FRAME_T>())
-                        throw new NaposhtimProtocolException(NaposhtimExceptionCode.PROTOCOL_RECV_UNKNOWN_RESPONSE, $"The length of engine info response <ENGINE_INFO_RESPONSE_FRAME_T> should be {Marshal.SizeOf<ENGINE_INFO_RESPONSE_FRAME_T>()} bytes, the received data length is {recvLength} bytes.");
+                        throw new NapishtimProtocolException(NapishtimExceptionCode.PROTOCOL_RECV_UNKNOWN_RESPONSE, $"The length of engine info response <ENGINE_INFO_RESPONSE_FRAME_T> should be {Marshal.SizeOf<ENGINE_INFO_RESPONSE_FRAME_T>()} bytes, the received data length is {recvLength} bytes.");
                     var response = MemoryMarshal.Read<ENGINE_INFO_RESPONSE_FRAME_T>(__user_data);
                     if (response.protocol_head.trans_head != request.protocol_head.trans_head)
-                        throw new NaposhtimProtocolException(NaposhtimExceptionCode.PROTOCOL_TRANSID_MISMATCH, $"TRANS_ID: {request.protocol_head.trans_head:X8} vs {response.protocol_head.trans_head:X8}");
+                        throw new NapishtimProtocolException(NapishtimExceptionCode.PROTOCOL_TRANSID_MISMATCH, $"TRANS_ID: {request.protocol_head.trans_head:X8} vs {response.protocol_head.trans_head:X8}");
                     else if ((response.function_head.func_code ^ FUNC_CODE_T.INFO) != FUNC_CODE_T.RESPONSE_FLAG)
-                        throw new NaposhtimProtocolException(NaposhtimExceptionCode.PROTOCOL_FUNC_CODE_MISMATCH, $"FUNC_CODE: {(byte)FUNC_CODE_T.DOWNLOAD:X2} vs {(byte)response.function_head.func_code:X2}");
+                        throw new NapishtimProtocolException(NapishtimExceptionCode.PROTOCOL_FUNC_CODE_MISMATCH, $"FUNC_CODE: {(byte)FUNC_CODE_T.DOWNLOAD:X2} vs {(byte)response.function_head.func_code:X2}");
                     else if (response.response.exception != 0)
-                        throw new NaposhtimProtocolException(NaposhtimExceptionCode.PROTOCOL_SERVER_EXCEPTION, $"The server returned an exception code {response.response.exception:X8}.");
+                        throw new NapishtimProtocolException(NapishtimExceptionCode.PROTOCOL_SERVER_EXCEPTION, $"The server returned an exception code {response.response.exception:X8}.");
 
                     version = response.response.version;
                     stepCapacity = response.response.step_capacity;
@@ -171,7 +171,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Protocol
         public void Initialize(ReadOnlyMemory<byte> pJSON)
         {
             if (pJSON.Length > Common.MAX_DOWNLOAD_DATA_SIZE_IN_BYTE)
-                throw new NaposhtimProtocolException(NaposhtimExceptionCode.PROTOCOL_DATA_LENGTH_OUT_RANGE, $"The length({pJSON.Length} bytes) of recipe initialization list to be downloaded is out of range.");
+                throw new NapishtimProtocolException(NapishtimExceptionCode.PROTOCOL_DATA_LENGTH_OUT_RANGE, $"The length({pJSON.Length} bytes) of recipe initialization list to be downloaded is out of range.");
             lock (__lock_me)
             {
                 RECIPE_INITIALIZE_REQUEST_FRAME_T request;
@@ -184,16 +184,16 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Protocol
 
                 var recvLength = __data_packager.DataRecv(__user_data);
                 if (recvLength != Marshal.SizeOf<RECIPE_INITIALIZE_RESPONSE_FRAME_T>())
-                    throw new NaposhtimProtocolException(NaposhtimExceptionCode.PROTOCOL_RECV_UNKNOWN_RESPONSE, $"The length of initialize recipe response <RECIPE_INITIALIZE_RESPONSE_FRAME_T> should be {Marshal.SizeOf<RECIPE_INITIALIZE_RESPONSE_FRAME_T>()} bytes, the received data length is {recvLength} bytes.");
+                    throw new NapishtimProtocolException(NapishtimExceptionCode.PROTOCOL_RECV_UNKNOWN_RESPONSE, $"The length of initialize recipe response <RECIPE_INITIALIZE_RESPONSE_FRAME_T> should be {Marshal.SizeOf<RECIPE_INITIALIZE_RESPONSE_FRAME_T>()} bytes, the received data length is {recvLength} bytes.");
                 var response = MemoryMarshal.Read<RECIPE_INITIALIZE_RESPONSE_FRAME_T>(__user_data);
                 if (response.protocol_head.trans_head != request.protocol_head.trans_head)
-                    throw new NaposhtimProtocolException(NaposhtimExceptionCode.PROTOCOL_TRANSID_MISMATCH, $"TRANS_ID: {request.protocol_head.trans_head:X8} vs {response.protocol_head.trans_head:X8}");
+                    throw new NapishtimProtocolException(NapishtimExceptionCode.PROTOCOL_TRANSID_MISMATCH, $"TRANS_ID: {request.protocol_head.trans_head:X8} vs {response.protocol_head.trans_head:X8}");
                 else if ((response.function_head.func_code ^ FUNC_CODE_T.INITIALIZE) != FUNC_CODE_T.RESPONSE_FLAG)
-                    throw new NaposhtimProtocolException(NaposhtimExceptionCode.PROTOCOL_FUNC_CODE_MISMATCH, $"FUNC_CODE: {(byte)FUNC_CODE_T.INITIALIZE:X2} vs {(byte)response.function_head.func_code:X2}");
+                    throw new NapishtimProtocolException(NapishtimExceptionCode.PROTOCOL_FUNC_CODE_MISMATCH, $"FUNC_CODE: {(byte)FUNC_CODE_T.INITIALIZE:X2} vs {(byte)response.function_head.func_code:X2}");
                 else if (response.response.content_size_in_byte != request.request.content_size_in_byte)
-                    throw new NaposhtimProtocolException(NaposhtimExceptionCode.PROTOCOL_SEGMENT_MISMATCH, $"CONTENT_LENGTH: {request.request.content_size_in_byte} vs {response.response.content_size_in_byte}");
+                    throw new NapishtimProtocolException(NapishtimExceptionCode.PROTOCOL_SEGMENT_MISMATCH, $"CONTENT_LENGTH: {request.request.content_size_in_byte} vs {response.response.content_size_in_byte}");
                 else if (response.response.exception != 0)
-                    throw new NaposhtimProtocolException(NaposhtimExceptionCode.PROTOCOL_SERVER_EXCEPTION, $"The server returned an exception code {response.response.exception:X8}.");
+                    throw new NapishtimProtocolException(NapishtimExceptionCode.PROTOCOL_SERVER_EXCEPTION, $"The server returned an exception code {response.response.exception:X8}.");
             }
         }
     }

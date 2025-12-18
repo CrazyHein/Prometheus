@@ -96,7 +96,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Ex
         public override ExceptionResponseObject ResolveTarget(uint next, Context context, IReadOnlyDictionary<uint, Event> globals)
         {
             if (_exception_response["END_POINTS"].AsArray().Count == 0)
-                throw new NaposhtimDocumentException(NaposhtimExceptionCode.EXCEPTION_HANDLING_ARGUMENTS_ERROR, "At least one exception condition must be defined.");
+                throw new NapishtimDocumentException(NapishtimExceptionCode.EXCEPTION_HANDLING_ARGUMENTS_ERROR, "At least one exception condition must be defined.");
 
             JsonObject chewed;
             chewed = _exception_response.DeepClone().AsObject();
@@ -111,17 +111,17 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Ex
             try
             {
                 if (node["ASSEMBLY"].GetValue<string>() != typeof(SimpleExceptionResponse_S).FullName)
-                    throw new NaposhtimDocumentException(NaposhtimExceptionCode.EXCEPTION_HANDLING_ARGUMENTS_ERROR, $"Assmebly name mismatch: {node["ASSEMBLY"].GetValue<string>()} vs {typeof(SimpleExceptionResponse_S).FullName}.");
+                    throw new NapishtimDocumentException(NapishtimExceptionCode.EXCEPTION_HANDLING_ARGUMENTS_ERROR, $"Assmebly name mismatch: {node["ASSEMBLY"].GetValue<string>()} vs {typeof(SimpleExceptionResponse_S).FullName}.");
 
                 return new SimpleExceptionResponse_S(node);
             }
-            catch (NaposhtimException)
+            catch (NapishtimException)
             {
                 throw;
             }
             catch (Exception ex)
             {
-                throw new NaposhtimDocumentException(NaposhtimExceptionCode.EXCEPTION_HANDLING_ARGUMENTS_ERROR, $"Can not restore SimpleExceptionResponse_S object from node:\n{node.ToString()}", ex);
+                throw new NapishtimDocumentException(NapishtimExceptionCode.EXCEPTION_HANDLING_ARGUMENTS_ERROR, $"Can not restore SimpleExceptionResponse_S object from node:\n{node.ToString()}", ex);
             }
         }
 
@@ -146,9 +146,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe.Ex
                 var s = new ExceptionResponse(_response, globals, ref inlineEvent);
                 return s;
             }
-            catch (NaposhtimException e)
+            catch (NapishtimException e)
             {
-                throw new NaposhtimDocumentException(NaposhtimExceptionCode.DOCUMENT_EXCEPTION_RSP_BUILD_ERROR,
+                throw new NapishtimDocumentException(NapishtimExceptionCode.DOCUMENT_EXCEPTION_RSP_BUILD_ERROR,
                     $"Can not build SimpleExceptionResponse with the following JSON node:\n{_response.ToString()}", e);
             }
         }

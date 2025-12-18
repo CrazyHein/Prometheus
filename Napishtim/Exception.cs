@@ -7,15 +7,15 @@ using System.Threading.Tasks;
 
 namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim
 {
-    public class NaposhtimException : System.Exception
+    public class NapishtimException : System.Exception
     {
-        public NaposhtimExceptionCode? Code { get; private set; }
-        public NaposhtimException(NaposhtimExceptionCode code, string msg = "N/A"): base($"{code}:\n{msg}")
+        public NapishtimExceptionCode? Code { get; private set; }
+        public NapishtimException(NapishtimExceptionCode code, string msg = "N/A"): base($"{code}:\n{msg}")
         {
             Code = code;
         }
 
-        public NaposhtimException(NaposhtimExceptionCode code, string msg, Exception exp): base($"{code}:\n{msg}", exp)
+        public NapishtimException(NapishtimExceptionCode code, string msg, Exception exp): base($"{code}:\n{msg}", exp)
         {
             Code = code;
         }
@@ -30,72 +30,72 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim
         }
     }
 
-    public class NaposhtimIOException : NaposhtimException 
+    public class NapishtimIOException : NapishtimException 
     {
-        public NaposhtimIOException(NaposhtimExceptionCode code, string msg = "N/A") : base(code, msg)
+        public NapishtimIOException(NapishtimExceptionCode code, string msg = "N/A") : base(code, msg)
         {
 
         }
 
-        public NaposhtimIOException(NaposhtimExceptionCode code, string msg, Exception exp) : base(code, msg, exp)
+        public NapishtimIOException(NapishtimExceptionCode code, string msg, Exception exp) : base(code, msg, exp)
         {
 
         }
     }
 
-    public class NaposhtimDataPackageException : NaposhtimException
+    public class NapishtimDataPackageException : NapishtimException
     {
-        public NaposhtimDataPackageException(NaposhtimExceptionCode code, string msg = "N/A") : base(code, msg)
+        public NapishtimDataPackageException(NapishtimExceptionCode code, string msg = "N/A") : base(code, msg)
         {
 
         }
 
 
-        public NaposhtimDataPackageException(NaposhtimExceptionCode code, string msg, NaposhtimException exp) : base(code, msg, exp)
+        public NapishtimDataPackageException(NapishtimExceptionCode code, string msg, NapishtimException exp) : base(code, msg, exp)
         {
 
         }
     }
 
-    public class NaposhtimProtocolException : NaposhtimException
+    public class NapishtimProtocolException : NapishtimException
     {
-        public NaposhtimProtocolException(NaposhtimExceptionCode code, string msg = "N/A") : base(code, msg)
+        public NapishtimProtocolException(NapishtimExceptionCode code, string msg = "N/A") : base(code, msg)
         {
 
         }
 
-        public NaposhtimProtocolException(NaposhtimExceptionCode code, string msg, Exception exp) : base(code, msg, exp)
+        public NapishtimProtocolException(NapishtimExceptionCode code, string msg, Exception exp) : base(code, msg, exp)
         {
 
         }
     }
 
-    public class NaposhtimScriptException : NaposhtimException
+    public class NapishtimScriptException : NapishtimException
     {
-        public NaposhtimScriptException(NaposhtimExceptionCode code, string msg = "N/A") : base(code, msg)
+        public NapishtimScriptException(NapishtimExceptionCode code, string msg = "N/A") : base(code, msg)
         {
 
         }
 
-        public NaposhtimScriptException(NaposhtimExceptionCode code, string msg, Exception exp) : base(code, msg, exp)
+        public NapishtimScriptException(NapishtimExceptionCode code, string msg, Exception exp) : base(code, msg, exp)
         {
 
         }
     }
-    public class NaposhtimDocumentException : NaposhtimException
+    public class NapishtimDocumentException : NapishtimException
     {
-        public NaposhtimDocumentException(NaposhtimExceptionCode code, string msg = "N/A") : base(code, msg)
+        public NapishtimDocumentException(NapishtimExceptionCode code, string msg = "N/A") : base(code, msg)
         {
 
         }
 
-        public NaposhtimDocumentException(NaposhtimExceptionCode code, string msg, Exception exp) : base(code, msg, exp)
+        public NapishtimDocumentException(NapishtimExceptionCode code, string msg, Exception exp) : base(code, msg, exp)
         {
 
         }
     }
 
-    public enum NaposhtimExceptionCode : ushort
+    public enum NapishtimExceptionCode : ushort
     {
         
         REMOTE_SERVER_DISCONNECTED                                  = 0x1001,
