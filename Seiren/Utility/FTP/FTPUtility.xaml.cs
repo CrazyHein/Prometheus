@@ -21,7 +21,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility
     /// </summary>
     public partial class FTPUtility : Window
     {
-        public FTPUtility(FTPMode mode,
+        public FTPUtility(FTPMode mode, Platform platform,
             VariableDictionary vd, IEnumerable<string> variableNames,
             ControllerConfiguration cc, IEnumerable<string> configurationNames,
             ObjectDictionary od, IEnumerable<uint> objectIndexes,
@@ -31,7 +31,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility
             DataTypeCatalogue dataTypes, ControllerModelCatalogue models, FTPTargetProperty property, AppInstallerProperty app)
         {
             InitializeComponent();
-            DataContext = new FTPUtilityModel(mode,
+            DataContext = new FTPUtilityModel(mode, platform,
                 vd, variableNames,
                 cc, configurationNames,
                 od, objectIndexes,

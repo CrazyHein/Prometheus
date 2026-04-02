@@ -7,7 +7,7 @@
         xmlns:sync="http://schemas.syncfusion.com/wpf"
         xmlns:syncfusionskin ="clr-namespace:Syncfusion.SfSkinManager;assembly=Syncfusion.SfSkinManager.WPF"
         mc:Ignorable="d"
-        Title="FTP Utility" Height="550" Width="500" WindowStartupLocation="CenterScreen" Closing="Window_Closing">
+        Title="FTP Utility" Height="580" Width="500" WindowStartupLocation="CenterScreen" Closing="Window_Closing">
     <DockPanel syncfusionskin:SfSkinManager.Theme="{syncfusionskin:SkinManagerExtension ThemeName=FluentLight}"  Margin="8,4,8,4" LastChildFill="True">
         <DockPanel.Resources>
             <local:InvertBooleanValue x:Key="InvertBoolean"/>
@@ -32,6 +32,8 @@
         </Grid>
         <Grid x:Name="InputsGrid">
             <Grid.RowDefinitions>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
                 <RowDefinition Height="auto"/>
                 <RowDefinition Height="auto"/>
                 <RowDefinition Height="auto"/>
@@ -71,6 +73,8 @@
             <sync:SfTextInputLayout Name="TxtInputOrbmentVersion" Grid.Row="5" Grid.Column="1" IsEnabled="{Binding ElementName=ChkboxDownloadOrbment, Path=IsChecked}" Hint="Available Versions"  HelperText="Select Orbment Runtime version here" FontSize="12" FontStyle="Italic" ContainerType="Filled" Margin="4,8,4,8">
                 <ComboBox FontStyle="Normal" ItemsSource="{Binding AvailableOrbmentVersions}" SelectedItem="{Binding SelectedOrbmentVersion}" />
             </sync:SfTextInputLayout>
+
+            <CheckBox Content="over SSH" Grid.Row="6" Grid.Column="0" Margin="4,8,4,8" IsChecked="{Binding OverSSH, Mode=OneWay}" IsEnabled="False"/>
         </Grid>
     </DockPanel>
 </Window>

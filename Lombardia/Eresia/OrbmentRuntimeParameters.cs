@@ -9,13 +9,16 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia.OrbmentPa
 {
     public enum EventLogger : ushort
     {
-        CCPU_BUILT_IN_LOGGER = 0x0001
+        CCPU_BUILT_IN_LOGGER = 0x0001,
+        SPD_ROTATING_LOGGER = 0x0002
     }
 
     public enum ClockSource : ushort
     {
         BUILT_IN_HARDWARE_CLOCK = 0x0001,
-        INTER_MODULE_SYNC_CLOCK = 0x0002
+        INTER_MODULE_SYNC_CLOCK = 0x0002,
+        POSIX_SIGNAL_BASED_CLOCK = 0x0003,
+        LINUX_FD_BASED_CLOCK = 0x0004
     }
 
     public class EventLoggerConfiguration
@@ -58,12 +61,17 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia.OrbmentPa
         {
             get { return __period; }
             set 
-            { 
-                if (value <= 1000 && value % 5 != 0) 
-                    throw new LombardiaException(LOMBARDIA_ERROR_CODE_T.INVALID_TIMER_CYCLE_SETTING); 
-                else if (value > 1000 && value % 1000 != 0)
-                    throw new LombardiaException(LOMBARDIA_ERROR_CODE_T.INVALID_TIMER_CYCLE_SETTING);
-                else if(value > 60000)
+            {
+                if ((ClockSource == ClockSource.BUILT_IN_HARDWARE_CLOCK && CustomClockSource) || !CustomClockSource)
+                {
+                    if (value <= 1000 && value % 5 != 0)
+                        throw new LombardiaException(LOMBARDIA_ERROR_CODE_T.INVALID_TIMER_CYCLE_SETTING);
+                    else if (value > 1000 && value % 1000 != 0)
+                        throw new LombardiaException(LOMBARDIA_ERROR_CODE_T.INVALID_TIMER_CYCLE_SETTING);
+                    else if (value > 60000)
+                        throw new LombardiaException(LOMBARDIA_ERROR_CODE_T.INVALID_TIMER_CYCLE_SETTING);
+                }
+                else if (value == 0)
                     throw new LombardiaException(LOMBARDIA_ERROR_CODE_T.INVALID_TIMER_CYCLE_SETTING);
                 __period = value; 
             }
@@ -265,6 +273,53 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia.OrbmentPa
         }
     }
 
+    public class SLMPServiceConfiguration
+    {
+        private uint __posix_priority = 21;
+        public uint PosixPriority
+        {
+            get { return __posix_priority; }
+            set { if (value > 255) throw new LombardiaException(LOMBARDIA_ERROR_CODE_T.POSIX_PRIORITY_OUT_OF_RANGE); __posix_priority = value; }
+        }
+        public ushort Port { get; set; } = 5010;
+        private int __recv = 60000;
+        public int RecvTimeout
+        {
+            get { return __recv; }
+            set { if (value < 0) throw new LombardiaException(LOMBARDIA_ERROR_CODE_T.INVALID_TIME_OUT_SETTING); __recv = value; }
+        }
+        private int __send = 5000;
+        public int SendTimeout
+        {
+            get { return __send; }
+            set { if (value < 0) throw new LombardiaException(LOMBARDIA_ERROR_CODE_T.INVALID_TIME_OUT_SETTING); __send = value; }
+        }
+        public uint BufferSize { get; set; } = 4096;
+        public uint DevDSize { get; set; } = 1024*1024;
+
+        public bool CustomPosixPriority { get; set; } = false;
+        public bool CustomPort { get; set; } = false;
+        public bool CustomRecvTimeout { get; set; } = false;
+        public bool CustomSendTimeout { get; set; } = false;
+        public bool CustomBufferSize { get; set; } = false;
+        public bool CustomDevDSize { get; set; } = false;
+
+        public void ApplyDeviceRuntimeDefault()
+        {
+            CustomPosixPriority = false;
+            CustomPort = false;
+            CustomRecvTimeout = false;
+            CustomSendTimeout = false;
+            CustomBufferSize = false;
+            CustomDevDSize = false;
+        }
+
+        public SLMPServiceConfiguration ShallowCopy()
+        {
+            return (SLMPServiceConfiguration)this.MemberwiseClone();
+        }
+    }
+
     public class RuntimeConfiguration
     {
         public EventLogger EventLogger { get; set; } = EventLogger.CCPU_BUILT_IN_LOGGER;
@@ -275,6 +330,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia.OrbmentPa
         public DLinkServiceConfiguration DLinkServiceConfiguration { get; init; } = new DLinkServiceConfiguration();
         public ILinkServiceConfiguration ILinkServiceConfiguration { get; init; } = new ILinkServiceConfiguration(); 
         public RLinkServiceConfiguration RLinkServiceConfiguration { get; init; } = new RLinkServiceConfiguration();
+        public SLMPServiceConfiguration SLMPServiceConfiguration { get; init; } = new SLMPServiceConfiguration();
         public RuntimeConfiguration()
         {
 
@@ -444,6 +500,38 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia.OrbmentPa
                                     RLinkServiceConfiguration.CustomAcquisitionRate = true;
                                 }
                                 break;
+                            case "SLMPService":
+                                if (sub.SelectSingleNode("Priority") != null)
+                                {
+                                    SLMPServiceConfiguration.PosixPriority = Convert.ToUInt32(sub.SelectSingleNode("Priority").FirstChild.Value);
+                                    SLMPServiceConfiguration.CustomPosixPriority = true;
+                                }
+                                if (sub.SelectSingleNode("Port") != null)
+                                {
+                                    SLMPServiceConfiguration.Port = Convert.ToUInt16(sub.SelectSingleNode("Port").FirstChild.Value);
+                                    SLMPServiceConfiguration.CustomPort = true;
+                                }
+                                if (sub.SelectSingleNode("Recv") != null)
+                                {
+                                    SLMPServiceConfiguration.RecvTimeout = Convert.ToInt32(sub.SelectSingleNode("Recv").FirstChild.Value);
+                                    SLMPServiceConfiguration.CustomRecvTimeout = true;
+                                }
+                                if (sub.SelectSingleNode("Send") != null)
+                                {
+                                    SLMPServiceConfiguration.SendTimeout = Convert.ToInt32(sub.SelectSingleNode("Send").FirstChild.Value);
+                                    SLMPServiceConfiguration.CustomSendTimeout = true;
+                                }
+                                if (sub.SelectSingleNode("Buffer") != null)
+                                {
+                                    SLMPServiceConfiguration.BufferSize = Convert.ToUInt32(sub.SelectSingleNode("Buffer").FirstChild.Value);
+                                    SLMPServiceConfiguration.CustomBufferSize = true;
+                                }
+                                if (sub.SelectSingleNode("DevD/Size") != null)
+                                {
+                                    SLMPServiceConfiguration.DevDSize = Convert.ToUInt32(sub.SelectSingleNode("DevD/Size").FirstChild.Value);
+                                    SLMPServiceConfiguration.CustomDevDSize = true; 
+                                }
+                                break;
                         }
                     }
                 }
@@ -467,6 +555,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia.OrbmentPa
             DLinkServiceConfiguration.ApplyDeviceRuntimeDefault();
             ILinkServiceConfiguration.ApplyDeviceRuntimeDefault();
             RLinkServiceConfiguration.ApplyDeviceRuntimeDefault();
+            SLMPServiceConfiguration.ApplyDeviceRuntimeDefault();
             __ReLoad(node);
         }
 
@@ -523,7 +612,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia.OrbmentPa
                 propertyNode.AppendChild(doc.CreateTextNode(DeviceIOScanTaskConfiguration.PeriodInMillisecond.ToString()));
                 areaNode.AppendChild(propertyNode);
             }
-            if (DeviceIOScanTaskConfiguration.CustomPeriod)
+            if (DeviceIOScanTaskConfiguration.CustomTaskStack)
             {
                 propertyNode = doc.CreateElement("StackBytes");
                 propertyNode.AppendChild(doc.CreateTextNode(DeviceIOScanTaskConfiguration.TaskStackInByte.ToString()));
@@ -532,7 +621,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia.OrbmentPa
             configurationNode.AppendChild(areaNode);
 
             areaNode = doc.CreateElement("DeviceControlTask");
-            if (DeviceControlTaskConfiguration .CustomPosixPriority)
+            if (DeviceControlTaskConfiguration.CustomPosixPriority)
             {
                 propertyNode = doc.CreateElement("Priority");
                 propertyNode.AppendChild(doc.CreateTextNode(DeviceControlTaskConfiguration.PosixPriority.ToString()));
@@ -653,6 +742,47 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia.OrbmentPa
             {
                 propertyNode = doc.CreateElement("AcquisitionRate");
                 propertyNode.AppendChild(doc.CreateTextNode(RLinkServiceConfiguration.AcquisitionRate.ToString()));
+                areaNode.AppendChild(propertyNode);
+            }
+            configurationNode.AppendChild(areaNode);
+
+            areaNode = doc.CreateElement("SLMPService");
+            if (SLMPServiceConfiguration.CustomPosixPriority)
+            {
+                propertyNode = doc.CreateElement("Priority");
+                propertyNode.AppendChild(doc.CreateTextNode(SLMPServiceConfiguration.PosixPriority.ToString()));
+                areaNode.AppendChild(propertyNode);
+            }
+            if (SLMPServiceConfiguration.CustomPort)
+            {
+                propertyNode = doc.CreateElement("Port");
+                propertyNode.AppendChild(doc.CreateTextNode(SLMPServiceConfiguration.Port.ToString()));
+                areaNode.AppendChild(propertyNode);
+            }
+            if (SLMPServiceConfiguration.CustomRecvTimeout)
+            {
+                propertyNode = doc.CreateElement("Recv");
+                propertyNode.AppendChild(doc.CreateTextNode(SLMPServiceConfiguration.RecvTimeout.ToString()));
+                areaNode.AppendChild(propertyNode);
+            }
+            if (SLMPServiceConfiguration.CustomSendTimeout)
+            {
+                propertyNode = doc.CreateElement("Send");
+                propertyNode.AppendChild(doc.CreateTextNode(SLMPServiceConfiguration.SendTimeout.ToString()));
+                areaNode.AppendChild(propertyNode);
+            }
+            if (SLMPServiceConfiguration.CustomBufferSize)
+            {
+                propertyNode = doc.CreateElement("Buffer");
+                propertyNode.AppendChild(doc.CreateTextNode(SLMPServiceConfiguration.BufferSize.ToString()));
+                areaNode.AppendChild(propertyNode);
+            }
+            if (SLMPServiceConfiguration.CustomDevDSize)
+            {
+                propertyNode = doc.CreateElement("DevD");
+                var subPropertyNode = doc.CreateElement("Size");
+                subPropertyNode.AppendChild(doc.CreateTextNode(SLMPServiceConfiguration.DevDSize.ToString()));
+                propertyNode.AppendChild(subPropertyNode);
                 areaNode.AppendChild(propertyNode);
             }
             configurationNode.AppendChild(areaNode);

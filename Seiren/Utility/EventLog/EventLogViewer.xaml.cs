@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -21,9 +22,12 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility
     public partial class EventLogViewer : Window
     {
         private static string __TITLE = "EventLog Viewer";
-        public EventLogViewer(FTPTargetProperty property)
+
+        private Platform __platform;
+        public EventLogViewer(FTPTargetProperty property, Platform platform)
         {
             InitializeComponent();
+            __platform = platform;
             DataContext = new EventLogModel() 
             {
                 HostIPv4 = property.HostIPv4String,
@@ -31,8 +35,16 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility
                 User = property.User,
                 Password = property.Password,
                 Timeout = property.TimeoutValue,
-                ReadWriteTimeout = property.ReadWriteTimeoutValue
+                ReadWriteTimeout = property.ReadWriteTimeoutValue,
+                Platform = platform
             };
+
+            if(platform != Platform.R12CCPU)
+            {
+                ViewOrbmentLogOnlyChk.IsEnabled = false;
+                BrowseOpenLocalBt.IsEnabled = false;
+                ChooseEventsStorageCombo.IsEnabled = false;
+            }
         }
 
         private async void Upload_Click(object sender, RoutedEventArgs e)
@@ -46,7 +58,19 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility
                 model.IsBusy = false;
                 ControlPanelGrid.IsEnabled = true;
 
-                this.Title = __TITLE + " - via FTP - " + model.HistoryDestination.ToString();
+                switch(__platform)
+                {
+                    case Platform.R12CCPU:
+                        this.Title = __TITLE + " - via FTP - " + model.HistoryDestination.ToString();
+                        break;
+                    case Platform.MXRL:
+                        this.Title = __TITLE + " - via SFTP - LinuxRT FS";
+                        break;
+                    default:
+                        this.Title = __TITLE + " - via FTP - " + model.HistoryDestination.ToString();
+                        break;
+                }
+               
             }
             catch (Exception ex)
             {

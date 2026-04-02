@@ -223,7 +223,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility.R12C
         public ushort start_io;
     }
 
-    public record Log(string Data, ushort EventType, ushort EventCode, uint Source, ushort StartIO, byte[] Raw)
+    public record Log(string Date, ushort EventType, ushort EventCode, uint Source, ushort StartIO, byte[] Raw)
     {
 
     }

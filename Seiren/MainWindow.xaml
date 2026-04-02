@@ -15,6 +15,8 @@
         <CommandBinding Command="local:ConsoleControl.Import" Executed="ImportCommand_Executed" CanExecute="ImportCommand_CanExecuted"/>
         <CommandBinding Command="local:ConsoleControl.DownloadviaFTP" Executed="DownloadviaFTPCommand_Executed" CanExecute="DownloadviaFTPCommand_CanExecuted"/>
         <CommandBinding Command="local:ConsoleControl.UploadviaFTP" Executed="UploadviaFTPCommand_Executed" CanExecute="UploadviaFTPCommand_CanExecuted"/>
+        <CommandBinding Command="local:ConsoleControl.DownloadviaSFTP" Executed="DownloadviaSFTPCommand_Executed" CanExecute="DownloadviaFTPCommand_CanExecuted"/>
+        <CommandBinding Command="local:ConsoleControl.UploadviaSFTP" Executed="UploadviaSFTPCommand_Executed" CanExecute="UploadviaFTPCommand_CanExecuted"/>
         <CommandBinding Command="local:ConsoleControl.Close" Executed="CloseCommand_Executed" CanExecute="CloseCommand_CanExecuted"/>
         <CommandBinding Command="local:ConsoleControl.Quit" Executed="QuitCommand_Executed"/>
         <CommandBinding Command="local:ConsoleControl.About" Executed="AboutCommand_Executed"/>
@@ -27,11 +29,13 @@
         <CommandBinding Command="local:ConsoleControl.RecordRedo" Executed="RecordRedoCommand_Executed" CanExecute="RecordRedoCommand_CanExecuted"/>
         <CommandBinding Command="local:ConsoleControl.OpenCompare" Executed="OpenCompareCommand_Executed" CanExecute="CompareCommand_CanExecuted"/>
         <CommandBinding Command="local:ConsoleControl.ImportCompare" Executed="ImportCompareCommand_Executed" CanExecute="CompareCommand_CanExecuted"/>
-        <CommandBinding Command="local:ConsoleControl.UploadCompare" Executed="UploadCompareCommand_Executed" CanExecute="CompareCommand_CanExecuted"/>
+        <CommandBinding Command="local:ConsoleControl.FTPUploadCompare" Executed="FTPUploadCompareCommand_Executed" CanExecute="CompareCommand_CanExecuted"/>
+        <CommandBinding Command="local:ConsoleControl.SFTPUploadCompare" Executed="SFTPUploadCompareCommand_Executed" CanExecute="CompareCommand_CanExecuted"/>
         <CommandBinding Command="local:ConsoleControl.SaveLayoutState" Executed="SaveLayoutStateCommand_Executed" CanExecute="SaveLayoutStateCommand_CanExecuted"/>
         <CommandBinding Command="local:ConsoleControl.ControllerRemoteOperation" Executed="RemoteOperationCommand_Executed" CanExecute="RemoteOperationCommand_CanExecuted"/>
         <CommandBinding Command="local:ConsoleControl.BrowseEtherCATPDOs" Executed="BrowseEtherCATPDOs_Executed" CanExecute="BrowseEtherCATPDOs_CanExecuted"/>
-        <CommandBinding Command="local:ConsoleControl.EventHistory" Executed="EventHistory_Executed" CanExecute="EventHistory_CanExecuted"/>
+        <CommandBinding Command="local:ConsoleControl.R12CCPUEventHistory" Executed="R12CCPUEventHistory_Executed" CanExecute="EventHistory_CanExecuted"/>
+        <CommandBinding Command="local:ConsoleControl.MXRLEventHistory" Executed="MXRLEventHistory_Executed" CanExecute="EventHistory_CanExecuted"/>
         <CommandBinding Command="local:ConsoleControl.BrowseCIPAssemblyIOs" Executed="BrowseCIPAssemblyIOs_Executed" CanExecute="BrowseCIPAssemblyIOs_CanExecuted"/>
         <CommandBinding Command="local:ConsoleControl.SmartECATUtility" Executed="SmartECATUtiltiy_Executed" CanExecute="SmartECATUtiltiy_CanExecuted"/>
     </Window.CommandBindings>
@@ -166,13 +170,28 @@
                     <BitmapImage  UriSource="imgs/ftpd.png"/>
                 </sync:ButtonAdv.LargeIcon>
             </sync:ButtonAdv>
+            <sync:ButtonAdv Command="local:ConsoleControl.UploadviaSFTP" SizeMode="Large" Label="SFTP" Margin="2" Width="60" ToolTip="Upload via SFTP">
+                <sync:ButtonAdv.LargeIcon>
+                    <BitmapImage  UriSource="imgs/sftpu.png"/>
+                </sync:ButtonAdv.LargeIcon>
+            </sync:ButtonAdv>
+            <sync:ButtonAdv Command="local:ConsoleControl.DownloadviaSFTP" SizeMode="Large" Label="SFTP" Margin="2" Width="60" ToolTip="Download via SFTP">
+                <sync:ButtonAdv.LargeIcon>
+                    <BitmapImage  UriSource="imgs/sftpd.png"/>
+                </sync:ButtonAdv.LargeIcon>
+            </sync:ButtonAdv>
             <sync:ToolBarItemSeparator/>
             <sync:ButtonAdv Command="local:ConsoleControl.BrowseEtherCATPDOs" SizeMode="Large" Label="ENI" Margin="2" Width="60">
                 <sync:ButtonAdv.LargeIcon>
                     <BitmapImage  UriSource="imgs/pdos.png"/>
                 </sync:ButtonAdv.LargeIcon>
             </sync:ButtonAdv>
-            <sync:ButtonAdv Command="local:ConsoleControl.EventHistory" SizeMode="Large" Label="LOG" Margin="2" Width="60">
+            <sync:ButtonAdv Command="local:ConsoleControl.R12CCPUEventHistory" SizeMode="Large" Label="R12CCPU" Margin="2" Width="60">
+                <sync:ButtonAdv.LargeIcon>
+                    <BitmapImage  UriSource="imgs/log.png"/>
+                </sync:ButtonAdv.LargeIcon>
+            </sync:ButtonAdv>
+            <sync:ButtonAdv Command="local:ConsoleControl.MXRLEventHistory" SizeMode="Large" Label="MXRL" Margin="2" Width="60">
                 <sync:ButtonAdv.LargeIcon>
                     <BitmapImage  UriSource="imgs/log.png"/>
                 </sync:ButtonAdv.LargeIcon>
@@ -364,7 +383,23 @@
                             <Image Source="imgs/ftpd.png" Height="28" Width="28"/>
                         </sync:MenuItemAdv.Icon>
                     </sync:MenuItemAdv>
-                    <sync:MenuItemAdv Command="local:ConsoleControl.UploadCompare" ToolTip="Compare via FTP">
+                    <sync:MenuItemAdv Command="local:ConsoleControl.FTPUploadCompare" ToolTip="Compare via FTP">
+                        <sync:MenuItemAdv.Icon>
+                            <Image Source="imgs/compare.png" Height="28" Width="28"/>
+                        </sync:MenuItemAdv.Icon>
+                    </sync:MenuItemAdv>
+                    <sync:MenuItemSeparator/>
+                    <sync:MenuItemAdv Command="local:ConsoleControl.UploadviaSFTP" ToolTip="Upload via SFTP">
+                        <sync:MenuItemAdv.Icon>
+                            <Image Source="imgs/sftpu.png" Height="28" Width="28"/>
+                        </sync:MenuItemAdv.Icon>
+                    </sync:MenuItemAdv>
+                    <sync:MenuItemAdv Command="local:ConsoleControl.DownloadviaSFTP" ToolTip="Download via SFTP">
+                        <sync:MenuItemAdv.Icon>
+                            <Image Source="imgs/sftpd.png" Height="28" Width="28"/>
+                        </sync:MenuItemAdv.Icon>
+                    </sync:MenuItemAdv>
+                    <sync:MenuItemAdv Command="local:ConsoleControl.SFTPUploadCompare" ToolTip="Compare via SFTP">
                         <sync:MenuItemAdv.Icon>
                             <Image Source="imgs/compare.png" Height="28" Width="28"/>
                         </sync:MenuItemAdv.Icon>
@@ -376,7 +411,12 @@
                         <Image Source="imgs/remote.png" Height="28" Width="28"/>
                     </sync:MenuItemAdv.Icon>
                 </sync:MenuItemAdv>
-                <sync:MenuItemAdv Command="local:ConsoleControl.EventHistory" ToolTip="Browse R12CCPU-V Event History">
+                <sync:MenuItemAdv Command="local:ConsoleControl.R12CCPUEventHistory" ToolTip="Browse R12CCPU-V Event History">
+                    <sync:MenuItemAdv.Icon>
+                        <Image Source="imgs/log.png" Height="28" Width="28"/>
+                    </sync:MenuItemAdv.Icon>
+                </sync:MenuItemAdv>
+                <sync:MenuItemAdv Command="local:ConsoleControl.MXRLEventHistory" ToolTip="Browse MXRL Event History">
                     <sync:MenuItemAdv.Icon>
                         <Image Source="imgs/log.png" Height="28" Width="28"/>
                     </sync:MenuItemAdv.Icon>

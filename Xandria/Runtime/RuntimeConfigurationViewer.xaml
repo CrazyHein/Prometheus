@@ -9,7 +9,7 @@
              xmlns:sync="http://schemas.syncfusion.com/wpf"
              xmlns:sys="clr-namespace:System;assembly=mscorlib"
              mc:Ignorable="d" 
-             d:DesignHeight="600" d:DesignWidth="400" d:DataContext="{d:DesignInstance Type=local:RuntimeConfigurationModel}" WindowStartupLocation="CenterOwner" ResizeMode="CanResize"
+             d:DesignHeight="5000" d:DesignWidth="400" d:DataContext="{d:DesignInstance Type=local:RuntimeConfigurationModel}" WindowStartupLocation="CenterOwner" ResizeMode="CanResize"
              Width="600" Height="700">
     <DockPanel syncfusionskin:SfSkinManager.Theme="{syncfusionskin:SkinManagerExtension ThemeName=FluentLight}"  Margin="8,4,8,4" LastChildFill="True">
         <UniformGrid Columns="2" Margin="0,16,0,0" DockPanel.Dock="Bottom">
@@ -31,6 +31,7 @@
                     </ObjectDataProvider>
                 </Grid.Resources>
                 <Grid.RowDefinitions>
+                    <RowDefinition Height="auto"/>
                     <RowDefinition Height="auto"/>
                     <RowDefinition Height="auto"/>
                     <RowDefinition Height="auto"/>
@@ -272,6 +273,58 @@
                                             ErrorText="Please input a positive number or zero"
                                             ContainerType="Filled"  FontStyle="Italic" FontSize="12" Margin="4" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}">
                                 <TextBox FontStyle="Normal" Text="{Binding Configuration.ILinkServiceConfiguration.EngineStepCapacity, ValidatesOnExceptions=True, NotifyOnValidationError=True}"/>
+                            </sync:SfTextInputLayout>
+                        </CheckBox>
+                    </StackPanel>
+                </GroupBox>
+                <GroupBox Header="SLMP Service" Padding="4,8,4,4" Margin="2" Grid.Row="6">
+                    <StackPanel Name="SLMPServiceSettings">
+                        <CheckBox IsChecked="{Binding Configuration.SLMPServiceConfiguration.CustomPosixPriority}" HorizontalContentAlignment="Stretch">
+                            <sync:SfTextInputLayout Hint="Posix Priority  (0 ~ 255)" 
+                                            HelperText="Set the posix priority for SLMP Service (0 ~ 255)" 
+                                            ErrorText="The posix priority should be between 0 and 255"
+                                            ContainerType="Filled"  FontStyle="Italic" FontSize="12" Margin="4" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}">
+                                <TextBox FontStyle="Normal" Text="{Binding Configuration.SLMPServiceConfiguration.PosixPriority, ValidatesOnExceptions=True, NotifyOnValidationError=True}"/>
+                            </sync:SfTextInputLayout>
+                        </CheckBox>
+                        <CheckBox IsChecked="{Binding Configuration.SLMPServiceConfiguration.CustomPort}" HorizontalContentAlignment="Stretch">
+                            <sync:SfTextInputLayout Hint="Port" 
+                                         HelperText="Set port number which SLMP Service will listen on" 
+                                         ErrorText="The port number should be between 0 and 65535"
+                                         ContainerType="Filled"  FontStyle="Italic" FontSize="12" Margin="4" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}">
+                                <TextBox FontStyle="Normal" Text="{Binding Configuration.SLMPServiceConfiguration.Port, ValidatesOnExceptions=True, NotifyOnValidationError=True}"/>
+                            </sync:SfTextInputLayout>
+                        </CheckBox>
+                        <CheckBox IsChecked="{Binding Configuration.SLMPServiceConfiguration.CustomRecvTimeout}" HorizontalContentAlignment="Stretch">
+                            <sync:SfTextInputLayout Hint="Receive Timeout" 
+                                         HelperText="Set a value that specifies the amount of time(ms) after which a synchronous Receive call will time out" 
+                                         ErrorText="Please input a positive number or zero"
+                                         ContainerType="Filled"  FontStyle="Italic" FontSize="12" Margin="4" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}">
+                                <TextBox FontStyle="Normal" Text="{Binding Configuration.SLMPServiceConfiguration.RecvTimeout, ValidatesOnExceptions=True, NotifyOnValidationError=True}"/>
+                            </sync:SfTextInputLayout>
+                        </CheckBox>
+                        <CheckBox IsChecked="{Binding Configuration.SLMPServiceConfiguration.CustomSendTimeout}" HorizontalContentAlignment="Stretch">
+                            <sync:SfTextInputLayout Hint="Send Timeout" 
+                                         HelperText="Set a value that specifies the amount of time(ms) after which a synchronous Send call will time out" 
+                                         ErrorText="Please input a positive number or zero"
+                                         ContainerType="Filled"  FontStyle="Italic" FontSize="12" Margin="4" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}">
+                                <TextBox FontStyle="Normal" Text="{Binding Configuration.SLMPServiceConfiguration.SendTimeout, ValidatesOnExceptions=True, NotifyOnValidationError=True}"/>
+                            </sync:SfTextInputLayout>
+                        </CheckBox>
+                        <CheckBox IsChecked="{Binding Configuration.SLMPServiceConfiguration.CustomBufferSize}" HorizontalContentAlignment="Stretch">
+                            <sync:SfTextInputLayout Hint="Server Internal Buffer Size(bytes)" 
+                                         HelperText="Set the buffer size for receiving and sending data" 
+                                         ErrorText="Please input a positive number or zero"
+                                         ContainerType="Filled"  FontStyle="Italic" FontSize="12" Margin="4" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}">
+                                <TextBox FontStyle="Normal" Text="{Binding Configuration.SLMPServiceConfiguration.BufferSize, ValidatesOnExceptions=True, NotifyOnValidationError=True}"/>
+                            </sync:SfTextInputLayout>
+                        </CheckBox>
+                        <CheckBox IsChecked="{Binding Configuration.SLMPServiceConfiguration.CustomDevDSize}" HorizontalContentAlignment="Stretch">
+                            <sync:SfTextInputLayout Hint="DevD Size(words)" 
+                                         HelperText="Set the number of the DevD devices" 
+                                         ErrorText="Please input a positive number or zero"
+                                         ContainerType="Filled"  FontStyle="Italic" FontSize="12" Margin="4" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}">
+                                <TextBox FontStyle="Normal" Text="{Binding Configuration.SLMPServiceConfiguration.DevDSize, ValidatesOnExceptions=True, NotifyOnValidationError=True}"/>
                             </sync:SfTextInputLayout>
                         </CheckBox>
                     </StackPanel>

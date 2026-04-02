@@ -1,4 +1,6 @@
 ﻿using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia;
+using Microsoft.VisualBasic.ApplicationServices;
+using Renci.SshNet;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -18,6 +20,12 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Xandria.Utility
         Upload,
         Download,
     }
+
+    public enum Platform
+    {
+        R12CCPU,
+        MXRL
+    }
     class FTPUtilityModel : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
@@ -29,7 +37,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Xandria.Utility
         private ControllerModelCatalogue __controller_model_catalogue;
         private TaskUserParameterHelper __task_user_parameter_helper;
 
-        public FTPUtilityModel(FTPMode mode, ControllerModelCatalogue cc, TaskUserParameterHelper helper)
+        public FTPUtilityModel(FTPMode mode, Platform platform, ControllerModelCatalogue cc, TaskUserParameterHelper helper)
         {
             Mode = mode;
             __controller_model_catalogue = cc;
@@ -42,6 +50,28 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Xandria.Utility
             AvailableOrbmentVersions = list.OrderByDescending(v => v);
             if (list.Count != 0)
                 SelectedOrbmentVersion = AvailableOrbmentVersions.First();
+            
+            switch(platform)
+            {
+                case Platform.R12CCPU:
+                    OverSSH = false;
+                    HostPort = 21;
+                    User = "target";
+                    Password = "Password";
+                    __task_user_parameters_path = "/2/r2h_task_user_parameters.xml";
+                    break;
+                case Platform.MXRL:
+                    OverSSH = true;
+                    HostPort = 22;
+                    User = "root";
+                    Password = "password";
+                    __task_user_parameters_path = "/home/mxr/r2h_task_user_parameters.xml";
+                    break;
+                default:
+                    OverSSH = true;
+                    break;
+
+            }
         }
 
         public FTPMode Mode { get; private set; }
@@ -59,6 +89,9 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Xandria.Utility
         public string Password { get; set; } = "password";
         public int Timeout { get; set; } = 5000;
         public int ReadWriteTimeout { get; set; } = 5000;
+
+        public bool OverSSH { get; } = false;
+
         private string __task_user_parameters_path = "/2/r2h_task_user_parameters.xml";
         public string TaskUserParametersPath
         {
@@ -99,101 +132,163 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Xandria.Utility
 
         public TaskUserParameterHelper Upload()
         {
-            NetworkCredential cred = null;
-            if (User != null && User.Trim().Length > 0 && Password != null && Password.Trim().Length > 0)
-                cred = new NetworkCredential(User.Trim(), Password.Trim());
-            FtpWebRequest request;
-            TaskUserParameterHelper helper;
-            request = (FtpWebRequest)FtpWebRequest.Create("ftp://" + HostIPv4 + ":" + HostPort.ToString() + __task_user_parameters_path);
-            request.Credentials = cred;
-            request.KeepAlive = false;
-            request.Method = WebRequestMethods.Ftp.DownloadFile;
-            request.UseBinary = true;
-            request.Timeout = Timeout;
-            request.ReadWriteTimeout = ReadWriteTimeout;
-
-            using (FtpWebResponse response = (FtpWebResponse)request.GetResponse())
-            using (System.IO.Stream sm = response.GetResponseStream())
+            if (OverSSH == false)
             {
-                helper = new TaskUserParameterHelper(__controller_model_catalogue, sm);
-                sm.Close();
-                response.Close();
+                NetworkCredential cred = null;
+                if (User != null && User.Trim().Length > 0 && Password != null && Password.Trim().Length > 0)
+                    cred = new NetworkCredential(User.Trim(), Password.Trim());
+                FtpWebRequest request;
+                TaskUserParameterHelper helper;
+                request = (FtpWebRequest)FtpWebRequest.Create("ftp://" + HostIPv4 + ":" + HostPort.ToString() + __task_user_parameters_path);
+                request.Credentials = cred;
+                request.KeepAlive = false;
+                request.Method = WebRequestMethods.Ftp.DownloadFile;
+                request.UseBinary = true;
+                request.Timeout = Timeout;
+                request.ReadWriteTimeout = ReadWriteTimeout;
+
+                using (FtpWebResponse response = (FtpWebResponse)request.GetResponse())
+                using (System.IO.Stream sm = response.GetResponseStream())
+                {
+                    helper = new TaskUserParameterHelper(__controller_model_catalogue, sm);
+                    sm.Close();
+                    response.Close();
+                }
+                return helper;
             }
-            return helper;
+            else
+            {
+                TaskUserParameterHelper helper;
+                using (var client = new SftpClient(HostIPv4, HostPort, User.Trim(), Password.Trim()) { OperationTimeout = TimeSpan.FromMilliseconds(ReadWriteTimeout) })
+                using (System.IO.MemoryStream mm = new MemoryStream())
+                {
+                    client.Connect();
+                    client.DownloadFile(__task_user_parameters_path, mm);
+                    mm.Position = 0;
+                    helper = new TaskUserParameterHelper(__controller_model_catalogue, mm);
+                    mm.Close();
+                    client.Disconnect();
+                }
+                return helper;
+            }
         }
 
         public void Upload(string remote, string local, int bufferSize = 16 * 1024, bool keepAlive = false)
         {
-            NetworkCredential cred = null;
-            if (User != null && User.Trim().Length > 0 && Password != null && Password.Trim().Length > 0)
-                cred = new NetworkCredential(User.Trim(), Password.Trim());
-            FtpWebRequest request;
-            request = (FtpWebRequest)FtpWebRequest.Create("ftp://" + HostIPv4 + ":" + HostPort.ToString() + remote);
-            request.Credentials = cred;
-            request.KeepAlive = keepAlive;
-            request.Method = WebRequestMethods.Ftp.DownloadFile;
-            request.UseBinary = true;
-            request.Timeout = Timeout;
-            request.ReadWriteTimeout = ReadWriteTimeout;
-
-            using (FtpWebResponse response = (FtpWebResponse)request.GetResponse())
-            using (System.IO.Stream sm = response.GetResponseStream())
-            using (System.IO.FileStream fs = System.IO.File.Create(local))
+            if (OverSSH == false)
             {
-                byte[] buffer = new byte[bufferSize];
-                int read = 0;
-                do
+                NetworkCredential cred = null;
+                if (User != null && User.Trim().Length > 0 && Password != null && Password.Trim().Length > 0)
+                    cred = new NetworkCredential(User.Trim(), Password.Trim());
+                FtpWebRequest request;
+                request = (FtpWebRequest)FtpWebRequest.Create("ftp://" + HostIPv4 + ":" + HostPort.ToString() + remote);
+                request.Credentials = cred;
+                request.KeepAlive = keepAlive;
+                request.Method = WebRequestMethods.Ftp.DownloadFile;
+                request.UseBinary = true;
+                request.Timeout = Timeout;
+                request.ReadWriteTimeout = ReadWriteTimeout;
+
+                using (FtpWebResponse response = (FtpWebResponse)request.GetResponse())
+                using (System.IO.Stream sm = response.GetResponseStream())
+                using (System.IO.FileStream fs = System.IO.File.Create(local))
                 {
-                    read = sm.Read(buffer, 0, buffer.Length);
-                    fs.Write(buffer, 0, read);
-                } while (read != 0);
+                    byte[] buffer = new byte[bufferSize];
+                    int read = 0;
+                    do
+                    {
+                        read = sm.Read(buffer, 0, buffer.Length);
+                        fs.Write(buffer, 0, read);
+                    } while (read != 0);
+                }
+            }
+            else
+            {
+                using (var client = new SftpClient(HostIPv4, HostPort, User.Trim(), Password.Trim()) { OperationTimeout = TimeSpan.FromMilliseconds(ReadWriteTimeout) })
+                using (System.IO.FileStream fs = System.IO.File.Create(local))
+                {
+                    client.Connect();
+                    client.DownloadFile(remote, fs);
+                    fs.Close();
+                    client.Disconnect();
+                }
             }
         }
 
         public void Download()
         {
-            NetworkCredential cred = null;
-            if (User != null && User.Trim().Length > 0 && Password != null && Password.Trim().Length > 0)
-                cred = new NetworkCredential(User.Trim(), Password.Trim());
-            FtpWebRequest request;
-            request = (FtpWebRequest)FtpWebRequest.Create("ftp://" + HostIPv4 + ":" + HostPort.ToString() + __task_user_parameters_path);
-            request.Credentials = cred;
-            request.KeepAlive = false;
-            request.Method = WebRequestMethods.Ftp.UploadFile;
-            request.UseBinary = true;
-            request.Timeout = Timeout;
-            request.ReadWriteTimeout = ReadWriteTimeout;
-            using (System.IO.Stream sm = request.GetRequestStream())
+            if (OverSSH == false)
             {
-                __task_user_parameter_helper.Save(sm);
-                sm.Close();
+                NetworkCredential cred = null;
+                if (User != null && User.Trim().Length > 0 && Password != null && Password.Trim().Length > 0)
+                    cred = new NetworkCredential(User.Trim(), Password.Trim());
+                FtpWebRequest request;
+                request = (FtpWebRequest)FtpWebRequest.Create("ftp://" + HostIPv4 + ":" + HostPort.ToString() + __task_user_parameters_path);
+                request.Credentials = cred;
+                request.KeepAlive = false;
+                request.Method = WebRequestMethods.Ftp.UploadFile;
+                request.UseBinary = true;
+                request.Timeout = Timeout;
+                request.ReadWriteTimeout = ReadWriteTimeout;
+                using (System.IO.Stream sm = request.GetRequestStream())
+                {
+                    __task_user_parameter_helper.Save(sm);
+                    sm.Close();
+                }
+            }
+            else
+            {
+                using (var client = new SftpClient(HostIPv4, HostPort, User.Trim(), Password.Trim()) { OperationTimeout = TimeSpan.FromMilliseconds(ReadWriteTimeout) })
+                using (System.IO.MemoryStream mm = new MemoryStream())
+                {
+                    client.Connect();
+                    __task_user_parameter_helper.Save(mm);
+                    mm.Position = 0;
+                    client.UploadFile(mm, __task_user_parameters_path);
+                    mm.Close();
+                    client.Disconnect();
+                }
             }
         }
 
         public void Download(string local, string remote, int bufferSize = 16 * 1024, bool keepAlive = false)
         {
-            NetworkCredential cred = null;
-            if (User != null && User.Trim().Length > 0 && Password != null && Password.Trim().Length > 0)
-                cred = new NetworkCredential(User.Trim(), Password.Trim());
-            FtpWebRequest request;
-            request = (FtpWebRequest)FtpWebRequest.Create("ftp://" + HostIPv4 + ":" + HostPort.ToString() + remote);
-            request.Credentials = cred;
-            request.KeepAlive = keepAlive;
-            request.Method = WebRequestMethods.Ftp.UploadFile;
-            request.UseBinary = true;
-            request.Timeout = Timeout;
-            request.ReadWriteTimeout = ReadWriteTimeout;
-
-            using (System.IO.FileStream fs = System.IO.File.OpenRead(local))
-            using (System.IO.Stream sm = request.GetRequestStream())
+            if (OverSSH == false)
             {
-                byte[] buffer = new byte[bufferSize];
-                int read = 0;
-                do
+                NetworkCredential cred = null;
+                if (User != null && User.Trim().Length > 0 && Password != null && Password.Trim().Length > 0)
+                    cred = new NetworkCredential(User.Trim(), Password.Trim());
+                FtpWebRequest request;
+                request = (FtpWebRequest)FtpWebRequest.Create("ftp://" + HostIPv4 + ":" + HostPort.ToString() + remote);
+                request.Credentials = cred;
+                request.KeepAlive = keepAlive;
+                request.Method = WebRequestMethods.Ftp.UploadFile;
+                request.UseBinary = true;
+                request.Timeout = Timeout;
+                request.ReadWriteTimeout = ReadWriteTimeout;
+
+                using (System.IO.FileStream fs = System.IO.File.OpenRead(local))
+                using (System.IO.Stream sm = request.GetRequestStream())
                 {
-                    read = fs.Read(buffer, 0, buffer.Length);
-                    sm.Write(buffer, 0, read);
-                } while (read != 0);
+                    byte[] buffer = new byte[bufferSize];
+                    int read = 0;
+                    do
+                    {
+                        read = fs.Read(buffer, 0, buffer.Length);
+                        sm.Write(buffer, 0, read);
+                    } while (read != 0);
+                }
+            }
+            else
+            {
+                using (var client = new SftpClient(HostIPv4, HostPort, User.Trim(), Password.Trim()) { OperationTimeout = TimeSpan.FromMilliseconds(ReadWriteTimeout) })
+                using (System.IO.FileStream fs = System.IO.File.OpenRead(local))
+                {
+                    client.Connect();
+                    client.UploadFile(fs, remote);
+                    fs.Close();
+                    client.Disconnect();
+                }
             }
         }
 

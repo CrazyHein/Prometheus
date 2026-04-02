@@ -32,6 +32,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Xandria
         public static RoutedUICommand Quit { get; private set; }
         public static RoutedUICommand UploadviaFTP { get; private set; }
         public static RoutedUICommand DownloadviaFTP { get; private set; }
+        public static RoutedUICommand UploadviaSFTP { get; private set; }
+        public static RoutedUICommand DownloadviaSFTP { get; private set; }
         public static RoutedUICommand AddLocalModule { get; private set; }
         public static RoutedUICommand EditLocalModule { get; private set; }
         public static RoutedUICommand RemoveLocalModule { get; private set; }
@@ -92,6 +94,18 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Xandria
                 new KeyGesture(Key.F5, ModifierKeys.Control, "Ctrl+F5")
             };
             DownloadviaFTP = new RoutedUICommand("Download", "Download via FTP", typeof(ConsoleControl), gestureDownloadviaFTP);
+
+            InputGestureCollection gestureUploadviaSFTP = new InputGestureCollection
+            {
+                new KeyGesture(Key.F6, ModifierKeys.Control | ModifierKeys.Shift, "Ctrl+Shift+F4")
+            };
+            UploadviaSFTP = new RoutedUICommand("Upload", "Upload via SFTP", typeof(ConsoleControl), gestureUploadviaSFTP);
+
+            InputGestureCollection gestureDownloadviaSFTP = new InputGestureCollection
+            {
+                new KeyGesture(Key.F7, ModifierKeys.Control | ModifierKeys.Shift, "Ctrl+Shift+F5")
+            };
+            DownloadviaSFTP = new RoutedUICommand("Download", "Download via SFTP", typeof(ConsoleControl), gestureDownloadviaSFTP);
 
             AddLocalModule = new RoutedUICommand("Add", "Add Local Module", typeof(ConsoleControl));
             InsertLocalModule = new RoutedUICommand("Insert", "Insert Local Module", typeof(ConsoleControl));

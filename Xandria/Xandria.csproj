@@ -6,7 +6,7 @@
     <UseWPF>true</UseWPF>
     <UseWindowsForms>true</UseWindowsForms>
     <RootNamespace>AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Xandria</RootNamespace>
-    <Version>0.5.0.0</Version>
+    <Version>0.6.0.0</Version>
     <Company>AMEC</Company>
     <Authors>CrazyHein</Authors>
     <ApplicationIcon>imgs\logo.ico</ApplicationIcon>
@@ -32,6 +32,8 @@
     <None Remove="imgs\remove.png" />
     <None Remove="imgs\save.png" />
     <None Remove="imgs\saveas.png" />
+    <None Remove="imgs\sftpd.png" />
+    <None Remove="imgs\sftpu.png" />
     <None Remove="splash.jpg" />
   </ItemGroup>
 
@@ -43,6 +45,12 @@
   
   <ItemGroup>
     <None Include="Project_Readme.html" />
+  </ItemGroup>
+
+  
+  
+  <ItemGroup>
+    <PackageReference Include="SSH.NET" Version="2025.1.0" />
   </ItemGroup>
 
   
@@ -111,6 +119,8 @@
     <Resource Include="imgs\remove.png" />
     <Resource Include="imgs\save.png" />
     <Resource Include="imgs\saveas.png" />
+    <Resource Include="imgs\sftpd.png" />
+    <Resource Include="imgs\sftpu.png" />
   </ItemGroup>
 
   

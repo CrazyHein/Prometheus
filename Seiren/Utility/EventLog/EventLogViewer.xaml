@@ -16,7 +16,7 @@
             <RowDefinition Height="auto"/>
         </Grid.RowDefinitions>
         <GroupBox Header="User Options" Padding="2,4,2,2" Margin="5,2,5,2">
-            <CheckBox Content="View Orbment Log Only" IsChecked="{Binding ViewOrbmentLogOnly}"/>
+            <CheckBox Content="View Orbment Log Only" IsChecked="{Binding ViewOrbmentLogOnly}" Name="ViewOrbmentLogOnlyChk"/>
         </GroupBox>
         <Grid Grid.Row="2" Margin="4,2,4,2" HorizontalAlignment="Stretch" Name="ControlPanelGrid">
             <Grid.ColumnDefinitions>
@@ -30,7 +30,7 @@
                     </ObjectDataProvider.MethodParameters>
                 </ObjectDataProvider>
             </Grid.Resources>
-            <GroupBox Header="via FTP (You need to set the FTP related options in the settings first)" Padding="2,4,2,2" Margin="0,0,4,0">
+            <GroupBox Header="via (S)FTP (You need to set the FTP related options in the settings first)" Padding="2,4,2,2" Margin="0,0,4,0">
                 <DockPanel LastChildFill="True">
                     <Button DockPanel.Dock="Right" Height="30" Width="90" Margin="24,2,2,2" Click="Upload_Click" HorizontalAlignment="Right" Name="UploadBt">
                         <Button.Content>
@@ -40,7 +40,7 @@
                             </StackPanel>
                         </Button.Content>
                     </Button>
-                    <sync:SfTextInputLayout DockPanel.Dock="Left" Hint="Destination" HelperText="Choose save destination of event history file." FontSize="12" FontStyle="Italic" ContainerType="Filled">
+                    <sync:SfTextInputLayout DockPanel.Dock="Left" Hint="Destination" HelperText="Choose save destination of event history file." FontSize="12" FontStyle="Italic" ContainerType="Filled" Name="ChooseEventsStorageCombo">
                         <sync:ComboBoxAdv FontStyle="Normal" ItemsSource="{Binding Source={StaticResource destinations}}" SelectedItem="{Binding HistoryDestination}"/>
                     </sync:SfTextInputLayout>
                 </DockPanel>
@@ -65,7 +65,7 @@
                          LiveDataUpdateMode="AllowDataShaping" ScrollMode="Async" QueryRowHeight="MainViewer_QueryRowHeight"
                          ItemsSource="{Binding Records}">
             <sync:SfDataGrid.Columns>
-                <sync:GridTextColumn ValueBinding="{Binding Data}" HeaderText="Occurrence Data"/>
+                <sync:GridTextColumn ValueBinding="{Binding Date}" HeaderText="Occurrence Date"/>
                 <sync:GridTextColumn ValueBinding="{Binding EventType, StringFormat='0x{0:X04}'}" HeaderText="Event Type"/>
                 <sync:GridTextColumn ValueBinding="{Binding EventCode, StringFormat='0x{0:X04}'}" HeaderText="Event Code"/>
                 <sync:GridTextColumn ValueBinding="{Binding Source, StringFormat='0x{0:X08}'}" HeaderText="Source"/>

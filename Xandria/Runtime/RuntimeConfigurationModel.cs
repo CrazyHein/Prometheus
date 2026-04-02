@@ -23,7 +23,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Xandria
                 DeviceControlTaskConfiguration = data.DeviceControlTaskConfiguration.ShallowCopy(),
                 DLinkServiceConfiguration = data.DLinkServiceConfiguration.ShallowCopy(),
                 ILinkServiceConfiguration = data.ILinkServiceConfiguration.ShallowCopy(),
-                RLinkServiceConfiguration = data.RLinkServiceConfiguration.ShallowCopy()
+                RLinkServiceConfiguration = data.RLinkServiceConfiguration.ShallowCopy(),
+                SLMPServiceConfiguration = data.SLMPServiceConfiguration.ShallowCopy(),
             };
         }
     }

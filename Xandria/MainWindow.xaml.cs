@@ -327,7 +327,20 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Xandria
                 return;
             }
 
-            var wnd = new FTPUtility(FTPMode.Download, __controller_model_catalogue, __task_user_parameter_helper);
+            var wnd = new FTPUtility(FTPMode.Download, Platform.R12CCPU, __controller_model_catalogue, __task_user_parameter_helper);
+            wnd.ShowDialog();
+        }
+
+        private void DownloadviaSFTPCommand_Executed(object sender, System.Windows.Input.ExecutedRoutedEventArgs e)
+        {
+            string error = __update_binding_source();
+            if (error != null)
+            {
+                MessageBox.Show(error, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            var wnd = new FTPUtility(FTPMode.Download, Platform.MXRL, __controller_model_catalogue, __task_user_parameter_helper);
             wnd.ShowDialog();
         }
 
@@ -345,7 +358,25 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Xandria
                     return;
             }
 
-            var wnd = new FTPUtility(FTPMode.Upload, __controller_model_catalogue, __task_user_parameter_helper);
+            var wnd = new FTPUtility(FTPMode.Upload, Platform.R12CCPU, __controller_model_catalogue, __task_user_parameter_helper);
+            if (wnd.ShowDialog() == true)
+            {
+                __task_user_parameter_helper = wnd.UploadResult;
+                __main_model.CurrentlyOpenFile = String.Empty;
+                __reset_layout();
+            }
+        }
+
+        private void UploadviaSFTPCommand_Executed(object sender, System.Windows.Input.ExecutedRoutedEventArgs e)
+        {
+            if ((__main_model.IsNonTemporaryFile && __data_model_has_changes()) || __main_model.IsTemporaryFile)
+            {
+                var res = MessageBox.Show("Discard the changes you have made ?", "Question", MessageBoxButton.YesNo, MessageBoxImage.Question);
+                if (res == MessageBoxResult.No)
+                    return;
+            }
+
+            var wnd = new FTPUtility(FTPMode.Upload, Platform.MXRL, __controller_model_catalogue, __task_user_parameter_helper);
             if (wnd.ShowDialog() == true)
             {
                 __task_user_parameter_helper = wnd.UploadResult;

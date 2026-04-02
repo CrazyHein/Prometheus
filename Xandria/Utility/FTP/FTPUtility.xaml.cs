@@ -22,15 +22,20 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Xandria.Utility
     /// </summary>
     public partial class FTPUtility : Window
     {
-        public FTPUtility(FTPMode mode, ControllerModelCatalogue cc, TaskUserParameterHelper helper)
+        public FTPUtility(FTPMode mode, Platform platform, ControllerModelCatalogue cc, TaskUserParameterHelper helper)
         {
             InitializeComponent();
             __original_helper = helper;
-            DataContext = new FTPUtilityModel(mode, cc, helper);
+            DataContext = new FTPUtilityModel(mode, platform, cc, helper);
             if(mode == FTPMode.Upload)
             {
                 ChkboxDownloadOrbment.Visibility = Visibility.Collapsed;
                 TxtInputOrbmentVersion.Visibility = Visibility.Collapsed;
+            }
+            if (platform != Platform.R12CCPU)
+            {
+                ChkboxDownloadOrbment.IsChecked = false;
+                ChkboxDownloadOrbment.IsEnabled = false;
             }
         }
 
@@ -74,6 +79,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Xandria.Utility
                                         System.Windows.Forms.SaveFileDialog save = new System.Windows.Forms.SaveFileDialog() { AddExtension = true, CheckFileExists = true };
                                         save.Filter = $"{field.Key} Files(*{ext})|*{ext}";
                                         save.FileName = $"{device.DeviceModel}_{System.IO.Path.GetFileName(field.Value)}";
+                                        save.CheckFileExists = false;
                                         try
                                         {
                                             if (save.ShowDialog() == System.Windows.Forms.DialogResult.OK)
@@ -104,6 +110,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Xandria.Utility
                                         System.Windows.Forms.SaveFileDialog save = new System.Windows.Forms.SaveFileDialog() { AddExtension = true, CheckFileExists = true};
                                         save.Filter = $"{field.Key} Files(*{ext})|*{ext}";
                                         save.FileName = $"{device.DeviceModel}_{System.IO.Path.GetFileName(field.Value)}";
+                                        save.CheckFileExists = false;
                                         try
                                         {
                                             if (save.ShowDialog() == System.Windows.Forms.DialogResult.OK)

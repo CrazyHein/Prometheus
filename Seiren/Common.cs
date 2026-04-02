@@ -38,6 +38,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
 
         public static RoutedUICommand UploadviaFTP { get; private set; }
         public static RoutedUICommand DownloadviaFTP { get; private set; }
+        public static RoutedUICommand UploadviaSFTP { get; private set; }
+        public static RoutedUICommand DownloadviaSFTP { get; private set; }
         public static RoutedUICommand AddRecord { get; private set; }
         public static RoutedUICommand AddRecordEx { get; private set; }
         public static RoutedUICommand EditRecord { get; private set; }
@@ -58,7 +60,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         public static RoutedUICommand StopDebugging { get; private set; }
         public static RoutedUICommand MoveUpRecord { get; private set; }
         public static RoutedUICommand MoveDownRecord { get; private set; }
-        public static RoutedUICommand UploadCompare { get; private set; }
+        public static RoutedUICommand FTPUploadCompare { get; private set; }
+        public static RoutedUICommand SFTPUploadCompare { get; private set; }
         public static RoutedUICommand ImportCompare { get; private set; }
         public static RoutedUICommand OpenCompare { get; private set; }
         public static RoutedUICommand SaveLayoutState { get; private set; }
@@ -70,7 +73,8 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
         public static RoutedUICommand ControllerRemoteOperation { get; private set; }
         public static RoutedUICommand BrowseEtherCATPDOs { get; private set; }
         public static RoutedUICommand AddAllSelectedRecords { get; private set; }
-        public static RoutedUICommand EventHistory { get; private set; }
+        public static RoutedUICommand R12CCPUEventHistory { get; private set; }
+        public static RoutedUICommand MXRLEventHistory { get; private set; }
         public static RoutedUICommand SetDAQFlag { get; private set; }
         public static RoutedUICommand ResetDAQFlag { get; private set; }
         public static RoutedUICommand StartBackgroundDAQ { get; private set; }
@@ -145,11 +149,29 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
             };
             DownloadviaFTP = new RoutedUICommand("Download", "Download via FTP", typeof(ConsoleControl), gestureDownloadviaFTP);
 
-            InputGestureCollection gestureUploadCompare = new InputGestureCollection
+            InputGestureCollection gestureUploadviaSFTP = new InputGestureCollection
+            {
+                new KeyGesture(Key.F4, ModifierKeys.Control | ModifierKeys.Alt, "Ctrl+Alt+F4")
+            };
+            UploadviaSFTP = new RoutedUICommand("Upload", "Upload via SFTP", typeof(ConsoleControl), gestureUploadviaSFTP);
+
+            InputGestureCollection gestureDownloadviaSFTP = new InputGestureCollection
+            {
+                new KeyGesture(Key.F5, ModifierKeys.Control | ModifierKeys.Alt, "Ctrl+Alt+F5")
+            };
+            DownloadviaSFTP = new RoutedUICommand("Download", "Download via SFTP", typeof(ConsoleControl), gestureDownloadviaSFTP);
+
+            InputGestureCollection gestureFTPUploadCompare = new InputGestureCollection
             {
                 new KeyGesture(Key.F4, ModifierKeys.Control | ModifierKeys.Shift, "Ctrl+Shift+F4")
             };
-            UploadCompare = new RoutedUICommand("Compare", "Compare via FTP", typeof(ConsoleControl), gestureUploadCompare);
+            FTPUploadCompare = new RoutedUICommand("Compare", "Compare via FTP", typeof(ConsoleControl), gestureFTPUploadCompare);
+
+            InputGestureCollection gestureSFTPUploadCompare = new InputGestureCollection
+            {
+                new KeyGesture(Key.F5, ModifierKeys.Control | ModifierKeys.Shift, "Ctrl+Shift+F5")
+            };
+            SFTPUploadCompare = new RoutedUICommand("Compare", "Compare via SFTP", typeof(ConsoleControl), gestureSFTPUploadCompare);
 
             InputGestureCollection gestureAddRecord = new InputGestureCollection
             {
@@ -215,7 +237,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
 
             InputGestureCollection gestureStartMonitoring = new InputGestureCollection
             {
-                new KeyGesture(Key.F6, ModifierKeys.Control, "Ctrl+F7")
+                new KeyGesture(Key.F7, ModifierKeys.Control, "Ctrl+F7")
             };
             StartMonitoring = new RoutedUICommand("Start Monitoring", "Start Monitoring", typeof(ConsoleControl), gestureStartMonitoring);
 
@@ -255,11 +277,17 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
 
             AddAllSelectedRecords = new RoutedUICommand("Add All Selected Records", "Add All Selected Records", typeof(ConsoleControl));
 
-            InputGestureCollection gestureEventHistory = new InputGestureCollection
+            InputGestureCollection gestureR12CCPUEventHistory = new InputGestureCollection
             {
                 new KeyGesture(Key.F10, ModifierKeys.Control, "Ctrl+F10")
             };
-            EventHistory = new RoutedUICommand("Event History", "Browse R12CCPU-V Event History", typeof(ConsoleControl), gestureEventHistory);
+            R12CCPUEventHistory = new RoutedUICommand("R12CCPU Event History", "Browse R12CCPU-V Event History", typeof(ConsoleControl), gestureR12CCPUEventHistory);
+
+            InputGestureCollection gestureMXRLEventHistory = new InputGestureCollection
+            {
+                new KeyGesture(Key.F10, ModifierKeys.Control | ModifierKeys.Shift, "Ctrl+Shift+F10")
+            };
+            MXRLEventHistory = new RoutedUICommand("MXRL Event History", "Browse MXRL Event History", typeof(ConsoleControl), gestureMXRLEventHistory);
 
             SetDAQFlag = new RoutedUICommand("Set DAQ Flag", "Set DAQ Flag", typeof(ConsoleControl));
             ResetDAQFlag = new RoutedUICommand("Reset DAQ Flag", "Reset DAQ Flag", typeof(ConsoleControl));

@@ -12,6 +12,8 @@
         <CommandBinding Command="local:ConsoleControl.SaveAs" Executed="SaveAsCommand_Executed" CanExecute="SaveAsCommand_CanExecuted"/>
         <CommandBinding Command="local:ConsoleControl.DownloadviaFTP" Executed="DownloadviaFTPCommand_Executed" CanExecute="DownloadviaFTPCommand_CanExecuted"/>
         <CommandBinding Command="local:ConsoleControl.UploadviaFTP" Executed="UploadviaFTPCommand_Executed" CanExecute="UploadviaFTPCommand_CanExecuted"/>
+        <CommandBinding Command="local:ConsoleControl.DownloadviaSFTP" Executed="DownloadviaSFTPCommand_Executed" CanExecute="DownloadviaFTPCommand_CanExecuted"/>
+        <CommandBinding Command="local:ConsoleControl.UploadviaSFTP" Executed="UploadviaSFTPCommand_Executed" CanExecute="UploadviaFTPCommand_CanExecuted"/>
         <CommandBinding Command="local:ConsoleControl.Close" Executed="CloseCommand_Executed" CanExecute="CloseCommand_CanExecuted"/>
         <CommandBinding Command="local:ConsoleControl.Quit" Executed="QuitCommand_Executed"/>
         <CommandBinding Command="local:ConsoleControl.About" Executed="AboutCommand_Executed"/>
@@ -78,6 +80,17 @@
                     </sync:MenuItemAdv.Icon>
                 </sync:MenuItemAdv>
                 <sync:MenuItemSeparator/>
+                <sync:MenuItemAdv Command="local:ConsoleControl.UploadviaSFTP" ToolTip="Upload via SFTP">
+                    <sync:MenuItemAdv.Icon>
+                        <Image Source="imgs/sftpu.png" Height="28" Width="28"/>
+                    </sync:MenuItemAdv.Icon>
+                </sync:MenuItemAdv>
+                <sync:MenuItemAdv Command="local:ConsoleControl.DownloadviaSFTP" ToolTip="Download via SFTP">
+                    <sync:MenuItemAdv.Icon>
+                        <Image Source="imgs/sftpd.png" Height="28" Width="28"/>
+                    </sync:MenuItemAdv.Icon>
+                </sync:MenuItemAdv>
+                <sync:MenuItemSeparator/>
                 <sync:MenuItemAdv Command="local:ConsoleControl.OpenRuntimeConfiguration" ToolTip="Edit &amp; View Runtime Configuration">
                     <sync:MenuItemAdv.Icon>
                         <Image Source="imgs/cfg.png" Height="28" Width="28"/>
@@ -122,6 +135,17 @@
             <sync:ButtonAdv Command="local:ConsoleControl.DownloadviaFTP" SizeMode="Large" Label="FTP" Margin="2" Width="60" ToolTip="Download via FTP">
                 <sync:ButtonAdv.LargeIcon>
                     <BitmapImage  UriSource="imgs/ftpd.png"/>
+                </sync:ButtonAdv.LargeIcon>
+            </sync:ButtonAdv>
+            <sync:ToolBarItemSeparator/>
+            <sync:ButtonAdv Command="local:ConsoleControl.UploadviaSFTP" SizeMode="Large" Label="SFTP" Margin="2" Width="60" ToolTip="Upload via SFTP">
+                <sync:ButtonAdv.LargeIcon>
+                    <BitmapImage  UriSource="imgs/sftpu.png"/>
+                </sync:ButtonAdv.LargeIcon>
+            </sync:ButtonAdv>
+            <sync:ButtonAdv Command="local:ConsoleControl.DownloadviaSFTP" SizeMode="Large" Label="SFTP" Margin="2" Width="60" ToolTip="Download via SFTP">
+                <sync:ButtonAdv.LargeIcon>
+                    <BitmapImage  UriSource="imgs/sftpd.png"/>
                 </sync:ButtonAdv.LargeIcon>
             </sync:ButtonAdv>
             <sync:ToolBarItemSeparator/>

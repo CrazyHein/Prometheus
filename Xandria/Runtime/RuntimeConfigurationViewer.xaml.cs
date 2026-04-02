@@ -66,6 +66,11 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Xandria
                 var input = (c as CheckBox).Content as SfTextInputLayout;
                 (input?.InputView as TextBox)?.GetBindingExpression(TextBox.TextProperty).UpdateSource();
             }
+            foreach (var c in SLMPServiceSettings.Children)
+            {
+                var input = (c as CheckBox).Content as SfTextInputLayout;
+                (input?.InputView as TextBox)?.GetBindingExpression(TextBox.TextProperty).UpdateSource();
+            }
         }
 
         private void Cancel_Click(object sender, RoutedEventArgs e)

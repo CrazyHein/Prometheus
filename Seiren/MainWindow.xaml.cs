@@ -842,7 +842,27 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                 return;
             }
 
-            var wnd = new FTPUtility(FTPMode.Download,
+            var wnd = new FTPUtility(FTPMode.Download, Platform.R12CCPU,
+                   __variable_dictionary, (__variables_viewer.DataContext as VariablesModel).VariableNames,
+                   __controller_configuration, (__controller_configuration_viewer.DataContext as ControllerConfigurationModel).ReferenceNames,
+                   __object_dictionary, (__objects_viewer.DataContext as ObjectsModel).ObjectIndexes,
+                   __tx_diagnostic_area, __tx_bit_area, __tx_block_area,
+                   __rx_control_area, __rx_bit_area, __rx_block_area,
+                   __interlock_area, __misc_info, __data_type_catalogue, __controller_model_catalogue,
+                   __settings.FTPTargetProperty, __settings.AppInstallerProperty);
+            wnd.ShowDialog();
+        }
+
+        private void DownloadviaSFTPCommand_Executed(object sender, System.Windows.Input.ExecutedRoutedEventArgs e)
+        {
+            string? error = __update_binding_source();
+            if (error != null)
+            {
+                MessageBox.Show(error, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            var wnd = new FTPUtility(FTPMode.Download, Platform.MXRL,
                    __variable_dictionary, (__variables_viewer.DataContext as VariablesModel).VariableNames,
                    __controller_configuration, (__controller_configuration_viewer.DataContext as ControllerConfigurationModel).ReferenceNames,
                    __object_dictionary, (__objects_viewer.DataContext as ObjectsModel).ObjectIndexes,
@@ -867,7 +887,36 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                     return;
             }
 
-            var wnd = new FTPUtility(FTPMode.Upload,
+            var wnd = new FTPUtility(FTPMode.Upload, Platform.R12CCPU,
+                    __variable_dictionary, null,
+                    __controller_configuration, null,
+                    __object_dictionary, null,
+                    __tx_diagnostic_area, __tx_bit_area, __tx_block_area,
+                    __rx_control_area, __rx_bit_area, __rx_block_area,
+                    __interlock_area, __misc_info, __data_type_catalogue, __controller_model_catalogue,
+                    __settings.FTPTargetProperty, __settings.AppInstallerProperty);
+            if (wnd.ShowDialog() == true)
+            {
+                DebugConsole.WriteInfo($"Create new file with settings reading from connected controller.");
+                (__variable_dictionary, __controller_configuration, __object_dictionary,
+                        __tx_diagnostic_area, __tx_bit_area, __tx_block_area,
+                        __rx_control_area, __rx_bit_area, __rx_block_area,
+                        __interlock_area, __misc_info) = wnd.UploadResult;
+                __main_model.CurrentlyOpenFile = String.Empty;
+                __reset_layout();
+            }
+        }
+
+        private void UploadviaSFTPCommand_Executed(object sender, System.Windows.Input.ExecutedRoutedEventArgs e)
+        {
+            if ((__main_model.IsNonTemporaryFile && __data_model_has_changes()) || __main_model.IsTemporaryFile)
+            {
+                var res = MessageBox.Show("Discard the changes you have made ?", "Question", MessageBoxButton.YesNo, MessageBoxImage.Question);
+                if (res == MessageBoxResult.No)
+                    return;
+            }
+
+            var wnd = new FTPUtility(FTPMode.Upload, Platform.MXRL,
                     __variable_dictionary, null,
                     __controller_configuration, null,
                     __object_dictionary, null,
@@ -1101,7 +1150,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                 MessageBox.Show(__compare_result(wnd.ImportResult, (wnd.DataContext as ImportExportModel).XMLIO), "Comparison Result", MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
-        private void UploadCompareCommand_Executed(object sender, System.Windows.Input.ExecutedRoutedEventArgs e)
+        private void FTPUploadCompareCommand_Executed(object sender, System.Windows.Input.ExecutedRoutedEventArgs e)
         {
             string? error = __update_binding_source();
             if (error != null)
@@ -1110,7 +1159,27 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                 return;
             }
 
-            var wnd = new FTPUtility(FTPMode.Compare,
+            var wnd = new FTPUtility(FTPMode.Compare, Platform.R12CCPU,
+                    __variable_dictionary, null,
+                    __controller_configuration, null,
+                    __object_dictionary, null,
+                    __tx_diagnostic_area, __tx_bit_area, __tx_block_area,
+                    __rx_control_area, __rx_bit_area, __rx_block_area,
+                    __interlock_area, __misc_info, __data_type_catalogue, __controller_model_catalogue, __settings.FTPTargetProperty, __settings.AppInstallerProperty);
+            if (wnd.ShowDialog() == true)
+                MessageBox.Show(__compare_result(wnd.UploadResult, (wnd.DataContext as FTPUtilityModel).IO), "Comparison Result", MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+
+        private void SFTPUploadCompareCommand_Executed(object sender, System.Windows.Input.ExecutedRoutedEventArgs e)
+        {
+            string? error = __update_binding_source();
+            if (error != null)
+            {
+                MessageBox.Show(error, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            var wnd = new FTPUtility(FTPMode.Compare, Platform.MXRL,
                     __variable_dictionary, null,
                     __controller_configuration, null,
                     __object_dictionary, null,
@@ -1423,10 +1492,17 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren
                 MessageBox.Show("Perhaps you should first create a new file or open an existing one.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
         }
 
-        private void EventHistory_Executed(object sender, System.Windows.Input.ExecutedRoutedEventArgs e)
+        private void R12CCPUEventHistory_Executed(object sender, System.Windows.Input.ExecutedRoutedEventArgs e)
         {
 
-            EventLogViewer viewer = new EventLogViewer(__settings.FTPTargetProperty);
+            EventLogViewer viewer = new EventLogViewer(__settings.FTPTargetProperty, Platform.R12CCPU);
+            viewer.ShowDialog();
+        }
+
+        private void MXRLEventHistory_Executed(object sender, System.Windows.Input.ExecutedRoutedEventArgs e)
+        {
+
+            EventLogViewer viewer = new EventLogViewer(__settings.FTPTargetProperty, Platform.MXRL);
             viewer.ShowDialog();
         }
 
