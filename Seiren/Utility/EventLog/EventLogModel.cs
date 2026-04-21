@@ -120,10 +120,10 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility
                     using (var client = new SftpClient(HostIPv4, HostPort, User.Trim(), Password.Trim()) { OperationTimeout = TimeSpan.FromMilliseconds(ReadWriteTimeout) })
                     {
                         client.Connect();
-                        foreach (var f in client.ListDirectory(__MXRL_LOGS_PATH))
+                        foreach (var f in client.ListDirectory(__MXRL_LOGS_PATH).Where(f => f.IsDirectory == false && f.Name.EndsWith("txt")).OrderBy(f => f.Name))
                         {
-                            if (f.IsDirectory || f.Name.EndsWith("txt") == false)
-                                continue;
+                            //if (f.IsDirectory || f.Name.EndsWith("txt") == false)
+                            //    continue;
                             using (System.IO.MemoryStream mm = new MemoryStream())
                             {
                                 client.DownloadFile(f.FullName, mm);

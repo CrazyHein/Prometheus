@@ -327,6 +327,14 @@
                                 <TextBox FontStyle="Normal" Text="{Binding Configuration.SLMPServiceConfiguration.DevDSize, ValidatesOnExceptions=True, NotifyOnValidationError=True}"/>
                             </sync:SfTextInputLayout>
                         </CheckBox>
+                        <CheckBox IsChecked="{Binding Configuration.SLMPServiceConfiguration.CustomDevWSize}" HorizontalContentAlignment="Stretch">
+                            <sync:SfTextInputLayout Hint="DevW Size(words)" 
+                                         HelperText="Set the number of the DevW devices" 
+                                         ErrorText="Please input a positive number or zero"
+                                         ContainerType="Filled"  FontStyle="Italic" FontSize="12" Margin="4" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}">
+                                <TextBox FontStyle="Normal" Text="{Binding Configuration.SLMPServiceConfiguration.DevWSize, ValidatesOnExceptions=True, NotifyOnValidationError=True}"/>
+                            </sync:SfTextInputLayout>
+                        </CheckBox>
                     </StackPanel>
                 </GroupBox>
             </Grid>

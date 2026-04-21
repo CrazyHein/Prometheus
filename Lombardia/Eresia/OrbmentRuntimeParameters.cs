@@ -296,6 +296,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia.OrbmentPa
         }
         public uint BufferSize { get; set; } = 4096;
         public uint DevDSize { get; set; } = 1024*1024;
+        public uint DevWSize { get; set; } = 1024*1024;
 
         public bool CustomPosixPriority { get; set; } = false;
         public bool CustomPort { get; set; } = false;
@@ -303,6 +304,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia.OrbmentPa
         public bool CustomSendTimeout { get; set; } = false;
         public bool CustomBufferSize { get; set; } = false;
         public bool CustomDevDSize { get; set; } = false;
+        public bool CustomDevWSize { get; set; } = false;
 
         public void ApplyDeviceRuntimeDefault()
         {
@@ -312,6 +314,7 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia.OrbmentPa
             CustomSendTimeout = false;
             CustomBufferSize = false;
             CustomDevDSize = false;
+            CustomDevWSize = false;
         }
 
         public SLMPServiceConfiguration ShallowCopy()
@@ -530,6 +533,11 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia.OrbmentPa
                                 {
                                     SLMPServiceConfiguration.DevDSize = Convert.ToUInt32(sub.SelectSingleNode("DevD/Size").FirstChild.Value);
                                     SLMPServiceConfiguration.CustomDevDSize = true; 
+                                }
+                                if (sub.SelectSingleNode("DevW/Size") != null)
+                                {
+                                    SLMPServiceConfiguration.DevWSize = Convert.ToUInt32(sub.SelectSingleNode("DevW/Size").FirstChild.Value);
+                                    SLMPServiceConfiguration.CustomDevWSize = true;
                                 }
                                 break;
                         }
@@ -782,6 +790,14 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia.OrbmentPa
                 propertyNode = doc.CreateElement("DevD");
                 var subPropertyNode = doc.CreateElement("Size");
                 subPropertyNode.AppendChild(doc.CreateTextNode(SLMPServiceConfiguration.DevDSize.ToString()));
+                propertyNode.AppendChild(subPropertyNode);
+                areaNode.AppendChild(propertyNode);
+            }
+            if (SLMPServiceConfiguration.CustomDevWSize)
+            {
+                propertyNode = doc.CreateElement("DevW");
+                var subPropertyNode = doc.CreateElement("Size");
+                subPropertyNode.AppendChild(doc.CreateTextNode(SLMPServiceConfiguration.DevWSize.ToString()));
                 propertyNode.AppendChild(subPropertyNode);
                 areaNode.AppendChild(propertyNode);
             }

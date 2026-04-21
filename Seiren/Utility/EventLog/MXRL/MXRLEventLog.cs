@@ -27,12 +27,12 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility.MXRL
         private static Regex __PATTERN;
         private List<Log> __logs = new List<Log>();
 
-        public IEnumerable<Log> Records { get { return __logs.OrderByDescending(i => i.DateTime); }}
-
+        //public IEnumerable<Log> Records { get { return __logs.OrderByDescending(i => i.DateTime); }}
+        public IEnumerable<Log> Records { get { return (__logs as IEnumerable<Log>).Reverse(); } }
 
         static EventLog()
         {
-            __PATTERN = new Regex(@"^\s*\[(.+)\]\s*\[([0-9,a-f,A-F]{4})\|([0-9,a-f,A-F]{8})\]\s*(.+)\s*->\s*(.+)$", RegexOptions.Compiled);
+            __PATTERN = new Regex(@"^\s*\[([0-9.:\- ]+)\]\s*\[([0-9,a-f,A-F]{4})\|([0-9,a-f,A-F]{8})\]\s*(.+)\s*->\s*(.+)$", RegexOptions.Compiled);
         }
 
         public void Append(string logFileContent)
