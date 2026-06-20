@@ -845,57 +845,60 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Recipe
             uint version = 0;
             string assembly = string.Empty;
 
-            JsonObject root = JsonNode.Parse(File.OpenRead(path)).AsObject();
-
-            if (root.TryGetPropertyValue("VERSION", out var versionNode) && versionNode.GetValueKind() == JsonValueKind.Number)
-                version = versionNode.GetValue<uint>();
-            if (version == 0)
-                throw new NapishtimDocumentException(NapishtimExceptionCode.DOCUMENT_FILE_VERSION_UNSUPPORTED, $"No version information is read or the version information is invalid.");
-            if (version > RecipeDocument.SupportedScriptFileFormatVersion)
-                throw new NapishtimDocumentException(NapishtimExceptionCode.DOCUMENT_FILE_VERSION_UNSUPPORTED, $"The file version is {version}, the supported version is up to {RecipeDocument.SupportedSourceFileFormatVersion}.");
-
-            if (root.TryGetPropertyValue("SCRIPT_ASSEMBLY", out var assemblyNode) && assemblyNode.GetValueKind() == JsonValueKind.String)
-                assembly = assemblyNode.GetValue<string>();
-            if (String.IsNullOrEmpty(assembly))
-                throw new NapishtimDocumentException(NapishtimExceptionCode.DOCUMENT_FILE_ASSEMBLY_MISMATCH, $"No assembly information is read or the assembly information is invalid.");
-            if (assembly != typeof(RecipeDocument).FullName)
-                throw new NapishtimDocumentException(NapishtimExceptionCode.DOCUMENT_FILE_ASSEMBLY_MISMATCH, $"Read assembly: {assembly}; \nDesired assmebly: {typeof(RecipeDocument).FullName};");
-
-            if (root.TryGetPropertyValue("INITIALIZATION_LIST", out var initializationNode) && initializationNode.GetValueKind() == JsonValueKind.Object)
-                initializationList = new InitializationList(initializationNode.AsObject());
-            else
-                initializationList = new InitializationList();
-
-            if (root.TryGetPropertyValue("GLOBAL_EVENTS", out var globalNodes) && globalNodes.GetValueKind() == JsonValueKind.Array)
+            using (var fs = File.OpenRead(path))
             {
-                foreach (var globalNode in globalNodes.AsArray())
+                JsonObject root = JsonNode.Parse(fs).AsObject();
+
+                if (root.TryGetPropertyValue("VERSION", out var versionNode) && versionNode.GetValueKind() == JsonValueKind.Number)
+                    version = versionNode.GetValue<uint>();
+                if (version == 0)
+                    throw new NapishtimDocumentException(NapishtimExceptionCode.DOCUMENT_FILE_VERSION_UNSUPPORTED, $"No version information is read or the version information is invalid.");
+                if (version > RecipeDocument.SupportedScriptFileFormatVersion)
+                    throw new NapishtimDocumentException(NapishtimExceptionCode.DOCUMENT_FILE_VERSION_UNSUPPORTED, $"The file version is {version}, the supported version is up to {RecipeDocument.SupportedSourceFileFormatVersion}.");
+
+                if (root.TryGetPropertyValue("SCRIPT_ASSEMBLY", out var assemblyNode) && assemblyNode.GetValueKind() == JsonValueKind.String)
+                    assembly = assemblyNode.GetValue<string>();
+                if (String.IsNullOrEmpty(assembly))
+                    throw new NapishtimDocumentException(NapishtimExceptionCode.DOCUMENT_FILE_ASSEMBLY_MISMATCH, $"No assembly information is read or the assembly information is invalid.");
+                if (assembly != typeof(RecipeDocument).FullName)
+                    throw new NapishtimDocumentException(NapishtimExceptionCode.DOCUMENT_FILE_ASSEMBLY_MISMATCH, $"Read assembly: {assembly}; \nDesired assmebly: {typeof(RecipeDocument).FullName};");
+
+                if (root.TryGetPropertyValue("INITIALIZATION_LIST", out var initializationNode) && initializationNode.GetValueKind() == JsonValueKind.Object)
+                    initializationList = new InitializationList(initializationNode.AsObject());
+                else
+                    initializationList = new InitializationList();
+
+                if (root.TryGetPropertyValue("GLOBAL_EVENTS", out var globalNodes) && globalNodes.GetValueKind() == JsonValueKind.Array)
                 {
-                    uint idx = globalNode["ID"].GetValue<uint>();
-                    string name = globalNode["NAME"].GetValue<string>();
-                    Event evt = Event.MAKE(globalNode["EVENT"]);
-                    globals.Add((idx, name, evt));
+                    foreach (var globalNode in globalNodes.AsArray())
+                    {
+                        uint idx = globalNode["ID"].GetValue<uint>();
+                        string name = globalNode["NAME"].GetValue<string>();
+                        Event evt = Event.MAKE(globalNode["EVENT"]);
+                        globals.Add((idx, name, evt));
+                    }
                 }
-            }
-            Dictionary<uint, Event> globalEvents = new Dictionary<uint, Event>(globals.Select(x => KeyValuePair.Create(x.idx, x.evt)));
+                Dictionary<uint, Event> globalEvents = new Dictionary<uint, Event>(globals.Select(x => KeyValuePair.Create(x.idx, x.evt)));
 
-            if (root.TryGetPropertyValue("EXCEPTION_RESPONSE", out var exceptionNodes) && exceptionNodes.GetValueKind() == JsonValueKind.Object)
-            {
-                uint inlineEventIndex = 10000;
-                exception = new ExceptionResponse(root["EXCEPTION_RESPONSE"], globalEvents, ref inlineEventIndex);
-            }
-
-            if (root.TryGetPropertyValue("STEPS", out var stepNodes) && stepNodes.GetValueKind() == JsonValueKind.Array)
-            {
-                foreach (var stepNode in stepNodes.AsArray())
+                if (root.TryGetPropertyValue("EXCEPTION_RESPONSE", out var exceptionNodes) && exceptionNodes.GetValueKind() == JsonValueKind.Object)
                 {
-                    string name = stepNode["NAME"].GetValue<string>();
                     uint inlineEventIndex = 10000;
-                    Step stp = new Step(stepNode["STEP"], globalEvents, ref inlineEventIndex);
-                    steps.Add((name, stp));
+                    exception = new ExceptionResponse(root["EXCEPTION_RESPONSE"], globalEvents, ref inlineEventIndex);
                 }
-            }
 
-            return (initializationList, globals, steps, exception);
+                if (root.TryGetPropertyValue("STEPS", out var stepNodes) && stepNodes.GetValueKind() == JsonValueKind.Array)
+                {
+                    foreach (var stepNode in stepNodes.AsArray())
+                    {
+                        string name = stepNode["NAME"].GetValue<string>();
+                        uint inlineEventIndex = 10000;
+                        Step stp = new Step(stepNode["STEP"], globalEvents, ref inlineEventIndex);
+                        steps.Add((name, stp));
+                    }
+                }
+
+                return (initializationList, globals, steps, exception);
+            }
         }
     }
 }
