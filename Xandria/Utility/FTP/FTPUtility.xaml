@@ -66,7 +66,7 @@
             </sync:SfTextInputLayout>
             
             <sync:SfTextInputLayout Grid.Row="3" Grid.ColumnSpan="2" Hint="Task User Parameters File" HelperText="Input user task parameters file name here" ContainerType="Filled" FontStyle="Italic" FontSize="12" Margin="4,8,4,8" HasError="{Binding RelativeSource={RelativeSource self}, Path = InputView.(Validation.HasError)}">
-                <TextBox Text="{Binding TaskUserParametersPath, ValidatesOnExceptions=True, NotifyOnValidationError=True}" FontStyle="Normal" IsReadOnly="True"/>
+                <TextBox Text="{Binding TaskUserParametersPath, ValidatesOnExceptions=True, NotifyOnValidationError=True}" FontStyle="Normal"/>
             </sync:SfTextInputLayout>
 
             <CheckBox Name="ChkboxDownloadOrbment" Content="Download Orbment Runtime Binary" Grid.Row="5" Grid.Column="0" Margin="4,8,4,8"/>

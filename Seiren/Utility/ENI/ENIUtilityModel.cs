@@ -1,4 +1,5 @@
 ﻿using AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Lombardia;
+using Syncfusion.Windows.Shared;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -59,9 +60,11 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility
                     foreach (XmlNode varEntry in pdoNode.SelectNodes("Entry"))
                     {
                         ushort varSize = Convert.ToUInt16(varEntry.SelectSingleNode("BitLen").FirstChild.Value);
-                        if (varEntry.SelectSingleNode("Name") != null)
+                        if (varEntry.SelectSingleNode("Name") != null && varEntry.SelectSingleNode("Name").FirstChild != null)
                         {
                             string? varName = varEntry.SelectSingleNode("Name").FirstChild.Value;
+                            if (varName.IsNullOrWhiteSpace())
+                                continue;
                             string? varType = varEntry.SelectSingleNode("DataType").FirstChild.Value.ToUpper();
                             ushort varIndex = Convert.ToUInt16(varEntry.SelectSingleNode("Index").FirstChild.Value.Substring(2), 16);
                             byte varSubIndex = Convert.ToByte(varEntry.SelectSingleNode("SubIndex").FirstChild.Value, 10);
@@ -86,9 +89,11 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Seiren.Utility
                     foreach (XmlNode varEntry in pdoNode.SelectNodes("Entry"))
                     {
                         ushort varSize = Convert.ToUInt16(varEntry.SelectSingleNode("BitLen").FirstChild.Value);
-                        if (varEntry.SelectSingleNode("Name") != null)
+                        if (varEntry.SelectSingleNode("Name") != null && varEntry.SelectSingleNode("Name").FirstChild != null)
                         {
                             string? varName = varEntry.SelectSingleNode("Name").FirstChild.Value;
+                            if (varName.IsNullOrWhiteSpace())
+                                continue;
                             string? varType = varEntry.SelectSingleNode("DataType").FirstChild.Value.ToUpper();
                             ushort varIndex = Convert.ToUInt16(varEntry.SelectSingleNode("Index").FirstChild.Value.Substring(2), 16);
                             byte varSubIndex = Convert.ToByte(varEntry.SelectSingleNode("SubIndex").FirstChild.Value, 10);
