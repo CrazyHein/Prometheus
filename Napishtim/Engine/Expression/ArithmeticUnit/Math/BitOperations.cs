@@ -176,4 +176,21 @@ namespace AMEC.PCSoftware.RemoteConsole.CrazyHein.Prometheus.Napishtim.Engine.Ex
             throw new NotImplementedException();
         }
     }
+
+    [ArithmeticUnitUsage("BitOperation", "INVBIT(a,n): Converts 'a' to an unsigned 32-bit integer, flip the n-th bit of the integer and returns the result.")]
+    public class INVBIT : ArithmeticUnit
+    {
+        public INVBIT(IReadOnlyList<Expression> parameters) : base(parameters)
+        {
+            if (parameters.Count != 2)
+                throw new NapishtimScriptException(NapishtimExceptionCode.SCRIPT_EXPRESSION_SPRITE_SYNTAX_ERROR,
+                    this.GetType().GetCustomAttribute<ArithmeticUnitUsageAttribute>().Usage);
+        }
+        public override string Name => "INVBIT";
+
+        public override double Value()
+        {
+            throw new NotImplementedException();
+        }
+    }
 }
